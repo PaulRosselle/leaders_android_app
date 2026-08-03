@@ -2,7 +2,7 @@ package com.leaders.gamelogic.entities;
 
 import androidx.annotation.NonNull;
 
-public class Cell {
+public final class Cell {
     @NonNull
     private final Position position;
     private Character character;

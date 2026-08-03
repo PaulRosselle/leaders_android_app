@@ -7,7 +7,7 @@ import com.leaders.gamelogic.enums.TeamColor;
 
 import java.util.UUID;
 
-public class Character {
+public final class Character {
     @NonNull
     private final UUID id;
     @NonNull
