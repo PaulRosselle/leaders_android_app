@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.leaders.gamelogic.enums.TeamColor;
 
-public class Player {
+public final class Player {
     @NonNull
     private final TeamColor teamColor;
     @NonNull

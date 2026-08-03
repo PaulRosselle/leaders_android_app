@@ -6,7 +6,7 @@ import com.leaders.gamelogic.enums.GameActionType;
 import com.leaders.gamelogic.enums.TransitionTarget;
 import com.leaders.gamelogic.enums.TransitionType;
 
-public class TransitionAction implements IGameAction {
+public final class TransitionAction implements IGameAction {
     @Override
     public GameActionType getActionType() {
         return GameActionType.Transition;

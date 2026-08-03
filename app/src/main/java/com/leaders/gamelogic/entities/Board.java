@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-public class Board {
+public final class Board {
     // There is as many column as the diameter of the hexagonal board
     private static final int COLUMN_COUNT = Position.HEX_RADIUS * 2 + 1;
 
