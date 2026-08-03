@@ -1,17 +1,45 @@
 package com.leaders.gamelogic.enums;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.NoSuchElementException;
 
 public enum Direction {
-    Top,
-    TopRight,
-    BottomRight,
-    Bottom,
-    BottomLeft,
-    TopLeft;
+    Top (0, -1, 1),
+    TopRight (1, -1, 0),
+    BottomRight (1, 0, -1),
+    Bottom (0, 1, -1),
+    BottomLeft (-1, 1, 0),
+    TopLeft (-1, 0, 1);
+
+    private static final Direction[] CLOCKWISE_DIRECTIONS = {
+        Top,
+        TopRight,
+        BottomRight,
+        Bottom,
+        BottomLeft,
+        TopLeft
+    };
+
+    private final int q;
+    private final int r;
+    private final int s;
+
+    Direction(int q, int r, int s) {
+        this.q = q;
+        this.r = r;
+        this.s = s;
+    }
+
+    public int getQ() {
+        return q;
+    }
+
+    public int getR() {
+        return r;
+    }
+
+    public int getS() {
+        return s;
+    }
 
     /**
      * Returns the direction opposite to this one.
@@ -20,36 +48,7 @@ public enum Direction {
      * @throws NoSuchElementException if no opposite direction is found
      */
     public Direction getOpposite() {
-        switch (this) {
-            case Top: return Bottom;
-            case TopRight: return BottomLeft;
-            case BottomRight: return TopLeft;
-            case Bottom: return Top;
-            case BottomLeft: return TopRight;
-            case TopLeft: return BottomRight;
-            default: throw new NoSuchElementException(String.format("No opposite direction found for %s", this));
-        }
-    }
-
-    /**
-     * Indicates whether this direction lies on the vertical axis (top or bottom).
-     */
-    public boolean isSameColumn() {
-        return this == Direction.Top || this == Direction.Bottom;
-    }
-
-    /**
-     * Indicates whether this direction points towards the top.
-     */
-    public boolean isTop() {
-        return this == Direction.Top || this == Direction.TopLeft || this == Direction.TopRight;
-    }
-
-    /**
-     * Indicates whether this direction points towards the left.
-     */
-    public boolean isLeft() {
-        return this == Direction.TopLeft || this == Direction.BottomLeft;
+        return CLOCKWISE_DIRECTIONS[(ordinal() + CLOCKWISE_DIRECTIONS.length / 2) % CLOCKWISE_DIRECTIONS.length];
     }
 
     /**
@@ -60,18 +59,7 @@ public enum Direction {
      * @return the next {@link Direction}
      */
     public Direction getNext(boolean clockwise) {
-        // We add every direction in clockwise order.
-        // For the function to cycle automatically, we add again the first direction at the end of the list
-        ArrayList<Direction> directionsInOrder = new ArrayList<>(
-                Arrays.asList(Direction.Top, Direction.TopRight, Direction.BottomRight,
-                    Direction.Bottom, Direction.BottomLeft, Direction.TopLeft, Direction.Top)
-        );
-        // We just have to reverse the list order to get the next direction counter-clockwise
-        if (!clockwise) {
-            Collections.reverse(directionsInOrder);
-        }
-        // Since the last direction is always a repetition of the first one, we are
-        // sure to never get out of bounds by getting the next direction with the enum ord + 1
-        return directionsInOrder.get(this.ordinal() + 1);
+        int offset = clockwise ? 1 : -1;
+        return CLOCKWISE_DIRECTIONS[Math.floorMod(ordinal() + offset, CLOCKWISE_DIRECTIONS.length)];
     }
 }

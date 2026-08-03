@@ -8,18 +8,20 @@ import com.leaders.gamelogic.enums.TeamColor;
 import java.util.UUID;
 
 public class Character {
+    @NonNull
     private final UUID id;
     @NonNull
     private final CharacterType characterType;
     @NonNull
     private final TeamColor teamColor;
 
-    public Character(UUID id, @NonNull CharacterType characterType, @NonNull TeamColor teamColor) {
+    public Character(@NonNull UUID id, @NonNull CharacterType characterType, @NonNull TeamColor teamColor) {
         this.id = id;
         this.characterType = characterType;
         this.teamColor = teamColor;
     }
 
+    @NonNull
     public UUID getId() {
         return id;
     }

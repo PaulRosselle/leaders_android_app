@@ -1,6 +1,9 @@
 package com.leaders.gamelogic.entities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.leaders.gamelogic.enums.Direction;
 
 import java.util.Objects;
 
@@ -13,11 +16,17 @@ import java.util.Objects;
  * which are more convenient for hexagonal board operations such as distance
  * computation or alignment checks.
  * <p>
+ * Axial/cubic coordinates are considered the canonical representation of a
+ * position. Offset coordinates are only used to represent the physical layout
+ * of the board as columns and rows. All geometric operations, such as
+ * translations, distance calculations, and neighbor lookups, are performed
+ * using axial/cubic coordinates.
+ * <p>
  * Instances are immutable and validated at construction: a {@link Position}
  * can only represent a cell that actually lies within the hexagon.
  */
 public final class Position {
-    private static final int HEX_RADIUS = 3;
+    public static final int HEX_RADIUS = 3;
 
     private final int x;
     private final int y;
@@ -34,18 +43,76 @@ public final class Position {
      * @throws IllegalArgumentException if the resulting position falls outside
      *                                   the hexagonal board
      */
-    public Position(int x, int y) {
+    Position(int x, int y) {
+        int[] axialCoordinates = toAxial(x, y);
+        if (!isWithinHexagon(axialCoordinates[0], axialCoordinates[1], axialCoordinates[2])) {
+            throw new IllegalArgumentException("Out of range position: (" + x + ", " + y + ")");
+        }
+
         this.x = x;
         this.y = y;
 
-        int[] axialCoordinates = toAxial(x, y);
         this.q = axialCoordinates[0];
         this.r = axialCoordinates[1];
         this.s = axialCoordinates[2];
+    }
 
+    /**
+     * Creates a position directly from axial/cubic coordinates.
+     * <p>
+     * The provided coordinates must satisfy the cube-coordinate invariant
+     * {@code q + r + s == 0} and lie within the hexagonal board.
+     *
+     * @param q the axial q-coordinate
+     * @param r the axial r-coordinate
+     * @param s the axial s-coordinate
+     * @throws IllegalArgumentException if the coordinates do not represent
+     *                                  a valid position on the board
+     */
+    private Position(int q, int r, int s) {
         if (!isWithinHexagon(q, r, s)) {
-            throw new IllegalArgumentException("Out of range position: (" + x + ", " + y + ")");
+            throw new IllegalArgumentException("Out of range position: (" + q + ", " + r + ", " + s + ")");
         }
+        this.q = q;
+        this.r = r;
+        this.s = s;
+
+        x = q + HEX_RADIUS;
+        y = r - Math.max(-HEX_RADIUS, -q - HEX_RADIUS);
+    }
+
+    /**
+     * Returns the position obtained by translating this position by the given
+     * axial/cubic offset.
+     *
+     * @param translationQ the translation along the q-axis
+     * @param translationR the translation along the r-axis
+     * @param translationS the translation along the s-axis
+     * @return the translated position, or {@code null} if the resulting
+     *         position lies outside the board
+     */
+    @Nullable
+    public Position translated(int translationQ, int translationR, int translationS) {
+        int translatedQ = q + translationQ;
+        int translatedR = r + translationR;
+        int translatedS = s + translationS;
+
+        if (isWithinHexagon(translatedQ, translatedR, translatedS)) {
+            return new Position(translatedQ, translatedR, translatedS);
+        }
+        return null;
+    }
+
+    /**
+     * Returns the adjacent position in the given direction.
+     *
+     * @param direction the direction of the adjacent position
+     * @return the adjacent position, or {@code null} if this position lies on
+     *         the edge of the board in the given direction
+     */
+    @Nullable
+    public Position adjacent(Direction direction) {
+        return translated(direction.getQ(), direction.getR(), direction.getS());
     }
 
     public int getX() {
@@ -145,7 +212,8 @@ public final class Position {
      * @return {@code true} if the position is within the hexagon, {@code false} otherwise
      */
     public static boolean isWithinHexagon(int q, int r, int s) {
-        return Math.abs(q) <= HEX_RADIUS && Math.abs(r) <= HEX_RADIUS && Math.abs(s) <= HEX_RADIUS;
+        return q + r + s == 0 &&
+                Math.abs(q) <= HEX_RADIUS && Math.abs(r) <= HEX_RADIUS && Math.abs(s) <= HEX_RADIUS;
     }
 
     @Override
