@@ -9,7 +9,7 @@ import java.util.NoSuchElementException;
 
 public final class Board {
     // There is as many column as the diameter of the hexagonal board
-    private static final int COLUMN_COUNT = Position.HEX_RADIUS * 2 + 1;
+    public static final int COLUMN_COUNT = Position.HEX_RADIUS * 2 + 1;
 
     @NonNull
     private final Map<Position, Cell> cells;
@@ -24,7 +24,7 @@ public final class Board {
         }
     }
 
-    private static int getRowCount(int columnIdx) {
+    public static int getRowCount(int columnIdx) {
         return COLUMN_COUNT - Math.abs(columnIdx - Position.HEX_RADIUS);
     }
 

@@ -43,7 +43,7 @@ public final class Position {
      * @throws IllegalArgumentException if the resulting position falls outside
      *                                   the hexagonal board
      */
-    Position(int x, int y) {
+    public Position(int x, int y) {
         int[] axialCoordinates = toAxial(x, y);
         if (!isWithinHexagon(axialCoordinates[0], axialCoordinates[1], axialCoordinates[2])) {
             throw new IllegalArgumentException("Out of range position: (" + x + ", " + y + ")");
