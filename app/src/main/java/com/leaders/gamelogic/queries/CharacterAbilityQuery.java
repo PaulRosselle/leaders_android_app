@@ -117,15 +117,13 @@ public final class CharacterAbilityQuery {
      * act immediately after one another.</p>
      *
      * @param currentActionsPhase the current actions phase
-     * @param currentTeamColor the color of the team whose turn it is
      * @param character the character being evaluated
      * @return {@code true} if the character can act
      */
     public static boolean canAct(@NonNull ActionsPhase currentActionsPhase,
-                                 @NonNull TeamColor currentTeamColor,
                                  @NonNull Character character) {
         // Characters are only allowed to act during a turn matching their team colors
-        if (character.getTeamColor() != currentTeamColor) {
+        if (character.getTeamColor() != currentActionsPhase.getTurnTeamColor()) {
             return false;
         }
 
@@ -200,9 +198,10 @@ public final class CharacterAbilityQuery {
                 !currentActionsPhase.getActions().isEmpty()) {
             List<CharacterAction> characterActions = currentActionsPhase.getCharacterActions();
             CharacterAction lastAction = characterActions.get(characterActions.size() - 1);
-            // If we find a leader movement in the action targets, the Nemesis is forced to play
+            // If we find an enemy leader movement in the action targets, the Nemesis is forced to play
             for (CharacterActionTarget actionTarget : lastAction.getTargets()) {
                 if (actionTarget.getCharacter().getCharacterType().getCharacterCard().isLeader() &&
+                        actionTarget.getCharacter().getTeamColor() != character.getTeamColor() &&
                         actionTarget.getOriginPos() != null && actionTarget.getDestPos() != null) {
                     return true;
                 }

@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 
 import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.actions.TransitionAction;
+import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.enums.TransitionTarget;
 import com.leaders.gamelogic.historyentries.IPhase;
 import com.leaders.gamelogic.historyentries.Segment;
@@ -15,8 +16,8 @@ public final class RecruitmentPhase extends TurnPhase {
     @NonNull
     private final ArrayList<IGameAction> actions;
 
-    public RecruitmentPhase(@Nullable TransitionAction startAction, @Nullable TransitionAction endAction) {
-        super(startAction, endAction);
+    public RecruitmentPhase(@Nullable TransitionAction startAction, @Nullable TransitionAction endAction, @NonNull TeamColor turnTeamColor) {
+        super(startAction, endAction, turnTeamColor);
         actions = new ArrayList<>();
     }
 
