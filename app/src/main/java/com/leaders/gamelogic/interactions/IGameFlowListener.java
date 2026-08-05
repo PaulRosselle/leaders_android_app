@@ -18,7 +18,7 @@ public interface IGameFlowListener {
 
     /**
      * Fired once when the game session starts, before the first turn.
-     * <p>
+     *
      * @param game the current game state at session start
      * @return a future completed when the caller has finished handling the event
      */
@@ -27,7 +27,7 @@ public interface IGameFlowListener {
 
     /**
      * Fired once when the game session ends.
-     * <p>
+     *
      * @param winner the winning player
      * @return a future completed when the caller has finished handling the event
      */
@@ -36,7 +36,7 @@ public interface IGameFlowListener {
 
     /**
      * Fired whenever the game enters a new phase.
-     * <p>
+     *
      * @param phase the incoming game phase
      * @return a future completed when the caller has finished handling the event
      */
