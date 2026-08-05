@@ -12,6 +12,8 @@ import com.leaders.gamelogic.enums.Direction;
 import com.leaders.gamelogic.enums.TeamColor;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -110,6 +112,64 @@ public final class BoardQuery {
             }
         }
         return null;
+    }
+
+    /**
+     * Returns the cell adjacent to the given position in the specified direction.
+     *
+     * @param board the board containing the cells
+     * @param position the reference position
+     * @param direction the direction of the adjacent cell
+     * @return the adjacent cell, or {@code null} if the position has no adjacent
+     *         cell in the specified direction
+     */
+    public static Cell findAdjacentCell(@NonNull Board board,
+                                        @NonNull Position position, @NonNull Direction direction) {
+        Position adjacentPos = position.adjacent(direction);
+        return adjacentPos != null ? board.getCell(adjacentPos) : null;
+    }
+
+    /**
+     * Recursively collects empty cells adjacent to the given position up to the
+     * specified maximum distance.
+     *
+     * @param adjacentEmptyCells the set collecting the discovered empty cells
+     * @param board the board to search on
+     * @param currentPosition the current search position
+     * @param currentDistance the current distance from the initial position
+     * @param maxDistance the maximum search distance
+     */
+    private static void gatherAdjacentEmptyCells(@NonNull LinkedHashSet<Cell> adjacentEmptyCells,
+                                                 @NonNull Board board,
+                                                 @NonNull Position currentPosition,
+                                                 int currentDistance, int maxDistance) {
+        for (Direction direction : Direction.values()) {
+            // Add the adjacent empty cell if it has not been visited yet,
+            // then continue the search until the maximum distance is reached.
+            Cell adjacentCell = findAdjacentCell(board, currentPosition, direction);
+            if (adjacentCell != null && adjacentCell.getCharacter() == null &&
+                    adjacentEmptyCells.add(adjacentCell) && currentDistance < maxDistance) {
+                gatherAdjacentEmptyCells(adjacentEmptyCells, board, adjacentCell.getPosition(),
+                        currentDistance + 1, maxDistance);
+            }
+        }
+    }
+
+    /**
+     * Finds all empty cells reachable from the given position within the specified
+     * maximum distance.
+     *
+     * @param board the board to search on
+     * @param position the center position of the search
+     * @param maxDistance the maximum search distance
+     * @return a list of empty cells within the specified distance
+     */
+    public static List<Cell> findEmptyCellsAround(@NonNull Board board, @NonNull Position position,
+                                                  int maxDistance) {
+        LinkedHashSet<Cell> emptyCellsAround = new LinkedHashSet<>();
+        // Since the distance to an immediately adjacent cell is 1, we initialize "currentDistance" with this value
+        gatherAdjacentEmptyCells(emptyCellsAround, board, position, 1, maxDistance);
+        return new ArrayList<>(emptyCellsAround);
     }
 
     /**
