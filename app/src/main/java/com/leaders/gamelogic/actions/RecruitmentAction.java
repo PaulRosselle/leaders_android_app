@@ -2,6 +2,7 @@ package com.leaders.gamelogic.actions;
 
 import androidx.annotation.NonNull;
 
+import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.GameActionType;
 
@@ -22,7 +23,7 @@ public final class RecruitmentAction implements IGameAction {
     }
 
     @NonNull
-    public Character getCharacter() {
+    public com.leaders.gamelogic.entities.Character getCharacter() {
         return character;
     }
 
