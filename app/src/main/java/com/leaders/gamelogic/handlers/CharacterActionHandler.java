@@ -14,7 +14,7 @@ import com.leaders.gamelogic.entities.Game;
  * 3. removal (OriginPos → null)
  * 4. targeting only (null → null) - identifies a target without modifying the board
  */
-public final class CharacterActionHandler extends ActionHandler {
+public final class CharacterActionHandler extends GameActionHandler {
     @NonNull
     private final CharacterAction characterAction;
     public CharacterActionHandler(@NonNull Game game, @NonNull CharacterAction characterAction) {

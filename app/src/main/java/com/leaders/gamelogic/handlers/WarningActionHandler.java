@@ -7,7 +7,7 @@ import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.enums.WarningType;
 
-public final class WarningActionHandler extends ActionHandler {
+public final class WarningActionHandler extends GameActionHandler {
     @NonNull
     private final WarningAction warningAction;
 

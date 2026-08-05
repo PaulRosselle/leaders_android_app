@@ -4,11 +4,11 @@ import androidx.annotation.NonNull;
 
 import com.leaders.gamelogic.entities.Game;
 
-public abstract class ActionHandler {
+public abstract class GameActionHandler {
     @NonNull
     protected final Game game;
 
-    public ActionHandler(@NonNull Game game) {
+    public GameActionHandler(@NonNull Game game) {
         this.game = game;
     }
 

@@ -5,7 +5,7 @@ import androidx.annotation.NonNull;
 import com.leaders.gamelogic.actions.BanishmentAction;
 import com.leaders.gamelogic.entities.Game;
 
-public final class BanishmentActionHandler extends ActionHandler {
+public final class BanishmentActionHandler extends GameActionHandler {
     @NonNull
     private final BanishmentAction banishmentAction;
 
