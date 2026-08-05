@@ -8,7 +8,6 @@ import com.leaders.gamelogic.enums.GamePhaseType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.enums.TransitionTarget;
 import com.leaders.gamelogic.historyentries.IHistoryEntry;
-import com.leaders.gamelogic.historyentries.IPhase;
 import com.leaders.gamelogic.historyentries.Segment;
 
 import java.util.ArrayList;
