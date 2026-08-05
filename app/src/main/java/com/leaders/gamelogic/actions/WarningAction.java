@@ -15,10 +15,12 @@ public final class WarningAction implements IGameAction {
     private final WarningType warningType;
     @NonNull
     private final TeamColor teamColor;
+    private final int countChange;
 
-    public WarningAction(@NonNull WarningType warningType, @NonNull TeamColor teamColor) {
+    public WarningAction(@NonNull WarningType warningType, @NonNull TeamColor teamColor, int countChange) {
         this.warningType = warningType;
         this.teamColor = teamColor;
+        this.countChange = countChange;
     }
 
     @NonNull
@@ -29,5 +31,9 @@ public final class WarningAction implements IGameAction {
     @NonNull
     public TeamColor getTeamColor() {
         return teamColor;
+    }
+
+    public int getCountChange() {
+        return countChange;
     }
 }
