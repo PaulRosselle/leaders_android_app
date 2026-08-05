@@ -7,13 +7,11 @@ import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.actions.TransitionAction;
 import com.leaders.gamelogic.enums.TransitionTarget;
-import com.leaders.gamelogic.historyentries.IPhase;
-import com.leaders.gamelogic.historyentries.Segment;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public final class ActionsPhase extends Segment implements IPhase {
+public final class ActionsPhase extends TurnPhase {
     @NonNull
     private final ArrayList<IGameAction> actions;
 

@@ -47,27 +47,31 @@ public class Turn extends Segment implements IHistoryEntry {
         return TransitionTarget.Turn;
     }
 
-    public IPhase[] getSubPhasesInOrder() {
-        return new IPhase[] { turnStartPhase, actionsPhase, recruitmentPhase, turnEndPhase };
+    /**
+     * Returns the sub-phases of this turn in their execution order.
+     *
+     * @return the ordered list of sub-phases composing this turn
+     */
+    @NonNull
+    public TurnPhase[] getSubPhasesInOrder() {
+        return new TurnPhase[] { turnStartPhase, actionsPhase, recruitmentPhase, turnEndPhase };
     }
 
-    public Segment[] getSubPhasesInOrderAsSegments() {
-        ArrayList<Segment> segments = new ArrayList<>();
-        for (IPhase phase : getSubPhasesInOrder()) {
-            if (phase instanceof Segment) {
-                segments.add((Segment) phase);
-            }
-        }
-        return segments.toArray(new Segment[0]);
-    }
-
-    public Segment getSubPhaseAsSegment(GamePhaseType gamePhaseType) {
+    /**
+     * Returns the sub-phase corresponding to the given game phase type.
+     *
+     * @param gamePhaseType the game phase type to resolve
+     * @return the sub-phase matching the given game phase type
+     * @throws IllegalStateException if no sub-phase matches the given game phase type
+     */
+    @NonNull
+    public TurnPhase getSubPhase(@NonNull GamePhaseType gamePhaseType) {
         TransitionTarget transitionTarget = gamePhaseType.getTransitionTarget();
-        for (Segment segment : getSubPhasesInOrderAsSegments()) {
-            if (segment.getTransitionTarget() == transitionTarget) {
-                return segment;
+        for (TurnPhase turnPhase : getSubPhasesInOrder()) {
+            if (turnPhase.getTransitionTarget() == transitionTarget) {
+                return turnPhase;
             }
         }
-        throw new IllegalStateException("No phase found matching game phase type " + gamePhaseType);
+        throw new IllegalStateException("No sub phase found matching game phase type " + gamePhaseType);
     }
 }
