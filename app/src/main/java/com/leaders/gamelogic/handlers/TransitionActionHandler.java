@@ -5,7 +5,7 @@ import androidx.annotation.NonNull;
 import com.leaders.gamelogic.actions.TransitionAction;
 import com.leaders.gamelogic.entities.Game;
 
-public final class TransitionActionHandler extends ActionHandler {
+public final class TransitionActionHandler extends GameActionHandler {
     @NonNull
     public TransitionAction transitionAction;
 

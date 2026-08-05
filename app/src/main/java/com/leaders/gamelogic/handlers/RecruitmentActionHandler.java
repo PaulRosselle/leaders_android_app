@@ -6,7 +6,7 @@ import com.leaders.gamelogic.actions.RecruitmentAction;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.enums.CharacterCard;
 
-public final class RecruitmentActionHandler extends ActionHandler {
+public final class RecruitmentActionHandler extends GameActionHandler {
     @NonNull
     private final RecruitmentAction recruitmentAction;
 
