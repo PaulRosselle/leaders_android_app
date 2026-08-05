@@ -42,8 +42,8 @@ import java.util.List;
  * All methods are static and side effect free: they read the game state and
  * return a result without mutating anything.
  */
-public class CharacterAbilityQuery {
-    private static final int LEADER_CAPTURE_VALUE = 2;
+public final class CharacterAbilityQuery {
+    public static final int LEADER_CAPTURE_VALUE = 2;
 
     private CharacterAbilityQuery(){
         throw new AssertionError("Cannot instantiate utility class");
@@ -89,13 +89,8 @@ public class CharacterAbilityQuery {
      * @return the character's contribution to the enemy leader capture
      */
     public static int getCaptureContribution(@NonNull Game game,
-                                             @NonNull Character character) {
-        Cell enemyLeaderCell = BoardQuery.findLeaderCell(game.getBoard(), character.getTeamColor());
-        // Without an enemy leader, the capture value is always equal to zero
-        if (enemyLeaderCell == null) {
-            return 0;
-        }
-
+                                             @NonNull Character character,
+                                             @NonNull Cell enemyLeaderCell) {
         switch (character.getCharacterType()) {
             // The archer only takes part in the capture from a distance of two
             case Archer: {
