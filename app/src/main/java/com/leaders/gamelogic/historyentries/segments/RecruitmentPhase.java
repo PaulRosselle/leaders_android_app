@@ -11,7 +11,7 @@ import com.leaders.gamelogic.historyentries.Segment;
 
 import java.util.ArrayList;
 
-public final class RecruitmentPhase extends Segment implements IPhase {
+public final class RecruitmentPhase extends TurnPhase {
     @NonNull
     private final ArrayList<IGameAction> actions;
 
