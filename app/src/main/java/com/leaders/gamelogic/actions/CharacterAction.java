@@ -5,7 +5,7 @@ import androidx.annotation.NonNull;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.enums.GameActionType;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public final class CharacterAction implements IGameAction {
     @Override
@@ -13,20 +13,15 @@ public final class CharacterAction implements IGameAction {
         return GameActionType.CharacterAction;
     }
 
-    private final boolean isActiveAbility;
     @NonNull
     private final Character srcCharacter;
-    @NonNull
-    private final ArrayList<CharacterActionTarget> targets;
 
-    public CharacterAction(boolean isActiveAbility, @NonNull Character srcCharacter, @NonNull ArrayList<CharacterActionTarget> targets) {
-        this.isActiveAbility = isActiveAbility;
+    @NonNull
+    private final List<CharacterActionTarget> targets;
+
+    public CharacterAction(@NonNull Character srcCharacter, @NonNull List<CharacterActionTarget> targets) {
         this.srcCharacter = srcCharacter;
         this.targets = targets;
-    }
-
-    public boolean isActiveAbility() {
-        return isActiveAbility;
     }
 
     @NonNull
@@ -35,7 +30,7 @@ public final class CharacterAction implements IGameAction {
     }
 
     @NonNull
-    public ArrayList<CharacterActionTarget> getTargets() {
+    public List<CharacterActionTarget> getTargets() {
         return targets;
     }
 }

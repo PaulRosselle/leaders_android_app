@@ -27,6 +27,11 @@ public final class CharacterActionBuilder {
         this.sourceCharacter = sourceCharacter;
     }
 
+    public CharacterActionBuilder(@NonNull CharacterActionBuilder refBuilder) {
+        this.sourceCharacter = refBuilder.sourceCharacter;
+        this.interactionResults = new ArrayList<>(refBuilder.interactionResults);
+    }
+
     /**
      * Returns the interaction results collected so far.
      *
