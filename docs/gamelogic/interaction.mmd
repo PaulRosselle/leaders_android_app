@@ -1,0 +1,21 @@
+flowchart LR
+
+    UI["Application"]
+
+    Request["InteractionRequest"]
+
+    Listener["IGameFlowListener"]
+
+    Result["InteractionResult"]
+
+    Resolver["CharacterActionResolver"]
+
+    Resolver --> Request
+
+    Request --> Listener
+
+    Listener --> Result
+
+    Result --> Resolver
+
+    UI -.implements.-> Listener

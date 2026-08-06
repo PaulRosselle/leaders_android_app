@@ -1,0 +1,19 @@
+flowchart LR
+
+    Character["Character"]
+
+    Resolver["CharacterActionResolver"]
+
+    Builder["CharacterActionBuilder"]
+
+    Action["CharacterAction"]
+
+    Handler["CharacterActionHandler"]
+
+    Character --> Resolver
+
+    Resolver --> Builder
+
+    Builder --> Action
+
+    Action --> Handler

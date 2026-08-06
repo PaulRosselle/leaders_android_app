@@ -1,0 +1,27 @@
+flowchart LR
+
+    UI["Application / AI / Tests"]
+
+    subgraph Engine["GameLogic"]
+        direction LR
+
+        Interaction["Interactions"]
+        Resolver["Resolvers"]
+        Action["Actions"]
+        Handler["Handlers"]
+        Projection["Game Projection"]
+        Query["Queries"]
+        History["Game History"]
+    end
+
+    UI --> Interaction
+    Interaction --> Resolver
+    Resolver --> Action
+    Action --> Handler
+    Handler --> Projection
+
+    Query --> Resolver
+    Projection --> Query
+
+    History --> Handler
+    Action --> History

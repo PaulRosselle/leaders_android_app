@@ -1,0 +1,37 @@
+flowchart TB
+
+    subgraph GameLogic
+        direction TB
+
+        Entities["entities"]
+        History["historyentries"]
+        Actions["actions"]
+        Handlers["handlers"]
+        Queries["queries"]
+        Resolvers["resolver"]
+        Interactions["interactions"]
+        Factories["factories"]
+        Enums["enums"]
+    end
+
+    Factories --> Entities
+
+    Entities --> Actions
+    Entities --> Queries
+    Entities --> Resolvers
+    Entities --> Handlers
+
+    Enums --> Entities
+    Enums --> Actions
+    Enums --> Queries
+    Enums --> Resolvers
+    Enums --> Handlers
+
+    Actions --> History
+    Actions --> Handlers
+
+    History --> Handlers
+
+    Queries --> Resolvers
+
+    Interactions --> Resolvers
