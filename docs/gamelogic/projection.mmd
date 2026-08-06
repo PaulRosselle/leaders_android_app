@@ -1,0 +1,15 @@
+flowchart LR
+
+    History["Game History"]
+
+    Action["Game Actions"]
+
+    Handler["Game Action Handlers"]
+
+    Projection["Game Projection"]
+
+    Action --> History
+
+    History --> Handler
+
+    Handler --> Projection

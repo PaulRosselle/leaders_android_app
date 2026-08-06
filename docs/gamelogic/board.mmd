@@ -1,0 +1,17 @@
+flowchart TB
+
+    Position["Position"]
+
+    Direction["Direction"]
+
+    Board["Board"]
+
+    Query["BoardQuery"]
+
+    Position --> Board
+
+    Direction --> Position
+
+    Board --> Query
+
+    Position --> Query
