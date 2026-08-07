@@ -10,8 +10,6 @@ import com.leaders.gamelogic.enums.TransitionTarget;
 import com.leaders.gamelogic.historyentries.IHistoryEntry;
 import com.leaders.gamelogic.historyentries.Segment;
 
-import java.util.ArrayList;
-
 public class Turn extends Segment implements IHistoryEntry {
     @NonNull
     private final TeamColor teamColor;
@@ -32,6 +30,15 @@ public class Turn extends Segment implements IHistoryEntry {
         this.actionsPhase = actionsPhase;
         this.recruitmentPhase = recruitmentPhase;
         this.turnEndPhase = turnEndPhase;
+    }
+
+    public Turn(@NonNull Turn refTurn) {
+        this(refTurn.getStartAction(), refTurn.getEndAction(), refTurn.getTeamColor(),
+                new TurnStartPhase(refTurn.turnStartPhase),
+                new ActionsPhase(refTurn.actionsPhase),
+                new RecruitmentPhase(refTurn.recruitmentPhase),
+                new TurnEndPhase(refTurn.turnEndPhase)
+        );
     }
 
     @NonNull

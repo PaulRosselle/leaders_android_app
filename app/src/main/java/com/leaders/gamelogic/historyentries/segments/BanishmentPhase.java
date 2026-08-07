@@ -25,6 +25,11 @@ public final class BanishmentPhase extends Segment implements IHistoryEntry, IPh
         actions = new ArrayList<>();
     }
 
+    public BanishmentPhase(@NonNull BanishmentPhase refBanishmentPhase) {
+        this(refBanishmentPhase.getStartAction(), refBanishmentPhase.getEndAction(), refBanishmentPhase.getTeamColor());
+        actions.addAll(refBanishmentPhase.getActions());
+    }
+
     @NonNull
     @Override
     public ArrayList<IGameAction> getActions() {

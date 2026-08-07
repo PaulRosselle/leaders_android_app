@@ -6,6 +6,7 @@ import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.enums.WarningType;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 
@@ -30,6 +31,15 @@ public final class Game {
         this.recruitedCharacters = recruitedCharacters;
         this.banishedCards = banishedCards;
         this.playerWarnings = playerWarnings;
+    }
+
+    public Game(@NonNull Game refGame) {
+        this(new Board(refGame.board),
+                new ArrayList<>(refGame.recruitableCards),
+                new ArrayList<>(refGame.recruitedCharacters),
+                new ArrayList<>(refGame.banishedCards),
+                new EnumMap<>(refGame.playerWarnings)
+        );
     }
 
     @NonNull

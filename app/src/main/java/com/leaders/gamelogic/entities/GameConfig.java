@@ -6,29 +6,42 @@ import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.GameMode;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 public final class GameConfig {
+
     @NonNull
-    private final Player[] players;
+    private final List<Player> players;
+
     @NonNull
     private final Player firstPlayer;
+
     @NonNull
     private final GameMode gameMode;
-    @NonNull
-    private final CharacterCard initialRecruitableCards;
-    @NonNull
-    private final IGameAction[] initialPlacements;
 
-    public GameConfig(@NonNull Player[] players, @NonNull Player firstPlayer, @NonNull GameMode gameMode,
-                      @NonNull CharacterCard initialRecruitableCards, @NonNull IGameAction[] initialPlacements) {
-        this.players = players;
+    @NonNull
+    private final List<CharacterCard> initialRecruitableCards;
+
+    @NonNull
+    private final List<IGameAction> initialPlacements;
+
+
+    public GameConfig(@NonNull List<Player> players, @NonNull Player firstPlayer,
+                      @NonNull GameMode gameMode,
+                      @NonNull List<CharacterCard> initialRecruitableCards,
+                      @NonNull List<IGameAction> initialPlacements) {
+        // We make unmodifiable copies of lists to ensure the GameConfig is immutable
+        this.players = List.copyOf(players);
         this.firstPlayer = firstPlayer;
         this.gameMode = gameMode;
-        this.initialRecruitableCards = initialRecruitableCards;
-        this.initialPlacements = initialPlacements;
+        this.initialRecruitableCards = List.copyOf(initialRecruitableCards);
+        this.initialPlacements = List.copyOf(initialPlacements);
     }
 
     @NonNull
-    public Player[] getPlayers() {
+    public List<Player> getPlayers() {
         return players;
     }
 
@@ -43,12 +56,12 @@ public final class GameConfig {
     }
 
     @NonNull
-    public CharacterCard getInitialRecruitableCards() {
+    public List<CharacterCard> getInitialRecruitableCards() {
         return initialRecruitableCards;
     }
 
     @NonNull
-    public IGameAction[] getInitialPlacements() {
+    public List<IGameAction> getInitialPlacements() {
         return initialPlacements;
     }
 }

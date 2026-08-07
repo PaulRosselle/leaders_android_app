@@ -32,7 +32,7 @@ public final class CharacterPlayableState {
         return mandatory;
     }
 
-    public boolean isCanUseActiveAbility() {
+    public boolean canUseActiveAbility() {
         return canUseActiveAbility;
     }
 }

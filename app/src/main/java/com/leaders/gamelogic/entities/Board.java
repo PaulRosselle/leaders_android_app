@@ -24,6 +24,13 @@ public final class Board {
         }
     }
 
+    public Board(@NonNull Board refBoard) {
+        this();
+        for (Map.Entry<Position, Cell> entry : cells.entrySet()) {
+            entry.getValue().setCharacter(refBoard.getCell(entry.getKey()).getCharacter());
+        }
+    }
+
     public static int getRowCount(int columnIdx) {
         return COLUMN_COUNT - Math.abs(columnIdx - Position.HEX_RADIUS);
     }
