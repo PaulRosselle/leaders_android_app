@@ -16,10 +16,7 @@ public final class InteractionResult {
     private final InteractionResultType resultType;
 
     @Nullable
-    private final CharacterCard chosenCard;
-
-    @Nullable
-    private final Position chosenPosition;
+    private final InteractionTarget chosenTarget;
 
     /**
      * Creates an interaction result.
@@ -29,14 +26,12 @@ public final class InteractionResult {
      * checked by the interaction handling logic.</p>
      *
      * @param resultType the type of response provided by the caller
-     * @param chosenCard the selected card, if applicable
-     * @param chosenPosition the selected position, if applicable
+     * @param chosenTarget the selected target, if applicable
      */
-    public InteractionResult(@NonNull InteractionResultType resultType, @Nullable CharacterCard chosenCard, @Nullable Position chosenPosition) {
+    public InteractionResult(@NonNull InteractionResultType resultType, @Nullable InteractionTarget chosenTarget) {
         // No defensive copies are necessary since every of the used types are immutable
         this.resultType = resultType;
-        this.chosenCard = chosenCard;
-        this.chosenPosition = chosenPosition;
+        this.chosenTarget = chosenTarget;
     }
 
     @NonNull
@@ -45,12 +40,7 @@ public final class InteractionResult {
     }
 
     @Nullable
-    public CharacterCard getChosenCard() {
-        return chosenCard;
-    }
-
-    @Nullable
-    public Position getChosenPosition() {
-        return chosenPosition;
+    public InteractionTarget getChosenTarget() {
+        return chosenTarget;
     }
 }
