@@ -7,8 +7,6 @@ import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.actions.TransitionAction;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.enums.TransitionTarget;
-import com.leaders.gamelogic.historyentries.IPhase;
-import com.leaders.gamelogic.historyentries.Segment;
 
 import java.util.ArrayList;
 
@@ -19,6 +17,11 @@ public final class RecruitmentPhase extends TurnPhase {
     public RecruitmentPhase(@Nullable TransitionAction startAction, @Nullable TransitionAction endAction, @NonNull TeamColor turnTeamColor) {
         super(startAction, endAction, turnTeamColor);
         actions = new ArrayList<>();
+    }
+
+    public RecruitmentPhase(@NonNull RecruitmentPhase refRecruitmentPhase) {
+        this(refRecruitmentPhase.getStartAction(), refRecruitmentPhase.getEndAction(), refRecruitmentPhase.getTurnTeamColor());
+        actions.addAll(refRecruitmentPhase.getActions());
     }
 
     @NonNull
