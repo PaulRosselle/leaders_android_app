@@ -7,18 +7,20 @@ import org.junit.Test;
 public class TeamColorTest {
 
     @Test
-    public void getOpposite_shouldReturnWhiteForBlack() {
+    public void getOpposite_shouldReturnOther() {
         assertEquals(
                 TeamColor.White,
                 TeamColor.Black.getOpposite()
         );
-    }
 
-    @Test
-    public void getOpposite_shouldReturnBlackForWhite() {
         assertEquals(
                 TeamColor.Black,
                 TeamColor.White.getOpposite()
         );
+    }
+
+    @Test
+    public void shouldContainExactlyTwoTeamColors() {
+        assertEquals(2, TeamColor.values().length);
     }
 }
