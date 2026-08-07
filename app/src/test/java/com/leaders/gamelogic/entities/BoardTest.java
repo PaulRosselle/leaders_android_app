@@ -2,9 +2,14 @@ package com.leaders.gamelogic.entities;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
+
+import com.leaders.gamelogic.enums.CharacterType;
+import com.leaders.gamelogic.enums.TeamColor;
 
 import org.junit.Test;
 
@@ -32,6 +37,38 @@ public class BoardTest {
                             .count()
             );
         }
+    }
+
+    @Test
+    public void copy_shouldNotShareCells() {
+        Board original = new Board();
+        Position position = new Position(3, 3);
+        Character testCharacter = Character.create(CharacterType.LeaderQueen, TeamColor.Black);
+        original.getCell(position).setCharacter(testCharacter);
+        Board copy = new Board(original);
+
+        assertNotSame(
+                original.getCell(position),
+                copy.getCell(position)
+        );
+        // Characters are immutable and safely shared by reference
+        assertSame(
+                original.getCell(position).getCharacter(),
+                copy.getCell(position).getCharacter()
+        );
+    }
+
+    @Test
+    public void copy_shouldNotShareMutableCellState() {
+        Board original = new Board();
+        Board copy = new Board(original);
+
+        Position position = new Position(3, 3);
+        Character testCharacter = Character.create(CharacterType.LeaderQueen, TeamColor.Black);
+
+        original.getCell(position).setCharacter(testCharacter);
+
+        assertNull(copy.getCell(position).getCharacter());
     }
 
     @Test
