@@ -17,6 +17,7 @@ import com.leaders.gamelogic.interactions.CharacterActionBuilder;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
 import com.leaders.gamelogic.interactions.InteractionResultType;
+import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.interactions.InteractionType;
 import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
@@ -147,8 +148,10 @@ public abstract class CharacterActionResolver {
 
         // Build the list of legal movement destinations.
         // Invalid destinations are filtered out before being exposed to the interaction layer.
-        Map<TargetCategory, List<Position>> legalPositions = new EnumMap<>(TargetCategory.class);
-        legalPositions.put(TargetCategory.MovementDestination, getNormalMovementValidDestinations(builder));
+        List<InteractionTarget> legalTargets = new ArrayList<>();
+        for (Position destination : getNormalMovementValidDestinations(builder)) {
+            legalTargets.add(new InteractionTarget(TargetCategory.MovementDestination, destination));
+        }
 
         // A movement action requires the player to choose a position.
         // Cancelling remains available while the action is being built.
@@ -156,7 +159,7 @@ public abstract class CharacterActionResolver {
         legalResults.add(InteractionResultType.PositionChosen);
         legalResults.add(InteractionResultType.CancelAction);
 
-        return new InteractionRequest(InteractionType.PositionExpected, null, legalPositions, legalResults);
+        return new InteractionRequest(InteractionType.PositionExpected, legalTargets, legalResults);
     }
 
     /**
