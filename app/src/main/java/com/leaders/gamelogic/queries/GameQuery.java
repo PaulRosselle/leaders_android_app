@@ -7,7 +7,6 @@ import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
-import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.enums.Direction;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.enums.WarningType;
@@ -43,7 +42,7 @@ public final class GameQuery {
                 "Leader not found for team " + teamColor
         );
         for (Character character : game.getRecruitedCharacters()) {
-            if (character.getTeamColor() == teamColor) {
+            if (character.getTeamColor() != teamColor) {
                 totalCaptureValue += CharacterAbilityQuery.getCaptureContribution(game, character, leaderCell);
                 if (totalCaptureValue >= CharacterAbilityQuery.LEADER_CAPTURE_VALUE) {
                     return true;
