@@ -1,9 +1,10 @@
 package com.leaders.gamelogic.interactions;
 
 public enum TargetCategory {
-    PlayableCharacter,
-    RecruitmentDestination,
-    MovementDestination,
-    ActiveAbilityDestination,
-    ActiveAbilityTarget
+    PlayableCharacter, // target a Character
+    RecruitmentCard, // target a CharacterCard
+    RecruitmentDestination, // target a Position
+    MovementDestination, // target a Position
+    ActiveAbilityDestination, // target a Position
+    ActiveAbilityTargetPosition // target a Position
 }
