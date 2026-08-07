@@ -22,7 +22,7 @@ public final class BanishmentActionHandler extends GameActionHandler {
 
     @Override
     public void undoAction() {
-        game.getBanishedCards().add(banishmentAction.getCharacterCard());
-        game.getRecruitableCards().remove(banishmentAction.getCharacterCard());
+        game.getBanishedCards().remove(banishmentAction.getCharacterCard());
+        game.getRecruitableCards().add(banishmentAction.getCharacterCard());
     }
 }
