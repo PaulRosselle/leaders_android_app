@@ -64,7 +64,7 @@ public class CharacterPlayableStateTest {
         CharacterPlayableState state =
                 new CharacterPlayableState(character, position, false, true);
 
-        assertTrue(state.isCanUseActiveAbility());
+        assertTrue(state.canUseActiveAbility());
     }
 
     @Test
@@ -79,6 +79,6 @@ public class CharacterPlayableStateTest {
                 new CharacterPlayableState(character, position, false, false);
 
         assertFalse(state.isMandatory());
-        assertFalse(state.isCanUseActiveAbility());
+        assertFalse(state.canUseActiveAbility());
     }
 }
