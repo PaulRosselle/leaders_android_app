@@ -267,29 +267,6 @@ public final class GameQuery {
     }
 
     /**
-     * Returns the number of barrage warnings received by the specified team.
-     *
-     * @param game the game to evaluate
-     * @param playerTeamColor the team whose barrage warnings are counted
-     * @return the number of barrage warnings for the specified team
-     * @throws IllegalStateException if no player exists for the specified team
-     */
-    private static int getBarrageWarningCount(@NonNull Game game, @NonNull TeamColor playerTeamColor) {
-        for (Map.Entry<Player, List<WarningType>> playerEntry : game.getPlayerWarnings().entrySet()) {
-            if (playerEntry.getKey().getTeamColor() == playerTeamColor) {
-                int barrageWarningCount = 0;
-                for (WarningType warningType : playerEntry.getValue()) {
-                    if (warningType == WarningType.Barrage) {
-                        barrageWarningCount++;
-                    }
-                }
-                return barrageWarningCount;
-            }
-        }
-        throw new IllegalStateException("No player found for team color " + playerTeamColor);
-    }
-
-    /**
      * Returns the winning team, if the game has ended.
      *
      * @param game the game to evaluate
@@ -304,7 +281,7 @@ public final class GameQuery {
 
         // Once a player reach the barrage warning limit, they lose the game. A player can only lose
         // because of barrage warnings during his turn so we don't make the check for the opponent
-        if (getBarrageWarningCount(game, currentPhaseTeam) >= BARRAGE_WARNING_LIMIT) {
+        if (game.getPlayerWarningCount(currentPhaseTeam, WarningType.Barrage) >= BARRAGE_WARNING_LIMIT) {
             return opponentTeam;
         }
 
