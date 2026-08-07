@@ -26,9 +26,8 @@ import com.leaders.gamelogic.queries.GameQuery;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.EnumMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 
 /**
  * Base class responsible for resolving the interaction flow required to build
@@ -112,9 +111,10 @@ public abstract class CharacterActionResolver {
             CharacterActionBuilder nextMovementBuilder = new CharacterActionBuilder(builder);
             nextMovementBuilder.getInteractionResults().add(new InteractionResult(
                     InteractionResultType.PositionChosen,
-                    null, destCell.getPosition()));
-            CharacterAction movementAction = buildAction(nextMovementBuilder);
+                    new InteractionTarget(TargetCategory.MovementDestination, destCell.getPosition()))
+            );
 
+            CharacterAction movementAction = buildAction(nextMovementBuilder);
             if (isActionValid(movementAction)) {
                 destPositions.add(destCell.getPosition());
             }
@@ -176,10 +176,20 @@ public abstract class CharacterActionResolver {
         if (builder.getInteractionResults().size() != 1) {
             throw new IllegalArgumentException("The default character action builder only handles single interaction actions");
         }
+
+        // The default movement action only requires a single interaction.
         InteractionResult interactionResult = builder.getInteractionResults().get(0);
+
+        // For a movement to be valid a destination (Position) must be chosen.
+        if (interactionResult.getResultType() != InteractionResultType.PositionChosen ||
+                interactionResult.getChosenTarget() == null) {
+            throw new IllegalArgumentException("A movement action cannot be built without a PositionChosen InteractionResult");
+        }
+
         CharacterActionTarget target = new CharacterActionTarget(builder.getSourceCharacter(),
                 BoardQuery.getCellByCharacterId(game.getBoard(), character.getId()).getPosition(),
-                interactionResult.getChosenPosition());
+                Objects.requireNonNull(interactionResult.getChosenTarget().getChosenPosition(),
+                        "A movement interaction target must be a valid Position"));
         return new CharacterAction(builder.getSourceCharacter(), Collections.singletonList(target));
     }
 }
