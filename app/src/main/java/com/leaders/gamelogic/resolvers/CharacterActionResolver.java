@@ -41,7 +41,7 @@ import java.util.Objects;
  * {@link #getNextInteraction(CharacterActionBuilder)} to provide custom
  * interaction flows depending on the character abilities and action rules.</p>
  */
-public abstract class CharacterActionResolver {
+public class CharacterActionResolver {
     @NonNull
     protected final Game game;
     @NonNull
@@ -49,6 +49,9 @@ public abstract class CharacterActionResolver {
 
     @NonNull
     protected final Character character;
+
+    @NonNull
+    protected final Position characterPos;
 
     /**
      * Creates a resolver for a specific character in a given game context.
@@ -61,6 +64,7 @@ public abstract class CharacterActionResolver {
         this.game = game;
         this.gameHistory = gameHistory;
         this.character = character;
+        this.characterPos = BoardQuery.getCellByCharacterId(game.getBoard(), character.getId()).getPosition();
     }
 
     /**
@@ -112,10 +116,18 @@ public abstract class CharacterActionResolver {
             // This allows the resulting action to be validated before exposing the
             // destination as a legal interaction option.
             CharacterActionBuilder nextMovementBuilder = new CharacterActionBuilder(builder);
-            nextMovementBuilder.getInteractionResults().add(new InteractionResult(
+            nextMovementBuilder.addResult(new InteractionResult(
                     InteractionResultType.PositionChosen,
                     new InteractionTarget(TargetCategory.MovementDestination, destCell.getPosition()))
             );
+            nextMovementBuilder.addFeedback(new InteractionFeedback(
+                    new CharacterActionMotion(
+                            CharacterMotionType.Move,
+                            List.of(new CharacterActionTarget(character,
+                                    characterPos,
+                                    destCell.getPosition())
+                            ))
+            ));
 
             CharacterAction movementAction = buildAction(nextMovementBuilder);
             if (isActionValid(movementAction)) {
