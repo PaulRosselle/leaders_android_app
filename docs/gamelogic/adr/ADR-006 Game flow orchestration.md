@@ -15,11 +15,11 @@ The engine therefore requires a dedicated orchestration layer responsible for se
 
 Game flow is coordinated by a dedicated orchestration layer.
 
-The orchestration layer drives the execution of the game by coordinating resolvers, interaction exchanges and game action execution without implementing gameplay rules itself.
+The orchestration layer drives the execution of the game by coordinating resolvers, interaction exchanges, feedback acknowledgements and game action execution without implementing gameplay rules itself.
 
-It is responsible for determining when gameplay resolution should continue, when external interactions are required and when produced actions should be applied to the game state.
+It is responsible for determining when gameplay resolution should continue, when external interactions are required, when feedback must be acknowledged by the external application and when produced actions should be applied to the game state.
 
-The orchestration layer communicates with external applications through `IGameFlowListener`, allowing the engine to notify the application of game events and request interaction handling without depending on any specific presentation technology.
+The orchestration layer communicates with external applications through `IGameFlowListener`, allowing the engine to forward interaction requests and feedbacks and to receive interaction results and feedback acknowledgements without depending on any specific presentation technology.
 
 ## Consequences
 
@@ -28,3 +28,4 @@ The orchestration layer communicates with external applications through `IGameFl
 - Interaction management remains independent from gameplay decision logic.
 - Game state mutations remain independent from orchestration.
 - The orchestration layer can evolve without affecting gameplay rules or state management.
+- Feedback acknowledgement is handled by the orchestration layer and does not become part of gameplay resolution logic.
