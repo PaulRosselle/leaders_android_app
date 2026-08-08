@@ -3,6 +3,7 @@ package com.leaders.gamelogic.queries;
 import androidx.annotation.NonNull;
 
 import com.leaders.gamelogic.actions.CharacterAction;
+import com.leaders.gamelogic.actions.CharacterActionMotion;
 import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
@@ -199,11 +200,13 @@ public final class CharacterAbilityQuery {
             List<CharacterAction> characterActions = currentActionsPhase.getCharacterActions();
             CharacterAction lastAction = characterActions.get(characterActions.size() - 1);
             // If we find an enemy leader movement in the action targets, the Nemesis is forced to play
-            for (CharacterActionTarget actionTarget : lastAction.getTargets()) {
-                if (actionTarget.getCharacter().getCharacterType().getCharacterCard().isLeader() &&
-                        actionTarget.getCharacter().getTeamColor() != character.getTeamColor() &&
-                        actionTarget.getOriginPos() != null && actionTarget.getDestPos() != null) {
-                    return true;
+            for (CharacterActionMotion motion : lastAction.getMotions()) {
+                for (CharacterActionTarget actionTarget : motion.getTargets()) {
+                    if (actionTarget.getCharacter().getCharacterType().getCharacterCard().isLeader() &&
+                            actionTarget.getCharacter().getTeamColor() != character.getTeamColor() &&
+                            actionTarget.getOriginPos() != null && actionTarget.getDestPos() != null) {
+                        return true;
+                    }
                 }
             }
         }

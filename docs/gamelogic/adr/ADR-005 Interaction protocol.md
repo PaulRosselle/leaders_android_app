@@ -16,15 +16,17 @@ The communication mechanism must therefore describe *what* information is requir
 The game engine communicates with external applications through a generic interaction protocol.
 
 When additional information is required, the engine produces an `InteractionRequest` describing the expected interaction. Once the application has collected the requested information, it returns an `InteractionResult` to the engine.
+After processing an `InteractionResult`, the resolver may produce an `InteractionFeedback` describing a gameplay event that should be presented by the external application. The application acknowledges the feedback before the resolution workflow continues.
 
-Resolvers declare which interactions are required but never communicate directly with the application. The orchestration layer is responsible for forwarding interaction requests, collecting the corresponding results and resuming the resolution workflow.
+Resolvers declare which interactions and feedbacks are required but never communicate directly with the application. The orchestration layer is responsible for forwarding interaction requests, collecting the corresponding results, forwarding feedbacks and waiting for their acknowledgements before resuming the resolution workflow.
 
-The interaction protocol is independent from any user interface implementation and describes gameplay interactions exclusively through domain concepts.
+The interaction protocol is independent from any user interface implementation and describes gameplay interactions and gameplay presentation semantics exclusively through domain concepts.
 
 ## Consequences
 
 - The game engine remains independent from any presentation technology.
 - Human players, AI players and automated tests can all interact with the engine through the same protocol.
 - Gameplay logic remains independent from interaction management.
-- The orchestration layer becomes responsible for coordinating interaction exchanges.
+- Gameplay feedback can be emitted without depending on a rendering framework.
+- The orchestration layer becomes responsible for coordinating interaction exchanges and feedback acknowledgements.
 - New interaction mechanisms can be introduced without modifying gameplay resolution.

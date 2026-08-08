@@ -1,21 +1,17 @@
-flowchart LR
-
-    UI["Application"]
-
+flowchart TD
+    Resolver["Resolver"]
     Request["InteractionRequest"]
-
-    Listener["IGameFlowListener"]
-
+    Listener1["IGameFlowListener / UI"]
     Result["InteractionResult"]
-
-    Resolver["CharacterActionResolver"]
+    Feedback["InteractionFeedback"]
+    Listener2["IGameFlowListener / UI"]
+    Ack["Acknowledgement"]
 
     Resolver --> Request
-
-    Request --> Listener
-
-    Listener --> Result
-
+    Request --> Listener1
+    Listener1 --> Result
     Result --> Resolver
-
-    UI -.implements.-> Listener
+    Resolver --> Feedback
+    Feedback --> Listener2
+    Listener2 --> Ack
+    Ack --> Resolver

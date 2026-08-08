@@ -18,10 +18,11 @@ Gameplay intentions are resolved through dedicated resolver classes.
 Each resolver encapsulates the decision logic required to resolve a specific type of gameplay action. During the resolution process, a resolver may require additional player input before it can produce one or more game actions.
 
 Rather than interacting directly with the user interface, resolvers expose the required interactions through `InteractionRequest` objects and consume the corresponding `InteractionResult` objects once they are provided by the game flow.
+After receiving an `InteractionResult`, a resolver may produce one or more `InteractionFeedback` objects describing gameplay events that must be acknowledged by the external application before resolution can continue.
 
 Resolvers rely on queries to evaluate the current game state and delegate game action construction to dedicated builders when appropriate.
 
-Resolvers determine **what** information is required and **what** actions should be produced, but they neither communicate with the user interface nor modify the game state.
+Resolvers determine **what** information is required, **what** feedback must be emitted, and **what** actions should be produced, but they neither communicate with the user interface nor modify the game state.
 
 ## Consequences
 
@@ -31,3 +32,4 @@ Resolvers determine **what** information is required and **what** actions should
 - Action construction remains reusable and independent from gameplay decision logic.
 - State mutations remain the exclusive responsibility of game action handlers.
 - The same resolution workflow can support different front-ends without modification.
+- Presentation feedback can be emitted progressively during action resolution without coupling resolvers to the user interface.

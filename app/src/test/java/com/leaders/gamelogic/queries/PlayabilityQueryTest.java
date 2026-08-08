@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import com.leaders.gamelogic.actions.CharacterActionMotion;
 import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Character;
@@ -14,6 +15,7 @@ import com.leaders.gamelogic.entities.GameConfig;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.entities.Position;
+import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.TeamColor;
@@ -28,7 +30,6 @@ import com.leaders.gamelogic.actions.CharacterAction;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 
@@ -191,8 +192,14 @@ public class PlayabilityQueryTest {
          * when mustActNow() is true, this character is returned alone.
          */
         CharacterAction leaderAction = new CharacterAction(leader,
-                Collections.singletonList(new CharacterActionTarget(leader,
-                        new Position(3, 1), new Position(3, 2))));
+                List.of(new CharacterActionMotion(CharacterMotionType.Move,
+                        List.of(new CharacterActionTarget(
+                                leader,
+                                new Position(3, 1),
+                                new Position(3, 2)
+                        ))
+                ))
+        );
         actionsPhase.getActions().add(leaderAction);
 
         Turn turn = createTurn(actionsPhase);

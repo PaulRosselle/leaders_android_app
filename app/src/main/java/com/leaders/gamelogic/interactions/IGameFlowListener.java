@@ -67,4 +67,15 @@ public interface IGameFlowListener {
      */
     @NonNull
     CompletableFuture<InteractionResult> onInputRequired(@NonNull InteractionRequest request);
+
+    /**
+     * Fired whenever the game produces a feedback that must be handled by the caller.
+     *
+     * <p>The game flow waits for the returned future to complete before continuing.</p>
+     *
+     * @param feedback the feedback to handle
+     * @return a future completed when the caller has finished handling the feedback
+     */
+    @NonNull
+    CompletableFuture<Void> onFeedback(@NonNull InteractionFeedback feedback);
 }
