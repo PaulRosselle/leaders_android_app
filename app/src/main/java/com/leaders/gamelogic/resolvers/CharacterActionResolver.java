@@ -16,6 +16,7 @@ import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.factories.GameActionHandlerFactory;
 import com.leaders.gamelogic.handlers.GameActionHandler;
 import com.leaders.gamelogic.interactions.CharacterActionBuilder;
+import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
 import com.leaders.gamelogic.interactions.InteractionResultType;
@@ -27,6 +28,7 @@ import com.leaders.gamelogic.queries.CharacterAbilityQuery;
 import com.leaders.gamelogic.queries.GameQuery;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -164,6 +166,40 @@ public abstract class CharacterActionResolver {
     }
 
     /**
+     * Returns the next feedback generated from the current interaction state.
+     * <p>
+     * Each resolver implementation is responsible for translating its own
+     * interaction result flow into a concrete {@link InteractionFeedback} instance.</p>
+     *
+     * @param builder builder containing the current interaction state
+     * @return the next feedback, or {@code null} if none is available
+     */
+    @Nullable
+    public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
+        // The default movement action only requires a single interaction.
+        // When the result is gotten, a single feedback can be generated containing the movement instructions
+        if (builder.getInteractionResults().size() != 1 ||
+                !builder.getInteractionFeedbacks().isEmpty()) {
+            return null;
+        }
+
+        // For a movement to be valid, a destination (Position) must be chosen.
+        InteractionResult interactionResult = builder.getInteractionResults().get(0);
+        if (interactionResult.getResultType() != InteractionResultType.PositionChosen ||
+                interactionResult.getChosenTarget() == null) {
+            throw new IllegalArgumentException("A movement action cannot be built without a PositionChosen InteractionResult");
+        }
+
+        CharacterActionTarget target = new CharacterActionTarget(
+                builder.getSourceCharacter(),
+                BoardQuery.getCellByCharacterId(game.getBoard(), character.getId()).getPosition(),
+                Objects.requireNonNull(interactionResult.getChosenTarget().getChosenPosition(),
+                        "A movement interaction target must be a valid Position")
+        );
+        return new InteractionFeedback(new CharacterActionMotion(CharacterMotionType.Move, List.of(target)));
+    }
+
+    /**
      * Builds the final action represented by the current interaction state.
      *
      * <p>Each resolver implementation is responsible for translating its own
@@ -174,24 +210,12 @@ public abstract class CharacterActionResolver {
      */
     @NonNull
     public CharacterAction buildAction(@NonNull CharacterActionBuilder builder) {
-        if (builder.getInteractionResults().size() != 1) {
+        if (builder.getInteractionResults().size() != 1 ||
+                builder.getInteractionFeedbacks().size() != 1) {
             throw new IllegalArgumentException("The default character action builder only handles single interaction actions");
         }
 
-        // The default movement action only requires a single interaction.
-        InteractionResult interactionResult = builder.getInteractionResults().get(0);
-
-        // For a movement to be valid a destination (Position) must be chosen.
-        if (interactionResult.getResultType() != InteractionResultType.PositionChosen ||
-                interactionResult.getChosenTarget() == null) {
-            throw new IllegalArgumentException("A movement action cannot be built without a PositionChosen InteractionResult");
-        }
-
-        CharacterActionTarget target = new CharacterActionTarget(builder.getSourceCharacter(),
-                BoardQuery.getCellByCharacterId(game.getBoard(), character.getId()).getPosition(),
-                Objects.requireNonNull(interactionResult.getChosenTarget().getChosenPosition(),
-                        "A movement interaction target must be a valid Position"));
         return new CharacterAction(builder.getSourceCharacter(),
-                List.of(new CharacterActionMotion(CharacterMotionType.Move, List.of(target))));
+                Collections.singletonList(builder.getInteractionFeedbacks().get(0).getCharacterActionMotion()));
     }
 }
