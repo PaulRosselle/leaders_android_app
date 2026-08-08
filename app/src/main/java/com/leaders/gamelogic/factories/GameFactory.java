@@ -19,17 +19,20 @@ import java.util.List;
 public final class GameFactory {
 
     private GameFactory() {
+        throw new AssertionError("Cannot instantiate utility class");
     }
 
     @NonNull
     public static Game create(@NonNull GameHistory gameHistory) {
         // First, create a default game instance
         Game game = new Game(new Board(),
-                new ArrayList<>(), // recruitableCards
+                new ArrayList<>(gameHistory.getConfig().getInitialRecruitableCards()),
                 new ArrayList<>(), // recruitedCharacters
                 new ArrayList<>(), // banishedCards
                 new EnumMap<>(TeamColor.class) // playerWarnings
         );
+
+
 
         // The config contains every action made before the game started.
         doActions(game, gameHistory.getConfig().getInitialPlacements());
