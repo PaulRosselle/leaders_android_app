@@ -4,12 +4,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.leaders.gamelogic.actions.CharacterAction;
+import com.leaders.gamelogic.actions.CharacterActionMotion;
 import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.Position;
+import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.factories.GameActionHandlerFactory;
 import com.leaders.gamelogic.handlers.GameActionHandler;
@@ -25,7 +27,6 @@ import com.leaders.gamelogic.queries.CharacterAbilityQuery;
 import com.leaders.gamelogic.queries.GameQuery;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -190,6 +191,7 @@ public abstract class CharacterActionResolver {
                 BoardQuery.getCellByCharacterId(game.getBoard(), character.getId()).getPosition(),
                 Objects.requireNonNull(interactionResult.getChosenTarget().getChosenPosition(),
                         "A movement interaction target must be a valid Position"));
-        return new CharacterAction(builder.getSourceCharacter(), Collections.singletonList(target));
+        return new CharacterAction(builder.getSourceCharacter(),
+                List.of(new CharacterActionMotion(CharacterMotionType.Move, List.of(target))));
     }
 }

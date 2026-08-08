@@ -4,11 +4,13 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
 import com.leaders.gamelogic.actions.CharacterAction;
+import com.leaders.gamelogic.actions.CharacterActionMotion;
 import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.Position;
+import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.TeamColor;
 
@@ -44,12 +46,13 @@ public class CharacterActionHandlerTest {
         assertNull(game.getBoard().getCell(destinationPosition).getCharacter());
         assertSame(character, game.getBoard().getCell(originPosition).getCharacter());
 
-        CharacterAction action = new CharacterAction(
-                character,
-                List.of(new CharacterActionTarget(
-                        character,
-                        originPosition,
-                        destinationPosition
+        CharacterAction action = new CharacterAction(character,
+                List.of(new CharacterActionMotion(CharacterMotionType.Move,
+                        List.of(new CharacterActionTarget(
+                                character,
+                                originPosition,
+                                destinationPosition
+                        ))
                 ))
         );
         new CharacterActionHandler(game, action).doAction();
@@ -66,14 +69,16 @@ public class CharacterActionHandlerTest {
 
         assertNull(game.getBoard().getCell(destinationPosition).getCharacter());
 
-        CharacterAction action = new CharacterAction(
-                character,
-                List.of(new CharacterActionTarget(
-                        character,
-                        null,
-                        destinationPosition
+        CharacterAction action = new CharacterAction(character,
+                List.of(new CharacterActionMotion(CharacterMotionType.Add,
+                        List.of(new CharacterActionTarget(
+                                character,
+                                null,
+                                destinationPosition
+                        ))
                 ))
         );
+
         new CharacterActionHandler(game, action).doAction();
 
         assertSame(character, game.getBoard().getCell(destinationPosition).getCharacter());
@@ -88,12 +93,13 @@ public class CharacterActionHandlerTest {
 
         assertSame(character, game.getBoard().getCell(originPosition).getCharacter());
 
-        CharacterAction action = new CharacterAction(
-                character,
-                List.of(new CharacterActionTarget(
-                        character,
-                        originPosition,
-                        null
+        CharacterAction action = new CharacterAction(character,
+                List.of(new CharacterActionMotion(CharacterMotionType.Remove,
+                        List.of(new CharacterActionTarget(
+                                character,
+                                originPosition,
+                                null
+                        ))
                 ))
         );
         new CharacterActionHandler(game, action).doAction();
@@ -110,14 +116,14 @@ public class CharacterActionHandlerTest {
 
         assertSame(character, game.getBoard().getCell(position).getCharacter());
 
-        CharacterActionTarget target = new CharacterActionTarget(
-                character,
-                null,
-                null
-        );
-        CharacterAction action = new CharacterAction(
-                character,
-                List.of(target)
+        CharacterAction action = new CharacterAction(character,
+                List.of(new CharacterActionMotion(CharacterMotionType.Transform,
+                        List.of(new CharacterActionTarget(
+                                character,
+                                null,
+                                null
+                        ))
+                ))
         );
 
         new CharacterActionHandler(game, action).doAction();
@@ -153,7 +159,8 @@ public class CharacterActionHandlerTest {
                 )
         );
 
-        CharacterAction action = new CharacterAction(firstCharacter, targets);
+        CharacterAction action = new CharacterAction(firstCharacter,
+                List.of(new CharacterActionMotion(CharacterMotionType.Swap, targets)));
 
         new CharacterActionHandler(game, action).doAction();
 
@@ -179,20 +186,21 @@ public class CharacterActionHandlerTest {
         assertSame(secondCharacter, game.getBoard().getCell(secondPosition).getCharacter());
         assertNull(game.getBoard().getCell(thirdPosition).getCharacter());
 
-        CharacterAction action = new CharacterAction(
-                firstCharacter,
-                List.of(
-                        new CharacterActionTarget(
-                                secondCharacter,
-                                secondPosition,
-                                thirdPosition
-                        ),
-                        new CharacterActionTarget(
-                                firstCharacter,
-                                firstPosition,
-                                secondPosition
+        CharacterAction action = new CharacterAction(firstCharacter,
+                List.of(new CharacterActionMotion(CharacterMotionType.Push,
+                        List.of(
+                                new CharacterActionTarget(
+                                        secondCharacter,
+                                        secondPosition,
+                                        thirdPosition
+                                ),
+                                new CharacterActionTarget(
+                                        firstCharacter,
+                                        firstPosition,
+                                        secondPosition
+                                )
                         )
-                )
+                ))
         );
 
         CharacterActionHandler handler = new CharacterActionHandler(game, action);
@@ -215,14 +223,16 @@ public class CharacterActionHandlerTest {
         assertSame(character, game.getBoard().getCell(originPosition).getCharacter());
         assertNull(game.getBoard().getCell(destinationPosition).getCharacter());
 
-        CharacterAction action = new CharacterAction(
-                character,
-                List.of(new CharacterActionTarget(
-                        character,
-                        originPosition,
-                        destinationPosition
+        CharacterAction action = new CharacterAction(character,
+                List.of(new CharacterActionMotion(CharacterMotionType.Move,
+                        List.of(new CharacterActionTarget(
+                                character,
+                                originPosition,
+                                destinationPosition
+                        ))
                 ))
         );
+
         CharacterActionHandler handler = new CharacterActionHandler(game, action);
 
         handler.doAction();
@@ -241,14 +251,16 @@ public class CharacterActionHandlerTest {
 
         assertSame(character, game.getBoard().getCell(originPosition).getCharacter());
 
-        CharacterAction action = new CharacterAction(
-                character,
-                List.of(new CharacterActionTarget(
-                        character,
-                        originPosition,
-                        null
+        CharacterAction action = new CharacterAction(character,
+                List.of(new CharacterActionMotion(CharacterMotionType.Remove,
+                        List.of(new CharacterActionTarget(
+                                character,
+                                originPosition,
+                                null
+                        ))
                 ))
         );
+
         CharacterActionHandler handler = new CharacterActionHandler(game, action);
 
         handler.doAction();
@@ -285,7 +297,9 @@ public class CharacterActionHandlerTest {
                 )
         );
 
-        CharacterAction action = new CharacterAction(firstCharacter, targets);
+        CharacterAction action = new CharacterAction(firstCharacter,
+                List.of(new CharacterActionMotion(CharacterMotionType.Swap, targets)));
+
         CharacterActionHandler handler = new CharacterActionHandler(game, action);
 
         handler.doAction();
@@ -313,20 +327,21 @@ public class CharacterActionHandlerTest {
         assertSame(secondCharacter, game.getBoard().getCell(secondPosition).getCharacter());
         assertNull(game.getBoard().getCell(thirdPosition).getCharacter());
 
-        CharacterAction action = new CharacterAction(
-                firstCharacter,
-                List.of(
-                        new CharacterActionTarget(
-                                secondCharacter,
-                                secondPosition,
-                                thirdPosition
-                        ),
-                        new CharacterActionTarget(
-                                firstCharacter,
-                                firstPosition,
-                                secondPosition
+        CharacterAction action = new CharacterAction(firstCharacter,
+                List.of(new CharacterActionMotion(CharacterMotionType.Remove,
+                        List.of(
+                                new CharacterActionTarget(
+                                        secondCharacter,
+                                        secondPosition,
+                                        thirdPosition
+                                ),
+                                new CharacterActionTarget(
+                                        firstCharacter,
+                                        firstPosition,
+                                        secondPosition
+                                )
                         )
-                )
+                ))
         );
 
         CharacterActionHandler handler = new CharacterActionHandler(game, action);

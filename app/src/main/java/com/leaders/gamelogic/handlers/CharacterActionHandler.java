@@ -3,6 +3,7 @@ package com.leaders.gamelogic.handlers;
 import androidx.annotation.NonNull;
 
 import com.leaders.gamelogic.actions.CharacterAction;
+import com.leaders.gamelogic.actions.CharacterActionMotion;
 import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Game;
@@ -25,16 +26,19 @@ public final class CharacterActionHandler extends GameActionHandler {
     @Override
     public void doAction() {
         Board board = game.getBoard();
-        // Characters are removed from their original position before being added to their destination.
-        // This prevents a character swap from removing a character that has already been placed.
-        for (CharacterActionTarget target : characterAction.getTargets()) {
-            if (target.getOriginPos() != null) {
-                board.getCell(target.getOriginPos()).setCharacter(null);
+
+        for (CharacterActionMotion motion : characterAction.getMotions()) {
+            // Characters are removed from their original position before being added to their destination.
+            // This prevents a character swap from removing a character that has already been placed.
+            for (CharacterActionTarget target : motion.getTargets()) {
+                if (target.getOriginPos() != null) {
+                    board.getCell(target.getOriginPos()).setCharacter(null);
+                }
             }
-        }
-        for (CharacterActionTarget target : characterAction.getTargets()) {
-            if (target.getDestPos() != null) {
-                board.getCell(target.getDestPos()).setCharacter(target.getCharacter());
+            for (CharacterActionTarget target : motion.getTargets()) {
+                if (target.getDestPos() != null) {
+                    board.getCell(target.getDestPos()).setCharacter(target.getCharacter());
+                }
             }
         }
     }
@@ -42,16 +46,19 @@ public final class CharacterActionHandler extends GameActionHandler {
     @Override
     public void undoAction() {
         Board board = game.getBoard();
-        // Characters are removed from their destination before being restored to their original position.
-        // This mirrors the action application order and prevents incorrect removals during swaps.
-        for (CharacterActionTarget target : characterAction.getTargets()) {
-            if (target.getDestPos() != null) {
-                board.getCell(target.getDestPos()).setCharacter(null);
+
+        for (CharacterActionMotion motion : characterAction.getMotions()) {
+            // Characters are removed from their destination before being restored to their original position.
+            // This mirrors the action application order and prevents incorrect removals during swaps.
+            for (CharacterActionTarget target : motion.getTargets()) {
+                if (target.getDestPos() != null) {
+                    board.getCell(target.getDestPos()).setCharacter(null);
+                }
             }
-        }
-        for (CharacterActionTarget target : characterAction.getTargets()) {
-            if (target.getOriginPos() != null) {
-                board.getCell(target.getOriginPos()).setCharacter(target.getCharacter());
+            for (CharacterActionTarget target : motion.getTargets()) {
+                if (target.getOriginPos() != null) {
+                    board.getCell(target.getOriginPos()).setCharacter(target.getCharacter());
+                }
             }
         }
     }

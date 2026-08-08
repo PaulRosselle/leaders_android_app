@@ -17,11 +17,11 @@ public final class CharacterAction implements IGameAction {
     private final Character srcCharacter;
 
     @NonNull
-    private final List<CharacterActionTarget> targets;
+    private final List<CharacterActionMotion> motions;
 
-    public CharacterAction(@NonNull Character srcCharacter, @NonNull List<CharacterActionTarget> targets) {
+    public CharacterAction(@NonNull Character srcCharacter, @NonNull List<CharacterActionMotion> motions) {
         this.srcCharacter = srcCharacter;
-        this.targets = targets;
+        this.motions = motions;
     }
 
     @NonNull
@@ -30,7 +30,7 @@ public final class CharacterAction implements IGameAction {
     }
 
     @NonNull
-    public List<CharacterActionTarget> getTargets() {
-        return targets;
+    public List<CharacterActionMotion> getMotions() {
+        return motions;
     }
 }
