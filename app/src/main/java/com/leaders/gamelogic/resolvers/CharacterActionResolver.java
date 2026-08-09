@@ -28,7 +28,6 @@ import com.leaders.gamelogic.queries.CharacterAbilityQuery;
 import com.leaders.gamelogic.queries.GameQuery;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -195,18 +194,20 @@ public class CharacterActionResolver {
             return null;
         }
 
-        // No feedback is generated if the action is not a character movement (ex : cancellation)
-        InteractionResult interactionResult = builder.getInteractionResults().get(0);
-        if (interactionResult.getResultType() != InteractionResultType.PositionChosen ||
-                interactionResult.getChosenTarget() == null) {
+        InteractionResult result = builder.getInteractionResults().get(0);
+        if (result.getResultType() == InteractionResultType.CancelAction) {
             return null;
         }
 
-        CharacterActionTarget target = new CharacterActionTarget(
-                builder.getSourceCharacter(),
-                BoardQuery.getCellByCharacterId(game.getBoard(), character.getId()).getPosition(),
-                Objects.requireNonNull(interactionResult.getChosenTarget().getChosenPosition(),
-                        "A movement interaction target must be a valid Position")
+        if (!isNormalMovementResult(result)) {
+            throw new IllegalArgumentException("The default action resolver only handles normal movement");
+        }
+
+        CharacterActionTarget target = new CharacterActionTarget(character, characterPos,
+                Objects.requireNonNull(Objects.requireNonNull(result.getChosenTarget(),
+                                "Movement interaction result invalid : no target")
+                                .getChosenPosition(),
+                        "Movement interaction result invalid : no target")
         );
         return new InteractionFeedback(new CharacterActionMotion(CharacterMotionType.Move, List.of(target)));
     }
@@ -229,5 +230,11 @@ public class CharacterActionResolver {
 
         return new CharacterAction(builder.getSourceCharacter(),
                 List.of((builder.getInteractionFeedbacks().get(0).getCharacterActionMotion())));
+    }
+
+    protected boolean isNormalMovementResult(@NonNull InteractionResult result) {
+        return result.getResultType() == InteractionResultType.PositionChosen &&
+                result.getChosenTarget() != null &&
+                result.getChosenTarget().getCategory() == TargetCategory.MovementDestination;
     }
 }

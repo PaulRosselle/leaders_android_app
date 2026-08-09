@@ -50,7 +50,7 @@ public class AcrobatActionResolver extends CharacterActionResolver {
         // If the action builder contains already a default movement interaction,
         // we leave the interaction to be handled by the parent default movement resolver
         if (!builder.getInteractionResults().isEmpty()) {
-            if (isInteractionResultMovement(builder.getInteractionResults().get(0))) {
+            if (isNormalMovementResult(builder.getInteractionResults().get(0))) {
                 return super.getNextInteraction(builder);
             }
             return null;
@@ -83,18 +83,25 @@ public class AcrobatActionResolver extends CharacterActionResolver {
         }
 
         InteractionResult result = builder.getInteractionResults().get(0);
+        if (result.getResultType() == InteractionResultType.CancelAction) {
+            return null;
+        }
+
         InteractionFeedback feedback;
-        if (isInteractionResultMovement(result)) {
+        if (isNormalMovementResult(result)) {
             feedback = super.getNextFeedback(builder);
-        } else {
+        } else if (isInteractionResultAcrobatJump(result)){
             feedback = buildAcrobatJumpFeedback(result);
+        } else {
+            throw new IllegalArgumentException("Invalid Acrobat interaction type " + result.getResultType());
         }
         return feedback;
     }
 
-    private boolean isInteractionResultMovement(@NonNull InteractionResult result) {
-        return result.getChosenTarget() != null &&
-                result.getChosenTarget().getCategory() == TargetCategory.MovementDestination;
+    private boolean isInteractionResultAcrobatJump(@NonNull InteractionResult result) {
+        return result.getResultType() == InteractionResultType.PositionChosen &&
+                result.getChosenTarget() != null &&
+                result.getChosenTarget().getCategory() == TargetCategory.ActiveAbilityDestination;
     }
 
     @NonNull
