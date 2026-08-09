@@ -3,6 +3,7 @@ package com.leaders.gamelogic.resolvers.characters;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.actions.CharacterActionMotion;
 import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.entities.Cell;
@@ -42,7 +43,7 @@ public class BrewmasterActionResolver extends CharacterActionResolver {
     @Nullable
     public InteractionRequest getNextInteraction(@NonNull CharacterActionBuilder builder) {
         // For the first interaction, both normal movement and ability activation are possible
-        if (builder.getInteractionResults().isEmpty()) {
+         if (builder.getInteractionResults().isEmpty()) {
             return buildInitialInteraction(builder);
         }
 
@@ -115,7 +116,7 @@ public class BrewmasterActionResolver extends CharacterActionResolver {
      * An ally is only offered as an ability target if it has at least one valid destination.</p>*/
     @NonNull
     private InteractionRequest buildInitialInteraction(@NonNull CharacterActionBuilder builder) {
-        List<InteractionTarget> legalTargets = new ArrayList<>();
+         List<InteractionTarget> legalTargets = new ArrayList<>();
 
         // Normal movement and Brewmaster ability target cannot overlap:
         // a normal move requires an adjacent empty cell, while the brewmaster can only target adjacent allies.
@@ -223,7 +224,7 @@ public class BrewmasterActionResolver extends CharacterActionResolver {
                         List.of(new CharacterActionTarget(target, targetPos, destPos))
                     ))
             );
-            if (!isActionValid(buildAction(destBuilder))) {
+            if (isActionValid(buildAction(destBuilder))) {
                 targetDestinations.add(destPos);
                 // Exiting early can be useful to check if a target has at least one valid destination
                 if (exitAfterFirstValidDest) {
@@ -234,7 +235,6 @@ public class BrewmasterActionResolver extends CharacterActionResolver {
 
         return targetDestinations;
     }
-
 
     private boolean isBrewmasterTargetResult(@NonNull InteractionResult result) {
         return result.getResultType() == InteractionResultType.PositionChosen &&

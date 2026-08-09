@@ -223,13 +223,15 @@ public class CharacterActionResolver {
      */
     @NonNull
     public CharacterAction buildAction(@NonNull CharacterActionBuilder builder) {
-        if (builder.getInteractionResults().size() != 1 ||
-                builder.getInteractionFeedbacks().size() != 1) {
-            throw new IllegalArgumentException("The default character action resolver only handles single interaction actions");
+        if (builder.getInteractionFeedbacks().size() > 1) {
+            throw new IllegalArgumentException("The default resolver use the builder's CharacterActionMotions to create a CharacterAction");
         }
 
-        return new CharacterAction(builder.getSourceCharacter(),
-                List.of((builder.getInteractionFeedbacks().get(0).getCharacterActionMotion())));
+        List<CharacterActionMotion> characterActionMotions = new ArrayList<>();
+        for (InteractionFeedback feedback : builder.getInteractionFeedbacks()) {
+            characterActionMotions.add(feedback.getCharacterActionMotion());
+        }
+        return new CharacterAction(builder.getSourceCharacter(), characterActionMotions);
     }
 
     protected boolean isNormalMovementResult(@NonNull InteractionResult result) {
