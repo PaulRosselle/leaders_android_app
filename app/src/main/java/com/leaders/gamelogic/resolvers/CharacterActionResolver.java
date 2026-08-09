@@ -195,11 +195,11 @@ public class CharacterActionResolver {
             return null;
         }
 
-        // For a movement to be valid, a destination (Position) must be chosen.
+        // No feedback is generated if the action is not a character movement (ex : cancellation)
         InteractionResult interactionResult = builder.getInteractionResults().get(0);
         if (interactionResult.getResultType() != InteractionResultType.PositionChosen ||
                 interactionResult.getChosenTarget() == null) {
-            throw new IllegalArgumentException("A movement action cannot be built without a PositionChosen InteractionResult");
+            return null;
         }
 
         CharacterActionTarget target = new CharacterActionTarget(

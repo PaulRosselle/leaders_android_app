@@ -123,9 +123,11 @@ public class AcrobatActionResolver extends CharacterActionResolver {
             Position destination = destinations.get(i);
 
             CharacterActionBuilder jumpBuilder = new CharacterActionBuilder(builder);
-            jumpBuilder.addResult(new InteractionResult(InteractionResultType.PositionChosen,
+            InteractionResult jumpResult = new InteractionResult(InteractionResultType.PositionChosen,
                     new InteractionTarget(TargetCategory.ActiveAbilityDestination, destination)
-            ));
+            );
+            jumpBuilder.addResult(jumpResult);
+            jumpBuilder.addFeedback(buildAcrobatJumpFeedback(jumpResult));
 
             if (!isActionValid(buildAction(jumpBuilder))) {
                 destinations.remove(i);
