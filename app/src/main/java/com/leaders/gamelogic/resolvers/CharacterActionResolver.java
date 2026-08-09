@@ -195,11 +195,11 @@ public class CharacterActionResolver {
             return null;
         }
 
-        // For a movement to be valid, a destination (Position) must be chosen.
+        // No feedback is generated if the action is not a character movement (ex : cancellation)
         InteractionResult interactionResult = builder.getInteractionResults().get(0);
         if (interactionResult.getResultType() != InteractionResultType.PositionChosen ||
                 interactionResult.getChosenTarget() == null) {
-            throw new IllegalArgumentException("A movement action cannot be built without a PositionChosen InteractionResult");
+            return null;
         }
 
         CharacterActionTarget target = new CharacterActionTarget(
@@ -224,10 +224,10 @@ public class CharacterActionResolver {
     public CharacterAction buildAction(@NonNull CharacterActionBuilder builder) {
         if (builder.getInteractionResults().size() != 1 ||
                 builder.getInteractionFeedbacks().size() != 1) {
-            throw new IllegalArgumentException("The default character action builder only handles single interaction actions");
+            throw new IllegalArgumentException("The default character action resolver only handles single interaction actions");
         }
 
         return new CharacterAction(builder.getSourceCharacter(),
-                Collections.singletonList(builder.getInteractionFeedbacks().get(0).getCharacterActionMotion()));
+                List.of((builder.getInteractionFeedbacks().get(0).getCharacterActionMotion())));
     }
 }
