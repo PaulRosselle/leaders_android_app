@@ -72,7 +72,7 @@ public class BrewmasterActionResolverTest {
     }
 
     private void occupyAdjacentCells(@NonNull Position position) {
-        // Keep the test independent from the exact number of board cells around the target.
+        // Keep the test independent of the exact number of board cells around the target.
         // Only occupy cells that are available inside the board.
         for (com.leaders.gamelogic.enums.Direction direction : com.leaders.gamelogic.enums.Direction.values()) {
             com.leaders.gamelogic.entities.Cell cell =
