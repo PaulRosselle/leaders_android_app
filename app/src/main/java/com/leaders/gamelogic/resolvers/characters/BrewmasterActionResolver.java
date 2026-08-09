@@ -3,7 +3,6 @@ package com.leaders.gamelogic.resolvers.characters;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.actions.CharacterActionMotion;
 import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.entities.Cell;

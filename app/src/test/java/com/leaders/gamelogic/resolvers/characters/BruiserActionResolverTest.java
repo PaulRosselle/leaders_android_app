@@ -36,13 +36,15 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.EnumMap;
 
-public class BrewmasterActionResolverTest {
+public class BruiserActionResolverTest {
 
-    private static final Position BREWMASTER_POSITION = new Position(3, 3);
+    private static final Position BRUISER_POSITION = new Position(3, 3);
+    private static final Position TARGET_POSITION = new Position(3, 4);
 
     private Game game;
-    private Character brewmaster;
-    private BrewmasterActionResolver resolver;
+    private Character bruiser;
+    private Character target;
+    private BruiserActionResolver resolver;
 
     private Game createTestGame() {
         return new Game(new Board(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(),
@@ -58,46 +60,7 @@ public class BrewmasterActionResolverTest {
     }
 
     private CharacterActionBuilder createBuilder() {
-        return new CharacterActionBuilder(brewmaster, new ArrayList<>(), new ArrayList<>());
-    }
-
-
-
-    @NonNull
-    private Character placeCharacter(@NonNull CharacterType type, @NonNull TeamColor teamColor,
-                                     @NonNull Position position) {
-        Character character = Character.create(type, teamColor);
-        game.getBoard().getCell(position).setCharacter(character);
-        return character;
-    }
-
-    private void occupyAdjacentCells(@NonNull Position position) {
-        // Keep the test independent of the exact number of board cells around the target.
-        // Only occupy cells that are available inside the board.
-        for (com.leaders.gamelogic.enums.Direction direction : com.leaders.gamelogic.enums.Direction.values()) {
-            com.leaders.gamelogic.entities.Cell cell =
-                    com.leaders.gamelogic.queries.BoardQuery.findAdjacentCell(game.getBoard(), position, direction);
-            if (cell != null && cell.getCharacter() == null) {
-                placeCharacter(CharacterType.Hermit, TeamColor.White, cell.getPosition());
-            }
-        }
-    }
-
-    @NonNull
-    private InteractionResult createPositionResult(@NonNull TargetCategory category,
-                                                   @NonNull Position position) {
-        return new InteractionResult(InteractionResultType.PositionChosen,
-                new InteractionTarget(category, position));
-    }
-
-    private boolean containsTarget(@NonNull InteractionRequest request, @NonNull TargetCategory category,
-                                   @NonNull Position position) {
-        for (InteractionTarget target : request.getLegalTargets()) {
-            if (target.getCategory() == category && position.equals(target.getChosenPosition())) {
-                return true;
-            }
-        }
-        return false;
+        return new CharacterActionBuilder(bruiser, new ArrayList<>(), new ArrayList<>());
     }
 
     @Before
@@ -107,18 +70,18 @@ public class BrewmasterActionResolverTest {
         Character leader = Character.create(CharacterType.LeaderKing, TeamColor.Black);
         game.getBoard().getCell(new Position(0, 0)).setCharacter(leader);
 
-        brewmaster = Character.create(CharacterType.Brewmaster, TeamColor.Black);
-        game.getBoard().getCell(BREWMASTER_POSITION).setCharacter(brewmaster);
+        bruiser = Character.create(CharacterType.Bruiser, TeamColor.Black);
+        game.getBoard().getCell(BRUISER_POSITION).setCharacter(bruiser);
 
-        resolver = new BrewmasterActionResolver(game, createTestGameHistory(), brewmaster);
+        target = Character.create(CharacterType.Hermit, TeamColor.White);
+        game.getBoard().getCell(TARGET_POSITION).setCharacter(target);
+
+        resolver = new BruiserActionResolver(game, createTestGameHistory(), bruiser);
     }
 
     @Test
-    public void getNextInteraction_shouldRequestNormalMovementAndBrewmasterTargets() {
+    public void getNextInteraction_shouldRequestNormalMovementAndBruiserTargets() {
         Position normalDestination = new Position(3, 2);
-        Position allyPosition = new Position(3, 4);
-
-        placeCharacter(CharacterType.Hermit, TeamColor.Black, allyPosition);
 
         InteractionRequest request = resolver.getNextInteraction(createBuilder());
 
@@ -128,16 +91,16 @@ public class BrewmasterActionResolverTest {
         assertTrue(request.getLegalResults().contains(InteractionResultType.CancelAction));
 
         assertTrue(containsTarget(request, TargetCategory.MovementDestination, normalDestination));
-        assertTrue(containsTarget(request, TargetCategory.ActiveAbilityTargetPosition, allyPosition));
+        assertTrue(containsTarget(request, TargetCategory.ActiveAbilityTargetPosition, TARGET_POSITION));
     }
 
     @Test
-    public void getNextInteraction_shouldNotExposeAllyWithoutValidDestination() {
-        Position allyPosition = new Position(3, 4);
+    public void getNextInteraction_shouldNotExposeAdjacentAllyAsBruiserTarget() {
+        Position allyPosition = TARGET_POSITION;
 
-        placeCharacter(CharacterType.Hermit, TeamColor.Black, allyPosition);
-
-        occupyAdjacentCells(allyPosition);
+        game.getBoard().getCell(TARGET_POSITION).setCharacter(null);
+        Character ally = Character.create(CharacterType.Hermit, TeamColor.Black);
+        game.getBoard().getCell(allyPosition).setCharacter(ally);
 
         InteractionRequest request = resolver.getNextInteraction(createBuilder());
 
@@ -146,14 +109,9 @@ public class BrewmasterActionResolverTest {
     }
 
     @Test
-    public void getNextInteraction_shouldReturnDestinationChoicesAfterAllySelected() {
-        Position allyPosition = new Position(3, 4);
-        Position destination = new Position(3, 5);
-
-        placeCharacter(CharacterType.Hermit, TeamColor.Black, allyPosition);
-
+    public void getNextInteraction_shouldRequestPushDestinationAfterEnemySelected() {
         CharacterActionBuilder builder = createBuilder();
-        builder.addResult(createPositionResult(TargetCategory.ActiveAbilityTargetPosition, allyPosition));
+        builder.addResult(createPositionResult(TargetCategory.ActiveAbilityTargetPosition, TARGET_POSITION));
 
         InteractionRequest request = resolver.getNextInteraction(builder);
 
@@ -161,7 +119,12 @@ public class BrewmasterActionResolverTest {
         assertEquals(InteractionType.PositionExpected, request.getType());
         assertTrue(request.getLegalResults().contains(InteractionResultType.PositionChosen));
         assertTrue(request.getLegalResults().contains(InteractionResultType.CancelAction));
-        assertTrue(containsTarget(request, TargetCategory.ActiveAbilityTargetPosition, destination));
+
+        assertTrue(containsTarget(request, TargetCategory.ActiveAbilityDestination, new Position(2, 4)));
+        assertTrue(containsTarget(request, TargetCategory.ActiveAbilityDestination, new Position(4, 4)));
+        assertTrue(containsTarget(request, TargetCategory.ActiveAbilityDestination, new Position(3, 5)));
+
+        assertFalse(containsTarget(request, TargetCategory.ActiveAbilityDestination, BRUISER_POSITION));
     }
 
     @Test
@@ -172,6 +135,14 @@ public class BrewmasterActionResolverTest {
         builder.addResult(createPositionResult(TargetCategory.MovementDestination, destination));
 
         assertNull(resolver.getNextInteraction(builder));
+    }
+
+    @Test
+    public void getNextFeedback_shouldReturnNullBeforePushDestinationIsSelected() {
+        CharacterActionBuilder builder = createBuilder();
+        builder.addResult(createPositionResult(TargetCategory.ActiveAbilityTargetPosition, TARGET_POSITION));
+
+        assertNull(resolver.getNextFeedback(builder));
     }
 
     @Test
@@ -189,20 +160,17 @@ public class BrewmasterActionResolverTest {
 
         assertEquals(CharacterMotionType.Move, motion.getMotionType());
         assertEquals(1, motion.getTargets().size());
-        assertEquals(brewmaster, motion.getTargets().get(0).getCharacter());
-        assertEquals(BREWMASTER_POSITION, motion.getTargets().get(0).getOriginPos());
+        assertEquals(bruiser, motion.getTargets().get(0).getCharacter());
+        assertEquals(BRUISER_POSITION, motion.getTargets().get(0).getOriginPos());
         assertEquals(destination, motion.getTargets().get(0).getDestPos());
     }
 
     @Test
-    public void getNextFeedback_shouldCreateMoveForBrewmasterAbility() {
-        Position allyPosition = new Position(3, 4);
+    public void getNextFeedback_shouldCreatePushFeedback() {
         Position destination = new Position(3, 5);
 
-        Character ally = placeCharacter(CharacterType.Hermit, TeamColor.Black, allyPosition);
-
         CharacterActionBuilder builder = createBuilder();
-        builder.addResult(createPositionResult(TargetCategory.ActiveAbilityTargetPosition, allyPosition));
+        builder.addResult(createPositionResult(TargetCategory.ActiveAbilityTargetPosition, TARGET_POSITION));
         builder.addResult(createPositionResult(TargetCategory.ActiveAbilityDestination, destination));
 
         InteractionFeedback feedback = resolver.getNextFeedback(builder);
@@ -211,34 +179,24 @@ public class BrewmasterActionResolverTest {
 
         CharacterActionMotion motion = feedback.getCharacterActionMotion();
 
-        assertEquals(CharacterMotionType.Move, motion.getMotionType());
-        assertEquals(1, motion.getTargets().size());
-        assertEquals(ally, motion.getTargets().get(0).getCharacter());
-        assertEquals(allyPosition, motion.getTargets().get(0).getOriginPos());
-        assertEquals(destination, motion.getTargets().get(0).getDestPos());
-    }
+        assertEquals(CharacterMotionType.Push, motion.getMotionType());
+        assertEquals(2, motion.getTargets().size());
 
-    @Test
-    public void getNextFeedback_shouldReturnNullBeforeDestinationIsSelected() {
-        Position allyPosition = new Position(3, 4);
+        assertEquals(bruiser, motion.getTargets().get(0).getCharacter());
+        assertEquals(BRUISER_POSITION, motion.getTargets().get(0).getOriginPos());
+        assertEquals(TARGET_POSITION, motion.getTargets().get(0).getDestPos());
 
-        placeCharacter(CharacterType.Hermit, TeamColor.Black, allyPosition);
-
-        CharacterActionBuilder builder = createBuilder();
-        builder.addResult(createPositionResult(TargetCategory.ActiveAbilityTargetPosition, allyPosition));
-
-        assertNull(resolver.getNextFeedback(builder));
+        assertEquals(target, motion.getTargets().get(1).getCharacter());
+        assertEquals(TARGET_POSITION, motion.getTargets().get(1).getOriginPos());
+        assertEquals(destination, motion.getTargets().get(1).getDestPos());
     }
 
     @Test
     public void getNextFeedback_shouldReturnNullAfterFeedbackWasGenerated() {
-        Position allyPosition = new Position(3, 4);
         Position destination = new Position(3, 5);
 
-        placeCharacter(CharacterType.Hermit, TeamColor.Black, allyPosition);
-
         CharacterActionBuilder builder = createBuilder();
-        builder.addResult(createPositionResult(TargetCategory.ActiveAbilityTargetPosition, allyPosition));
+        builder.addResult(createPositionResult(TargetCategory.ActiveAbilityTargetPosition, TARGET_POSITION));
         builder.addResult(createPositionResult(TargetCategory.ActiveAbilityDestination, destination));
 
         InteractionFeedback feedback = resolver.getNextFeedback(builder);
@@ -265,20 +223,17 @@ public class BrewmasterActionResolverTest {
 
         CharacterAction action = resolver.buildAction(builder);
 
-        assertEquals(brewmaster, action.getSrcCharacter());
+        assertEquals(bruiser, action.getSrcCharacter());
         assertEquals(1, action.getMotions().size());
         assertEquals(CharacterMotionType.Move, action.getMotions().get(0).getMotionType());
     }
 
     @Test
-    public void buildAction_shouldBuildBrewmasterAbilityAction() {
-        Position allyPosition = new Position(3, 4);
+    public void buildAction_shouldBuildPushAction() {
         Position destination = new Position(3, 5);
 
-        placeCharacter(CharacterType.Hermit, TeamColor.Black, allyPosition);
-
         CharacterActionBuilder builder = createBuilder();
-        builder.addResult(createPositionResult(TargetCategory.ActiveAbilityTargetPosition, allyPosition));
+        builder.addResult(createPositionResult(TargetCategory.ActiveAbilityTargetPosition, TARGET_POSITION));
         builder.addResult(createPositionResult(TargetCategory.ActiveAbilityDestination, destination));
 
         InteractionFeedback feedback = resolver.getNextFeedback(builder);
@@ -289,39 +244,47 @@ public class BrewmasterActionResolverTest {
 
         CharacterAction action = resolver.buildAction(builder);
 
-        assertEquals(brewmaster, action.getSrcCharacter());
+        assertEquals(bruiser, action.getSrcCharacter());
         assertEquals(1, action.getMotions().size());
-        assertEquals(CharacterMotionType.Move, action.getMotions().get(0).getMotionType());
-        assertEquals(allyPosition, action.getMotions().get(0).getTargets().get(0).getOriginPos());
-        assertEquals(destination, action.getMotions().get(0).getTargets().get(0).getDestPos());
+
+        CharacterActionMotion motion = action.getMotions().get(0);
+
+        assertEquals(CharacterMotionType.Push, motion.getMotionType());
+        assertEquals(2, motion.getTargets().size());
+        assertEquals(bruiser, motion.getTargets().get(0).getCharacter());
+        assertEquals(target, motion.getTargets().get(1).getCharacter());
     }
 
     @Test
-    public void getNextInteraction_shouldIgnoreAdjacentEnemyAsBrewmasterTarget() {
-        Position enemyPosition = new Position(3, 4);
-
-        placeCharacter(CharacterType.Hermit, TeamColor.White, enemyPosition);
-
-        InteractionRequest request = resolver.getNextInteraction(createBuilder());
-
-        assertNotNull(request);
-        assertFalse(containsTarget(request, TargetCategory.ActiveAbilityTargetPosition, enemyPosition));
-    }
-
-    @Test
-    public void getNextInteraction_shouldNotExposeOccupiedDestination() {
-        Position allyPosition = new Position(3, 4);
+    public void getNextInteraction_shouldNotExposeOccupiedPushDestination() {
         Position occupiedDestination = new Position(3, 5);
 
-        placeCharacter(CharacterType.Hermit, TeamColor.Black, allyPosition);
-        placeCharacter(CharacterType.Rider, TeamColor.White, occupiedDestination);
+        Character occupant = Character.create(CharacterType.Hermit, TeamColor.Black);
+        game.getBoard().getCell(occupiedDestination).setCharacter(occupant);
 
         CharacterActionBuilder builder = createBuilder();
-        builder.addResult(createPositionResult(TargetCategory.ActiveAbilityTargetPosition, allyPosition));
+        builder.addResult(createPositionResult(TargetCategory.ActiveAbilityTargetPosition, TARGET_POSITION));
 
         InteractionRequest request = resolver.getNextInteraction(builder);
 
         assertNotNull(request);
-        assertFalse(containsTarget(request, TargetCategory.ActiveAbilityTargetPosition, occupiedDestination));
+        assertFalse(containsTarget(request, TargetCategory.ActiveAbilityDestination, occupiedDestination));
+    }
+
+    @NonNull
+    private InteractionResult createPositionResult(@NonNull TargetCategory category,
+                                                   @NonNull Position position) {
+        return new InteractionResult(InteractionResultType.PositionChosen,
+                new InteractionTarget(category, position));
+    }
+
+    private boolean containsTarget(@NonNull InteractionRequest request, @NonNull TargetCategory category,
+                                   @NonNull Position position) {
+        for (InteractionTarget target : request.getLegalTargets()) {
+            if (target.getCategory() == category && position.equals(target.getChosenPosition())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
