@@ -224,10 +224,10 @@ public class CharacterActionResolver {
     public CharacterAction buildAction(@NonNull CharacterActionBuilder builder) {
         if (builder.getInteractionResults().size() != 1 ||
                 builder.getInteractionFeedbacks().size() != 1) {
-            throw new IllegalArgumentException("The default character action builder only handles single interaction actions");
+            throw new IllegalArgumentException("The default character action resolver only handles single interaction actions");
         }
 
         return new CharacterAction(builder.getSourceCharacter(),
-                Collections.singletonList(builder.getInteractionFeedbacks().get(0).getCharacterActionMotion()));
+                List.of((builder.getInteractionFeedbacks().get(0).getCharacterActionMotion())));
     }
 }

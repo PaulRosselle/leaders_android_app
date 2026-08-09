@@ -138,7 +138,7 @@ public class CharacterActionResolverTest {
         builder.addResult(createPositionResult(destination));
 
         InteractionFeedback feedback = resolver.getNextFeedback(builder);
-        
+
         assertNotNull(feedback);
 
         builder.addFeedback(feedback);
