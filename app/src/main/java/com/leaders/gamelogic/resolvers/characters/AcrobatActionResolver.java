@@ -28,7 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class AcrobatActionResolver extends CharacterActionResolver {
+public final class AcrobatActionResolver extends CharacterActionResolver {
 
     /**
      * Resolves the Acrobat's active ability.

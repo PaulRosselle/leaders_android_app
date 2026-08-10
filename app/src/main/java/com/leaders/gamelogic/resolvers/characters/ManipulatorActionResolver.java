@@ -36,7 +36,7 @@ import java.util.Objects;
  * <p>The ability requires the player to first select the enemy to move, then
  * select its destination.</p>
  */
-public class ManipulatorActionResolver extends CharacterActionResolver {
+public final class ManipulatorActionResolver extends CharacterActionResolver {
 
     public ManipulatorActionResolver(@NonNull Game game, @NonNull GameHistory gameHistory,
                                      @NonNull Character character) {

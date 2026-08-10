@@ -36,7 +36,7 @@ import java.util.Objects;
  * <p>The ability requires the player to first select an adjacent enemy, then
  * select a valid destination for the pushed enemy.</p>
  */
-public class BruiserActionResolver extends CharacterActionResolver {
+public final class BruiserActionResolver extends CharacterActionResolver {
 
     public BruiserActionResolver(@NonNull Game game, @NonNull GameHistory gameHistory, @NonNull Character character) {
         super(game, gameHistory, character);
