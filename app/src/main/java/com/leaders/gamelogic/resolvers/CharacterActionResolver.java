@@ -156,7 +156,7 @@ public class CharacterActionResolver {
     public InteractionRequest getNextInteraction(@NonNull CharacterActionBuilder builder) {
         // The default movement action only requires a single interaction.
         // If an interaction has already been selected, no further interaction can be added to this action.
-        if (!builder.getInteractionResults().isEmpty()) {
+        if (!builder.getResults().isEmpty()) {
             return null;
         }
 
@@ -189,12 +189,12 @@ public class CharacterActionResolver {
     public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
         // The default movement action only requires a single interaction.
         // When the result is gotten, a single feedback can be generated containing the movement instructions
-        if (builder.getInteractionResults().size() != 1 ||
-                !builder.getInteractionFeedbacks().isEmpty()) {
+        if (builder.getResults().size() != 1 ||
+                !builder.getFeedbacks().isEmpty()) {
             return null;
         }
 
-        InteractionResult result = builder.getInteractionResults().get(0);
+        InteractionResult result = builder.getResults().get(0);
         if (result.getResultType() == InteractionResultType.CancelAction) {
             return null;
         }
@@ -223,12 +223,12 @@ public class CharacterActionResolver {
      */
     @NonNull
     public CharacterAction buildAction(@NonNull CharacterActionBuilder builder) {
-        if (builder.getInteractionFeedbacks().size() > 1) {
+        if (builder.getFeedbacks().size() > 1) {
             throw new IllegalArgumentException("The default resolver use the builder's CharacterActionMotions to create a CharacterAction");
         }
 
         List<CharacterActionMotion> characterActionMotions = new ArrayList<>();
-        for (InteractionFeedback feedback : builder.getInteractionFeedbacks()) {
+        for (InteractionFeedback feedback : builder.getFeedbacks()) {
             characterActionMotions.add(feedback.getCharacterActionMotion());
         }
         return new CharacterAction(builder.getSourceCharacter(), characterActionMotions);

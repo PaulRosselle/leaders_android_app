@@ -42,11 +42,11 @@ public final class BrewmasterActionResolver extends CharacterActionResolver {
     @Nullable
     public InteractionRequest getNextInteraction(@NonNull CharacterActionBuilder builder) {
         // For the first interaction, both normal movement and ability activation are possible
-         if (builder.getInteractionResults().isEmpty()) {
+         if (builder.getResults().isEmpty()) {
             return buildInitialInteraction(builder);
         }
 
-        InteractionResult firstResult = builder.getInteractionResults().get(0);
+        InteractionResult firstResult = builder.getResults().get(0);
         // If the first interaction was a normal movement
         if (isNormalMovementResult(firstResult)) {
             return super.getNextInteraction(builder);
@@ -63,11 +63,11 @@ public final class BrewmasterActionResolver extends CharacterActionResolver {
     @Nullable
     public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
         // Brewmaster actions generate a single feedback.
-        if (!builder.getInteractionFeedbacks().isEmpty()) {
+        if (!builder.getFeedbacks().isEmpty()) {
             return null;
         }
 
-        InteractionResult firstResult = builder.getInteractionResults().get(0);
+        InteractionResult firstResult = builder.getResults().get(0);
         if (firstResult.getResultType() == InteractionResultType.CancelAction) {
             return null;
         }
@@ -80,11 +80,11 @@ public final class BrewmasterActionResolver extends CharacterActionResolver {
 
         // An ability activation requires two interactions: the selected ally
         // and the destination to which that ally should be moved.
-        if (builder.getInteractionResults().size() < 2) {
+        if (builder.getResults().size() < 2) {
             return null;
         }
 
-        InteractionResult targetDestResult = builder.getInteractionResults().get(1);
+        InteractionResult targetDestResult = builder.getResults().get(1);
 
         if (!isBrewmasterTargetResult(firstResult) ||
                 !isBrewmasterTargetDestinationResult(targetDestResult)) {
@@ -200,7 +200,7 @@ public final class BrewmasterActionResolver extends CharacterActionResolver {
         // Create a builder containing the target selection so that each candidate
         // destination can be evaluated in the same interaction context as the final action.
         CharacterActionBuilder targetBuilder = new CharacterActionBuilder(builder);
-        if (targetBuilder.getInteractionResults().isEmpty()) {
+        if (targetBuilder.getResults().isEmpty()) {
             targetBuilder.addResult(new InteractionResult(
                     InteractionResultType.PositionChosen,
                     new InteractionTarget(TargetCategory.ActiveAbilityTargetPosition, targetPos)

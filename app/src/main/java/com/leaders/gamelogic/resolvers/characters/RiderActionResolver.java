@@ -44,7 +44,7 @@ public final class RiderActionResolver extends CharacterActionResolver {
     public InteractionRequest getNextInteraction(@NonNull CharacterActionBuilder builder) {
         // Rider actions require a single interaction.
         // If an interaction has already been selected, no further interaction can be added to this action.
-        if (!builder.getInteractionResults().isEmpty()) {
+        if (!builder.getResults().isEmpty()) {
             return null;
         }
 
@@ -71,12 +71,12 @@ public final class RiderActionResolver extends CharacterActionResolver {
     @Override
     @Nullable
     public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
-        if (builder.getInteractionResults().isEmpty() ||
-                !builder.getInteractionFeedbacks().isEmpty()) {
+        if (builder.getResults().isEmpty() ||
+                !builder.getFeedbacks().isEmpty()) {
             return null;
         }
 
-        InteractionResult result = builder.getInteractionResults().get(0);
+        InteractionResult result = builder.getResults().get(0);
 
         if (result.getResultType() == InteractionResultType.CancelAction) {
             return null;

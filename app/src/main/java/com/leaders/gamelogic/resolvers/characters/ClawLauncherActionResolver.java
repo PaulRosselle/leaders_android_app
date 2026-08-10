@@ -48,7 +48,7 @@ public final class ClawLauncherActionResolver extends CharacterActionResolver {
     @Nullable
     public InteractionRequest getNextInteraction(@NonNull CharacterActionBuilder builder) {
         // The Claw Launcher only requires a single interaction.
-        if (!builder.getInteractionResults().isEmpty()) {
+        if (!builder.getResults().isEmpty()) {
             return null;
         }
 
@@ -81,12 +81,12 @@ public final class ClawLauncherActionResolver extends CharacterActionResolver {
     @Override
     @Nullable
     public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
-        if (builder.getInteractionResults().isEmpty() ||
-                !builder.getInteractionFeedbacks().isEmpty()) {
+        if (builder.getResults().isEmpty() ||
+                !builder.getFeedbacks().isEmpty()) {
             return null;
         }
 
-        InteractionResult result = builder.getInteractionResults().get(0);
+        InteractionResult result = builder.getResults().get(0);
 
         if (result.getResultType() == InteractionResultType.CancelAction) {
             return null;

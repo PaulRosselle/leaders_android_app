@@ -46,11 +46,11 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
     @Override
     @Nullable
     public InteractionRequest getNextInteraction(@NonNull CharacterActionBuilder builder) {
-        if (builder.getInteractionResults().isEmpty()) {
+        if (builder.getResults().isEmpty()) {
             return buildInitialInteraction(builder);
         }
 
-        InteractionResult firstResult = builder.getInteractionResults().get(0);
+        InteractionResult firstResult = builder.getResults().get(0);
 
         if (isNormalMovementResult(firstResult)) {
             return super.getNextInteraction(builder);
@@ -66,15 +66,15 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
     @Override
     @Nullable
     public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
-        if (!builder.getInteractionFeedbacks().isEmpty()) {
+        if (!builder.getFeedbacks().isEmpty()) {
             return null;
         }
 
-        if (builder.getInteractionResults().isEmpty()) {
+        if (builder.getResults().isEmpty()) {
             return null;
         }
 
-        InteractionResult firstResult = builder.getInteractionResults().get(0);
+        InteractionResult firstResult = builder.getResults().get(0);
 
         if (firstResult.getResultType() == InteractionResultType.CancelAction) {
             return null;
@@ -84,11 +84,11 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
             return super.getNextFeedback(builder);
         }
 
-        if (builder.getInteractionResults().size() < 2) {
+        if (builder.getResults().size() < 2) {
             return null;
         }
 
-        InteractionResult destinationResult = builder.getInteractionResults().get(1);
+        InteractionResult destinationResult = builder.getResults().get(1);
 
         if (!isManipulatorTargetResult(firstResult) ||
                 !isManipulatorDestinationResult(destinationResult)) {
@@ -213,7 +213,7 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
 
 
         CharacterActionBuilder targetBuilder = new CharacterActionBuilder(builder);
-        if (targetBuilder.getInteractionResults().isEmpty()) {
+        if (targetBuilder.getResults().isEmpty()) {
             targetBuilder.addResult(new InteractionResult(
                     InteractionResultType.PositionChosen,
                     new InteractionTarget(TargetCategory.ActiveAbilityTargetPosition, targetPos)

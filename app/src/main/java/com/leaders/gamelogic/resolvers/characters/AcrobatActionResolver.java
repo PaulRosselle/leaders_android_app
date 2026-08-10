@@ -49,8 +49,8 @@ public final class AcrobatActionResolver extends CharacterActionResolver {
     public InteractionRequest getNextInteraction(@NonNull CharacterActionBuilder builder) {
         // If the action builder contains already a default movement interaction,
         // we leave the interaction to be handled by the parent default movement resolver
-        if (!builder.getInteractionResults().isEmpty()) {
-            if (isNormalMovementResult(builder.getInteractionResults().get(0))) {
+        if (!builder.getResults().isEmpty()) {
+            if (isNormalMovementResult(builder.getResults().get(0))) {
                 return super.getNextInteraction(builder);
             }
             return null;
@@ -77,12 +77,12 @@ public final class AcrobatActionResolver extends CharacterActionResolver {
         // Acrobat actions only requires a single interaction.
         // When the result is gotten, a single feedback can be generated
         // containing either movement or active ability instructions
-        if (builder.getInteractionResults().size() != 1 ||
-                !builder.getInteractionFeedbacks().isEmpty()) {
+        if (builder.getResults().size() != 1 ||
+                !builder.getFeedbacks().isEmpty()) {
             return null;
         }
 
-        InteractionResult result = builder.getInteractionResults().get(0);
+        InteractionResult result = builder.getResults().get(0);
         if (result.getResultType() == InteractionResultType.CancelAction) {
             return null;
         }
