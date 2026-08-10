@@ -121,8 +121,7 @@ public final class ClawLauncherActionResolver extends CharacterActionResolver {
 
             if (targetCell != null) {
                 Position targetPos = targetCell.getPosition();
-                if (isValidPull(builder, TargetCategory.ActiveAbilityTargetPosition,
-                        getAbilityPullDestination(characterPos, targetPos))) {
+                if (isValidPull(builder, TargetCategory.ActiveAbilityTargetPosition, targetPos)) {
                     targets.add(targetPos);
                 }
             }
@@ -133,11 +132,11 @@ public final class ClawLauncherActionResolver extends CharacterActionResolver {
 
     private boolean isValidPull(@NonNull CharacterActionBuilder builder,
                                 @NonNull TargetCategory targetCategory,
-                                @NonNull Position pullDestPos) {
+                                @NonNull Position targetPos) {
         CharacterActionBuilder pullBuilder = new CharacterActionBuilder(builder);
         InteractionResult pullResult = new InteractionResult(
                 InteractionResultType.PositionChosen,
-                new InteractionTarget(targetCategory, pullDestPos)
+                new InteractionTarget(targetCategory, targetPos)
         );
 
         pullBuilder.addResult(pullResult);
@@ -157,12 +156,12 @@ public final class ClawLauncherActionResolver extends CharacterActionResolver {
                 "Claw Launcher interaction result invalid: no target position"
         );
 
-        Character target = Objects.requireNonNull(
-                game.getBoard().getCell(targetPos).getCharacter(),
-                "Claw Launcher target position should contain a character"
-        );
-
         if (isClawLauncherTargetResult(result)) {
+            Character target = Objects.requireNonNull(
+                    game.getBoard().getCell(targetPos).getCharacter(),
+                    "Claw Launcher target position should contain a character"
+            );
+
             return new InteractionFeedback(new CharacterActionMotion(
                     CharacterMotionType.Move,
                     List.of(new CharacterActionTarget(
