@@ -21,7 +21,7 @@ import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.TeamColor;
-import com.leaders.gamelogic.interactions.CharacterActionBuilder;
+import com.leaders.gamelogic.interactions.GameActionBuilder;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
@@ -60,8 +60,8 @@ public class ManipulatorActionResolverTest {
                 new ArrayList<>(), new ArrayList<>()), new ArrayList<>());
     }
 
-    private CharacterActionBuilder createBuilder() {
-        return new CharacterActionBuilder(manipulator, new ArrayList<>(), new ArrayList<>());
+    private GameActionBuilder createBuilder() {
+        return new GameActionBuilder(manipulator, new ArrayList<>(), new ArrayList<>());
     }
 
     @Before
@@ -123,7 +123,7 @@ public class ManipulatorActionResolverTest {
 
     @Test
     public void getNextInteraction_shouldRequestTargetDestinationAfterTargetSelected() {
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(
                 TargetCategory.ActiveAbilityTargetPosition, TARGET_POSITION));
 
@@ -139,7 +139,7 @@ public class ManipulatorActionResolverTest {
 
     @Test
     public void getNextFeedback_shouldReturnNullBeforeDestinationIsSelected() {
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(
                 TargetCategory.ActiveAbilityTargetPosition, TARGET_POSITION));
 
@@ -150,7 +150,7 @@ public class ManipulatorActionResolverTest {
     public void getNextFeedback_shouldDelegateNormalMovementToParent() {
         Position destination = new Position(3, 2);
 
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(
                 TargetCategory.MovementDestination, destination));
 
@@ -169,7 +169,7 @@ public class ManipulatorActionResolverTest {
 
     @Test
     public void getNextFeedback_shouldCreateMoveFeedbackForTarget() {
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(
                 TargetCategory.ActiveAbilityTargetPosition, TARGET_POSITION));
         builder.addResult(createPositionResult(
@@ -190,7 +190,7 @@ public class ManipulatorActionResolverTest {
 
     @Test
     public void getNextFeedback_shouldReturnNullAfterFeedbackWasGenerated() {
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(
                 TargetCategory.ActiveAbilityTargetPosition, TARGET_POSITION));
         builder.addResult(createPositionResult(
@@ -209,7 +209,7 @@ public class ManipulatorActionResolverTest {
     public void buildAction_shouldBuildNormalMoveAction() {
         Position destination = new Position(3, 2);
 
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(
                 TargetCategory.MovementDestination, destination));
 
@@ -228,7 +228,7 @@ public class ManipulatorActionResolverTest {
 
     @Test
     public void buildAction_shouldBuildManipulatorMoveAction() {
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(
                 TargetCategory.ActiveAbilityTargetPosition, TARGET_POSITION));
         builder.addResult(createPositionResult(
@@ -259,7 +259,7 @@ public class ManipulatorActionResolverTest {
         Character occupant = Character.create(CharacterType.Hermit, TeamColor.Black);
         game.getBoard().getCell(TARGET_DESTINATION).setCharacter(occupant);
 
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(
                 TargetCategory.ActiveAbilityTargetPosition, TARGET_POSITION));
 

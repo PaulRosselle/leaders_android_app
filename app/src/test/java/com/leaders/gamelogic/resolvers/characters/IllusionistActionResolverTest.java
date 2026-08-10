@@ -21,7 +21,7 @@ import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.TeamColor;
-import com.leaders.gamelogic.interactions.CharacterActionBuilder;
+import com.leaders.gamelogic.interactions.GameActionBuilder;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
@@ -60,8 +60,8 @@ public class IllusionistActionResolverTest {
                 new ArrayList<>(), new ArrayList<>()), new ArrayList<>());
     }
 
-    private CharacterActionBuilder createBuilder() {
-        return new CharacterActionBuilder(illusionist, new ArrayList<>(), new ArrayList<>());
+    private GameActionBuilder createBuilder() {
+        return new GameActionBuilder(illusionist, new ArrayList<>(), new ArrayList<>());
     }
 
     @Before
@@ -121,7 +121,7 @@ public class IllusionistActionResolverTest {
 
     @Test
     public void getNextInteraction_shouldReturnNullAfterPositionChosen() {
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(
                 TargetCategory.ActiveAbilityTargetPosition, TARGET_POSITION));
 
@@ -130,7 +130,7 @@ public class IllusionistActionResolverTest {
 
     @Test
     public void getNextFeedback_shouldCreateNormalMoveFeedback() {
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(
                 TargetCategory.MovementDestination, NORMAL_DESTINATION));
 
@@ -149,7 +149,7 @@ public class IllusionistActionResolverTest {
 
     @Test
     public void getNextFeedback_shouldCreateSwapFeedback() {
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(
                 TargetCategory.ActiveAbilityTargetPosition, TARGET_POSITION));
 
@@ -173,7 +173,7 @@ public class IllusionistActionResolverTest {
 
     @Test
     public void getNextFeedback_shouldReturnNullAfterFeedbackWasGenerated() {
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(
                 TargetCategory.ActiveAbilityTargetPosition, TARGET_POSITION));
 
@@ -188,7 +188,7 @@ public class IllusionistActionResolverTest {
 
     @Test
     public void buildAction_shouldBuildNormalMoveAction() {
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(
                 TargetCategory.MovementDestination, NORMAL_DESTINATION));
 
@@ -213,7 +213,7 @@ public class IllusionistActionResolverTest {
 
     @Test
     public void buildAction_shouldBuildSwapAction() {
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(
                 TargetCategory.ActiveAbilityTargetPosition, TARGET_POSITION));
 

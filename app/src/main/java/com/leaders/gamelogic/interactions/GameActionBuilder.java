@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class CharacterActionBuilder {
+public final class GameActionBuilder {
 
     @NonNull
     private final Character sourceCharacter;
@@ -19,15 +19,15 @@ public final class CharacterActionBuilder {
     @NonNull
     private final List<InteractionFeedback> interactionFeedbacks;
 
-    public CharacterActionBuilder(@NonNull Character sourceCharacter,
-                                  @NonNull List<InteractionResult> interactionResults,
-                                  @NonNull List<InteractionFeedback> interactionFeedbacks) {
+    public GameActionBuilder(@NonNull Character sourceCharacter,
+                             @NonNull List<InteractionResult> interactionResults,
+                             @NonNull List<InteractionFeedback> interactionFeedbacks) {
         this.sourceCharacter = sourceCharacter;
         this.interactionResults = interactionResults;
         this.interactionFeedbacks = interactionFeedbacks;
     }
 
-    public CharacterActionBuilder(@NonNull CharacterActionBuilder refBuilder) {
+    public GameActionBuilder(@NonNull GameActionBuilder refBuilder) {
         this(refBuilder.sourceCharacter,
                 new ArrayList<>(refBuilder.interactionResults),
                 new ArrayList<>(refBuilder.interactionFeedbacks));

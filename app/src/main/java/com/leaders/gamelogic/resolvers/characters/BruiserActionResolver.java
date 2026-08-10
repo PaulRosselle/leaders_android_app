@@ -12,7 +12,7 @@ import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.Direction;
-import com.leaders.gamelogic.interactions.CharacterActionBuilder;
+import com.leaders.gamelogic.interactions.GameActionBuilder;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
@@ -44,7 +44,7 @@ public final class BruiserActionResolver extends CharacterActionResolver {
 
     @Override
     @Nullable
-    public InteractionRequest getNextInteraction(@NonNull CharacterActionBuilder builder) {
+    public InteractionRequest getNextInteraction(@NonNull GameActionBuilder builder) {
         // For the first interaction, both normal movement and ability activation are possible
         if (builder.getInteractionResults().isEmpty()) {
             return buildInitialInteraction(builder);
@@ -65,7 +65,7 @@ public final class BruiserActionResolver extends CharacterActionResolver {
 
     @Override
     @Nullable
-    public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
+    public InteractionFeedback getNextFeedback(@NonNull GameActionBuilder builder) {
         if (!builder.getInteractionFeedbacks().isEmpty()) {
             return null;
         }
@@ -121,7 +121,7 @@ public final class BruiserActionResolver extends CharacterActionResolver {
     }
 
     @NonNull
-    private InteractionRequest buildInitialInteraction(@NonNull CharacterActionBuilder builder) {
+    private InteractionRequest buildInitialInteraction(@NonNull GameActionBuilder builder) {
         List<InteractionTarget> legalTargets = new ArrayList<>();
 
         for (Position destination : getNormalMovementValidDestinations(builder)) {
@@ -142,7 +142,7 @@ public final class BruiserActionResolver extends CharacterActionResolver {
     }
 
     @NonNull
-    private InteractionRequest buildPushDestinationInteraction(@NonNull CharacterActionBuilder builder,
+    private InteractionRequest buildPushDestinationInteraction(@NonNull GameActionBuilder builder,
                                                                @NonNull InteractionResult result) {
         if (!isBruiserTargetResult(result)) {
             throw new IllegalArgumentException("A Bruiser ability target must be selected through a PositionChosen result");
@@ -205,7 +205,7 @@ public final class BruiserActionResolver extends CharacterActionResolver {
      *                                the first valid destination
      */
     @NonNull
-    private List<Position> getValidPushDestinations(@NonNull CharacterActionBuilder builder,
+    private List<Position> getValidPushDestinations(@NonNull GameActionBuilder builder,
                                                     @NonNull Position targetPos,
                                                     boolean exitAfterFirstValidDest) {
         Character target = Objects.requireNonNull(game.getBoard().getCell(targetPos).getCharacter(),
@@ -220,7 +220,7 @@ public final class BruiserActionResolver extends CharacterActionResolver {
         );
 
         // If the target result is missing, we add it before entering the destination loop
-        CharacterActionBuilder targetBuilder = new CharacterActionBuilder(builder);
+        GameActionBuilder targetBuilder = new GameActionBuilder(builder);
         if (builder.getInteractionResults().isEmpty()) {
             targetBuilder.addResult(new InteractionResult(
                     InteractionResultType.PositionChosen,
@@ -235,7 +235,7 @@ public final class BruiserActionResolver extends CharacterActionResolver {
             if (pushCell != null && pushCell.getCharacter() == null) {
                 Position pushDestPos = pushCell.getPosition();
 
-                CharacterActionBuilder destinationBuilder = new CharacterActionBuilder(targetBuilder);
+                GameActionBuilder destinationBuilder = new GameActionBuilder(targetBuilder);
                 destinationBuilder.addResult(new InteractionResult(
                         InteractionResultType.PositionChosen,
                         new InteractionTarget(TargetCategory.ActiveAbilityDestination, pushDestPos)

@@ -12,7 +12,7 @@ import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.Direction;
-import com.leaders.gamelogic.interactions.CharacterActionBuilder;
+import com.leaders.gamelogic.interactions.GameActionBuilder;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
@@ -40,7 +40,7 @@ public final class BrewmasterActionResolver extends CharacterActionResolver {
 
     @Override
     @Nullable
-    public InteractionRequest getNextInteraction(@NonNull CharacterActionBuilder builder) {
+    public InteractionRequest getNextInteraction(@NonNull GameActionBuilder builder) {
         // For the first interaction, both normal movement and ability activation are possible
          if (builder.getInteractionResults().isEmpty()) {
             return buildInitialInteraction(builder);
@@ -61,7 +61,7 @@ public final class BrewmasterActionResolver extends CharacterActionResolver {
 
     @Override
     @Nullable
-    public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
+    public InteractionFeedback getNextFeedback(@NonNull GameActionBuilder builder) {
         // Brewmaster actions generate a single feedback.
         if (!builder.getInteractionFeedbacks().isEmpty()) {
             return null;
@@ -114,7 +114,7 @@ public final class BrewmasterActionResolver extends CharacterActionResolver {
      * Brewmaster or select an adjacent allied character as the target of its active ability.
      * An ally is only offered as an ability target if it has at least one valid destination.</p>*/
     @NonNull
-    private InteractionRequest buildInitialInteraction(@NonNull CharacterActionBuilder builder) {
+    private InteractionRequest buildInitialInteraction(@NonNull GameActionBuilder builder) {
          List<InteractionTarget> legalTargets = new ArrayList<>();
 
         // Normal movement and Brewmaster ability target cannot overlap:
@@ -140,7 +140,7 @@ public final class BrewmasterActionResolver extends CharacterActionResolver {
      * <p>The first interaction identifies the allied character to move.
      * This interaction then offers every valid empty cell adjacent to that character.</p>*/
     @NonNull
-    private InteractionRequest buildTargetDestinationInteraction(@NonNull CharacterActionBuilder builder,
+    private InteractionRequest buildTargetDestinationInteraction(@NonNull GameActionBuilder builder,
                                                                  @NonNull InteractionResult result) {
         if (!isBrewmasterTargetResult(result)) {
             throw new IllegalArgumentException("A target position must be transmitted through a PositionChosen InteractionResult");
@@ -191,7 +191,7 @@ public final class BrewmasterActionResolver extends CharacterActionResolver {
      * one valid destination is found. This is used when determining whether a
      * character should be offered as an ability target in the first interaction.</p> */
     @NonNull
-    private List<Position> getValidTargetDestinations(@NonNull CharacterActionBuilder builder,
+    private List<Position> getValidTargetDestinations(@NonNull GameActionBuilder builder,
                                                       @NonNull Position targetPos,
                                                       boolean exitAfterFirstValidDest) {
         Character target = Objects.requireNonNull(game.getBoard().getCell(targetPos).getCharacter(),
@@ -199,7 +199,7 @@ public final class BrewmasterActionResolver extends CharacterActionResolver {
 
         // Create a builder containing the target selection so that each candidate
         // destination can be evaluated in the same interaction context as the final action.
-        CharacterActionBuilder targetBuilder = new CharacterActionBuilder(builder);
+        GameActionBuilder targetBuilder = new GameActionBuilder(builder);
         if (targetBuilder.getInteractionResults().isEmpty()) {
             targetBuilder.addResult(new InteractionResult(
                     InteractionResultType.PositionChosen,
@@ -211,7 +211,7 @@ public final class BrewmasterActionResolver extends CharacterActionResolver {
         // Only destinations producing a valid action are exposed to the player.
         List<Position> targetDestinations = new ArrayList<>();
         for (Cell destination : BoardQuery.findEmptyCellsAround(game.getBoard(), targetPos, 1)) {
-            CharacterActionBuilder destBuilder = new CharacterActionBuilder(targetBuilder);
+            GameActionBuilder destBuilder = new GameActionBuilder(targetBuilder);
             Position destPos = destination.getPosition();
             destBuilder.addResult(new InteractionResult(
                     InteractionResultType.PositionChosen,

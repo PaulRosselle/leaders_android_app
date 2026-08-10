@@ -20,7 +20,7 @@ import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.TeamColor;
-import com.leaders.gamelogic.interactions.CharacterActionBuilder;
+import com.leaders.gamelogic.interactions.GameActionBuilder;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
@@ -61,8 +61,8 @@ public class RoyalGuardActionResolverTest {
         ), new ArrayList<>());
     }
 
-    private CharacterActionBuilder createBuilder() {
-        return new CharacterActionBuilder(character, new ArrayList<>(), new ArrayList<>());
+    private GameActionBuilder createBuilder() {
+        return new GameActionBuilder(character, new ArrayList<>(), new ArrayList<>());
     }
 
     @NonNull
@@ -90,7 +90,7 @@ public class RoyalGuardActionResolverTest {
 
     @Test
     public void getNextInteraction_shouldRequestMovementAndAbilityDestinations() {
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
 
         InteractionRequest request = resolver.getNextInteraction(builder);
 
@@ -116,7 +116,7 @@ public class RoyalGuardActionResolverTest {
 
     @Test
     public void getNextInteraction_shouldNotReturnSecondInteraction() {
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(
                 TargetCategory.ActiveAbilityDestination,
                 new Position(1, 1)
@@ -130,7 +130,7 @@ public class RoyalGuardActionResolverTest {
     @Test
     public void getNextFeedback_shouldUseDefaultMovementForMovementDestination() {
         Position destination = new Position(3, 2);
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(
                 TargetCategory.MovementDestination,
                 destination
@@ -152,7 +152,7 @@ public class RoyalGuardActionResolverTest {
     @Test
     public void getNextFeedback_shouldBuildRoyalGuardMovement() {
         Position destination = new Position(1, 1);
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(
                 TargetCategory.ActiveAbilityDestination,
                 destination
@@ -174,7 +174,7 @@ public class RoyalGuardActionResolverTest {
     @Test
     public void getNextFeedback_shouldReturnNullAfterFeedbackWasGenerated() {
         Position destination = new Position(1, 1);
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(
                 TargetCategory.ActiveAbilityDestination,
                 destination
@@ -190,7 +190,7 @@ public class RoyalGuardActionResolverTest {
 
     @Test
     public void getNextFeedback_shouldReturnNullAfterCancelAction() {
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(new InteractionResult(
                 InteractionResultType.CancelAction,
                 null
@@ -202,7 +202,7 @@ public class RoyalGuardActionResolverTest {
     @Test
     public void buildAction_shouldBuildActionForRoyalGuardAbility() {
         Position destination = new Position(1, 1);
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(
                 TargetCategory.ActiveAbilityDestination,
                 destination
@@ -229,7 +229,7 @@ public class RoyalGuardActionResolverTest {
     @Test
     public void buildAction_shouldBuildActionForDefaultMovement() {
         Position destination = new Position(3, 2);
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(
                 TargetCategory.MovementDestination,
                 destination

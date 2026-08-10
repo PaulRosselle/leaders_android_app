@@ -21,7 +21,7 @@ import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.TeamColor;
-import com.leaders.gamelogic.interactions.CharacterActionBuilder;
+import com.leaders.gamelogic.interactions.GameActionBuilder;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
@@ -59,8 +59,8 @@ public class RiderActionResolverTest {
                 new ArrayList<>(), new ArrayList<>()), new ArrayList<>());
     }
 
-    private CharacterActionBuilder createBuilder() {
-        return new CharacterActionBuilder(rider, new ArrayList<>(), new ArrayList<>());
+    private GameActionBuilder createBuilder() {
+        return new GameActionBuilder(rider, new ArrayList<>(), new ArrayList<>());
     }
 
     @Before
@@ -114,7 +114,7 @@ public class RiderActionResolverTest {
 
     @Test
     public void getNextInteraction_shouldReturnNullAfterPositionChosen() {
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(
                 TargetCategory.ActiveAbilityDestination, DASH_DESTINATION));
 
@@ -123,7 +123,7 @@ public class RiderActionResolverTest {
 
     @Test
     public void getNextFeedback_shouldCreateNormalMoveFeedback() {
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(
                 TargetCategory.MovementDestination, NORMAL_DESTINATION));
 
@@ -142,7 +142,7 @@ public class RiderActionResolverTest {
 
     @Test
     public void getNextFeedback_shouldCreateDashMoveFeedback() {
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(
                 TargetCategory.ActiveAbilityDestination, DASH_DESTINATION));
 
@@ -161,7 +161,7 @@ public class RiderActionResolverTest {
 
     @Test
     public void getNextFeedback_shouldReturnNullAfterFeedbackWasGenerated() {
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(
                 TargetCategory.ActiveAbilityDestination, DASH_DESTINATION));
 
@@ -176,7 +176,7 @@ public class RiderActionResolverTest {
 
     @Test
     public void buildAction_shouldBuildNormalMoveAction() {
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(
                 TargetCategory.MovementDestination, NORMAL_DESTINATION));
 
@@ -201,7 +201,7 @@ public class RiderActionResolverTest {
 
     @Test
     public void buildAction_shouldBuildDashMoveAction() {
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(
                 TargetCategory.ActiveAbilityDestination, DASH_DESTINATION));
 

@@ -12,7 +12,7 @@ import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.Direction;
-import com.leaders.gamelogic.interactions.CharacterActionBuilder;
+import com.leaders.gamelogic.interactions.GameActionBuilder;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
@@ -45,7 +45,7 @@ public final class IllusionistActionResolver extends CharacterActionResolver {
 
     @Override
     @Nullable
-    public InteractionRequest getNextInteraction(@NonNull CharacterActionBuilder builder) {
+    public InteractionRequest getNextInteraction(@NonNull GameActionBuilder builder) {
         // Rider actions require a single interaction.
         // If an interaction has already been selected, no further interaction can be added to this action.
         if (!builder.getInteractionResults().isEmpty()) {
@@ -75,7 +75,7 @@ public final class IllusionistActionResolver extends CharacterActionResolver {
 
     @Override
     @Nullable
-    public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
+    public InteractionFeedback getNextFeedback(@NonNull GameActionBuilder builder) {
         if (builder.getInteractionResults().isEmpty() ||
                 !builder.getInteractionFeedbacks().isEmpty()) {
             return null;
@@ -108,7 +108,7 @@ public final class IllusionistActionResolver extends CharacterActionResolver {
      * in each direction can be visible and targeted.</p>
      */
     @NonNull
-    private List<Position> getIllusionistTargetPositions(@NonNull CharacterActionBuilder builder) {
+    private List<Position> getIllusionistTargetPositions(@NonNull GameActionBuilder builder) {
         List<Position> targets = new ArrayList<>();
 
         for (Direction direction : Direction.values()) {
@@ -127,7 +127,7 @@ public final class IllusionistActionResolver extends CharacterActionResolver {
                                     targetPos
                             )
                     );
-                    CharacterActionBuilder targetBuilder = new CharacterActionBuilder(builder);
+                    GameActionBuilder targetBuilder = new GameActionBuilder(builder);
                     targetBuilder.addResult(swapResult);
                     targetBuilder.addFeedback(buildSwapFeedback(swapResult));
 

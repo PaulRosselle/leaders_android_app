@@ -12,7 +12,7 @@ import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.Direction;
-import com.leaders.gamelogic.interactions.CharacterActionBuilder;
+import com.leaders.gamelogic.interactions.GameActionBuilder;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
@@ -46,7 +46,7 @@ public final class ClawLauncherActionResolver extends CharacterActionResolver {
 
     @Override
     @Nullable
-    public InteractionRequest getNextInteraction(@NonNull CharacterActionBuilder builder) {
+    public InteractionRequest getNextInteraction(@NonNull GameActionBuilder builder) {
         // The Claw Launcher only requires a single interaction.
         if (!builder.getInteractionResults().isEmpty()) {
             return null;
@@ -80,7 +80,7 @@ public final class ClawLauncherActionResolver extends CharacterActionResolver {
 
     @Override
     @Nullable
-    public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
+    public InteractionFeedback getNextFeedback(@NonNull GameActionBuilder builder) {
         if (builder.getInteractionResults().isEmpty() ||
                 !builder.getInteractionFeedbacks().isEmpty()) {
             return null;
@@ -112,7 +112,7 @@ public final class ClawLauncherActionResolver extends CharacterActionResolver {
      * and can therefore be targeted.</p>
      */
     @NonNull
-    private List<Position> getClawLauncherValidTargetPositions(@NonNull CharacterActionBuilder builder) {
+    private List<Position> getClawLauncherValidTargetPositions(@NonNull GameActionBuilder builder) {
         List<Position> targets = new ArrayList<>();
 
         for (Direction direction : Direction.values()) {
@@ -130,10 +130,10 @@ public final class ClawLauncherActionResolver extends CharacterActionResolver {
         return targets;
     }
 
-    private boolean isValidPull(@NonNull CharacterActionBuilder builder,
+    private boolean isValidPull(@NonNull GameActionBuilder builder,
                                 @NonNull TargetCategory targetCategory,
                                 @NonNull Position targetPos) {
-        CharacterActionBuilder pullBuilder = new CharacterActionBuilder(builder);
+        GameActionBuilder pullBuilder = new GameActionBuilder(builder);
         InteractionResult pullResult = new InteractionResult(
                 InteractionResultType.PositionChosen,
                 new InteractionTarget(targetCategory, targetPos)

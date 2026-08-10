@@ -20,7 +20,7 @@ import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.TeamColor;
-import com.leaders.gamelogic.interactions.CharacterActionBuilder;
+import com.leaders.gamelogic.interactions.GameActionBuilder;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
@@ -62,8 +62,8 @@ public class ClawLauncherActionResolverTest {
         ), new ArrayList<>());
     }
 
-    private CharacterActionBuilder createBuilder() {
-        return new CharacterActionBuilder(character, new ArrayList<>(), new ArrayList<>());
+    private GameActionBuilder createBuilder() {
+        return new GameActionBuilder(character, new ArrayList<>(), new ArrayList<>());
     }
 
     @NonNull
@@ -93,7 +93,7 @@ public class ClawLauncherActionResolverTest {
 
     @Test
     public void getNextInteraction_shouldRequestMovementAndAbilityTargets() {
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
 
         InteractionRequest request = resolver.getNextInteraction(builder);
 
@@ -125,7 +125,7 @@ public class ClawLauncherActionResolverTest {
 
     @Test
     public void getNextInteraction_shouldNotReturnSecondInteraction() {
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(createResult(
                 TargetCategory.ActiveAbilityTargetPosition,
                 new Position(3, 0)
@@ -139,7 +139,7 @@ public class ClawLauncherActionResolverTest {
     @Test
     public void getNextFeedback_shouldMoveTargetTowardClawLauncher() {
         Position targetPosition = new Position(3, 0);
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(createResult(
                 TargetCategory.ActiveAbilityTargetPosition,
                 targetPosition
@@ -161,7 +161,7 @@ public class ClawLauncherActionResolverTest {
     @Test
     public void getNextFeedback_shouldMoveClawLauncherTowardTarget() {
         Position destination = new Position(3, 1);
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(createResult(
                 TargetCategory.ActiveAbilityDestination,
                 destination
@@ -183,7 +183,7 @@ public class ClawLauncherActionResolverTest {
     @Test
     public void getNextFeedback_shouldUseDefaultMovementForMovementDestination() {
         Position destination = new Position(3, 2);
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(createResult(
                 TargetCategory.MovementDestination,
                 destination
@@ -204,7 +204,7 @@ public class ClawLauncherActionResolverTest {
     @Test
     public void getNextFeedback_shouldReturnNullAfterFeedbackWasGenerated() {
         Position destination = new Position(3, 1);
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(createResult(
                 TargetCategory.ActiveAbilityDestination,
                 destination
@@ -221,7 +221,7 @@ public class ClawLauncherActionResolverTest {
     @Test
     public void buildAction_shouldBuildActionForTargetPull() {
         Position targetPosition = new Position(3, 0);
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(createResult(
                 TargetCategory.ActiveAbilityTargetPosition,
                 targetPosition
@@ -248,7 +248,7 @@ public class ClawLauncherActionResolverTest {
     @Test
     public void buildAction_shouldBuildActionForClawLauncherPull() {
         Position destination = new Position(3, 1);
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(createResult(
                 TargetCategory.ActiveAbilityDestination,
                 destination
@@ -275,7 +275,7 @@ public class ClawLauncherActionResolverTest {
     @Test
     public void buildAction_shouldBuildActionForDefaultMovement() {
         Position destination = new Position(3, 2);
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
         builder.addResult(createResult(
                 TargetCategory.MovementDestination,
                 destination
@@ -296,7 +296,7 @@ public class ClawLauncherActionResolverTest {
 
     @Test
     public void getNextFeedback_shouldReturnNullAfterCancelAction() {
-        CharacterActionBuilder builder = createBuilder();
+        GameActionBuilder builder = createBuilder();
 
         builder.addResult(new InteractionResult(
                 InteractionResultType.CancelAction,

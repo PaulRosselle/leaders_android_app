@@ -12,7 +12,7 @@ import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.Direction;
-import com.leaders.gamelogic.interactions.CharacterActionBuilder;
+import com.leaders.gamelogic.interactions.GameActionBuilder;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
@@ -45,7 +45,7 @@ public final class WandererActionResolver extends CharacterActionResolver {
 
     @Override
     @Nullable
-    public InteractionRequest getNextInteraction(@NonNull CharacterActionBuilder builder) {
+    public InteractionRequest getNextInteraction(@NonNull GameActionBuilder builder) {
         // Wanderer actions require a single interaction.
         // If an interaction has already been selected, no further interaction can be added to this action.
         if (!builder.getInteractionResults().isEmpty()) {
@@ -75,7 +75,7 @@ public final class WandererActionResolver extends CharacterActionResolver {
 
     @Override
     @Nullable
-    public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
+    public InteractionFeedback getNextFeedback(@NonNull GameActionBuilder builder) {
         if (builder.getInteractionResults().isEmpty() ||
                 !builder.getInteractionFeedbacks().isEmpty()) {
             return null;
@@ -105,14 +105,14 @@ public final class WandererActionResolver extends CharacterActionResolver {
      * mechanism before being exposed to the player.</p>
      */
     @NonNull
-    private List<Position> getWandererFlightDestinations(@NonNull CharacterActionBuilder builder) {
+    private List<Position> getWandererFlightDestinations(@NonNull GameActionBuilder builder) {
         List<Position> destinations = new ArrayList<>();
 
         for (Cell cell : game.getBoard().getCells().values()) {
             if (cell.getCharacter() == null && !isCellAdjacentToEnemy(cell.getPosition())) {
                 Position destPos = cell.getPosition();
 
-                CharacterActionBuilder destinationBuilder = new CharacterActionBuilder(builder);
+                GameActionBuilder destinationBuilder = new GameActionBuilder(builder);
                 destinationBuilder.addResult(new InteractionResult(
                         InteractionResultType.PositionChosen,
                         new InteractionTarget(

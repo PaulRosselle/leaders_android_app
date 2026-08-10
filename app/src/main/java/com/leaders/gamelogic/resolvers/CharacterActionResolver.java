@@ -15,7 +15,7 @@ import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.factories.GameActionHandlerFactory;
 import com.leaders.gamelogic.handlers.GameActionHandler;
-import com.leaders.gamelogic.interactions.CharacterActionBuilder;
+import com.leaders.gamelogic.interactions.GameActionBuilder;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
@@ -37,7 +37,7 @@ import java.util.Objects;
  *
  * <p>A resolver defines how a character action is progressively constructed
  * through player interactions. Implementations may override
- * {@link #getNextInteraction(CharacterActionBuilder)} to provide custom
+ * {@link #getNextInteraction(GameActionBuilder)} to provide custom
  * interaction flows depending on the character abilities and action rules.</p>
  */
 public class CharacterActionResolver {
@@ -108,13 +108,13 @@ public class CharacterActionResolver {
      * @return list of destinations that can legally be selected
      */
     @NonNull
-    protected List<Position> getNormalMovementValidDestinations(@NonNull CharacterActionBuilder builder) {
+    protected List<Position> getNormalMovementValidDestinations(@NonNull GameActionBuilder builder) {
         List<Position> destPositions = new ArrayList<>();
         for (Cell destCell : CharacterAbilityQuery.getNormalMovementDestCells(game, character)) {
             // Create a temporary action builder containing the tested position choice.
             // This allows the resulting action to be validated before exposing the
             // destination as a legal interaction option.
-            CharacterActionBuilder nextMovementBuilder = new CharacterActionBuilder(builder);
+            GameActionBuilder nextMovementBuilder = new GameActionBuilder(builder);
             nextMovementBuilder.addResult(new InteractionResult(
                     InteractionResultType.PositionChosen,
                     new InteractionTarget(TargetCategory.MovementDestination, destCell.getPosition()))
@@ -153,7 +153,7 @@ public class CharacterActionResolver {
      *         is required or possible
      */
     @Nullable
-    public InteractionRequest getNextInteraction(@NonNull CharacterActionBuilder builder) {
+    public InteractionRequest getNextInteraction(@NonNull GameActionBuilder builder) {
         // The default movement action only requires a single interaction.
         // If an interaction has already been selected, no further interaction can be added to this action.
         if (!builder.getInteractionResults().isEmpty()) {
@@ -186,7 +186,7 @@ public class CharacterActionResolver {
      * @return the next feedback, or {@code null} if none is available
      */
     @Nullable
-    public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
+    public InteractionFeedback getNextFeedback(@NonNull GameActionBuilder builder) {
         // The default movement action only requires a single interaction.
         // When the result is gotten, a single feedback can be generated containing the movement instructions
         if (builder.getInteractionResults().size() != 1 ||
@@ -222,7 +222,7 @@ public class CharacterActionResolver {
      * @return the action corresponding to the current builder state
      */
     @NonNull
-    public CharacterAction buildAction(@NonNull CharacterActionBuilder builder) {
+    public CharacterAction buildAction(@NonNull GameActionBuilder builder) {
         if (builder.getInteractionFeedbacks().size() > 1) {
             throw new IllegalArgumentException("The default resolver use the builder's CharacterActionMotions to create a CharacterAction");
         }

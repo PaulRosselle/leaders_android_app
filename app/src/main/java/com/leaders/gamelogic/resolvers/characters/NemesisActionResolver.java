@@ -12,7 +12,7 @@ import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.Direction;
-import com.leaders.gamelogic.interactions.CharacterActionBuilder;
+import com.leaders.gamelogic.interactions.GameActionBuilder;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
@@ -46,7 +46,7 @@ public final class NemesisActionResolver extends CharacterActionResolver {
 
     @Override
     @Nullable
-    public InteractionRequest getNextInteraction(@NonNull CharacterActionBuilder builder) {
+    public InteractionRequest getNextInteraction(@NonNull GameActionBuilder builder) {
         if (!builder.getInteractionResults().isEmpty()) {
             return null;
         }
@@ -66,7 +66,7 @@ public final class NemesisActionResolver extends CharacterActionResolver {
 
     @Override
     @Nullable
-    public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
+    public InteractionFeedback getNextFeedback(@NonNull GameActionBuilder builder) {
         if (builder.getInteractionResults().isEmpty() ||
                 !builder.getInteractionFeedbacks().isEmpty()) {
             return null;
@@ -100,7 +100,7 @@ public final class NemesisActionResolver extends CharacterActionResolver {
      * the Nemesis must end on a different cell when moving by two cells.</p>
      */
     @NonNull
-    private List<Position> getValidNemesisMovementDestinations(@NonNull CharacterActionBuilder builder) {
+    private List<Position> getValidNemesisMovementDestinations(@NonNull GameActionBuilder builder) {
         Set<Position> secondStepDestinations = new HashSet<>();
         List<Position> firstStepDestinations = new ArrayList<>();
 
@@ -131,12 +131,12 @@ public final class NemesisActionResolver extends CharacterActionResolver {
     }
 
     @NonNull
-    private List<Position> filterValidDestinations(@NonNull CharacterActionBuilder builder,
+    private List<Position> filterValidDestinations(@NonNull GameActionBuilder builder,
                                                    @NonNull Iterable<Position> destinations) {
         List<Position> validDestinations = new ArrayList<>();
 
         for (Position destPos : destinations) {
-            CharacterActionBuilder destinationBuilder = new CharacterActionBuilder(builder);
+            GameActionBuilder destinationBuilder = new GameActionBuilder(builder);
             InteractionResult result = new InteractionResult(
                     InteractionResultType.PositionChosen,
                     new InteractionTarget(TargetCategory.MovementDestination, destPos)

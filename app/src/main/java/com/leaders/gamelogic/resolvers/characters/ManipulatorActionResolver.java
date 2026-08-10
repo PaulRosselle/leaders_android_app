@@ -12,7 +12,7 @@ import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.Direction;
-import com.leaders.gamelogic.interactions.CharacterActionBuilder;
+import com.leaders.gamelogic.interactions.GameActionBuilder;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
@@ -45,7 +45,7 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
 
     @Override
     @Nullable
-    public InteractionRequest getNextInteraction(@NonNull CharacterActionBuilder builder) {
+    public InteractionRequest getNextInteraction(@NonNull GameActionBuilder builder) {
         if (builder.getInteractionResults().isEmpty()) {
             return buildInitialInteraction(builder);
         }
@@ -65,7 +65,7 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
 
     @Override
     @Nullable
-    public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
+    public InteractionFeedback getNextFeedback(@NonNull GameActionBuilder builder) {
         if (!builder.getInteractionFeedbacks().isEmpty()) {
             return null;
         }
@@ -118,7 +118,7 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
     }
 
     @NonNull
-    private InteractionRequest buildInitialInteraction(@NonNull CharacterActionBuilder builder) {
+    private InteractionRequest buildInitialInteraction(@NonNull GameActionBuilder builder) {
         List<InteractionTarget> legalTargets = new ArrayList<>();
 
         for (Position destination : getNormalMovementValidDestinations(builder)) {
@@ -139,7 +139,7 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
     }
 
     @NonNull
-    private InteractionRequest buildTargetDestinationInteraction(@NonNull CharacterActionBuilder builder,
+    private InteractionRequest buildTargetDestinationInteraction(@NonNull GameActionBuilder builder,
                                                                  @NonNull InteractionResult result) {
         if (!isManipulatorTargetResult(result)) {
             throw new IllegalArgumentException(
@@ -203,7 +203,7 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
      *                                the first valid destination
      */
     @NonNull
-    private List<Position> getValidTargetDestinations(@NonNull CharacterActionBuilder builder,
+    private List<Position> getValidTargetDestinations(@NonNull GameActionBuilder builder,
                                                       @NonNull Position targetPos,
                                                       boolean exitAfterFirstValidDest) {
         Character target = Objects.requireNonNull(game.getBoard().getCell(targetPos).getCharacter(),
@@ -212,7 +212,7 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
         List<Position> destinations = new ArrayList<>();
 
 
-        CharacterActionBuilder targetBuilder = new CharacterActionBuilder(builder);
+        GameActionBuilder targetBuilder = new GameActionBuilder(builder);
         if (targetBuilder.getInteractionResults().isEmpty()) {
             targetBuilder.addResult(new InteractionResult(
                     InteractionResultType.PositionChosen,
@@ -223,7 +223,7 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
         for (Cell destinationCell : BoardQuery.findEmptyCellsAround(game.getBoard(), targetPos, 1)) {
             Position destination = destinationCell.getPosition();
 
-            CharacterActionBuilder destinationBuilder = new CharacterActionBuilder(targetBuilder);
+            GameActionBuilder destinationBuilder = new GameActionBuilder(targetBuilder);
             destinationBuilder.addResult(new InteractionResult(
                     InteractionResultType.PositionChosen,
                     new InteractionTarget(TargetCategory.ActiveAbilityDestination, destination)
