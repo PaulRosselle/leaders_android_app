@@ -36,7 +36,7 @@ import java.util.Objects;
  * interaction. The selected destination is then used to build the movement
  * feedback.</p>
  */
-public class WandererActionResolver extends CharacterActionResolver {
+public final class WandererActionResolver extends CharacterActionResolver {
 
     public WandererActionResolver(@NonNull Game game, @NonNull GameHistory gameHistory,
                                   @NonNull Character character) {

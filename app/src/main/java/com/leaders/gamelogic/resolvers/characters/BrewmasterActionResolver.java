@@ -32,7 +32,7 @@ import java.util.Objects;
  * The ability requires the player to first select an adjacent ally, then
  * select an empty cell adjacent to that ally.</p>
  */
-public class BrewmasterActionResolver extends CharacterActionResolver {
+public final class BrewmasterActionResolver extends CharacterActionResolver {
 
     public BrewmasterActionResolver(@NonNull Game game, @NonNull GameHistory gameHistory, @NonNull Character character) {
         super(game, gameHistory, character);

@@ -37,7 +37,7 @@ import java.util.Objects;
  * The destination of both characters is then determined automatically from
  * their respective starting positions.</p>
  */
-public class IllusionistActionResolver extends CharacterActionResolver {
+public final class IllusionistActionResolver extends CharacterActionResolver {
 
     public IllusionistActionResolver(@NonNull Game game, @NonNull GameHistory gameHistory, @NonNull Character character) {
         super(game, gameHistory, character);

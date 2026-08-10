@@ -33,7 +33,7 @@ import java.util.Objects;
  * <p>The Rider can move two cells in a straight line. Both cells crossed by
  * the movement must be valid for the movement to be performed.</p>
  */
-public class RiderActionResolver extends CharacterActionResolver {
+public final class RiderActionResolver extends CharacterActionResolver {
 
     public RiderActionResolver(@NonNull Game game, @NonNull GameHistory gameHistory, @NonNull Character character) {
         super(game, gameHistory, character);
