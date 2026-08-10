@@ -21,7 +21,7 @@ import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.TeamColor;
-import com.leaders.gamelogic.interactions.GameActionBuilder;
+import com.leaders.gamelogic.interactions.CharacterActionBuilder;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
@@ -60,8 +60,8 @@ public class WandererActionResolverTest {
                 new ArrayList<>(), new ArrayList<>()), new ArrayList<>());
     }
 
-    private GameActionBuilder createBuilder() {
-        return new GameActionBuilder(wanderer, new ArrayList<>(), new ArrayList<>());
+    private CharacterActionBuilder createBuilder() {
+        return new CharacterActionBuilder(wanderer, new ArrayList<>(), new ArrayList<>());
     }
 
     @Before
@@ -112,7 +112,7 @@ public class WandererActionResolverTest {
 
     @Test
     public void getNextInteraction_shouldReturnNullAfterPositionChosen() {
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(
                 TargetCategory.ActiveAbilityDestination, ABILITY_DESTINATION));
 
@@ -121,7 +121,7 @@ public class WandererActionResolverTest {
 
     @Test
     public void getNextFeedback_shouldCreateNormalMoveFeedback() {
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(
                 TargetCategory.MovementDestination, NORMAL_DESTINATION));
 
@@ -140,7 +140,7 @@ public class WandererActionResolverTest {
 
     @Test
     public void getNextFeedback_shouldCreateWandererMoveFeedback() {
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(
                 TargetCategory.ActiveAbilityDestination, ABILITY_DESTINATION));
 
@@ -159,7 +159,7 @@ public class WandererActionResolverTest {
 
     @Test
     public void getNextFeedback_shouldReturnNullAfterFeedbackWasGenerated() {
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(
                 TargetCategory.ActiveAbilityDestination, ABILITY_DESTINATION));
 
@@ -173,7 +173,7 @@ public class WandererActionResolverTest {
 
     @Test
     public void buildAction_shouldBuildNormalMoveAction() {
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(
                 TargetCategory.MovementDestination, NORMAL_DESTINATION));
 
@@ -198,7 +198,7 @@ public class WandererActionResolverTest {
 
     @Test
     public void buildAction_shouldBuildWandererMoveAction() {
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(
                 TargetCategory.ActiveAbilityDestination, ABILITY_DESTINATION));
 

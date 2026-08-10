@@ -21,7 +21,7 @@ import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.TeamColor;
-import com.leaders.gamelogic.interactions.GameActionBuilder;
+import com.leaders.gamelogic.interactions.CharacterActionBuilder;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
@@ -57,8 +57,8 @@ public class BrewmasterActionResolverTest {
                 new ArrayList<>(), new ArrayList<>()), new ArrayList<>());
     }
 
-    private GameActionBuilder createBuilder() {
-        return new GameActionBuilder(brewmaster, new ArrayList<>(), new ArrayList<>());
+    private CharacterActionBuilder createBuilder() {
+        return new CharacterActionBuilder(brewmaster, new ArrayList<>(), new ArrayList<>());
     }
 
 
@@ -152,7 +152,7 @@ public class BrewmasterActionResolverTest {
 
         placeCharacter(CharacterType.Hermit, TeamColor.Black, allyPosition);
 
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(TargetCategory.ActiveAbilityTargetPosition, allyPosition));
 
         InteractionRequest request = resolver.getNextInteraction(builder);
@@ -168,7 +168,7 @@ public class BrewmasterActionResolverTest {
     public void getNextInteraction_shouldDelegateNormalMovementToParent() {
         Position destination = new Position(3, 2);
 
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(TargetCategory.MovementDestination, destination));
 
         assertNull(resolver.getNextInteraction(builder));
@@ -178,7 +178,7 @@ public class BrewmasterActionResolverTest {
     public void getNextFeedback_shouldDelegateNormalMovementToParent() {
         Position destination = new Position(3, 2);
 
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(TargetCategory.MovementDestination, destination));
 
         InteractionFeedback feedback = resolver.getNextFeedback(builder);
@@ -201,7 +201,7 @@ public class BrewmasterActionResolverTest {
 
         Character ally = placeCharacter(CharacterType.Hermit, TeamColor.Black, allyPosition);
 
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(TargetCategory.ActiveAbilityTargetPosition, allyPosition));
         builder.addResult(createPositionResult(TargetCategory.ActiveAbilityDestination, destination));
 
@@ -224,7 +224,7 @@ public class BrewmasterActionResolverTest {
 
         placeCharacter(CharacterType.Hermit, TeamColor.Black, allyPosition);
 
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(TargetCategory.ActiveAbilityTargetPosition, allyPosition));
 
         assertNull(resolver.getNextFeedback(builder));
@@ -237,7 +237,7 @@ public class BrewmasterActionResolverTest {
 
         placeCharacter(CharacterType.Hermit, TeamColor.Black, allyPosition);
 
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(TargetCategory.ActiveAbilityTargetPosition, allyPosition));
         builder.addResult(createPositionResult(TargetCategory.ActiveAbilityDestination, destination));
 
@@ -254,7 +254,7 @@ public class BrewmasterActionResolverTest {
     public void buildAction_shouldBuildNormalMoveAction() {
         Position destination = new Position(3, 2);
 
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(TargetCategory.MovementDestination, destination));
 
         InteractionFeedback feedback = resolver.getNextFeedback(builder);
@@ -277,7 +277,7 @@ public class BrewmasterActionResolverTest {
 
         placeCharacter(CharacterType.Hermit, TeamColor.Black, allyPosition);
 
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(TargetCategory.ActiveAbilityTargetPosition, allyPosition));
         builder.addResult(createPositionResult(TargetCategory.ActiveAbilityDestination, destination));
 
@@ -316,7 +316,7 @@ public class BrewmasterActionResolverTest {
         placeCharacter(CharacterType.Hermit, TeamColor.Black, allyPosition);
         placeCharacter(CharacterType.Rider, TeamColor.White, occupiedDestination);
 
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(TargetCategory.ActiveAbilityTargetPosition, allyPosition));
 
         InteractionRequest request = resolver.getNextInteraction(builder);

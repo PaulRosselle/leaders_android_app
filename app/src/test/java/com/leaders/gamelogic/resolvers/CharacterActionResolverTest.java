@@ -20,7 +20,7 @@ import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.TeamColor;
-import com.leaders.gamelogic.interactions.GameActionBuilder;
+import com.leaders.gamelogic.interactions.CharacterActionBuilder;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
@@ -63,8 +63,8 @@ public class CharacterActionResolverTest {
         ), new ArrayList<>());
     }
 
-    private GameActionBuilder createBuilder() {
-        return new GameActionBuilder(character, new ArrayList<>(), new ArrayList<>());
+    private CharacterActionBuilder createBuilder() {
+        return new CharacterActionBuilder(character, new ArrayList<>(), new ArrayList<>());
     }
 
     @NonNull
@@ -89,7 +89,7 @@ public class CharacterActionResolverTest {
 
     @Test
     public void getNextInteraction_shouldRequestMovementDestination() {
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
 
         InteractionRequest request = resolver.getNextInteraction(builder);
 
@@ -105,7 +105,7 @@ public class CharacterActionResolverTest {
 
     @Test
     public void getNextInteraction_shouldReturnNullAfterPositionChosen() {
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(new Position(3, 1)));
 
         InteractionRequest request = resolver.getNextInteraction(builder);
@@ -115,7 +115,7 @@ public class CharacterActionResolverTest {
     @Test
     public void getNextFeedback_shouldCreateMoveFeedback() {
         Position destination = new Position(3, 2);
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(destination));
 
         InteractionFeedback feedback = resolver.getNextFeedback(builder);
@@ -134,7 +134,7 @@ public class CharacterActionResolverTest {
     @Test
     public void buildAction_shouldBuildActionFromFeedback() {
         Position destination = new Position(3, 1);
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(destination));
 
         InteractionFeedback feedback = resolver.getNextFeedback(builder);

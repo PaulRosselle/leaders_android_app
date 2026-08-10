@@ -12,7 +12,7 @@ import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.Direction;
-import com.leaders.gamelogic.interactions.GameActionBuilder;
+import com.leaders.gamelogic.interactions.CharacterActionBuilder;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
@@ -46,7 +46,7 @@ public final class AcrobatActionResolver extends CharacterActionResolver {
 
     @Override
     @Nullable
-    public InteractionRequest getNextInteraction(@NonNull GameActionBuilder builder) {
+    public InteractionRequest getNextInteraction(@NonNull CharacterActionBuilder builder) {
         // If the action builder contains already a default movement interaction,
         // we leave the interaction to be handled by the parent default movement resolver
         if (!builder.getInteractionResults().isEmpty()) {
@@ -73,7 +73,7 @@ public final class AcrobatActionResolver extends CharacterActionResolver {
 
     @Override
     @Nullable
-    public InteractionFeedback getNextFeedback(@NonNull GameActionBuilder builder) {
+    public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
         // Acrobat actions only requires a single interaction.
         // When the result is gotten, a single feedback can be generated
         // containing either movement or active ability instructions
@@ -105,7 +105,7 @@ public final class AcrobatActionResolver extends CharacterActionResolver {
     }
 
     @NonNull
-    private List<Position> getAcrobatJumpDestinations(@NonNull GameActionBuilder builder) {
+    private List<Position> getAcrobatJumpDestinations(@NonNull CharacterActionBuilder builder) {
         // First we find every jump destination
         Set<Position> destinationsSet = new HashSet<>();
         for (Direction firstDirection : Direction.values()) {
@@ -129,7 +129,7 @@ public final class AcrobatActionResolver extends CharacterActionResolver {
         for (int i = destinations.size() - 1; i >= 0; i--) {
             Position destination = destinations.get(i);
 
-            GameActionBuilder jumpBuilder = new GameActionBuilder(builder);
+            CharacterActionBuilder jumpBuilder = new CharacterActionBuilder(builder);
             InteractionResult jumpResult = new InteractionResult(InteractionResultType.PositionChosen,
                     new InteractionTarget(TargetCategory.ActiveAbilityDestination, destination)
             );

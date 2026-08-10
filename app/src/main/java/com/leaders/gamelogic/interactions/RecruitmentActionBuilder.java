@@ -2,16 +2,20 @@ package com.leaders.gamelogic.interactions;
 
 import androidx.annotation.NonNull;
 
-import com.leaders.gamelogic.entities.Character;
+import com.leaders.gamelogic.enums.CharacterCard;
+import com.leaders.gamelogic.enums.TeamColor;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class GameActionBuilder {
+public final class RecruitmentActionBuilder {
 
     @NonNull
-    private final Character sourceCharacter;
+    private final CharacterCard recruitedCard;
+
+    @NonNull
+    private final TeamColor teamColor;
 
     @NonNull
     private final List<InteractionResult> interactionResults;
@@ -19,23 +23,30 @@ public final class GameActionBuilder {
     @NonNull
     private final List<InteractionFeedback> interactionFeedbacks;
 
-    public GameActionBuilder(@NonNull Character sourceCharacter,
-                             @NonNull List<InteractionResult> interactionResults,
-                             @NonNull List<InteractionFeedback> interactionFeedbacks) {
-        this.sourceCharacter = sourceCharacter;
+    public RecruitmentActionBuilder(@NonNull CharacterCard recruitedCard,
+                                    @NonNull TeamColor teamColor,
+                                    @NonNull List<InteractionResult> interactionResults,
+                                    @NonNull List<InteractionFeedback> interactionFeedbacks) {
+        this.recruitedCard = recruitedCard;
+        this.teamColor = teamColor;
         this.interactionResults = interactionResults;
         this.interactionFeedbacks = interactionFeedbacks;
     }
 
-    public GameActionBuilder(@NonNull GameActionBuilder refBuilder) {
-        this(refBuilder.sourceCharacter,
+    public RecruitmentActionBuilder(@NonNull RecruitmentActionBuilder refBuilder) {
+        this(refBuilder.recruitedCard, refBuilder.teamColor,
                 new ArrayList<>(refBuilder.interactionResults),
                 new ArrayList<>(refBuilder.interactionFeedbacks));
     }
 
     @NonNull
-    public Character getSourceCharacter() {
-        return sourceCharacter;
+    public CharacterCard getRecruitedCard() {
+        return recruitedCard;
+    }
+
+    @NonNull
+    public TeamColor getTeamColor() {
+        return teamColor;
     }
 
     @NonNull

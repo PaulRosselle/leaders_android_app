@@ -21,7 +21,7 @@ import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.TeamColor;
-import com.leaders.gamelogic.interactions.GameActionBuilder;
+import com.leaders.gamelogic.interactions.CharacterActionBuilder;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
@@ -59,8 +59,8 @@ public class BruiserActionResolverTest {
                 new ArrayList<>(), new ArrayList<>()), new ArrayList<>());
     }
 
-    private GameActionBuilder createBuilder() {
-        return new GameActionBuilder(bruiser, new ArrayList<>(), new ArrayList<>());
+    private CharacterActionBuilder createBuilder() {
+        return new CharacterActionBuilder(bruiser, new ArrayList<>(), new ArrayList<>());
     }
 
     @Before
@@ -110,7 +110,7 @@ public class BruiserActionResolverTest {
 
     @Test
     public void getNextInteraction_shouldRequestPushDestinationAfterEnemySelected() {
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(TargetCategory.ActiveAbilityTargetPosition, TARGET_POSITION));
 
         InteractionRequest request = resolver.getNextInteraction(builder);
@@ -131,7 +131,7 @@ public class BruiserActionResolverTest {
     public void getNextInteraction_shouldDelegateNormalMovementToParent() {
         Position destination = new Position(3, 2);
 
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(TargetCategory.MovementDestination, destination));
 
         assertNull(resolver.getNextInteraction(builder));
@@ -139,7 +139,7 @@ public class BruiserActionResolverTest {
 
     @Test
     public void getNextFeedback_shouldReturnNullBeforePushDestinationIsSelected() {
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(TargetCategory.ActiveAbilityTargetPosition, TARGET_POSITION));
 
         assertNull(resolver.getNextFeedback(builder));
@@ -149,7 +149,7 @@ public class BruiserActionResolverTest {
     public void getNextFeedback_shouldDelegateNormalMovementToParent() {
         Position destination = new Position(3, 2);
 
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(TargetCategory.MovementDestination, destination));
 
         InteractionFeedback feedback = resolver.getNextFeedback(builder);
@@ -169,7 +169,7 @@ public class BruiserActionResolverTest {
     public void getNextFeedback_shouldCreatePushFeedback() {
         Position destination = new Position(3, 5);
 
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(TargetCategory.ActiveAbilityTargetPosition, TARGET_POSITION));
         builder.addResult(createPositionResult(TargetCategory.ActiveAbilityDestination, destination));
 
@@ -195,7 +195,7 @@ public class BruiserActionResolverTest {
     public void getNextFeedback_shouldReturnNullAfterFeedbackWasGenerated() {
         Position destination = new Position(3, 5);
 
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(TargetCategory.ActiveAbilityTargetPosition, TARGET_POSITION));
         builder.addResult(createPositionResult(TargetCategory.ActiveAbilityDestination, destination));
 
@@ -212,7 +212,7 @@ public class BruiserActionResolverTest {
     public void buildAction_shouldBuildNormalMoveAction() {
         Position destination = new Position(3, 2);
 
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(TargetCategory.MovementDestination, destination));
 
         InteractionFeedback feedback = resolver.getNextFeedback(builder);
@@ -232,7 +232,7 @@ public class BruiserActionResolverTest {
     public void buildAction_shouldBuildPushAction() {
         Position destination = new Position(3, 5);
 
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(TargetCategory.ActiveAbilityTargetPosition, TARGET_POSITION));
         builder.addResult(createPositionResult(TargetCategory.ActiveAbilityDestination, destination));
 
@@ -262,7 +262,7 @@ public class BruiserActionResolverTest {
         Character occupant = Character.create(CharacterType.Hermit, TeamColor.Black);
         game.getBoard().getCell(occupiedDestination).setCharacter(occupant);
 
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(TargetCategory.ActiveAbilityTargetPosition, TARGET_POSITION));
 
         InteractionRequest request = resolver.getNextInteraction(builder);

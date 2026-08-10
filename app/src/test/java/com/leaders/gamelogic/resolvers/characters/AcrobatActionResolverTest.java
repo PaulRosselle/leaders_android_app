@@ -21,7 +21,7 @@ import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.TeamColor;
-import com.leaders.gamelogic.interactions.GameActionBuilder;
+import com.leaders.gamelogic.interactions.CharacterActionBuilder;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
@@ -70,8 +70,8 @@ public class AcrobatActionResolverTest {
         );
     }
 
-    private GameActionBuilder createBuilder() {
-        return new GameActionBuilder(acrobat, new ArrayList<>(), new ArrayList<>());
+    private CharacterActionBuilder createBuilder() {
+        return new CharacterActionBuilder(acrobat, new ArrayList<>(), new ArrayList<>());
     }
 
     private void placeCharacter(@NonNull Position position) {
@@ -130,14 +130,14 @@ public class AcrobatActionResolverTest {
 
     @Test
     public void getNextInteraction_shouldReturnNullAfterMovementChoice() {
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createResult(TargetCategory.MovementDestination, new Position(3, 2)));
         assertNull(resolver.getNextInteraction(builder));
     }
 
     @Test
     public void getNextInteraction_shouldReturnNullAfterAcrobatAbilityChoice() {
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createResult(TargetCategory.ActiveAbilityDestination, new Position(3, 1)));
 
         assertNull(resolver.getNextInteraction(builder));
@@ -147,7 +147,7 @@ public class AcrobatActionResolverTest {
     public void getNextFeedback_shouldDelegateNormalMovementToParent() {
         Position destination = new Position(3, 2);
 
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createResult(TargetCategory.MovementDestination, destination));
 
         InteractionFeedback feedback = resolver.getNextFeedback(builder);
@@ -166,7 +166,7 @@ public class AcrobatActionResolverTest {
     public void getNextFeedback_shouldCreateJumpForAcrobatAbility() {
         Position destination = new Position(3, 1);
 
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createResult(TargetCategory.ActiveAbilityDestination, destination));
 
         InteractionFeedback feedback = resolver.getNextFeedback(builder);
@@ -184,7 +184,7 @@ public class AcrobatActionResolverTest {
 
     @Test
     public void getNextFeedback_shouldReturnNullAfterFeedbackWasAlreadyGenerated() {
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
 
         builder.addResult(createResult(TargetCategory.ActiveAbilityDestination, new Position(3, 1)));
 
@@ -199,7 +199,7 @@ public class AcrobatActionResolverTest {
 
     @Test
     public void getNextFeedback_shouldReturnNullWithoutInteractionResult() {
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
 
         assertNull(resolver.getNextFeedback(builder));
     }
@@ -208,7 +208,7 @@ public class AcrobatActionResolverTest {
     public void buildAction_shouldBuildJumpAction() {
         Position destination = new Position(3, 1);
 
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createResult(TargetCategory.ActiveAbilityDestination, destination));
 
         InteractionFeedback feedback = resolver.getNextFeedback(builder);
@@ -232,7 +232,7 @@ public class AcrobatActionResolverTest {
     public void buildAction_shouldBuildNormalMoveAction() {
         Position destination = new Position(3, 2);
 
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createResult(TargetCategory.MovementDestination, destination));
 
         InteractionFeedback feedback = resolver.getNextFeedback(builder);

@@ -12,7 +12,7 @@ import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.Direction;
-import com.leaders.gamelogic.interactions.GameActionBuilder;
+import com.leaders.gamelogic.interactions.CharacterActionBuilder;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
@@ -41,7 +41,7 @@ public final class RiderActionResolver extends CharacterActionResolver {
 
     @Override
     @Nullable
-    public InteractionRequest getNextInteraction(@NonNull GameActionBuilder builder) {
+    public InteractionRequest getNextInteraction(@NonNull CharacterActionBuilder builder) {
         // Rider actions require a single interaction.
         // If an interaction has already been selected, no further interaction can be added to this action.
         if (!builder.getInteractionResults().isEmpty()) {
@@ -70,7 +70,7 @@ public final class RiderActionResolver extends CharacterActionResolver {
 
     @Override
     @Nullable
-    public InteractionFeedback getNextFeedback(@NonNull GameActionBuilder builder) {
+    public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
         if (builder.getInteractionResults().isEmpty() ||
                 !builder.getInteractionFeedbacks().isEmpty()) {
             return null;
@@ -100,7 +100,7 @@ public final class RiderActionResolver extends CharacterActionResolver {
      * cell must therefore exist and be empty, as must the destination cell.</p>
      */
     @NonNull
-    private List<Position> getRiderDashDestinations(@NonNull GameActionBuilder builder) {
+    private List<Position> getRiderDashDestinations(@NonNull CharacterActionBuilder builder) {
         List<Position> destinations = new ArrayList<>();
 
         for (Direction direction : Direction.values()) {
@@ -110,7 +110,7 @@ public final class RiderActionResolver extends CharacterActionResolver {
                 if (destCell != null && destCell.getCharacter() == null) {
                     Position destPos = destCell.getPosition();
 
-                    GameActionBuilder destBuilder = new GameActionBuilder(builder);
+                    CharacterActionBuilder destBuilder = new CharacterActionBuilder(builder);
                     destBuilder.addResult(new InteractionResult(
                             InteractionResultType.PositionChosen,
                             new InteractionTarget(TargetCategory.ActiveAbilityDestination, destPos)

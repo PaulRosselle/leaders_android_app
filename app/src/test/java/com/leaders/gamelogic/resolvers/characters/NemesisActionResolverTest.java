@@ -24,7 +24,7 @@ import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.Direction;
 import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.TeamColor;
-import com.leaders.gamelogic.interactions.GameActionBuilder;
+import com.leaders.gamelogic.interactions.CharacterActionBuilder;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
@@ -68,8 +68,8 @@ public class NemesisActionResolverTest {
         ), new ArrayList<>());
     }
 
-    private GameActionBuilder createBuilder() {
-        return new GameActionBuilder(character, new ArrayList<>(), new ArrayList<>());
+    private CharacterActionBuilder createBuilder() {
+        return new CharacterActionBuilder(character, new ArrayList<>(), new ArrayList<>());
     }
 
     @NonNull
@@ -101,7 +101,7 @@ public class NemesisActionResolverTest {
 
     @Test
     public void getNextInteraction_shouldRequestMovementDestination() {
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
 
         InteractionRequest request = resolver.getNextInteraction(builder);
 
@@ -114,7 +114,7 @@ public class NemesisActionResolverTest {
 
     @Test
     public void getNextInteraction_shouldPreferTwoStepDestinations() {
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
 
         InteractionRequest request = resolver.getNextInteraction(builder);
 
@@ -132,7 +132,7 @@ public class NemesisActionResolverTest {
 
     @Test
     public void getNextInteraction_shouldNotReturnOriginalPosition() {
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
 
         InteractionRequest request = resolver.getNextInteraction(builder);
 
@@ -151,7 +151,7 @@ public class NemesisActionResolverTest {
         placeCharacter(new Position(2, 1));
         placeCharacter(new Position(2, 2));
 
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
 
         InteractionRequest request = resolver.getNextInteraction(builder);
 
@@ -170,7 +170,7 @@ public class NemesisActionResolverTest {
         placeCharacter(new Position(1, 0));
         placeCharacter(new Position(1, 1));
 
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
 
         InteractionRequest request = resolver.getNextInteraction(builder);
 
@@ -180,7 +180,7 @@ public class NemesisActionResolverTest {
 
     @Test
     public void getNextInteraction_shouldReturnNullAfterPositionChosen() {
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         Position destination = new Position(3, 1);
         builder.addResult(createMovementResult(destination));
 
@@ -192,7 +192,7 @@ public class NemesisActionResolverTest {
     @Test
     public void getNextFeedback_shouldCreateMoveFeedback() {
         Position destination = new Position(3, 1);
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createMovementResult(destination));
 
         InteractionFeedback feedback = resolver.getNextFeedback(builder);
@@ -210,7 +210,7 @@ public class NemesisActionResolverTest {
 
     @Test
     public void getNextFeedback_shouldReturnNullForCancelAction() {
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
 
         builder.addResult(new InteractionResult(
                 InteractionResultType.CancelAction,
@@ -225,7 +225,7 @@ public class NemesisActionResolverTest {
     @Test
     public void buildAction_shouldBuildActionFromFeedback() {
         Position destination = new Position(3, 1);
-        GameActionBuilder builder = createBuilder();
+        CharacterActionBuilder builder = createBuilder();
         builder.addResult(createMovementResult(destination));
 
         InteractionFeedback feedback = resolver.getNextFeedback(builder);

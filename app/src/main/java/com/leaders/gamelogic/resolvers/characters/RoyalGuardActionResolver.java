@@ -11,7 +11,7 @@ import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterMotionType;
-import com.leaders.gamelogic.interactions.GameActionBuilder;
+import com.leaders.gamelogic.interactions.CharacterActionBuilder;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
@@ -45,7 +45,7 @@ public final class RoyalGuardActionResolver extends CharacterActionResolver {
 
     @Override
     @Nullable
-    public InteractionRequest getNextInteraction(@NonNull GameActionBuilder builder) {
+    public InteractionRequest getNextInteraction(@NonNull CharacterActionBuilder builder) {
         // Royal Guard actions require a single interaction.
         // If an interaction has already been selected, no further interaction can be added.
         if (!builder.getInteractionResults().isEmpty()) {
@@ -77,7 +77,7 @@ public final class RoyalGuardActionResolver extends CharacterActionResolver {
 
     @Override
     @Nullable
-    public InteractionFeedback getNextFeedback(@NonNull GameActionBuilder builder) {
+    public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
         if (builder.getInteractionResults().isEmpty() ||
                 !builder.getInteractionFeedbacks().isEmpty()) {
             return null;
@@ -110,7 +110,7 @@ public final class RoyalGuardActionResolver extends CharacterActionResolver {
      * its final destination is exposed to the player.</p>
      */
     @NonNull
-    private List<Position> getRoyalGuardDestinations(@NonNull GameActionBuilder builder) {
+    private List<Position> getRoyalGuardDestinations(@NonNull CharacterActionBuilder builder) {
         List<Position> destinations = new ArrayList<>();
 
         Cell leaderCell = BoardQuery.findLeaderCell(game.getBoard(), character.getTeamColor());
@@ -121,7 +121,7 @@ public final class RoyalGuardActionResolver extends CharacterActionResolver {
         for (Cell destCell : BoardQuery.findEmptyCellsAround(game.getBoard(), leaderCell.getPosition(), 2)) {
             Position destPos = destCell.getPosition();
 
-            GameActionBuilder destBuilder = new GameActionBuilder(builder);
+            CharacterActionBuilder destBuilder = new CharacterActionBuilder(builder);
             InteractionResult result = new InteractionResult(
                     InteractionResultType.PositionChosen,
                     new InteractionTarget(TargetCategory.ActiveAbilityDestination, destPos)
