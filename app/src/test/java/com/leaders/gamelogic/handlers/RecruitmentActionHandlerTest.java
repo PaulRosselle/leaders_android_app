@@ -4,7 +4,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
+import androidx.annotation.NonNull;
+
 import com.leaders.gamelogic.actions.RecruitmentAction;
+import com.leaders.gamelogic.actions.RecruitmentActionTarget;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
@@ -17,6 +20,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 
 public class RecruitmentActionHandlerTest {
 
@@ -29,8 +33,8 @@ public class RecruitmentActionHandlerTest {
         );
     }
 
-    private RecruitmentAction createRecruitmentAction(Character character, Position position) {
-        return new RecruitmentAction(character, position);
+    private RecruitmentAction createRecruitmentAction(@NonNull Character character, @NonNull Position position) {
+        return new RecruitmentAction(List.of(new RecruitmentActionTarget(character, position)));
     }
 
     @Test

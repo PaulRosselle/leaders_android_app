@@ -14,6 +14,7 @@ import com.leaders.gamelogic.actions.CharacterActionMotion;
 import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.actions.RecruitmentAction;
+import com.leaders.gamelogic.actions.RecruitmentActionTarget;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
@@ -113,7 +114,9 @@ public class GameFactoryTest {
         RecruitmentPhase recruitmentPhase = new RecruitmentPhase(null, null, teamColor);
         recruitmentPhase.start();
         Character recruitedCharacter = Character.create(CharacterType.Acrobat, TeamColor.Black);
-        recruitmentPhase.getActions().add(new RecruitmentAction(recruitedCharacter, new Position(0, 0)));
+        recruitmentPhase.getActions().add(new RecruitmentAction(
+                List.of(new RecruitmentActionTarget(recruitedCharacter, new Position(0, 0)))
+        ));
 
         Turn turn = new Turn(null, null, teamColor,
                 turnStartPhase,

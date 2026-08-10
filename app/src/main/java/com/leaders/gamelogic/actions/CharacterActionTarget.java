@@ -13,19 +13,23 @@ public final class CharacterActionTarget {
     private final Position originPos;
     @Nullable
     private final Position destPos;
+
     public CharacterActionTarget(@NonNull Character character, @Nullable Position originPos, @Nullable Position destPos) {
         this.character = character;
         this.originPos = originPos;
         this.destPos = destPos;
     }
+
     @NonNull
     public Character getCharacter() {
         return character;
     }
+
     @Nullable
     public Position getOriginPos() {
         return originPos;
     }
+    
     @Nullable
     public Position getDestPos() {
         return destPos;

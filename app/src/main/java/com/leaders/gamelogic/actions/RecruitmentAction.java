@@ -2,9 +2,11 @@ package com.leaders.gamelogic.actions;
 
 import androidx.annotation.NonNull;
 
-import com.leaders.gamelogic.entities.Character;
-import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.GameActionType;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public final class RecruitmentAction implements IGameAction {
     @Override
@@ -13,22 +15,14 @@ public final class RecruitmentAction implements IGameAction {
     }
 
     @NonNull
-    private final Character character;
-    @NonNull
-    private final Position destPos;
+    private final List<RecruitmentActionTarget> targets;
 
-    public RecruitmentAction(@NonNull Character character, @NonNull Position destPos) {
-        this.character = character;
-        this.destPos = destPos;
+    public RecruitmentAction(@NonNull List<RecruitmentActionTarget> targets) {
+        this.targets = new ArrayList<>(targets);
     }
 
     @NonNull
-    public com.leaders.gamelogic.entities.Character getCharacter() {
-        return character;
-    }
-
-    @NonNull
-    public Position getDestPos() {
-        return destPos;
+    public List<RecruitmentActionTarget> getTargets() {
+        return Collections.unmodifiableList(targets);
     }
 }
