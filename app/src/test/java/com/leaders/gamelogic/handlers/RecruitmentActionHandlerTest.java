@@ -7,13 +7,14 @@ import static org.junit.Assert.assertSame;
 import androidx.annotation.NonNull;
 
 import com.leaders.gamelogic.actions.RecruitmentAction;
-import com.leaders.gamelogic.actions.RecruitmentActionTarget;
+import com.leaders.gamelogic.actions.RecruitmentActionMotion;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
+import com.leaders.gamelogic.enums.RecruitmentMotionType;
 import com.leaders.gamelogic.enums.TeamColor;
 
 import org.junit.Test;
@@ -34,7 +35,13 @@ public class RecruitmentActionHandlerTest {
     }
 
     private RecruitmentAction createRecruitmentAction(@NonNull Character character, @NonNull Position position) {
-        return new RecruitmentAction(List.of(new RecruitmentActionTarget(character, position)));
+        return new RecruitmentAction(List.of(
+                new RecruitmentActionMotion(
+                        RecruitmentMotionType.Add,
+                        character,
+                        position
+                ))
+        );
     }
 
     @Test

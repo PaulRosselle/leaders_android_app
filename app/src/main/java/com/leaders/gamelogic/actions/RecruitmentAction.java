@@ -15,14 +15,14 @@ public final class RecruitmentAction implements IGameAction {
     }
 
     @NonNull
-    private final List<RecruitmentActionTarget> targets;
+    private final List<RecruitmentActionMotion> motions;
 
-    public RecruitmentAction(@NonNull List<RecruitmentActionTarget> targets) {
-        this.targets = new ArrayList<>(targets);
+    public RecruitmentAction(@NonNull List<RecruitmentActionMotion> motions) {
+        this.motions = new ArrayList<>(motions);
     }
 
     @NonNull
-    public List<RecruitmentActionTarget> getTargets() {
-        return Collections.unmodifiableList(targets);
+    public List<RecruitmentActionMotion> getMotions() {
+        return Collections.unmodifiableList(motions);
     }
 }

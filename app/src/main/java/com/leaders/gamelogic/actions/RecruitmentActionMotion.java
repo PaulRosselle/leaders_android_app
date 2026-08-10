@@ -2,6 +2,8 @@ package com.leaders.gamelogic.actions;
 
 import androidx.annotation.NonNull;
 
+import com.leaders.gamelogic.entities.Character;
+import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.RecruitmentMotionType;
 
 public final class RecruitmentActionMotion {
@@ -9,21 +11,31 @@ public final class RecruitmentActionMotion {
     private final RecruitmentMotionType motionType;
 
     @NonNull
-    private final RecruitmentActionTarget target;
-
-    public RecruitmentActionMotion(@NonNull RecruitmentMotionType motionType,
-                                   @NonNull RecruitmentActionTarget target) {
-        this.motionType = motionType;
-        this.target = target;
-    }
+    private final Character character;
 
     @NonNull
-    public RecruitmentActionTarget getTarget() {
-        return target;
+    private final Position position;
+
+    public RecruitmentActionMotion(@NonNull RecruitmentMotionType motionType,
+                                   @NonNull Character character,
+                                   @NonNull Position position) {
+        this.motionType = motionType;
+        this.character = character;
+        this.position = position;
     }
 
     @NonNull
     public RecruitmentMotionType getMotionType() {
         return motionType;
+    }
+
+    @NonNull
+    public Character getCharacter() {
+        return character;
+    }
+
+    @NonNull
+    public Position getPosition() {
+        return position;
     }
 }
