@@ -13,6 +13,7 @@ import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.Direction;
 import com.leaders.gamelogic.interactions.CharacterActionBuilder;
+import com.leaders.gamelogic.interactions.InteractionContext;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
@@ -46,11 +47,11 @@ public final class BruiserActionResolver extends CharacterActionResolver {
     @Nullable
     public InteractionRequest getNextInteraction(@NonNull CharacterActionBuilder builder) {
         // For the first interaction, both normal movement and ability activation are possible
-        if (builder.getInteractionResults().isEmpty()) {
+        if (builder.getResults().isEmpty()) {
             return buildInitialInteraction(builder);
         }
 
-        InteractionResult firstResult = builder.getInteractionResults().get(0);
+        InteractionResult firstResult = builder.getResults().get(0);
 
         if (isNormalMovementResult(firstResult)) {
             return super.getNextInteraction(builder);
@@ -66,15 +67,15 @@ public final class BruiserActionResolver extends CharacterActionResolver {
     @Override
     @Nullable
     public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
-        if (!builder.getInteractionFeedbacks().isEmpty()) {
+        if (!builder.getFeedbacks().isEmpty()) {
             return null;
         }
 
-        if (builder.getInteractionResults().isEmpty()) {
+        if (builder.getResults().isEmpty()) {
             return null;
         }
 
-        InteractionResult firstResult = builder.getInteractionResults().get(0);
+        InteractionResult firstResult = builder.getResults().get(0);
 
         if (firstResult.getResultType() == InteractionResultType.CancelAction) {
             return null;
@@ -84,11 +85,11 @@ public final class BruiserActionResolver extends CharacterActionResolver {
             return super.getNextFeedback(builder);
         }
 
-        if (builder.getInteractionResults().size() < 2) {
+        if (builder.getResults().size() < 2) {
             return null;
         }
 
-        InteractionResult destinationResult = builder.getInteractionResults().get(1);
+        InteractionResult destinationResult = builder.getResults().get(1);
 
         if (!isBruiserTargetResult(firstResult) ||
                 !isBruiserDestinationResult(destinationResult)) {
@@ -111,13 +112,13 @@ public final class BruiserActionResolver extends CharacterActionResolver {
                 game.getBoard().getCell(targetOrigin).getCharacter(),
                 "Bruiser target position should contain a character");
 
-        return new InteractionFeedback(new CharacterActionMotion(
+        return InteractionFeedback.createForCharacterAction(List.of(new CharacterActionMotion(
                 CharacterMotionType.Push,
                 List.of(
                         new CharacterActionTarget(character, characterPos, targetOrigin),
                         new CharacterActionTarget(target, targetOrigin, destination)
                 )
-        ));
+        )));
     }
 
     @NonNull
@@ -136,6 +137,7 @@ public final class BruiserActionResolver extends CharacterActionResolver {
 
         return new InteractionRequest(
                 InteractionType.PositionExpected,
+                new InteractionContext(character),
                 legalTargets,
                 List.of(InteractionResultType.PositionChosen, InteractionResultType.CancelAction)
         );
@@ -159,8 +161,11 @@ public final class BruiserActionResolver extends CharacterActionResolver {
             legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityDestination, destination));
         }
 
+        Character targetedEnemy = Objects.requireNonNull(game.getBoard().getCell(targetPos).getCharacter(),
+                "A Bruiser target position must contain an enemy");
         return new InteractionRequest(
                 InteractionType.PositionExpected,
+                new InteractionContext(targetedEnemy), // Here the request has for subjet the target
                 legalTargets,
                 List.of(InteractionResultType.PositionChosen, InteractionResultType.CancelAction)
         );
@@ -221,9 +226,10 @@ public final class BruiserActionResolver extends CharacterActionResolver {
 
         // If the target result is missing, we add it before entering the destination loop
         CharacterActionBuilder targetBuilder = new CharacterActionBuilder(builder);
-        if (builder.getInteractionResults().isEmpty()) {
+        if (builder.getResults().isEmpty()) {
             targetBuilder.addResult(new InteractionResult(
                     InteractionResultType.PositionChosen,
+                    new InteractionContext(character),
                     new InteractionTarget(TargetCategory.ActiveAbilityTargetPosition, targetPos)
             ));
         }
@@ -238,16 +244,19 @@ public final class BruiserActionResolver extends CharacterActionResolver {
                 CharacterActionBuilder destinationBuilder = new CharacterActionBuilder(targetBuilder);
                 destinationBuilder.addResult(new InteractionResult(
                         InteractionResultType.PositionChosen,
+                        new InteractionContext(target), // Here the result subject is the target
                         new InteractionTarget(TargetCategory.ActiveAbilityDestination, pushDestPos)
                 ));
 
-                destinationBuilder.addFeedback(new InteractionFeedback(new CharacterActionMotion(
-                        CharacterMotionType.Push,
-                        List.of(
-                                new CharacterActionTarget(character, characterPos, targetPos),
-                                new CharacterActionTarget(target, targetPos, pushDestPos)
-                        )
-                )));
+                destinationBuilder.addFeedback(InteractionFeedback.createForCharacterAction(
+                        List.of(new CharacterActionMotion(
+                                CharacterMotionType.Push,
+                                List.of(
+                                        new CharacterActionTarget(character, characterPos, targetPos),
+                                        new CharacterActionTarget(target, targetPos, pushDestPos)
+                                ))
+                        ))
+                );
 
                 if (isActionValid(buildAction(destinationBuilder))) {
                     destinations.add(pushDestPos);

@@ -13,6 +13,7 @@ import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.Direction;
 import com.leaders.gamelogic.interactions.CharacterActionBuilder;
+import com.leaders.gamelogic.interactions.InteractionContext;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
@@ -42,32 +43,38 @@ public final class BrewmasterActionResolver extends CharacterActionResolver {
     @Nullable
     public InteractionRequest getNextInteraction(@NonNull CharacterActionBuilder builder) {
         // For the first interaction, both normal movement and ability activation are possible
-         if (builder.getInteractionResults().isEmpty()) {
+         if (builder.getResults().isEmpty()) {
             return buildInitialInteraction(builder);
         }
 
-        InteractionResult firstResult = builder.getInteractionResults().get(0);
+        InteractionResult firstResult = builder.getResults().get(0);
+        if (firstResult.getResultType() == InteractionResultType.CancelAction) {
+            return null;
+        }
+
         // If the first interaction was a normal movement
         if (isNormalMovementResult(firstResult)) {
             return super.getNextInteraction(builder);
         }
+
         // Otherwise it should be an ability activation, in which case the next (and last)
         // interaction is to select a target destination
         if (isBrewmasterTargetResult(firstResult)) {
             return buildTargetDestinationInteraction(builder, firstResult);
         }
-        return null;
+
+        throw new IllegalArgumentException("Invalid Brewmaster action builder");
     }
 
     @Override
     @Nullable
     public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
         // Brewmaster actions generate a single feedback.
-        if (!builder.getInteractionFeedbacks().isEmpty()) {
+        if (!builder.getFeedbacks().isEmpty()) {
             return null;
         }
 
-        InteractionResult firstResult = builder.getInteractionResults().get(0);
+        InteractionResult firstResult = builder.getResults().get(0);
         if (firstResult.getResultType() == InteractionResultType.CancelAction) {
             return null;
         }
@@ -80,11 +87,11 @@ public final class BrewmasterActionResolver extends CharacterActionResolver {
 
         // An ability activation requires two interactions: the selected ally
         // and the destination to which that ally should be moved.
-        if (builder.getInteractionResults().size() < 2) {
+        if (builder.getResults().size() < 2) {
             return null;
         }
 
-        InteractionResult targetDestResult = builder.getInteractionResults().get(1);
+        InteractionResult targetDestResult = builder.getResults().get(1);
 
         if (!isBrewmasterTargetResult(firstResult) ||
                 !isBrewmasterTargetDestinationResult(targetDestResult)) {
@@ -103,10 +110,10 @@ public final class BrewmasterActionResolver extends CharacterActionResolver {
                         .getChosenPosition(),
                 "Brewmaster target destination interaction result invalid : no destination");
 
-        return new InteractionFeedback(new CharacterActionMotion(
+        return InteractionFeedback.createForCharacterAction(List.of(new CharacterActionMotion(
                 CharacterMotionType.Move,
                 List.of(new CharacterActionTarget(target, targetOrigin, targetDest))
-        ));
+        )));
     }
 
     /** * Builds the first interaction of the action.
@@ -131,6 +138,7 @@ public final class BrewmasterActionResolver extends CharacterActionResolver {
 
         return new InteractionRequest(
                 InteractionType.PositionExpected,
+                new InteractionContext(character),
                 legalTargets,
                 List.of(InteractionResultType.PositionChosen, InteractionResultType.CancelAction)
         );
@@ -156,8 +164,11 @@ public final class BrewmasterActionResolver extends CharacterActionResolver {
             legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityTargetPosition, destination));
         }
 
+        Character targetedAlly = Objects.requireNonNull(game.getBoard().getCell(targetPos).getCharacter(),
+                "A Brewmaster target position must contain an ally");
         return new InteractionRequest(
                 InteractionType.PositionExpected,
+                new InteractionContext(targetedAlly), // Here the request has for subjet the target
                 legalTargets,
                 List.of(InteractionResultType.PositionChosen, InteractionResultType.CancelAction)
         );
@@ -200,9 +211,10 @@ public final class BrewmasterActionResolver extends CharacterActionResolver {
         // Create a builder containing the target selection so that each candidate
         // destination can be evaluated in the same interaction context as the final action.
         CharacterActionBuilder targetBuilder = new CharacterActionBuilder(builder);
-        if (targetBuilder.getInteractionResults().isEmpty()) {
+        if (targetBuilder.getResults().isEmpty()) {
             targetBuilder.addResult(new InteractionResult(
                     InteractionResultType.PositionChosen,
+                    new InteractionContext(character),
                     new InteractionTarget(TargetCategory.ActiveAbilityTargetPosition, targetPos)
             ));
         }
@@ -215,13 +227,14 @@ public final class BrewmasterActionResolver extends CharacterActionResolver {
             Position destPos = destination.getPosition();
             destBuilder.addResult(new InteractionResult(
                     InteractionResultType.PositionChosen,
+                    new InteractionContext(target), // Here the result has for subjet the target
                     new InteractionTarget(TargetCategory.ActiveAbilityDestination, destPos)
             ));
-            destBuilder.addFeedback(new InteractionFeedback(
-                    new CharacterActionMotion(
+            destBuilder.addFeedback(InteractionFeedback.createForCharacterAction(
+                    List.of(new CharacterActionMotion(
                         CharacterMotionType.Move,
                         List.of(new CharacterActionTarget(target, targetPos, destPos))
-                    ))
+                    )))
             );
             if (isActionValid(buildAction(destBuilder))) {
                 targetDestinations.add(destPos);

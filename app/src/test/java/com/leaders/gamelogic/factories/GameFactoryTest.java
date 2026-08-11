@@ -14,6 +14,7 @@ import com.leaders.gamelogic.actions.CharacterActionMotion;
 import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.actions.RecruitmentAction;
+import com.leaders.gamelogic.actions.RecruitmentActionMotion;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
@@ -25,6 +26,7 @@ import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.GameMode;
+import com.leaders.gamelogic.enums.RecruitmentMotionType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.enums.WarningType;
 import com.leaders.gamelogic.historyentries.IHistoryEntry;
@@ -113,7 +115,13 @@ public class GameFactoryTest {
         RecruitmentPhase recruitmentPhase = new RecruitmentPhase(null, null, teamColor);
         recruitmentPhase.start();
         Character recruitedCharacter = Character.create(CharacterType.Acrobat, TeamColor.Black);
-        recruitmentPhase.getActions().add(new RecruitmentAction(recruitedCharacter, new Position(0, 0)));
+        recruitmentPhase.getActions().add(new RecruitmentAction(
+                List.of(new RecruitmentActionMotion(
+                        RecruitmentMotionType.Add,
+                        recruitedCharacter,
+                        new Position(0, 0)
+                ))
+        ));
 
         Turn turn = new Turn(null, null, teamColor,
                 turnStartPhase,

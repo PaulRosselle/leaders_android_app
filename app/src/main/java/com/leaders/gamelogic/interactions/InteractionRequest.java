@@ -12,7 +12,10 @@ import java.util.List;
  */
 public final class InteractionRequest {
     @NonNull
-    private final InteractionType type;
+    private final InteractionType requestType;
+
+    @NonNull
+    private final InteractionContext context;
 
     @NonNull
     private final List<InteractionTarget> legalTargets;
@@ -27,21 +30,28 @@ public final class InteractionRequest {
      * modified externally after creation. This preserves the immutability contract of
      * this context token.</p>
      *
-     * @param type the expected interaction type
+     * @param requestType the expected interaction type
      * @param legalTargets the exhaustive list of accepted interaction targets
      * @param legalResults the exhaustive list of accepted interaction result types
      */
-    public InteractionRequest(@NonNull InteractionType type,
+    public InteractionRequest(@NonNull InteractionType requestType,
+                              @NonNull InteractionContext context,
                               @NonNull List<InteractionTarget> legalTargets,
                               @NonNull List<InteractionResultType> legalResults) {
-        this.type = type;
+        this.requestType = requestType;
+        this.context = context;
         this.legalTargets = List.copyOf(legalTargets);
         this.legalResults = List.copyOf(legalResults);
     }
 
     @NonNull
-    public InteractionType getType() {
-        return type;
+    public InteractionType getRequestType() {
+        return requestType;
+    }
+
+    @NonNull
+    public InteractionContext getContext() {
+        return context;
     }
 
     @NonNull

@@ -22,6 +22,7 @@ import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.interactions.CharacterActionBuilder;
+import com.leaders.gamelogic.interactions.InteractionContext;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
@@ -35,6 +36,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 
 public class RiderActionResolverTest {
 
@@ -81,7 +83,7 @@ public class RiderActionResolverTest {
         InteractionRequest request = resolver.getNextInteraction(createBuilder());
 
         assertNotNull(request);
-        assertEquals(InteractionType.PositionExpected, request.getType());
+        assertEquals(InteractionType.PositionExpected, request.getRequestType());
         assertTrue(request.getLegalResults().contains(InteractionResultType.PositionChosen));
         assertTrue(request.getLegalResults().contains(InteractionResultType.CancelAction));
 
@@ -131,7 +133,10 @@ public class RiderActionResolverTest {
 
         assertNotNull(feedback);
 
-        CharacterActionMotion motion = feedback.getCharacterActionMotion();
+        List<CharacterActionMotion> motions = feedback.getCharacterActionMotions();
+
+        assertEquals(1, motions.size());
+        CharacterActionMotion motion = motions.get(0);
 
         assertEquals(CharacterMotionType.Move, motion.getMotionType());
         assertEquals(1, motion.getTargets().size());
@@ -150,7 +155,10 @@ public class RiderActionResolverTest {
 
         assertNotNull(feedback);
 
-        CharacterActionMotion motion = feedback.getCharacterActionMotion();
+        List<CharacterActionMotion> motions = feedback.getCharacterActionMotions();
+
+        assertEquals(1, motions.size());
+        CharacterActionMotion motion = motions.get(0);
 
         assertEquals(CharacterMotionType.Move, motion.getMotionType());
         assertEquals(1, motion.getTargets().size());
@@ -229,6 +237,7 @@ public class RiderActionResolverTest {
                                                    @NonNull Position position) {
         return new InteractionResult(
                 InteractionResultType.PositionChosen,
+                new InteractionContext(rider),
                 new InteractionTarget(category, position)
         );
     }

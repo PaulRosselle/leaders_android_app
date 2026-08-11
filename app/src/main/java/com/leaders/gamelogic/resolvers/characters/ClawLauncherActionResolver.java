@@ -13,6 +13,7 @@ import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.Direction;
 import com.leaders.gamelogic.interactions.CharacterActionBuilder;
+import com.leaders.gamelogic.interactions.InteractionContext;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
@@ -48,7 +49,7 @@ public final class ClawLauncherActionResolver extends CharacterActionResolver {
     @Nullable
     public InteractionRequest getNextInteraction(@NonNull CharacterActionBuilder builder) {
         // The Claw Launcher only requires a single interaction.
-        if (!builder.getInteractionResults().isEmpty()) {
+        if (!builder.getResults().isEmpty()) {
             return null;
         }
 
@@ -73,6 +74,7 @@ public final class ClawLauncherActionResolver extends CharacterActionResolver {
 
         return new InteractionRequest(
                 InteractionType.PositionExpected,
+                new InteractionContext(character),
                 legalTargets,
                 List.of(InteractionResultType.PositionChosen, InteractionResultType.CancelAction)
         );
@@ -81,12 +83,12 @@ public final class ClawLauncherActionResolver extends CharacterActionResolver {
     @Override
     @Nullable
     public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
-        if (builder.getInteractionResults().isEmpty() ||
-                !builder.getInteractionFeedbacks().isEmpty()) {
+        if (builder.getResults().isEmpty() ||
+                !builder.getFeedbacks().isEmpty()) {
             return null;
         }
 
-        InteractionResult result = builder.getInteractionResults().get(0);
+        InteractionResult result = builder.getResults().get(0);
 
         if (result.getResultType() == InteractionResultType.CancelAction) {
             return null;
@@ -136,6 +138,7 @@ public final class ClawLauncherActionResolver extends CharacterActionResolver {
         CharacterActionBuilder pullBuilder = new CharacterActionBuilder(builder);
         InteractionResult pullResult = new InteractionResult(
                 InteractionResultType.PositionChosen,
+                new InteractionContext(character),
                 new InteractionTarget(targetCategory, targetPos)
         );
 
@@ -162,19 +165,19 @@ public final class ClawLauncherActionResolver extends CharacterActionResolver {
                     "Claw Launcher target position should contain a character"
             );
 
-            return new InteractionFeedback(new CharacterActionMotion(
+            return InteractionFeedback.createForCharacterAction(List.of(new CharacterActionMotion(
                     CharacterMotionType.Move,
                     List.of(new CharacterActionTarget(
                             target, targetPos, getAbilityPullDestination(characterPos, targetPos)))
-            ));
+            )));
         }
 
         if (isClawLauncherDestinationResult(result)) {
-            return new InteractionFeedback(new CharacterActionMotion(
+            return InteractionFeedback.createForCharacterAction(List.of(new CharacterActionMotion(
                     CharacterMotionType.Move,
                     List.of(new CharacterActionTarget(
                             character, characterPos, targetPos))
-            ));
+            )));
         }
 
         throw new IllegalArgumentException("Invalid target category for a Claw Launcher ability");

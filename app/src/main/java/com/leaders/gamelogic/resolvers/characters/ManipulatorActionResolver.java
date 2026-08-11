@@ -13,6 +13,7 @@ import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.Direction;
 import com.leaders.gamelogic.interactions.CharacterActionBuilder;
+import com.leaders.gamelogic.interactions.InteractionContext;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
@@ -46,11 +47,14 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
     @Override
     @Nullable
     public InteractionRequest getNextInteraction(@NonNull CharacterActionBuilder builder) {
-        if (builder.getInteractionResults().isEmpty()) {
+        if (builder.getResults().isEmpty()) {
             return buildInitialInteraction(builder);
         }
 
-        InteractionResult firstResult = builder.getInteractionResults().get(0);
+        InteractionResult firstResult = builder.getResults().get(0);
+        if (firstResult.getResultType() == InteractionResultType.CancelAction) {
+            return null;
+        }
 
         if (isNormalMovementResult(firstResult)) {
             return super.getNextInteraction(builder);
@@ -60,21 +64,21 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
             return buildTargetDestinationInteraction(builder, firstResult);
         }
 
-        return null;
+        throw new IllegalArgumentException("Invalid Manipulator action builder");
     }
 
     @Override
     @Nullable
     public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
-        if (!builder.getInteractionFeedbacks().isEmpty()) {
+        if (!builder.getFeedbacks().isEmpty()) {
             return null;
         }
 
-        if (builder.getInteractionResults().isEmpty()) {
+        if (builder.getResults().isEmpty()) {
             return null;
         }
 
-        InteractionResult firstResult = builder.getInteractionResults().get(0);
+        InteractionResult firstResult = builder.getResults().get(0);
 
         if (firstResult.getResultType() == InteractionResultType.CancelAction) {
             return null;
@@ -84,11 +88,11 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
             return super.getNextFeedback(builder);
         }
 
-        if (builder.getInteractionResults().size() < 2) {
+        if (builder.getResults().size() < 2) {
             return null;
         }
 
-        InteractionResult destinationResult = builder.getInteractionResults().get(1);
+        InteractionResult destinationResult = builder.getResults().get(1);
 
         if (!isManipulatorTargetResult(firstResult) ||
                 !isManipulatorDestinationResult(destinationResult)) {
@@ -111,10 +115,10 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
                 game.getBoard().getCell(targetOrigin).getCharacter(),
                 "Manipulator target position should contain a character");
 
-        return new InteractionFeedback(new CharacterActionMotion(
+        return InteractionFeedback.createForCharacterAction(List.of(new CharacterActionMotion(
                 CharacterMotionType.Move,
                 List.of(new CharacterActionTarget(target, targetOrigin, targetDestination))
-        ));
+        )));
     }
 
     @NonNull
@@ -133,6 +137,7 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
 
         return new InteractionRequest(
                 InteractionType.PositionExpected,
+                new InteractionContext(character),
                 legalTargets,
                 List.of(InteractionResultType.PositionChosen, InteractionResultType.CancelAction)
         );
@@ -157,8 +162,11 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
             legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityDestination, destination));
         }
 
+        Character targetedEnemy = Objects.requireNonNull(game.getBoard().getCell(targetPos).getCharacter(),
+                "A Manipulator target position must contain an enemy");
         return new InteractionRequest(
                 InteractionType.PositionExpected,
+                new InteractionContext(targetedEnemy), // Here the request has for subjet the target
                 legalTargets,
                 List.of(InteractionResultType.PositionChosen, InteractionResultType.CancelAction)
         );
@@ -213,9 +221,10 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
 
 
         CharacterActionBuilder targetBuilder = new CharacterActionBuilder(builder);
-        if (targetBuilder.getInteractionResults().isEmpty()) {
+        if (targetBuilder.getResults().isEmpty()) {
             targetBuilder.addResult(new InteractionResult(
                     InteractionResultType.PositionChosen,
+                    new InteractionContext(character),
                     new InteractionTarget(TargetCategory.ActiveAbilityTargetPosition, targetPos)
             ));
         }
@@ -226,13 +235,16 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
             CharacterActionBuilder destinationBuilder = new CharacterActionBuilder(targetBuilder);
             destinationBuilder.addResult(new InteractionResult(
                     InteractionResultType.PositionChosen,
+                    new InteractionContext(target), // Here the result has for subjet the target
                     new InteractionTarget(TargetCategory.ActiveAbilityDestination, destination)
             ));
 
-            destinationBuilder.addFeedback(new InteractionFeedback(new CharacterActionMotion(
-                    CharacterMotionType.Move,
-                    List.of(new CharacterActionTarget(target, targetPos, destination))
-            )));
+            destinationBuilder.addFeedback(InteractionFeedback.createForCharacterAction(
+                    List.of(new CharacterActionMotion(
+                            CharacterMotionType.Move,
+                            List.of(new CharacterActionTarget(target, targetPos, destination))
+                    ))
+            ));
 
             if (isActionValid(buildAction(destinationBuilder))) {
                 destinations.add(destination);

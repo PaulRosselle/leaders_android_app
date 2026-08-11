@@ -12,6 +12,7 @@ import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.interactions.CharacterActionBuilder;
+import com.leaders.gamelogic.interactions.InteractionContext;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
@@ -48,7 +49,7 @@ public final class RoyalGuardActionResolver extends CharacterActionResolver {
     public InteractionRequest getNextInteraction(@NonNull CharacterActionBuilder builder) {
         // Royal Guard actions require a single interaction.
         // If an interaction has already been selected, no further interaction can be added.
-        if (!builder.getInteractionResults().isEmpty()) {
+        if (!builder.getResults().isEmpty()) {
             return null;
         }
 
@@ -70,6 +71,7 @@ public final class RoyalGuardActionResolver extends CharacterActionResolver {
 
         return new InteractionRequest(
                 InteractionType.PositionExpected,
+                new InteractionContext(character),
                 legalTargets,
                 List.of(InteractionResultType.PositionChosen, InteractionResultType.CancelAction)
         );
@@ -78,12 +80,12 @@ public final class RoyalGuardActionResolver extends CharacterActionResolver {
     @Override
     @Nullable
     public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
-        if (builder.getInteractionResults().isEmpty() ||
-                !builder.getInteractionFeedbacks().isEmpty()) {
+        if (builder.getResults().isEmpty() ||
+                !builder.getFeedbacks().isEmpty()) {
             return null;
         }
 
-        InteractionResult result = builder.getInteractionResults().get(0);
+        InteractionResult result = builder.getResults().get(0);
 
         if (result.getResultType() == InteractionResultType.CancelAction) {
             return null;
@@ -124,6 +126,7 @@ public final class RoyalGuardActionResolver extends CharacterActionResolver {
             CharacterActionBuilder destBuilder = new CharacterActionBuilder(builder);
             InteractionResult result = new InteractionResult(
                     InteractionResultType.PositionChosen,
+                    new InteractionContext(character),
                     new InteractionTarget(TargetCategory.ActiveAbilityDestination, destPos)
             );
             destBuilder.addResult(result);
@@ -148,10 +151,10 @@ public final class RoyalGuardActionResolver extends CharacterActionResolver {
                 "Royal Guard destination interaction result invalid: no destination position"
         );
 
-        return new InteractionFeedback(new CharacterActionMotion(
+        return InteractionFeedback.createForCharacterAction(List.of(new CharacterActionMotion(
                 CharacterMotionType.Move,
                 List.of(new CharacterActionTarget(character, characterPos, destPos))
-        ));
+        )));
     }
 
     private boolean isRoyalGuardDestinationResult(@NonNull InteractionResult result) {
