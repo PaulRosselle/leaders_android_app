@@ -3,9 +3,6 @@ package com.leaders.gamelogic.interactions;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.leaders.gamelogic.entities.Position;
-import com.leaders.gamelogic.enums.CharacterCard;
-
 /**
  * Response returned by the external caller in reply to an InteractionRequest.
  * <p>
@@ -14,6 +11,9 @@ import com.leaders.gamelogic.enums.CharacterCard;
 public final class InteractionResult {
     @NonNull
     private final InteractionResultType resultType;
+
+    @NonNull
+    private final InteractionContext context;
 
     @Nullable
     private final InteractionTarget chosenTarget;
@@ -28,15 +28,23 @@ public final class InteractionResult {
      * @param resultType the type of response provided by the caller
      * @param chosenTarget the selected target, if applicable
      */
-    public InteractionResult(@NonNull InteractionResultType resultType, @Nullable InteractionTarget chosenTarget) {
+    public InteractionResult(@NonNull InteractionResultType resultType,
+                             @NonNull InteractionContext context,
+                             @Nullable InteractionTarget chosenTarget) {
         // No defensive copies are necessary since every of the used types are immutable
         this.resultType = resultType;
+        this.context = context;
         this.chosenTarget = chosenTarget;
     }
 
     @NonNull
     public InteractionResultType getResultType() {
         return resultType;
+    }
+
+    @NonNull
+    public InteractionContext getContext() {
+        return context;
     }
 
     @Nullable

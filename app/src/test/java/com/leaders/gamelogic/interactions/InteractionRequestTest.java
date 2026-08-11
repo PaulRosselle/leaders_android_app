@@ -24,9 +24,13 @@ public class InteractionRequestTest {
                 new InteractionTarget(TargetCategory.RecruitmentCard, CharacterCard.Archer));
         List<InteractionResultType> legalResults = List.of(InteractionResultType.CardChosen);
 
-        InteractionRequest request = new InteractionRequest(type, legalTargets, legalResults);
+        Character contextCharacter = Character.create(CharacterType.LeaderQueen, TeamColor.Black);
+        InteractionRequest request = new InteractionRequest(type,
+                new InteractionContext(contextCharacter),
+                legalTargets, legalResults
+        );
 
-        assertEquals(type, request.getType());
+        assertEquals(type, request.getRequestType());
         assertEquals(legalTargets, request.getLegalTargets());
         assertEquals(legalResults, request.getLegalResults());
     }
@@ -35,8 +39,12 @@ public class InteractionRequestTest {
     public void constructor_shouldDefensivelyCopyCollections() {
         List<InteractionTarget> legalTargets = new ArrayList<>();
         List<InteractionResultType> legalResults = new ArrayList<>();
+        Character contextCharacter = Character.create(CharacterType.LeaderQueen, TeamColor.Black);
+        InteractionRequest request = new InteractionRequest(InteractionType.CharacterExpected,
+                new InteractionContext(contextCharacter),
+                legalTargets, legalResults
+        );
 
-        InteractionRequest request = new InteractionRequest(InteractionType.CharacterExpected, legalTargets, legalResults);
 
         legalTargets.add(new InteractionTarget(
                 TargetCategory.PlayableCharacter,
@@ -50,8 +58,10 @@ public class InteractionRequestTest {
 
     @Test
     public void getLegalTargets_shouldReturnUnmodifiableList() {
+        Character contextCharacter = Character.create(CharacterType.LeaderQueen, TeamColor.Black);
         InteractionRequest request = new InteractionRequest(
                 InteractionType.PositionExpected,
+                new InteractionContext(contextCharacter),
                 List.of(new InteractionTarget(TargetCategory.RecruitmentDestination, new Position(3, 3))),
                 List.of()
         );
@@ -61,8 +71,10 @@ public class InteractionRequestTest {
 
     @Test
     public void getLegalResults_shouldReturnUnmodifiableList() {
+        Character contextCharacter = Character.create(CharacterType.LeaderQueen, TeamColor.Black);
         InteractionRequest request = new InteractionRequest(
                 InteractionType.CharacterCardExpected,
+                new InteractionContext(contextCharacter),
                 List.of(),
                 List.of(InteractionResultType.CardChosen)
         );

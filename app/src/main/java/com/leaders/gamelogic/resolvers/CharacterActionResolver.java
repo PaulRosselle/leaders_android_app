@@ -16,6 +16,7 @@ import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.factories.GameActionHandlerFactory;
 import com.leaders.gamelogic.handlers.GameActionHandler;
 import com.leaders.gamelogic.interactions.CharacterActionBuilder;
+import com.leaders.gamelogic.interactions.InteractionContext;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
@@ -117,15 +118,16 @@ public class CharacterActionResolver {
             CharacterActionBuilder nextMovementBuilder = new CharacterActionBuilder(builder);
             nextMovementBuilder.addResult(new InteractionResult(
                     InteractionResultType.PositionChosen,
+                    new InteractionContext(character),
                     new InteractionTarget(TargetCategory.MovementDestination, destCell.getPosition()))
             );
-            nextMovementBuilder.addFeedback(new InteractionFeedback(
-                    new CharacterActionMotion(
+            nextMovementBuilder.addFeedback(InteractionFeedback.createForCharacterAction(
+                    List.of(new CharacterActionMotion(
                             CharacterMotionType.Move,
                             List.of(new CharacterActionTarget(character,
                                     characterPos,
                                     destCell.getPosition())
-                            ))
+                            )))
             ));
 
             CharacterAction movementAction = buildAction(nextMovementBuilder);
@@ -173,7 +175,9 @@ public class CharacterActionResolver {
         legalResults.add(InteractionResultType.PositionChosen);
         legalResults.add(InteractionResultType.CancelAction);
 
-        return new InteractionRequest(InteractionType.PositionExpected, legalTargets, legalResults);
+        return new InteractionRequest(InteractionType.PositionExpected,
+                new InteractionContext(character),
+                legalTargets, legalResults);
     }
 
     /**
@@ -209,7 +213,8 @@ public class CharacterActionResolver {
                                 .getChosenPosition(),
                         "Movement interaction result invalid : no target")
         );
-        return new InteractionFeedback(new CharacterActionMotion(CharacterMotionType.Move, List.of(target)));
+        return InteractionFeedback.createForCharacterAction(
+                List.of(new CharacterActionMotion(CharacterMotionType.Move, List.of(target))));
     }
 
     /**
@@ -229,7 +234,7 @@ public class CharacterActionResolver {
 
         List<CharacterActionMotion> characterActionMotions = new ArrayList<>();
         for (InteractionFeedback feedback : builder.getFeedbacks()) {
-            characterActionMotions.add(feedback.getCharacterActionMotion());
+            characterActionMotions.addAll(feedback.getCharacterActionMotions());
         }
         return new CharacterAction(builder.getSourceCharacter(), characterActionMotions);
     }

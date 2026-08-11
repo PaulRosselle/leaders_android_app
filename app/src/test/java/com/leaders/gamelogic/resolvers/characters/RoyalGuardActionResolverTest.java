@@ -21,6 +21,7 @@ import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.interactions.CharacterActionBuilder;
+import com.leaders.gamelogic.interactions.InteractionContext;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
@@ -34,6 +35,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 
 public class RoyalGuardActionResolverTest {
 
@@ -70,6 +72,7 @@ public class RoyalGuardActionResolverTest {
                                                    @NonNull Position position) {
         return new InteractionResult(
                 InteractionResultType.PositionChosen,
+                new InteractionContext(character),
                 new InteractionTarget(category, position)
         );
     }
@@ -95,7 +98,7 @@ public class RoyalGuardActionResolverTest {
         InteractionRequest request = resolver.getNextInteraction(builder);
 
         assertNotNull(request);
-        assertEquals(InteractionType.PositionExpected, request.getType());
+        assertEquals(InteractionType.PositionExpected, request.getRequestType());
         assertTrue(request.getLegalResults().contains(InteractionResultType.PositionChosen));
         assertTrue(request.getLegalResults().contains(InteractionResultType.CancelAction));
 
@@ -140,7 +143,10 @@ public class RoyalGuardActionResolverTest {
 
         assertNotNull(feedback);
 
-        CharacterActionMotion motion = feedback.getCharacterActionMotion();
+        List<CharacterActionMotion> motions = feedback.getCharacterActionMotions();
+
+        assertEquals(1, motions.size());
+        CharacterActionMotion motion = motions.get(0);
 
         assertEquals(CharacterMotionType.Move, motion.getMotionType());
         assertEquals(1, motion.getTargets().size());
@@ -162,7 +168,10 @@ public class RoyalGuardActionResolverTest {
 
         assertNotNull(feedback);
 
-        CharacterActionMotion motion = feedback.getCharacterActionMotion();
+        List<CharacterActionMotion> motions = feedback.getCharacterActionMotions();
+
+        assertEquals(1, motions.size());
+        CharacterActionMotion motion = motions.get(0);
 
         assertEquals(CharacterMotionType.Move, motion.getMotionType());
         assertEquals(1, motion.getTargets().size());
@@ -193,6 +202,7 @@ public class RoyalGuardActionResolverTest {
         CharacterActionBuilder builder = createBuilder();
         builder.addResult(new InteractionResult(
                 InteractionResultType.CancelAction,
+                new InteractionContext(character),
                 null
         ));
 

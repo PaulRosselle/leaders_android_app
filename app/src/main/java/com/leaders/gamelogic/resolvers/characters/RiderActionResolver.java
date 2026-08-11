@@ -13,6 +13,7 @@ import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.Direction;
 import com.leaders.gamelogic.interactions.CharacterActionBuilder;
+import com.leaders.gamelogic.interactions.InteractionContext;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
@@ -63,6 +64,7 @@ public final class RiderActionResolver extends CharacterActionResolver {
 
         return new InteractionRequest(
                 InteractionType.PositionExpected,
+                new InteractionContext(character),
                 legalTargets,
                 List.of(InteractionResultType.PositionChosen, InteractionResultType.CancelAction)
         );
@@ -113,13 +115,16 @@ public final class RiderActionResolver extends CharacterActionResolver {
                     CharacterActionBuilder destBuilder = new CharacterActionBuilder(builder);
                     destBuilder.addResult(new InteractionResult(
                             InteractionResultType.PositionChosen,
+                            new InteractionContext(character),
                             new InteractionTarget(TargetCategory.ActiveAbilityDestination, destPos)
                     ));
 
-                    destBuilder.addFeedback(new InteractionFeedback(new CharacterActionMotion(
-                            CharacterMotionType.Move,
-                            List.of(new CharacterActionTarget(character, characterPos, destPos))
-                    )));
+                    destBuilder.addFeedback(InteractionFeedback.createForCharacterAction(
+                            List.of(new CharacterActionMotion(
+                                    CharacterMotionType.Move,
+                                    List.of(new CharacterActionTarget(character, characterPos, destPos))
+                            ))
+                    ));
 
                     if (isActionValid(buildAction(destBuilder))) {
                         destinations.add(destPos);
@@ -138,10 +143,10 @@ public final class RiderActionResolver extends CharacterActionResolver {
                         .getChosenPosition(),
                 "Rider destination interaction result invalid: no destination position");
 
-        return new InteractionFeedback(new CharacterActionMotion(
+        return InteractionFeedback.createForCharacterAction(List.of(new CharacterActionMotion(
                 CharacterMotionType.Move,
                 List.of(new CharacterActionTarget(character, characterPos, destination))
-        ));
+        )));
     }
 
     private boolean isRiderDestinationResult(@NonNull InteractionResult result) {

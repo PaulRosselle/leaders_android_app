@@ -13,6 +13,7 @@ import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.Direction;
 import com.leaders.gamelogic.interactions.CharacterActionBuilder;
+import com.leaders.gamelogic.interactions.InteractionContext;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
@@ -59,6 +60,7 @@ public final class NemesisActionResolver extends CharacterActionResolver {
 
         return new InteractionRequest(
                 InteractionType.PositionExpected,
+                new InteractionContext(character),
                 legalTargets,
                 List.of(InteractionResultType.PositionChosen, InteractionResultType.CancelAction)
         );
@@ -139,6 +141,7 @@ public final class NemesisActionResolver extends CharacterActionResolver {
             CharacterActionBuilder destinationBuilder = new CharacterActionBuilder(builder);
             InteractionResult result = new InteractionResult(
                     InteractionResultType.PositionChosen,
+                    new InteractionContext(character),
                     new InteractionTarget(TargetCategory.MovementDestination, destPos)
             );
 
@@ -163,10 +166,10 @@ public final class NemesisActionResolver extends CharacterActionResolver {
                 "Nemesis movement interaction result invalid: no destination position"
         );
 
-        return new InteractionFeedback(new CharacterActionMotion(
+        return InteractionFeedback.createForCharacterAction(List.of(new CharacterActionMotion(
                 CharacterMotionType.Move,
                 List.of(new CharacterActionTarget(character, characterPos, destination))
-        ));
+        )));
     }
 
     private boolean isMovementResult(@NonNull InteractionResult result) {

@@ -13,6 +13,7 @@ import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.Direction;
 import com.leaders.gamelogic.interactions.CharacterActionBuilder;
+import com.leaders.gamelogic.interactions.InteractionContext;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
@@ -68,6 +69,7 @@ public final class IllusionistActionResolver extends CharacterActionResolver {
 
         return new InteractionRequest(
                 InteractionType.PositionExpected,
+                new InteractionContext(character),
                 legalTargets,
                 List.of(InteractionResultType.PositionChosen, InteractionResultType.CancelAction)
         );
@@ -122,6 +124,7 @@ public final class IllusionistActionResolver extends CharacterActionResolver {
 
                     InteractionResult swapResult = new InteractionResult(
                             InteractionResultType.PositionChosen,
+                            new InteractionContext(character),
                             new InteractionTarget(
                                     TargetCategory.ActiveAbilityTargetPosition,
                                     targetPos
@@ -156,13 +159,13 @@ public final class IllusionistActionResolver extends CharacterActionResolver {
                 "Illusionist target position should contain a character"
         );
 
-        return new InteractionFeedback(new CharacterActionMotion(
+        return InteractionFeedback.createForCharacterAction(List.of(new CharacterActionMotion(
                 CharacterMotionType.Swap,
                 List.of(
                         new CharacterActionTarget(character, characterPos, targetPos),
                         new CharacterActionTarget(target, targetPos, characterPos)
                 )
-        ));
+        )));
     }
 
     private boolean isIllusionistTargetResult(@NonNull InteractionResult result) {

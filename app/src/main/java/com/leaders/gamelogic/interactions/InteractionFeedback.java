@@ -7,6 +7,7 @@ import com.leaders.gamelogic.actions.CharacterActionMotion;
 import com.leaders.gamelogic.actions.RecruitmentActionMotion;
 import com.leaders.gamelogic.enums.FeedbackType;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 public final class InteractionFeedback {
@@ -14,48 +15,43 @@ public final class InteractionFeedback {
     @NonNull final FeedbackType feedbackType;
 
     @Nullable
-    private final CharacterActionMotion characterActionMotion;
+    private final List<CharacterActionMotion> characterActionMotions;
 
     @Nullable
-    private final RecruitmentActionMotion recruitmentActionMotion;
+    private final List<RecruitmentActionMotion> recruitmentActionMotions;
 
     private InteractionFeedback(@NonNull FeedbackType feedbackType,
-                               @Nullable CharacterActionMotion characterActionMotion,
-                               @Nullable RecruitmentActionMotion recruitmentActionMotion) {
+                                @Nullable List<CharacterActionMotion> characterActionMotions,
+                                @Nullable List<RecruitmentActionMotion> recruitmentActionMotions) {
         this.feedbackType = feedbackType;
-        if ((characterActionMotion != null) == (recruitmentActionMotion != null)) {
+        if ((characterActionMotions != null) == (recruitmentActionMotions != null)) {
             throw new IllegalArgumentException("There can be only one motion data per interaction");
         }
-        this.characterActionMotion = characterActionMotion;
-        this.recruitmentActionMotion = recruitmentActionMotion;
-    }
-
-    public InteractionFeedback(@NonNull CharacterActionMotion characterActionMotion) {
-        this.feedbackType = FeedbackType.CharacterAction;
-        this.characterActionMotion = characterActionMotion;
-        this.recruitmentActionMotion = null;
-    }
-
-
-    public InteractionFeedback(@NonNull RecruitmentActionMotion recruitmentActionMotion) {
-        this.feedbackType = FeedbackType.RecruitmentAction;
-        this.characterActionMotion = null;
-        this.recruitmentActionMotion = recruitmentActionMotion;
+        this.characterActionMotions = characterActionMotions != null ? List.copyOf(characterActionMotions) : null;
+        this.recruitmentActionMotions = recruitmentActionMotions != null ? List.copyOf(recruitmentActionMotions) : null;
     }
 
     @NonNull
-    public CharacterActionMotion getCharacterActionMotion() {
-        if (characterActionMotion == null) {
+    public List<CharacterActionMotion> getCharacterActionMotions() {
+        if (characterActionMotions == null) {
             throw new NoSuchElementException("No character action motion in a " + feedbackType + " feedback");
         }
-        return characterActionMotion;
+        return characterActionMotions;
     }
 
     @NonNull
-    public RecruitmentActionMotion getRecruitmentActionMotion() {
-        if (recruitmentActionMotion == null) {
+    public List<RecruitmentActionMotion> getRecruitmentActionMotions() {
+        if (recruitmentActionMotions == null) {
             throw new NoSuchElementException("No character action motion in a " + feedbackType + " feedback");
         }
-        return recruitmentActionMotion;
+        return recruitmentActionMotions;
+    }
+
+    public static InteractionFeedback createForCharacterAction(@NonNull List<CharacterActionMotion> characterActionMotions) {
+        return new InteractionFeedback(FeedbackType.CharacterAction, characterActionMotions, null);
+    }
+
+    public static InteractionFeedback createForRecruitmentAction(@NonNull List<RecruitmentActionMotion> recruitmentActionMotions) {
+        return new InteractionFeedback(FeedbackType.RecruitmentAction, null, recruitmentActionMotions);
     }
 }
