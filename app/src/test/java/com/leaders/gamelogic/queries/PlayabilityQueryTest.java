@@ -36,11 +36,13 @@ import java.util.List;
 public class PlayabilityQueryTest {
 
     private Game createTestGame(Board board) {
+        // Build the minimal Game state required by the tests.
+        // This state is intentionally invalid as a real game state.
         return new Game(board,
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new EnumMap<>(TeamColor.class)
+                new ArrayList<>(), // recruitableCards
+                new ArrayList<>(), // recruitedCharacters
+                new EnumMap<>(TeamColor.class), // playerBanishedCards
+                new EnumMap<>(TeamColor.class) // playerWarnings
         );
     }
 

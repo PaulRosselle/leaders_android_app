@@ -7,6 +7,7 @@ import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.enums.WarningType;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 
@@ -18,18 +19,18 @@ public final class Game {
     @NonNull
     private final List<Character> recruitedCharacters;
     @NonNull
-    private final List<CharacterCard> banishedCards;
+    private final EnumMap<TeamColor, List<CharacterCard>> playerBanishedCards;
     @NonNull
     private final EnumMap<TeamColor, EnumMap<WarningType, Integer>> playerWarnings;
 
     public Game(@NonNull Board board, @NonNull List<CharacterCard> recruitableCards,
                 @NonNull List<Character> recruitedCharacters,
-                @NonNull List<CharacterCard> banishedCards,
+                @NonNull EnumMap<TeamColor, List<CharacterCard>> playerBanishedCards,
                 @NonNull EnumMap<TeamColor, EnumMap<WarningType, Integer>> playerWarnings) {
         this.board = board;
         this.recruitableCards = recruitableCards;
         this.recruitedCharacters = recruitedCharacters;
-        this.banishedCards = banishedCards;
+        this.playerBanishedCards = playerBanishedCards;
         this.playerWarnings = playerWarnings;
     }
 
@@ -37,7 +38,7 @@ public final class Game {
         this(new Board(refGame.board),
                 new ArrayList<>(refGame.recruitableCards),
                 new ArrayList<>(refGame.recruitedCharacters),
-                new ArrayList<>(refGame.banishedCards),
+                new EnumMap<>(refGame.playerBanishedCards),
                 new EnumMap<>(refGame.playerWarnings)
         );
     }
@@ -58,8 +59,27 @@ public final class Game {
     }
 
     @NonNull
-    public List<CharacterCard> getBanishedCards() {
-        return banishedCards;
+    public List<CharacterCard> getBanishedCards(@NonNull TeamColor playerTeamColor) {
+        List<CharacterCard> characterCards = playerBanishedCards.get(playerTeamColor);
+        // A missing team entry means that this team currently has no active warnings.
+        if (characterCards == null) {
+            return List.of();
+        }
+        return Collections.unmodifiableList(characterCards);
+    }
+
+    public void addBanishedCard(@NonNull TeamColor playerTeamColor, @NonNull CharacterCard characterCard) {
+        // Creates the team's banishment list only when the first banishment of this team is added.
+        // computeIfAbsent avoids creating an unused ArrayList when the team already exists.
+        playerBanishedCards.computeIfAbsent(playerTeamColor, key -> new ArrayList<>())
+                .add(characterCard);
+    }
+
+    public void removeBanishedCard(@NonNull TeamColor playerTeamColor, @NonNull CharacterCard characterCard) {
+        List<CharacterCard> characterCards = playerBanishedCards.get(playerTeamColor);
+        if (characterCards != null) {
+            characterCards.remove(characterCard);
+        }
     }
 
     /**

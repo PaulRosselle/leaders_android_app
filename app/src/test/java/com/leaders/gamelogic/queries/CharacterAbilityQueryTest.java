@@ -29,7 +29,7 @@ public class CharacterAbilityQueryTest {
         return new Game(board,
                 new ArrayList<>(), // recruitableCards
                 new ArrayList<>(), // recruitedCharacters
-                new ArrayList<>(), // banishedCards
+                new EnumMap<>(TeamColor.class), // playerBanishedCards
                 new EnumMap<>(TeamColor.class) // playerWarnings
         );
     }
