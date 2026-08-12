@@ -13,14 +13,27 @@ import com.leaders.gamelogic.historyentries.IPhase;
 import com.leaders.gamelogic.historyentries.segments.BanishmentPhase;
 import com.leaders.gamelogic.historyentries.segments.TurnPhase;
 
+/**
+ * Utility class responsible for determining the next phase of a game.
+ *
+ * <p>The transition between phases depends on the current game mode, the
+ * transition target of the last completed phase, the team concerned by that
+ * phase, and the current state of the game.</p>
+ */
 public final class PhaseTransitionQuery {
     private PhaseTransitionQuery(){
         throw new AssertionError("Cannot instantiate utility class");
     }
 
-    // TODO - javadoc
+    /**
+     * Returns the first phase of the game.
+     *
+     * @param gameHistory the history of the game
+     * @return the first phase of the game
+     * @throws IllegalStateException if the game mode is not supported
+     */
     private static GamePhase getFirstPhase(@NonNull GameHistory gameHistory) {
-        // TODO - comment
+        // The first phase depends on the game mode
         if (gameHistory.getConfig().getGameMode() == GameMode.Discovery) {
             return new GamePhase(
                     GamePhaseType.TurnStart,
@@ -28,7 +41,6 @@ public final class PhaseTransitionQuery {
             );
         }
 
-        // TODO - comment
         if (gameHistory.getConfig().getGameMode() == GameMode.Strategist) {
             TeamColor oppositeTeam = gameHistory.getConfig().getFirstPlayer().getTeamColor().getOpposite();
 
@@ -42,7 +54,14 @@ public final class PhaseTransitionQuery {
         throw new IllegalStateException("Game modes are limited to Discovery and Strategist");
     }
 
-    // TODO - javadoc
+    /**
+     * Returns the phase that follows the last ended phase of the game.
+     *
+     * @param history the history of the game
+     * @param game the current state of the game
+     * @return the next phase of the game
+     * @throws IllegalStateException if the last ended phase is not supported
+     */
     @NonNull
     public static GamePhase getNextPhase(@NonNull GameHistory history, @NonNull Game game) {
         if (history.getEntries().isEmpty()) {
@@ -73,7 +92,16 @@ public final class PhaseTransitionQuery {
         );
     }
 
-    // TODO - javadoc
+    /**
+     * Returns the type of the phase that follows the current phase.
+     *
+     * @param game the current state of the game
+     * @param gameHistory the history of the game
+     * @param currentPhaseTransition the transition target of the current phase
+     * @param currentPhaseTeam the team of the current phase
+     * @return the type of the next phase
+     * @throws IllegalStateException if the transition target is not supported
+     */
     @NonNull
     private static GamePhaseType getNextPhaseType(@NonNull Game game,
                                                   @NonNull GameHistory gameHistory,
@@ -86,12 +114,12 @@ public final class PhaseTransitionQuery {
 
             case RecruitmentPhase: return GamePhaseType.TurnEnd;
 
-            // TODO - comment : la phase de recrutement peut être reportée si aucun recrutement n'est possible et n'est plus proposée passé un certain stade de jeu
+            // Recruitment is delayed or skipped when it is not possible.
             case ActionsPhase:
                 return RecruitmentQuery.canRecruit(game, gameHistory, oppositeTeam) ?
                         GamePhaseType.Recruitment : GamePhaseType.TurnEnd;
 
-            // TODO - comment : la phase de bannissement n'est pas présente dans tous les modes de jeu et n'est plus proposée passé un certain stade de jeu
+            // Banishment is skipped when it is no longer possible.
             case TurnEndPhase:
             case BanishmentPhase:
                 return BanishmentQuery.canBanish(game, gameHistory, oppositeTeam) ?
@@ -101,12 +129,17 @@ public final class PhaseTransitionQuery {
         }
     }
 
-    // TODO - javadoc
+    /**
+     * Returns the team to which the next phase belongs.
+     *
+     * @param nextPhaseType the type of the next phase
+     * @param currentPhaseTeam the team of the current phase
+     * @return the team of the next phase
+     */
     @NonNull
     private static TeamColor getNextPhaseTeam(@NonNull GamePhaseType nextPhaseType,
                                               @NonNull TeamColor currentPhaseTeam) {
-
-        // TODO - comment : début de tour ou phase de bannissement = changement de joueur
+        // A starting a new turn or a banishment phase means it is the opposite team time to play.
         if (nextPhaseType == GamePhaseType.TurnStart
                 || nextPhaseType == GamePhaseType.Banishment) {
             return currentPhaseTeam.getOpposite();
