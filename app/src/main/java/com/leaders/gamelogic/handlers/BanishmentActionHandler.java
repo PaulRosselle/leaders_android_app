@@ -17,12 +17,12 @@ public final class BanishmentActionHandler extends GameActionHandler {
     @Override
     public void doAction() {
         game.getRecruitableCards().remove(banishmentAction.getCharacterCard());
-        game.getBanishedCards().add(banishmentAction.getCharacterCard());
+        game.addBanishedCard(banishmentAction.getTeamColor(), banishmentAction.getCharacterCard());
     }
 
     @Override
     public void undoAction() {
-        game.getBanishedCards().remove(banishmentAction.getCharacterCard());
+        game.removeBanishedCard(banishmentAction.getTeamColor(), banishmentAction.getCharacterCard());
         game.getRecruitableCards().add(banishmentAction.getCharacterCard());
     }
 }

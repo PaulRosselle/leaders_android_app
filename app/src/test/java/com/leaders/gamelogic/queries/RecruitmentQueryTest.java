@@ -49,11 +49,12 @@ public class RecruitmentQueryTest {
     }
 
     private Game createTestGame(Board board) {
-        return new Game(
-                board,
+        // Build the minimal Game state required by the tests.
+        // This state is intentionally invalid as a real game state.
+        return new Game(board,
                 new ArrayList<>(), // recruitableCards
                 new ArrayList<>(), // recruitedCharacters
-                new ArrayList<>(), // banishedCards
+                new EnumMap<>(TeamColor.class), // playerBanishedCards
                 new EnumMap<>(TeamColor.class) // playerWarnings
         );
     }

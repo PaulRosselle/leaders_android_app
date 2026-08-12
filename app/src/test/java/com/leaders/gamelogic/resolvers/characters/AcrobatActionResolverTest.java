@@ -46,12 +46,13 @@ public class AcrobatActionResolverTest {
     private final Position acrobatPosition = new Position(3, 3);
 
     private Game createTestGame() {
-        return new Game(
-                new Board(),
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new EnumMap<>(TeamColor.class)
+        // Build the minimal Game state required by the tests.
+        // This state is intentionally invalid as a real game state.
+        return new Game(new Board(),
+                new ArrayList<>(), // recruitableCards
+                new ArrayList<>(), // recruitedCharacters
+                new EnumMap<>(TeamColor.class), // playerBanishedCards
+                new EnumMap<>(TeamColor.class) // playerWarnings
         );
     }
 

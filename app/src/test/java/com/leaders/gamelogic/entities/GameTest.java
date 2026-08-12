@@ -17,7 +17,7 @@ public class GameTest {
         return new Game(new Board(),
                 new ArrayList<>(), // recruitableCards
                 new ArrayList<>(), // recruitedCharacters
-                new ArrayList<>(), // banishedCards
+                new EnumMap<>(TeamColor.class), // playerBanishedCards
                 new EnumMap<>(TeamColor.class) // playerWarnings
         );
     }
@@ -52,18 +52,6 @@ public class GameTest {
         assertNotSame(
                 original.getRecruitedCharacters(),
                 copy.getRecruitedCharacters()
-        );
-    }
-
-    @Test
-    public void copy_shouldCreateIndependentBanishedCardsCollection() {
-        Game original = createTestGame();
-
-        Game copy = new Game(original);
-
-        assertNotSame(
-                original.getBanishedCards(),
-                copy.getBanishedCards()
         );
     }
 }

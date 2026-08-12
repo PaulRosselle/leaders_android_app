@@ -206,7 +206,9 @@ public class GameFactoryTest {
         }
         assertTrue(game.getRecruitableCards().isEmpty());
         assertTrue(game.getRecruitedCharacters().isEmpty());
-        assertTrue(game.getBanishedCards().isEmpty());
+        for (TeamColor teamColor : TeamColor.values()) {
+            assertEquals(0, game.getBanishedCards(teamColor).size());
+        }
         for (WarningType warningType : WarningType.values()) {
             for (TeamColor teamColor : TeamColor.values()) {
                 assertEquals(0, game.getPlayerWarningCount(teamColor, warningType));
@@ -237,7 +239,9 @@ public class GameFactoryTest {
         assertEquals(CharacterCard.Wanderer, game.getRecruitableCards().get(0));
         assertEquals(1, game.getRecruitedCharacters().size());
         assertTrue(areSameCharacter(expectedChar2, game.getRecruitedCharacters().get(0)));
-        assertTrue(game.getBanishedCards().isEmpty());
+        for (TeamColor teamColor : TeamColor.values()) {
+            assertEquals(0, game.getBanishedCards(teamColor).size());
+        }
         for (WarningType warningType : WarningType.values()) {
             for (TeamColor teamColor : TeamColor.values()) {
                 assertEquals(0, game.getPlayerWarningCount(teamColor, warningType));
@@ -256,8 +260,13 @@ public class GameFactoryTest {
         assertEquals(1, game.getRecruitableCards().size());
         assertEquals(CharacterCard.Protector, game.getRecruitableCards().get(0));
         assertTrue(game.getRecruitedCharacters().isEmpty());
-        assertEquals(1, game.getBanishedCards().size());
-        assertEquals(CharacterCard.HermitAndCub, game.getBanishedCards().get(0));
+
+        for (TeamColor teamColor : TeamColor.values()) {
+        }
+        assertEquals(0, game.getBanishedCards(TeamColor.Black).size());
+        List<CharacterCard> whiteBans = game.getBanishedCards(TeamColor.White);
+        assertEquals(1, whiteBans.size());
+        assertEquals(CharacterCard.HermitAndCub, whiteBans.get(0));
         for (WarningType warningType : WarningType.values()) {
             for (TeamColor teamColor : TeamColor.values()) {
                 assertEquals(0, game.getPlayerWarningCount(teamColor, warningType));

@@ -12,16 +12,18 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 
 public class BanishmentActionHandlerTest {
 
     private Game createTestGame() {
-        return new Game(
-                new Board(),
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new EnumMap<>(TeamColor.class)
+        // Build the minimal Game state required by the tests.
+        // This state is intentionally invalid as a real game state.
+        return new Game(new Board(),
+                new ArrayList<>(), // recruitableCards
+                new ArrayList<>(), // recruitedCharacters
+                new EnumMap<>(TeamColor.class), // playerBanishedCards
+                new EnumMap<>(TeamColor.class) // playerWarnings
         );
     }
 
@@ -48,8 +50,10 @@ public class BanishmentActionHandlerTest {
 
         new BanishmentActionHandler(game, action).doAction();
 
-        assertEquals(1, game.getBanishedCards().size());
-        assertEquals(CharacterCard.HermitAndCub, game.getBanishedCards().get(0));
+        assertEquals(0, game.getBanishedCards(TeamColor.White).size());
+        List<CharacterCard> blackBans = game.getBanishedCards(TeamColor.Black);
+        assertEquals(1, blackBans.size());
+        assertEquals(CharacterCard.HermitAndCub, blackBans.get(0));
     }
 
     @Test
@@ -78,19 +82,19 @@ public class BanishmentActionHandlerTest {
         handler.doAction();
         handler.undoAction();
 
-        assertEquals(0, game.getBanishedCards().size());
+        for (TeamColor teamColor : TeamColor.values()) {
+            assertEquals(0, game.getBanishedCards(teamColor).size());
+        }
     }
 
     @Test
     public void doActionThenUndoAction_shouldRestoreGameState() {
         Game game = createTestGame();
         game.getRecruitableCards().add(CharacterCard.HermitAndCub);
-        game.getBanishedCards().add(CharacterCard.Assassin);
+        game.addBanishedCard(TeamColor.Black, CharacterCard.Assassin);
 
-        ArrayList<CharacterCard> recruitableCardsBefore =
-                new ArrayList<>(game.getRecruitableCards());
-        ArrayList<CharacterCard> banishedCardsBefore =
-                new ArrayList<>(game.getBanishedCards());
+        ArrayList<CharacterCard> recruitableCardsBefore = new ArrayList<>(game.getRecruitableCards());
+        List<CharacterCard> banishedCardsBefore = List.of(CharacterCard.Assassin);
 
         BanishmentAction action = createBanishmentAction();
         BanishmentActionHandler handler = new BanishmentActionHandler(game, action);
@@ -99,6 +103,7 @@ public class BanishmentActionHandlerTest {
         handler.undoAction();
 
         assertEquals(recruitableCardsBefore, game.getRecruitableCards());
-        assertEquals(banishedCardsBefore, game.getBanishedCards());
+        assertEquals(banishedCardsBefore, game.getBanishedCards(TeamColor.Black));
+        assertEquals(0, game.getBanishedCards(TeamColor.White).size());
     }
 }

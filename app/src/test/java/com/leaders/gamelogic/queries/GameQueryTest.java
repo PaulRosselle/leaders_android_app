@@ -25,10 +25,12 @@ import java.util.Objects;
 public class GameQueryTest {
 
     private Game createTestGame(Board board) {
+        // Build the minimal Game state required by the tests.
+        // This state is intentionally invalid as a real game state.
         return new Game(board,
                 new ArrayList<>(), // recruitableCards
                 new ArrayList<>(), // recruitedCharacters
-                new ArrayList<>(), // banishedCards
+                new EnumMap<>(TeamColor.class), // playerBanishedCards
                 new EnumMap<>(TeamColor.class) // playerWarnings
         );
     }

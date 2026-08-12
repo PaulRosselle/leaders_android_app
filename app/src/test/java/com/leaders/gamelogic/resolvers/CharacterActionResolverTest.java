@@ -42,10 +42,12 @@ public class CharacterActionResolverTest {
     private CharacterActionResolver resolver;
 
     private Game createTestGame() {
+        // Build the minimal Game state required by the tests.
+        // This state is intentionally invalid as a real game state.
         return new Game(new Board(),
                 new ArrayList<>(), // recruitableCards
                 new ArrayList<>(), // recruitedCharacters
-                new ArrayList<>(), // banishedCards
+                new EnumMap<>(TeamColor.class), // playerBanishedCards
                 new EnumMap<>(TeamColor.class) // playerWarnings
         );
     }

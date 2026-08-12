@@ -28,11 +28,9 @@ public final class GameFactory {
         Game game = new Game(new Board(),
                 new ArrayList<>(gameHistory.getConfig().getInitialRecruitableCards()),
                 new ArrayList<>(), // recruitedCharacters
-                new ArrayList<>(), // banishedCards
+                new EnumMap<>(TeamColor.class), // playerBanishedCards
                 new EnumMap<>(TeamColor.class) // playerWarnings
         );
-
-
 
         // The config contains every action made before the game started.
         doActions(game, gameHistory.getConfig().getInitialPlacements());

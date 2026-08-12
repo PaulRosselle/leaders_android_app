@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.leaders.gamelogic.entities.GameHistory;
+import com.leaders.gamelogic.entities.Player;
+import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.historyentries.IHistoryEntry;
 import com.leaders.gamelogic.historyentries.IPhase;
 import com.leaders.gamelogic.historyentries.segments.Turn;
@@ -110,5 +112,24 @@ public final class GameHistoryQuery {
                 turnPhase -> turnPhase.hasStarted() && turnPhase.hasEnded(),
                 true
         );
+    }
+
+    /**
+     * Returns the player with the matching team color.
+     *
+     * @param history the game history containing the players
+     * @param teamColor the team color of the player to find
+     * @return the player whose team matches {@code teamColor}
+     * @throws IllegalStateException if no player with the given team color can be found
+     */
+    @NonNull
+    public static Player getPlayerFromTeam(@NonNull GameHistory history, @NonNull TeamColor teamColor) {
+        for (Player player : history.getConfig().getPlayers()) {
+            if (player.getTeamColor() == teamColor) {
+                return player;
+            }
+        }
+
+        throw new IllegalStateException("No player found for team " + teamColor);
     }
 }
