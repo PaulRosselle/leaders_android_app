@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import androidx.annotation.NonNull;
@@ -19,8 +20,11 @@ import com.leaders.gamelogic.enums.GamePhaseType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.historyentries.segments.ActionsPhase;
 import com.leaders.gamelogic.historyentries.segments.BanishmentPhase;
+import com.leaders.gamelogic.historyentries.segments.RecruitmentPhase;
 import com.leaders.gamelogic.historyentries.segments.Turn;
+import com.leaders.gamelogic.historyentries.segments.TurnEndPhase;
 import com.leaders.gamelogic.historyentries.segments.TurnPhase;
+import com.leaders.gamelogic.historyentries.segments.TurnStartPhase;
 import com.leaders.gamelogic.interactions.IGameFlowListener;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
@@ -228,6 +232,102 @@ public class GameHandlerTest {
         assertTrue(listener.wasPhaseStartedWhenNotified());
     }
 
+    @Test
+    public void endCurrentPhase_shouldEndTurnStartPhase() throws Exception {
+        GameHistory history = createGameHistory(GameMode.Discovery);
+        Turn turn = new Turn(TeamColor.Black);
+        history.getEntries().add(turn);
+
+        TurnStartPhase turnStartPhase = (TurnStartPhase) turn.getSubPhase(GamePhaseType.TurnStart);
+        turnStartPhase.start();
+
+        GameHandler gameHandler = new GameHandler(history, new TestGameFlowListener(history));
+
+        invokeEndCurrentPhase(gameHandler);
+
+        assertTrue(turnStartPhase.hasStarted());
+        assertTrue(turnStartPhase.hasEnded());
+        assertFalse(turn.hasEnded());
+    }
+
+    @Test
+    public void endCurrentPhase_shouldEndActionsPhase() throws Exception {
+        GameHistory history = createGameHistory(GameMode.Discovery);
+        Turn turn = new Turn(TeamColor.Black);
+        history.getEntries().add(turn);
+
+        ActionsPhase actionsPhase = (ActionsPhase) turn.getSubPhase(GamePhaseType.Actions);
+        actionsPhase.start();
+
+        GameHandler gameHandler = new GameHandler(history, new TestGameFlowListener(history));
+
+        invokeEndCurrentPhase(gameHandler);
+
+        assertTrue(actionsPhase.hasStarted());
+        assertTrue(actionsPhase.hasEnded());
+        assertFalse(turn.hasEnded());
+    }
+
+    @Test
+    public void endCurrentPhase_shouldEndRecruitmentPhase() throws Exception {
+        GameHistory history = createGameHistory(GameMode.Discovery);
+        Turn turn = new Turn(TeamColor.Black);
+        history.getEntries().add(turn);
+
+        RecruitmentPhase recruitmentPhase = (RecruitmentPhase) turn.getSubPhase(GamePhaseType.Recruitment);
+        recruitmentPhase.start();
+
+        GameHandler gameHandler = new GameHandler(history, new TestGameFlowListener(history));
+
+        invokeEndCurrentPhase(gameHandler);
+
+        assertTrue(recruitmentPhase.hasStarted());
+        assertTrue(recruitmentPhase.hasEnded());
+        assertFalse(turn.hasEnded());
+    }
+
+    @Test
+    public void endCurrentPhase_shouldEndBanishmentPhase() throws Exception {
+        GameHistory history = createGameHistory(GameMode.Strategist);
+        BanishmentPhase banishmentPhase = new BanishmentPhase(TeamColor.Black);
+        history.getEntries().add(banishmentPhase);
+        banishmentPhase.start();
+
+        GameHandler gameHandler = new GameHandler(history, new TestGameFlowListener(history));
+
+        invokeEndCurrentPhase(gameHandler);
+
+        assertTrue(banishmentPhase.hasStarted());
+        assertTrue(banishmentPhase.hasEnded());
+    }
+
+    @Test
+    public void endCurrentPhase_shouldEndTurnEndPhaseAndTurn() throws Exception {
+        GameHistory history = createGameHistory(GameMode.Discovery);
+        Turn turn = new Turn(TeamColor.Black);
+        history.getEntries().add(turn);
+
+        TurnEndPhase turnEndPhase = (TurnEndPhase) turn.getSubPhase(GamePhaseType.TurnEnd);
+        turnEndPhase.start();
+
+        GameHandler gameHandler = new GameHandler(history, new TestGameFlowListener(history));
+
+        invokeEndCurrentPhase(gameHandler);
+
+        assertTrue(turnEndPhase.hasStarted());
+        assertTrue(turnEndPhase.hasEnded());
+        assertTrue(turn.hasEnded());
+    }
+
+    @Test
+    public void endCurrentPhase_shouldThrowWhenNoCurrentPhaseExists() throws Exception {
+        GameHistory history = createGameHistory();
+        GameHandler gameHandler = new GameHandler(history, new TestGameFlowListener(history));
+
+        assertThrows(IllegalStateException.class, () -> invokeEndCurrentPhase(gameHandler));
+    }
+
+
     @SuppressWarnings("unchecked")
     private CompletableFuture<Void> invokeStartNextPhase(GameHandler gameHandler) throws Exception {
         Method method = GameHandler.class.getDeclaredMethod("startNextPhaseAsync");
@@ -235,6 +335,21 @@ public class GameHandlerTest {
 
         try {
             return (CompletableFuture<Void>) method.invoke(gameHandler);
+        } catch (InvocationTargetException exception) {
+            Throwable cause = exception.getCause();
+            if (cause instanceof Exception) {
+                throw (Exception) cause;
+            }
+            throw exception;
+        }
+    }
+
+    private void invokeEndCurrentPhase(GameHandler gameHandler) throws Exception {
+        Method method = GameHandler.class.getDeclaredMethod("endCurrentPhase");
+        method.setAccessible(true);
+
+        try {
+            method.invoke(gameHandler);
         } catch (InvocationTargetException exception) {
             Throwable cause = exception.getCause();
             if (cause instanceof Exception) {
