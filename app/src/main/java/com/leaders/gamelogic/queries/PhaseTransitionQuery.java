@@ -68,21 +68,13 @@ public final class PhaseTransitionQuery {
             return getFirstPhase(history);
         }
 
-        TransitionTarget lastPhaseTransition;
-        TeamColor lastPhaseTeam;
         IPhase lastPhase = GameHistoryQuery.findLastEndedPhase(history);
-        if (lastPhase instanceof TurnPhase) {
-            TurnPhase turnPhase = (TurnPhase) lastPhase;
-            lastPhaseTransition = turnPhase.getTransitionTarget();
-            lastPhaseTeam = turnPhase.getTurnTeamColor();
-        } else if (lastPhase instanceof BanishmentPhase) {
-            BanishmentPhase banishmentPhase = (BanishmentPhase) lastPhase;
-            lastPhaseTransition = banishmentPhase.getTransitionTarget();
-            lastPhaseTeam = banishmentPhase.getTeamColor();
-        } else {
-            throw new IllegalStateException("A phase must belong to a turn or be a banishment phase");
+        if (lastPhase == null) {
+            throw new IllegalStateException("No next phase without a last phase");
         }
 
+        TransitionTarget lastPhaseTransition = GameHistoryQuery.getPhaseTransitionTarget(lastPhase);
+        TeamColor lastPhaseTeam = GameHistoryQuery.getPhaseTeamColor(lastPhase);
         GamePhaseType nextPhaseType = getNextPhaseType(game, history, lastPhaseTransition, lastPhaseTeam);
         TeamColor nextPhaseTeam = getNextPhaseTeam(nextPhaseType, lastPhaseTeam);
 
