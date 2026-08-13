@@ -10,8 +10,6 @@ import com.leaders.gamelogic.enums.GamePhaseType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.enums.TransitionTarget;
 import com.leaders.gamelogic.historyentries.IPhase;
-import com.leaders.gamelogic.historyentries.segments.BanishmentPhase;
-import com.leaders.gamelogic.historyentries.segments.TurnPhase;
 
 /**
  * Utility class responsible for determining the next phase of a game.
@@ -32,6 +30,7 @@ public final class PhaseTransitionQuery {
      * @return the first phase of the game
      * @throws IllegalStateException if the game mode is not supported
      */
+    @NonNull
     private static GamePhase getFirstPhase(@NonNull GameHistory gameHistory) {
         // The first phase depends on the game mode
         if (gameHistory.getConfig().getGameMode() == GameMode.Discovery) {
