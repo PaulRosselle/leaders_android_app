@@ -10,12 +10,11 @@ import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.GamePhaseType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.factories.GameFactory;
-import com.leaders.gamelogic.historyentries.segments.ActionsPhase;
+import com.leaders.gamelogic.historyentries.IPhase;
+import com.leaders.gamelogic.historyentries.Segment;
 import com.leaders.gamelogic.historyentries.segments.BanishmentPhase;
-import com.leaders.gamelogic.historyentries.segments.RecruitmentPhase;
 import com.leaders.gamelogic.historyentries.segments.Turn;
 import com.leaders.gamelogic.historyentries.segments.TurnEndPhase;
-import com.leaders.gamelogic.historyentries.segments.TurnStartPhase;
 import com.leaders.gamelogic.interactions.IGameFlowListener;
 import com.leaders.gamelogic.queries.GameHistoryQuery;
 import com.leaders.gamelogic.queries.PhaseTransitionQuery;
@@ -39,6 +38,26 @@ public final class GameHandler {
         this.currentHistory = currentHistory;
         this.currentGame = GameFactory.create(currentHistory);
         this.gameFlowListener = gameFlowListener;
+    }
+
+    @NonNull
+    public Game getCurrentGame() {
+        return currentGame;
+    }
+
+    @NonNull
+    public GameHistory getCurrentHistory() {
+        return currentHistory;
+    }
+
+    @NonNull
+    public GameMode getGameMode() {
+        return currentHistory.getConfig().getGameMode();
+    }
+
+    @NonNull
+    public List<Player> getPlayers() {
+        return currentHistory.getConfig().getPlayers();
     }
 
     /**
@@ -70,23 +89,68 @@ public final class GameHandler {
         return gameFlowListener.onPhaseChanged(nextPhase);
     }
 
-    @NonNull
-    public Game getCurrentGame() {
-        return currentGame;
+    /**
+     * Runs the current phase and closes it when execution completes successfully.
+     *
+     * @param currentPhase current game phase
+     * @return a future completed when the phase has been executed and ended
+     */
+    private CompletableFuture<Void> runCurrentPhaseAsync(@NonNull GamePhase currentPhase) {
+        CompletableFuture<Void> phaseExecution;
+
+        switch (currentPhase.getPhaseType()) {
+            case TurnStart: phaseExecution = runTurnStartPhaseAsync(currentPhase); break;
+            case Actions: phaseExecution = runActionsPhaseAsync(currentPhase); break;
+            case Recruitment: phaseExecution = runRecruitmentPhaseAsync(currentPhase); break;
+            case TurnEnd: phaseExecution = runTurnEndPhaseAsync(currentPhase); break;
+            case Banishment: phaseExecution = runBanishmentPhaseAsync(currentPhase); break;
+            default: throw new IllegalStateException("Unsupported game phase type " + currentPhase.getPhaseType());
+        }
+
+        return phaseExecution.thenRun(this::endCurrentPhase);
     }
 
-    @NonNull
-    public GameHistory getCurrentHistory() {
-        return currentHistory;
+    /**
+     * Ends the current phase segment.
+     *
+     * <p>When ending the turn end phase, the parent turn is ended as well.</p>
+     *
+     * @throws IllegalStateException if the current history state is invalid
+     */
+    private void endCurrentPhase() {
+        IPhase currentPhase = GameHistoryQuery.findCurrentPhase(currentHistory);
+        if (currentPhase instanceof TurnEndPhase) {
+            Turn currentTurn = GameHistoryQuery.findCurrentTurn(currentHistory);
+            if (currentTurn == null) {
+                throw new IllegalStateException("Cannot end TurnEnd phase without a current turn");
+            }
+            ((TurnEndPhase) currentPhase).end();
+            currentTurn.end();
+        } else if (currentPhase instanceof Segment) {
+            ((Segment) currentPhase).end();
+        } else {
+            throw new IllegalStateException(currentPhase == null ?
+                    "Cannot end a phase when no current phase exists" : "Current phase is not a segment");
+        }
     }
 
-    @NonNull
-    public GameMode getGameMode() {
-        return currentHistory.getConfig().getGameMode();
+    private CompletableFuture<Void> runTurnStartPhaseAsync(@NonNull GamePhase currentPhase) {
+        return CompletableFuture.completedFuture(null);
     }
 
-    @NonNull
-    public List<Player> getPlayers() {
-        return currentHistory.getConfig().getPlayers();
+    private CompletableFuture<Void> runActionsPhaseAsync(@NonNull GamePhase currentPhase) {
+        return CompletableFuture.completedFuture(null);
+    }
+
+    private CompletableFuture<Void> runRecruitmentPhaseAsync(@NonNull GamePhase currentPhase) {
+        return CompletableFuture.completedFuture(null);
+    }
+
+    private CompletableFuture<Void> runTurnEndPhaseAsync(@NonNull GamePhase currentPhase) {
+        return CompletableFuture.completedFuture(null);
+    }
+
+    private CompletableFuture<Void> runBanishmentPhaseAsync(@NonNull GamePhase currentPhase) {
+        return CompletableFuture.completedFuture(null);
     }
 }
