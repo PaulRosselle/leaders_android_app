@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.leaders.gamelogic.enums.GamePhaseType;
 
-public class GamePhase {
+public final class GamePhase {
     @NonNull
     private final GamePhaseType phaseType;
 

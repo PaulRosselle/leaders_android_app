@@ -19,6 +19,10 @@ public final class TurnEndPhase extends TurnPhase {
         actions = new ArrayList<>();
     }
 
+    public TurnEndPhase(@NonNull TeamColor turnTeamColor) {
+        this(null, null, turnTeamColor);
+    }
+
     public TurnEndPhase(@NonNull TurnEndPhase refTurnEndPhase) {
         this(refTurnEndPhase.getStartAction(), refTurnEndPhase.getEndAction(), refTurnEndPhase.getTurnTeamColor());
         actions.addAll(refTurnEndPhase.getActions());

@@ -66,7 +66,7 @@ public class PlayabilityQueryTest {
     }
 
     private ActionsPhase createActionsPhase() {
-        ActionsPhase actionsPhase = new ActionsPhase(null, null, TeamColor.Black);
+        ActionsPhase actionsPhase = new ActionsPhase(TeamColor.Black);
         actionsPhase.start();
         return actionsPhase;
     }
@@ -76,10 +76,10 @@ public class PlayabilityQueryTest {
                 null,
                 null,
                 TeamColor.Black,
-                new TurnStartPhase(null, null, TeamColor.Black),
+                new TurnStartPhase(TeamColor.Black),
                 actionsPhase,
-                new RecruitmentPhase(null, null, TeamColor.Black),
-                new TurnEndPhase(null, null, TeamColor.Black)
+                new RecruitmentPhase(TeamColor.Black),
+                new TurnEndPhase(TeamColor.Black)
         );
     }
 
@@ -88,7 +88,7 @@ public class PlayabilityQueryTest {
         Game game = createTestGame(new Board());
         GameHistory gameHistory = createTestGameHistory();
         gameHistory.getEntries().add(
-                new BanishmentPhase(null, null, TeamColor.Black)
+                new BanishmentPhase(TeamColor.Black)
         );
 
         PlayabilityQuery.getCharacterPlayableStates(game, gameHistory);

@@ -8,7 +8,7 @@ import com.leaders.gamelogic.historyentries.segments.Turn;
 
 import java.util.ArrayList;
 
-public class GameHistory {
+public final class GameHistory {
     @NonNull
     private final GameConfig config;
     @NonNull

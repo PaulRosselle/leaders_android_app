@@ -9,10 +9,6 @@ import com.leaders.gamelogic.historyentries.IHistoryEntry;
 import com.leaders.gamelogic.historyentries.Segment;
 import com.leaders.gamelogic.historyentries.segments.BanishmentPhase;
 import com.leaders.gamelogic.historyentries.segments.Turn;
-import com.leaders.gamelogic.historyentries.segments.TurnEndPhase;
-import com.leaders.gamelogic.historyentries.segments.TurnStartPhase;
-import com.leaders.gamelogic.historyentries.segments.ActionsPhase;
-import com.leaders.gamelogic.historyentries.segments.RecruitmentPhase;
 import com.leaders.gamelogic.enums.TeamColor;
 
 import org.junit.Test;
@@ -38,25 +34,11 @@ public class GameHistoryTest {
     }
 
     private Turn createTestTurn() {
-        TeamColor teamColor = TeamColor.Black;
-
-        return new Turn(
-                null,
-                null,
-                teamColor,
-                new TurnStartPhase(null, null, teamColor),
-                new ActionsPhase(null, null, teamColor),
-                new RecruitmentPhase(null, null, teamColor),
-                new TurnEndPhase(null, null, teamColor)
-        );
+        return new Turn(TeamColor.Black);
     }
 
     private BanishmentPhase createTestBanishmentPhase() {
-        return new BanishmentPhase(
-                null,
-                null,
-                TeamColor.Black
-        );
+        return new BanishmentPhase(TeamColor.Black);
     }
 
     @Test

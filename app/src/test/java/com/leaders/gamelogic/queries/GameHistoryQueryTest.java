@@ -10,9 +10,7 @@ import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.historyentries.segments.ActionsPhase;
 import com.leaders.gamelogic.historyentries.segments.BanishmentPhase;
-import com.leaders.gamelogic.historyentries.segments.RecruitmentPhase;
 import com.leaders.gamelogic.historyentries.segments.Turn;
-import com.leaders.gamelogic.historyentries.segments.TurnEndPhase;
 import com.leaders.gamelogic.historyentries.segments.TurnPhase;
 import com.leaders.gamelogic.historyentries.segments.TurnStartPhase;
 
@@ -38,15 +36,7 @@ public class GameHistoryQueryTest {
     }
 
     private Turn createTestTurn() {
-        return new Turn(
-                null,
-                null,
-                TeamColor.Black,
-                new TurnStartPhase(null, null, TeamColor.Black),
-                new ActionsPhase(null, null, TeamColor.Black),
-                new RecruitmentPhase(null, null, TeamColor.Black),
-                new TurnEndPhase(null, null, TeamColor.Black)
-        );
+        return new Turn(TeamColor.Black);
     }
 
     @Test
@@ -68,7 +58,7 @@ public class GameHistoryQueryTest {
     @Test
     public void findCurrentTurn_shouldReturnNullWhenLastEntryIsNotATurn() {
         GameHistory gameHistory = createTestGameHistory();
-        BanishmentPhase phase = new BanishmentPhase(null, null, TeamColor.Black);
+        BanishmentPhase phase = new BanishmentPhase(TeamColor.Black);
         gameHistory.getEntries().add(phase);
 
         assertNull(GameHistoryQuery.findCurrentTurn(gameHistory));
@@ -79,7 +69,7 @@ public class GameHistoryQueryTest {
         GameHistory gameHistory = createTestGameHistory();
         Turn turn = createTestTurn();
         gameHistory.getEntries().add(turn);
-        gameHistory.getEntries().add(new BanishmentPhase(null, null, TeamColor.Black));
+        gameHistory.getEntries().add(new BanishmentPhase(TeamColor.Black));
 
         assertNull(GameHistoryQuery.findCurrentTurn(gameHistory));
     }
@@ -87,7 +77,7 @@ public class GameHistoryQueryTest {
     @Test
     public void findCurrentPhase_shouldReturnLastPhaseWhenLastEntryIsPhase() {
         GameHistory gameHistory = createTestGameHistory();
-        BanishmentPhase phase = new BanishmentPhase(null, null, TeamColor.Black);
+        BanishmentPhase phase = new BanishmentPhase(TeamColor.Black);
         gameHistory.getEntries().add(phase);
 
         assertSame(phase, GameHistoryQuery.findCurrentPhase(gameHistory));
@@ -143,7 +133,7 @@ public class GameHistoryQueryTest {
     @Test
     public void findLastEndedPhase_shouldReturnLastPhaseWhenLastEntryIsPhase() {
         GameHistory gameHistory = createTestGameHistory();
-        BanishmentPhase phase = new BanishmentPhase(null, null, TeamColor.Black);
+        BanishmentPhase phase = new BanishmentPhase(TeamColor.Black);
         phase.start();
         phase.end();
         gameHistory.getEntries().add(phase);
