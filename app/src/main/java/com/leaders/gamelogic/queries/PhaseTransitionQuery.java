@@ -10,8 +10,6 @@ import com.leaders.gamelogic.enums.GamePhaseType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.enums.TransitionTarget;
 import com.leaders.gamelogic.historyentries.IPhase;
-import com.leaders.gamelogic.historyentries.segments.BanishmentPhase;
-import com.leaders.gamelogic.historyentries.segments.TurnPhase;
 
 /**
  * Utility class responsible for determining the next phase of a game.
@@ -32,6 +30,7 @@ public final class PhaseTransitionQuery {
      * @return the first phase of the game
      * @throws IllegalStateException if the game mode is not supported
      */
+    @NonNull
     private static GamePhase getFirstPhase(@NonNull GameHistory gameHistory) {
         // The first phase depends on the game mode
         if (gameHistory.getConfig().getGameMode() == GameMode.Discovery) {
@@ -68,21 +67,13 @@ public final class PhaseTransitionQuery {
             return getFirstPhase(history);
         }
 
-        TransitionTarget lastPhaseTransition;
-        TeamColor lastPhaseTeam;
         IPhase lastPhase = GameHistoryQuery.findLastEndedPhase(history);
-        if (lastPhase instanceof TurnPhase) {
-            TurnPhase turnPhase = (TurnPhase) lastPhase;
-            lastPhaseTransition = turnPhase.getTransitionTarget();
-            lastPhaseTeam = turnPhase.getTurnTeamColor();
-        } else if (lastPhase instanceof BanishmentPhase) {
-            BanishmentPhase banishmentPhase = (BanishmentPhase) lastPhase;
-            lastPhaseTransition = banishmentPhase.getTransitionTarget();
-            lastPhaseTeam = banishmentPhase.getTeamColor();
-        } else {
-            throw new IllegalStateException("A phase must belong to a turn or be a banishment phase");
+        if (lastPhase == null) {
+            throw new IllegalStateException("No next phase without a last phase");
         }
 
+        TransitionTarget lastPhaseTransition = GameHistoryQuery.getPhaseTransitionTarget(lastPhase);
+        TeamColor lastPhaseTeam = GameHistoryQuery.getPhaseTeamColor(lastPhase);
         GamePhaseType nextPhaseType = getNextPhaseType(game, history, lastPhaseTransition, lastPhaseTeam);
         TeamColor nextPhaseTeam = getNextPhaseTeam(nextPhaseType, lastPhaseTeam);
 

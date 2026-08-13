@@ -6,8 +6,10 @@ import androidx.annotation.Nullable;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.enums.TeamColor;
+import com.leaders.gamelogic.enums.TransitionTarget;
 import com.leaders.gamelogic.historyentries.IHistoryEntry;
 import com.leaders.gamelogic.historyentries.IPhase;
+import com.leaders.gamelogic.historyentries.segments.BanishmentPhase;
 import com.leaders.gamelogic.historyentries.segments.Turn;
 import com.leaders.gamelogic.historyentries.segments.TurnPhase;
 
@@ -112,6 +114,42 @@ public final class GameHistoryQuery {
                 turnPhase -> turnPhase.hasStarted() && turnPhase.hasEnded(),
                 true
         );
+    }
+
+    /**
+     * Returns the team color associated with the given phase.
+     *
+     * @param phase phase whose team should be resolved
+     * @return the team associated with the phase
+     * @throws IllegalStateException if the phase does not belong to a turn or banishment phase
+     */
+    @NonNull
+    public static TeamColor getPhaseTeamColor(@NonNull IPhase phase) {
+        if (phase instanceof TurnPhase) {
+            return ((TurnPhase) phase).getTurnTeamColor();
+        }
+        if (phase instanceof BanishmentPhase) {
+           return ((BanishmentPhase) phase).getTeamColor();
+        }
+        throw new IllegalStateException("A phase must belong to a turn or be a banishment phase");
+    }
+
+    /**
+     * Returns the transition target associated with the given phase.
+     *
+     * @param phase phase whose transition target should be resolved
+     * @return the transition target associated with the phase
+     * @throws IllegalStateException if the phase does not belong to a turn or banishment phase
+     */
+    @NonNull
+    public static TransitionTarget getPhaseTransitionTarget(@NonNull IPhase phase) {
+        if (phase instanceof TurnPhase) {
+            return ((TurnPhase) phase).getTransitionTarget();
+        }
+        if (phase instanceof BanishmentPhase) {
+            return ((BanishmentPhase) phase).getTransitionTarget();
+        }
+        throw new IllegalStateException("A phase must belong to a turn or be a banishment phase");
     }
 
     /**
