@@ -60,15 +60,7 @@ public class RecruitmentQueryTest {
     }
 
     private Turn createTestTurn() {
-        return new Turn(
-                null,
-                null,
-                TeamColor.Black,
-                new TurnStartPhase(null, null, TeamColor.Black),
-                new ActionsPhase(null, null, TeamColor.Black),
-                new RecruitmentPhase(null, null, TeamColor.Black),
-                new TurnEndPhase(null, null, TeamColor.Black)
-        );
+        return new Turn(TeamColor.Black);
     }
 
     private void addRecruitmentPhase(@NonNull GameHistory gameHistory) {

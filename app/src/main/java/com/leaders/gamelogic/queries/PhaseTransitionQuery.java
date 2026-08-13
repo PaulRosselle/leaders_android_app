@@ -56,13 +56,13 @@ public final class PhaseTransitionQuery {
     /**
      * Returns the phase that follows the last ended phase of the game.
      *
+     * @param game    the current state of the game
      * @param history the history of the game
-     * @param game the current state of the game
      * @return the next phase of the game
      * @throws IllegalStateException if the last ended phase is not supported
      */
     @NonNull
-    public static GamePhase getNextPhase(@NonNull GameHistory history, @NonNull Game game) {
+    public static GamePhase getNextPhase(@NonNull Game game, @NonNull GameHistory history) {
         if (history.getEntries().isEmpty()) {
             return getFirstPhase(history);
         }

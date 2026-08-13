@@ -23,13 +23,26 @@ public class Turn extends Segment implements IHistoryEntry {
     @NonNull
     private final TurnEndPhase turnEndPhase;
 
-    public Turn(@Nullable TransitionAction startAction, @Nullable TransitionAction endAction, @NonNull TeamColor teamColor, @NonNull TurnStartPhase turnStartPhase, @NonNull ActionsPhase actionsPhase, @NonNull RecruitmentPhase recruitmentPhase, @NonNull TurnEndPhase turnEndPhase) {
+    public Turn(@Nullable TransitionAction startAction, @Nullable TransitionAction endAction,
+                @NonNull TeamColor teamColor,
+                @NonNull TurnStartPhase turnStartPhase,
+                @NonNull ActionsPhase actionsPhase,
+                @NonNull RecruitmentPhase recruitmentPhase,
+                @NonNull TurnEndPhase turnEndPhase) {
         super(startAction, endAction);
         this.teamColor = teamColor;
         this.turnStartPhase = turnStartPhase;
         this.actionsPhase = actionsPhase;
         this.recruitmentPhase = recruitmentPhase;
         this.turnEndPhase = turnEndPhase;
+    }
+
+    public Turn(@NonNull TeamColor teamColor) {
+        this(null, null, teamColor,
+                new TurnStartPhase(teamColor),
+                new ActionsPhase(teamColor),
+                new RecruitmentPhase(teamColor),
+                new TurnEndPhase(teamColor));
     }
 
     public Turn(@NonNull Turn refTurn) {

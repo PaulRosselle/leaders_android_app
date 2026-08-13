@@ -35,7 +35,7 @@ public class CharacterAbilityQueryTest {
     }
 
     private ActionsPhase createActionsPhase() {
-        return new ActionsPhase(null, null, TeamColor.Black);
+        return new ActionsPhase(TeamColor.Black);
     }
 
     private Character createCharacter(CharacterType characterType, TeamColor teamColor) {
