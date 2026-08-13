@@ -2,7 +2,6 @@ package com.leaders.gamelogic.interactions;
 
 import androidx.annotation.NonNull;
 
-import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.Player;
 
@@ -42,18 +41,6 @@ public interface IGameFlowListener {
      */
     @NonNull
     CompletableFuture<Void> onPhaseChanged(@NonNull GamePhase phase);
-
-    /**
-     * Fired after each automatic action executed during a non-interactive phase.
-     * <p>
-     * Allows the caller to animate the corresponding board change before the game
-     * continues.
-     *
-     * @param action the executed game action
-     * @return a future completed when the caller has finished handling the event
-     */
-    @NonNull
-    CompletableFuture<Void> onAutomaticActionExecuted(@NonNull IGameAction action);
 
     /**
      * Fired whenever the game requires an input from the caller.
