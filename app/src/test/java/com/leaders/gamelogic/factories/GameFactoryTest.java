@@ -93,11 +93,11 @@ public class GameFactoryTest {
 
         TeamColor teamColor = TeamColor.Black;
 
-        TurnStartPhase turnStartPhase = new TurnStartPhase(null, null, teamColor);
+        TurnStartPhase turnStartPhase = new TurnStartPhase(teamColor);
         turnStartPhase.start();
         turnStartPhase.end();
 
-        ActionsPhase actionsPhase = new ActionsPhase(null, null, teamColor);
+        ActionsPhase actionsPhase = new ActionsPhase(teamColor);
         actionsPhase.start();
         Character movedCharacter = Character.create(CharacterType.LeaderKing, TeamColor.Black);
         actionsPhase.getActions().add(new CharacterAction(movedCharacter,
@@ -112,7 +112,7 @@ public class GameFactoryTest {
         );
         actionsPhase.end();
 
-        RecruitmentPhase recruitmentPhase = new RecruitmentPhase(null, null, teamColor);
+        RecruitmentPhase recruitmentPhase = new RecruitmentPhase(teamColor);
         recruitmentPhase.start();
         Character recruitedCharacter = Character.create(CharacterType.Acrobat, TeamColor.Black);
         recruitmentPhase.getActions().add(new RecruitmentAction(
@@ -127,7 +127,7 @@ public class GameFactoryTest {
                 turnStartPhase,
                 actionsPhase,
                 recruitmentPhase,
-                new TurnEndPhase(null, null, teamColor)
+                new TurnEndPhase(teamColor)
         );
 
         ArrayList<IHistoryEntry> entries = new ArrayList<>();
@@ -170,7 +170,7 @@ public class GameFactoryTest {
         );
 
         TeamColor teamColor = TeamColor.White;
-        BanishmentPhase banishmentPhase = new BanishmentPhase(null, null, teamColor);
+        BanishmentPhase banishmentPhase = new BanishmentPhase(teamColor);
         banishmentPhase.start();
         banishmentPhase.getActions().add(new BanishmentAction(CharacterCard.HermitAndCub, teamColor));
 
@@ -261,8 +261,6 @@ public class GameFactoryTest {
         assertEquals(CharacterCard.Protector, game.getRecruitableCards().get(0));
         assertTrue(game.getRecruitedCharacters().isEmpty());
 
-        for (TeamColor teamColor : TeamColor.values()) {
-        }
         assertEquals(0, game.getBanishedCards(TeamColor.Black).size());
         List<CharacterCard> whiteBans = game.getBanishedCards(TeamColor.White);
         assertEquals(1, whiteBans.size());

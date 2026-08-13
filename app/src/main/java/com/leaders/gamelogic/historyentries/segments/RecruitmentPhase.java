@@ -22,6 +22,10 @@ public final class RecruitmentPhase extends TurnPhase {
         actions = new ArrayList<>();
     }
 
+    public RecruitmentPhase(@NonNull TeamColor turnTeamColor) {
+        this(null, null, turnTeamColor);
+    }
+
     public RecruitmentPhase(@NonNull RecruitmentPhase refRecruitmentPhase) {
         this(refRecruitmentPhase.getStartAction(), refRecruitmentPhase.getEndAction(), refRecruitmentPhase.getTurnTeamColor());
         actions.addAll(refRecruitmentPhase.getActions());

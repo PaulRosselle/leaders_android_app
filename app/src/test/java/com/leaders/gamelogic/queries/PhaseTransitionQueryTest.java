@@ -55,19 +55,11 @@ public class PhaseTransitionQueryTest {
     }
 
     private Turn createTestTurn() {
-        return new Turn(
-                null,
-                null,
-                TeamColor.Black,
-                new TurnStartPhase(null, null, TeamColor.Black),
-                new ActionsPhase(null, null, TeamColor.Black),
-                new RecruitmentPhase(null, null, TeamColor.Black),
-                new TurnEndPhase(null, null, TeamColor.Black)
-        );
+        return new Turn(TeamColor.Black);
     }
 
     private GamePhase getNextPhase(GameHistory history) {
-        return PhaseTransitionQuery.getNextPhase(history, createTestGame());
+        return PhaseTransitionQuery.getNextPhase(createTestGame(), history);
     }
 
     @Test
@@ -138,7 +130,7 @@ public class PhaseTransitionQueryTest {
         addRecruitedCharacter(game, CharacterType.Assassin);
         addRecruitedCharacter(game, CharacterType.Bruiser);
 
-        GamePhase nextPhase = PhaseTransitionQuery.getNextPhase(history, game);
+        GamePhase nextPhase = PhaseTransitionQuery.getNextPhase(game, history);
 
         assertEquals(GamePhaseType.TurnEnd, nextPhase.getPhaseType());
         assertEquals(TeamColor.Black, nextPhase.getPhasePlayer().getTeamColor());
@@ -174,7 +166,7 @@ public class PhaseTransitionQueryTest {
         turnEndPhase.start();
         turnEndPhase.end();
 
-        GamePhase nextPhase = PhaseTransitionQuery.getNextPhase(history, game);
+        GamePhase nextPhase = PhaseTransitionQuery.getNextPhase(game, history);
 
         assertEquals(GamePhaseType.Banishment, nextPhase.getPhaseType());
         assertEquals(TeamColor.White, nextPhase.getPhasePlayer().getTeamColor());
@@ -193,7 +185,7 @@ public class PhaseTransitionQueryTest {
         turnEndPhase.start();
         turnEndPhase.end();
 
-        GamePhase nextPhase = PhaseTransitionQuery.getNextPhase(history, game);
+        GamePhase nextPhase = PhaseTransitionQuery.getNextPhase(game, history);
 
         assertEquals(GamePhaseType.TurnStart, nextPhase.getPhaseType());
         assertEquals(TeamColor.White, nextPhase.getPhasePlayer().getTeamColor());
@@ -205,12 +197,12 @@ public class PhaseTransitionQueryTest {
         GameHistory history = createTestGameHistory(GameMode.Strategist);
 
         BanishmentPhase banishmentPhase =
-                new BanishmentPhase(null, null, TeamColor.Black);
+                new BanishmentPhase(TeamColor.Black);
         banishmentPhase.start();
         banishmentPhase.end();
         history.getEntries().add(banishmentPhase);
 
-        GamePhase nextPhase = PhaseTransitionQuery.getNextPhase(history, game);
+        GamePhase nextPhase = PhaseTransitionQuery.getNextPhase(game, history);
 
         assertEquals(GamePhaseType.Banishment, nextPhase.getPhaseType());
         assertEquals(TeamColor.White, nextPhase.getPhasePlayer().getTeamColor());
@@ -222,12 +214,12 @@ public class PhaseTransitionQueryTest {
         GameHistory history = createTestGameHistory(GameMode.Discovery);
 
         BanishmentPhase banishmentPhase =
-                new BanishmentPhase(null, null, TeamColor.Black);
+                new BanishmentPhase(TeamColor.Black);
         banishmentPhase.start();
         banishmentPhase.end();
         history.getEntries().add(banishmentPhase);
 
-        GamePhase nextPhase = PhaseTransitionQuery.getNextPhase(history, game);
+        GamePhase nextPhase = PhaseTransitionQuery.getNextPhase(game, history);
 
         assertEquals(GamePhaseType.TurnStart, nextPhase.getPhaseType());
         assertEquals(TeamColor.White, nextPhase.getPhasePlayer().getTeamColor());
