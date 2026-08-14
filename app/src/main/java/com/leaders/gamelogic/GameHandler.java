@@ -2,6 +2,7 @@ package com.leaders.gamelogic;
 
 import androidx.annotation.NonNull;
 
+import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
@@ -9,7 +10,9 @@ import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.GamePhaseType;
 import com.leaders.gamelogic.enums.TeamColor;
+import com.leaders.gamelogic.factories.GameActionHandlerFactory;
 import com.leaders.gamelogic.factories.GameFactory;
+import com.leaders.gamelogic.handlers.GameActionHandler;
 import com.leaders.gamelogic.historyentries.IPhase;
 import com.leaders.gamelogic.historyentries.Segment;
 import com.leaders.gamelogic.historyentries.segments.BanishmentPhase;
@@ -245,5 +248,35 @@ public final class GameHandler {
 
     private CompletableFuture<Void> runBanishmentPhaseAsync(@NonNull GamePhase currentPhase) {
         return CompletableFuture.completedFuture(null);
+    }
+
+    /**
+     * Applies the given action to the current game and appends it to the current phase history.
+     *
+     * @param currentGamePhase current game phase
+     * @param action action to apply
+     * @throws IllegalStateException if no game phase is currently active
+     */
+    private void doAction(@NonNull GamePhase currentGamePhase, @NonNull IGameAction action) {
+        IPhase currentPhase = GameHistoryQuery.findCurrentPhase(currentHistory);
+        if (currentPhase == null) {
+            throw new IllegalStateException("Cannot do an action outside of a game phase");
+        }
+
+        GameActionHandler actionHandler = GameActionHandlerFactory.create(currentGame, action);
+        actionHandler.doAction();
+        currentPhase.getActions().add(action);
+        // Check for game end after each action, as every action represents a game state change
+        // that may trigger the victory condition.
+        checkGameEnded(currentGamePhase);
+    }
+
+    /**
+     * Checks whether the current game has ended.
+     *
+     * @param currentPhase current game phase
+     */
+    private void checkGameEnded(@NonNull GamePhase currentPhase) {
+        // Not implemented yet
     }
 }
