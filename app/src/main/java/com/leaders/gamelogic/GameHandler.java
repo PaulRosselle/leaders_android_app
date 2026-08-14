@@ -89,6 +89,11 @@ public final class GameHandler {
                 .thenCompose(future -> future);
     }
 
+    /**
+     * Runs the current phase or starts the next phase when none is active.
+     *
+     * @return a future completed when the current phase has been handled
+     */
     @NonNull
     private CompletableFuture<Void> runGameLoopAsync() {
         IPhase currentPhase = GameHistoryQuery.findCurrentPhase(currentHistory);
@@ -109,6 +114,13 @@ public final class GameHandler {
         return phaseExecution.thenCompose(ignored -> runGameLoopAsync());
     }
 
+    /**
+     * Handles the result of the game loop and propagates unexpected failures.
+     *
+     * @param result completed game loop result
+     * @param throwable failure raised by the game loop, if any
+     * @return a future completed when the game has ended, or failed with an unexpected exception
+     */
     @NonNull
     private CompletableFuture<Void> handleGameLoopResult(Void result, Throwable throwable) {
         CompletableFuture<Void> handledResult;
