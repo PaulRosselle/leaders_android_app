@@ -1,17 +1,17 @@
 package com.leaders.gamelogic.interactions;
 
 import com.leaders.gamelogic.entities.Character;
-import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public final class InteractionContext {
-    @NonNull
+    @Nullable
     private final Character character;
 
-    public InteractionContext(@NonNull Character character) {
+    public InteractionContext(@Nullable Character character) {
         this.character = character;
     }
 
-    @NonNull
+    @Nullable
     public Character getCharacter() {
         return character;
     }
