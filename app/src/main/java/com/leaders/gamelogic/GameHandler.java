@@ -313,7 +313,7 @@ public final class GameHandler {
 
         InteractionRequest request = new InteractionRequest(
                 InteractionType.PositionExpected,
-                new InteractionContext(null),
+                new InteractionContext(),
                 legalTargets,
                 legalResults
         );
