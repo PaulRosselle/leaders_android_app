@@ -7,6 +7,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
 import com.leaders.gamelogic.entities.Character;
+import com.leaders.gamelogic.entities.CharacterPlayableState;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
@@ -22,18 +23,23 @@ public class InteractionTargetTest {
 
         assertEquals(TargetCategory.RecruitmentCard, target.getCategory());
         assertEquals(CharacterCard.Archer, target.getChosenCard());
-        assertNull(target.getChosenCharacter());
+        assertNull(target.getChosenCharacterPlayableState());
         assertNull(target.getChosenPosition());
     }
 
     @Test
     public void constructor_shouldSetCharacterTarget() {
-        Character character = Character.create(CharacterType.Archer, TeamColor.Black);
-        InteractionTarget target = new InteractionTarget(TargetCategory.PlayableCharacter, character);
+        CharacterPlayableState characterPlayableState = new CharacterPlayableState(
+                Character.create(CharacterType.LeaderKing, TeamColor.Black),
+                new Position(3, 3),
+                false,
+                false
+        );
+        InteractionTarget target = new InteractionTarget(TargetCategory.PlayableCharacter, characterPlayableState);
 
         assertEquals(TargetCategory.PlayableCharacter, target.getCategory());
         assertNull(target.getChosenCard());
-        assertSame(character, target.getChosenCharacter());
+        assertSame(characterPlayableState, target.getChosenCharacterPlayableState());
         assertNull(target.getChosenPosition());
     }
 
@@ -45,7 +51,7 @@ public class InteractionTargetTest {
 
         assertEquals(TargetCategory.RecruitmentDestination, target.getCategory());
         assertNull(target.getChosenCard());
-        assertNull(target.getChosenCharacter());
+        assertNull(target.getChosenCharacterPlayableState());
         assertSame(position, target.getChosenPosition());
     }
 
@@ -59,10 +65,15 @@ public class InteractionTargetTest {
 
     @Test
     public void equals_shouldReturnTrueForIdenticalCharacterTargets() {
-        Character character = Character.create(CharacterType.Archer, TeamColor.Black);
+        CharacterPlayableState characterPlayableState = new CharacterPlayableState(
+                Character.create(CharacterType.Bruiser, TeamColor.Black),
+                new Position(3, 3),
+                false,
+                true
+        );
 
-        InteractionTarget first = new InteractionTarget(TargetCategory.PlayableCharacter, character);
-        InteractionTarget second = new InteractionTarget(TargetCategory.PlayableCharacter, character);
+        InteractionTarget first = new InteractionTarget(TargetCategory.PlayableCharacter, characterPlayableState);
+        InteractionTarget second = new InteractionTarget(TargetCategory.PlayableCharacter, characterPlayableState);
 
         assertEquals(first, second);
     }
@@ -102,7 +113,12 @@ public class InteractionTargetTest {
         InteractionTarget cardTarget = new InteractionTarget(TargetCategory.RecruitmentCard, CharacterCard.Archer);
         InteractionTarget characterTarget = new InteractionTarget(
                 TargetCategory.PlayableCharacter,
-                Character.create(CharacterType.Archer, TeamColor.Black)
+                new CharacterPlayableState(
+                        Character.create(CharacterType.Nemesis, TeamColor.Black),
+                        new Position(3, 3),
+                        true,
+                        false
+                )
         );
 
         assertNotEquals(cardTarget, characterTarget);
@@ -136,15 +152,17 @@ public class InteractionTargetTest {
     public void toString_shouldContainTargetInformation() {
         InteractionTarget target = new InteractionTarget(
                 TargetCategory.PlayableCharacter,
-                Character.create(
-                        CharacterType.Archer,
-                        TeamColor.Black
+                new CharacterPlayableState(
+                        Character.create(CharacterType.Archer, TeamColor.Black),
+                        new Position(3, 3),
+                        false,
+                        false
                 )
         );
 
         assertEquals(
                 "InteractionTarget{category=PlayableCharacter, character=" +
-                        target.getChosenCharacter() + "}",
+                        target.getChosenCharacterPlayableState() + "}",
                 target.toString()
         );
     }
