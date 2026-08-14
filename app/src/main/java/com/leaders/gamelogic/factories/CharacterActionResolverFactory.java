@@ -22,8 +22,9 @@ public final class CharacterActionResolverFactory {
         throw new AssertionError("Cannot instantiate utility class");
     }
 
-    public CharacterActionResolver create(@NonNull Game game, @NonNull GameHistory gameHistory,
-                                          @NonNull Character character) {
+    public static CharacterActionResolver create(@NonNull Game game,
+                                                 @NonNull GameHistory gameHistory,
+                                                 @NonNull Character character) {
         switch (character.getCharacterType()) {
             case Acrobat: return new AcrobatActionResolver(game, gameHistory, character);
             case Brewmaster: return new BrewmasterActionResolver(game, gameHistory, character);

@@ -1,7 +1,9 @@
 package com.leaders.gamelogic;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
+import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
@@ -11,6 +13,7 @@ import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.GamePhaseType;
 import com.leaders.gamelogic.enums.TeamColor;
+import com.leaders.gamelogic.factories.CharacterActionResolverFactory;
 import com.leaders.gamelogic.factories.GameActionHandlerFactory;
 import com.leaders.gamelogic.factories.GameFactory;
 import com.leaders.gamelogic.handlers.GameActionHandler;
@@ -20,8 +23,10 @@ import com.leaders.gamelogic.historyentries.segments.BanishmentPhase;
 import com.leaders.gamelogic.historyentries.segments.Turn;
 import com.leaders.gamelogic.historyentries.segments.TurnEndPhase;
 import com.leaders.gamelogic.historyentries.segments.TurnPhase;
+import com.leaders.gamelogic.interactions.CharacterActionBuilder;
 import com.leaders.gamelogic.interactions.IGameFlowListener;
 import com.leaders.gamelogic.interactions.InteractionContext;
+import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
 import com.leaders.gamelogic.interactions.InteractionResultType;
@@ -31,6 +36,7 @@ import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.GameHistoryQuery;
 import com.leaders.gamelogic.queries.PhaseTransitionQuery;
 import com.leaders.gamelogic.queries.PlayabilityQuery;
+import com.leaders.gamelogic.resolvers.CharacterActionResolver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -319,6 +325,83 @@ public final class GameHandler {
         );
 
         return gameFlowListener.onInputRequired(request);
+    }
+
+    /**
+     * Resolves and executes the action of the selected playable character.
+     *
+     * @param currentPhase current game phase
+     * @param playableCharacter selected playable character
+     * @return a future completed when the action has been resolved or canceled
+     * @throws IllegalArgumentException if the playable character is missing
+     */
+    private CompletableFuture<Void> runPlayCharacterAsync(@NonNull GamePhase currentPhase,
+                                                          @Nullable PlayableCharacter playableCharacter) {
+        if (playableCharacter == null) {
+            throw new IllegalArgumentException("A playable character is required to resolve an action");
+        }
+
+        CharacterActionBuilder builder = new CharacterActionBuilder(
+                playableCharacter.getCharacter(),
+                new ArrayList<>(),
+                new ArrayList<>()
+        );
+
+        CharacterActionResolver resolver = CharacterActionResolverFactory.create(
+                currentGame,
+                currentHistory,
+                playableCharacter.getCharacter()
+        );
+
+        return resolveCharacterActionAsync(currentPhase, builder, resolver);
+    }
+
+    /**
+     * Resolves a character action by requesting the required player inputs until the action
+     * is complete or canceled.
+     *
+     * @param currentPhase current game phase
+     * @param builder builder containing the current action state
+     * @param resolver resolver providing the next interaction and resulting action
+     * @return a future completed when the action has been resolved or canceled
+     */
+    @NonNull
+    private CompletableFuture<Void> resolveCharacterActionAsync(@NonNull GamePhase currentPhase,
+                                                                @NonNull CharacterActionBuilder builder,
+                                                                @NonNull CharacterActionResolver resolver) {
+        InteractionRequest request = resolver.getNextInteraction(builder);
+
+        // No further input is required, so the resolver can build and execute the action.
+        if (request == null) {
+            CharacterAction action = resolver.buildAction(builder);
+            doAction(currentPhase, action);
+            return CompletableFuture.completedFuture(null);
+        }
+
+        // Request the next input required to continue resolving the action.
+        return gameFlowListener.onInputRequired(request).thenCompose(result -> {
+            // Cancellation stops the resolution before the action is applied to the game.
+            if (result.getResultType() == InteractionResultType.CancelAction) {
+                return CompletableFuture.completedFuture(null);
+            }
+            builder.addResult(result);
+
+            // A feedback may be generated from the newly received input.
+            InteractionFeedback feedback = resolver.getNextFeedback(builder);
+            if (feedback == null) {
+                // No feedback is required, so continue directly with the next resolution step.
+                return resolveCharacterActionAsync(currentPhase, builder, resolver);
+            }
+
+            // Store the feedback before notifying the listener and continuing the resolution.
+            builder.addFeedback(feedback);
+            return gameFlowListener.onFeedback(feedback)
+                    .thenCompose(ignored -> resolveCharacterActionAsync(
+                            currentPhase,
+                            builder,
+                            resolver
+                    ));
+        });
     }
 
     private CompletableFuture<Void> runRecruitmentPhaseAsync(@NonNull GamePhase currentPhase) {

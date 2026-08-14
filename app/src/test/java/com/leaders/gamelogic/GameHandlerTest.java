@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
@@ -21,6 +22,7 @@ import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameConfig;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
+import com.leaders.gamelogic.entities.PlayableCharacter;
 import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterCard;
@@ -65,6 +67,8 @@ public class GameHandlerTest {
         private int gameStartedCount;
         private InteractionRequest lastInputRequired;
         private InteractionResult inputRequiredResult;
+        private InteractionFeedback lastFeedback;
+        private int feedbackCount;
         private CompletableFuture<Void> phaseChangedResult = CompletableFuture.completedFuture(null);
 
         private TestGameFlowListener(GameHistory history) {
@@ -103,6 +107,8 @@ public class GameHandlerTest {
         @NonNull
         @Override
         public CompletableFuture<Void> onFeedback(@NonNull InteractionFeedback feedback) {
+            feedbackCount++;
+            lastFeedback = feedback;
             return CompletableFuture.completedFuture(null);
         }
 
@@ -136,6 +142,14 @@ public class GameHandlerTest {
 
         InteractionRequest getLastInputRequired() {
             return lastInputRequired;
+        }
+
+        int getFeedbackCount() {
+            return feedbackCount;
+        }
+
+        InteractionFeedback getLastFeedback() {
+            return lastFeedback;
         }
     }
 
@@ -356,7 +370,7 @@ public class GameHandlerTest {
     }
 
     @Test
-    public void endCurrentPhase_shouldThrowWhenNoCurrentPhaseExists() throws Exception {
+    public void endCurrentPhase_shouldThrowWhenNoCurrentPhaseExists() {
         GameHistory history = createGameHistory();
         GameHandler gameHandler = new GameHandler(history, new TestGameFlowListener(history));
 
@@ -631,7 +645,7 @@ public class GameHandlerTest {
                 request.getLegalResults()
         );
 
-        assertEquals(2, request.getLegalTargets().size());
+        assertEquals(3, request.getLegalTargets().size());
 
         for (InteractionTarget target : request.getLegalTargets()) {
             assertEquals(TargetCategory.PlayableCharacter, target.getCategory());
@@ -692,6 +706,171 @@ public class GameHandlerTest {
                 ),
                 request.getLegalResults()
         );
+    }
+
+    @Test
+    public void runPlayCharacterAsync_shouldRejectMissingPlayableCharacter() {
+        GameHistory history = createPlayableCharacterGameHistory(new ArrayList<>());
+        TestGameFlowListener listener = new TestGameFlowListener(history);
+        GameHandler gameHandler = new GameHandler(history, listener);
+        GamePhase currentPhase = new GamePhase(GamePhaseType.Actions, history.getConfig().getPlayers().get(0));
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> invokeRunPlayCharacterAsync(gameHandler, currentPhase, null)
+        );
+
+        assertEquals(0, listener.getFeedbackCount());
+    }
+
+    @Test
+    public void runPlayCharacterAsync_shouldRequestActionInformation() {
+        List<Character> characters = new ArrayList<>();
+        GameHistory history = createPlayableCharacterGameHistory(characters);
+        TestGameFlowListener listener = new TestGameFlowListener(history);
+
+        InteractionResult result = new InteractionResult(
+                InteractionResultType.CancelAction,
+                new InteractionContext(characters.get(0)),
+                null
+        );
+        listener.setInputRequiredResult(result);
+
+        GameHandler gameHandler = new GameHandler(history, listener);
+        GamePhase currentPhase = new GamePhase(
+                GamePhaseType.Actions,
+                history.getConfig().getPlayers().get(0)
+        );
+        PlayableCharacter playableCharacter = new PlayableCharacter(
+                characters.get(0),
+                new Position(3, 3),
+                false,
+                false
+        );
+
+        invokeRunPlayCharacterAsync(gameHandler, currentPhase, playableCharacter).join();
+
+        assertEquals(1, listener.getInputRequiredCount());
+
+        InteractionRequest request = listener.getLastInputRequired();
+        assertNotNull(request);
+        assertEquals(InteractionType.PositionExpected, request.getRequestType());
+        assertEquals(
+                characters.get(0),
+                request.getContext().getCharacter()
+        );
+        assertTrue(request.getLegalResults().contains(InteractionResultType.PositionChosen));
+        assertTrue(request.getLegalResults().contains(InteractionResultType.CancelAction));
+
+        assertEquals(0, listener.getFeedbackCount());
+    }
+
+    @Test
+    public void runPlayCharacterAsync_shouldCancelWithoutApplyingAction() {
+        List<Character> characters = new ArrayList<>();
+        GameHistory history = createPlayableCharacterGameHistory(characters);
+        TestGameFlowListener listener = new TestGameFlowListener(history);
+
+        listener.setInputRequiredResult(new InteractionResult(
+                InteractionResultType.CancelAction,
+                new InteractionContext(characters.get(0)),
+                null
+        ));
+
+        GameHandler gameHandler = new GameHandler(history, listener);
+        GamePhase currentPhase = new GamePhase(
+                GamePhaseType.Actions,
+                history.getConfig().getPlayers().get(0)
+        );
+        PlayableCharacter playableCharacter = new PlayableCharacter(
+                characters.get(0),
+                new Position(3, 3),
+                false,
+                false
+        );
+
+        ActionsPhase actionsPhase = (ActionsPhase)
+                ((Turn) history.getEntries().get(0)).getSubPhase(GamePhaseType.Actions);
+
+        gameHandler.getCurrentGame().getBoard().getCell(new Position(3, 3))
+                .setCharacter(characters.get(0));
+
+        invokeRunPlayCharacterAsync(gameHandler, currentPhase, playableCharacter).join();
+
+        assertEquals(1, listener.getInputRequiredCount());
+        assertTrue(actionsPhase.getActions().isEmpty());
+        assertSame(
+                characters.get(0),
+                gameHandler.getCurrentGame().getBoard()
+                        .getCell(new Position(3, 3))
+                        .getCharacter()
+        );
+        assertNull(
+                gameHandler.getCurrentGame().getBoard()
+                        .getCell(new Position(3, 2))
+                        .getCharacter()
+        );
+
+        assertEquals(0, listener.getFeedbackCount());
+    }
+
+    @Test
+    public void runPlayCharacterAsync_shouldApplyCompletedAction() {
+        List<Character> characters = new ArrayList<>();
+        GameHistory history = createPlayableCharacterGameHistory(characters);
+        TestGameFlowListener listener = new TestGameFlowListener(history);
+
+        Position origin = new Position(3, 3);
+        Position destination = new Position(3, 2);
+
+        listener.setInputRequiredResult(new InteractionResult(
+                InteractionResultType.PositionChosen,
+                new InteractionContext(characters.get(0)),
+                new InteractionTarget(TargetCategory.MovementDestination, destination)
+        ));
+
+        GameHandler gameHandler = new GameHandler(history, listener);
+        GamePhase currentPhase = new GamePhase(
+                GamePhaseType.Actions,
+                history.getConfig().getPlayers().get(0)
+        );
+        PlayableCharacter playableCharacter = new PlayableCharacter(
+                characters.get(0),
+                origin,
+                false,
+                false
+        );
+
+        ActionsPhase actionsPhase = (ActionsPhase)
+                ((Turn) history.getEntries().get(0)).getSubPhase(GamePhaseType.Actions);
+
+        invokeRunPlayCharacterAsync(gameHandler, currentPhase, playableCharacter).join();
+
+        assertEquals(1, listener.getInputRequiredCount());
+        assertEquals(1, actionsPhase.getActions().size());
+        assertTrue(actionsPhase.getActions().get(0) instanceof CharacterAction);
+
+        CharacterAction action = (CharacterAction) actionsPhase.getActions().get(0);
+        assertSame(characters.get(0), action.getSrcCharacter());
+        assertEquals(1, action.getMotions().size());
+        assertEquals(origin, action.getMotions().get(0).getTargets().get(0).getOriginPos());
+        assertEquals(destination, action.getMotions().get(0).getTargets().get(0).getDestPos());
+
+        assertNull(
+                gameHandler.getCurrentGame().getBoard()
+                        .getCell(origin)
+                        .getCharacter()
+        );
+        assertSame(
+                characters.get(0),
+                gameHandler.getCurrentGame().getBoard()
+                        .getCell(destination)
+                        .getCharacter()
+        );
+
+        assertEquals(1, listener.getFeedbackCount());
+        assertNotNull(listener.getLastFeedback());
+        assertEquals(1, listener.getLastFeedback().getCharacterActionMotions().size());
     }
 
     @SuppressWarnings("unchecked")
@@ -795,6 +974,34 @@ public class GameHandlerTest {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    private CompletableFuture<Void> invokeRunPlayCharacterAsync(GameHandler gameHandler,
+                                                                GamePhase currentPhase,
+                                                                PlayableCharacter playableCharacter) {
+        try {
+            Method method = GameHandler.class.getDeclaredMethod(
+                    "runPlayCharacterAsync",
+                    GamePhase.class,
+                    PlayableCharacter.class
+            );
+            method.setAccessible(true);
+
+            return (CompletableFuture<Void>) method.invoke(
+                    gameHandler,
+                    currentPhase,
+                    playableCharacter
+            );
+        } catch (InvocationTargetException exception) {
+            Throwable cause = exception.getCause();
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            }
+            throw new RuntimeException(cause);
+        } catch (ReflectiveOperationException exception) {
+            throw new RuntimeException(exception);
+        }
+    }
+
     private GameHistory createGameHistory() {
         return createGameHistory(GameMode.Discovery, createPlayers());
     }
@@ -822,6 +1029,7 @@ public class GameHandlerTest {
     private GameHistory createPlayableCharacterGameHistory(@NonNull List<Character> characters) {
         List<Player> players = createPlayers();
 
+        Character leader = Character.create(CharacterType.LeaderKing, TeamColor.Black);
         Character acrobat = Character.create(CharacterType.Acrobat, TeamColor.Black);
         Character archer = Character.create(CharacterType.Archer, TeamColor.Black);
 
@@ -829,6 +1037,7 @@ public class GameHandlerTest {
         characters.add(archer);
 
         RecruitmentAction initialPlacement = new RecruitmentAction(Arrays.asList(
+                new RecruitmentActionMotion(RecruitmentMotionType.Add, leader, new Position(3, 0)),
                 new RecruitmentActionMotion(RecruitmentMotionType.Add, acrobat, new Position(3, 3)),
                 new RecruitmentActionMotion(RecruitmentMotionType.Add, archer, new Position(3, 4))
         ));
@@ -837,7 +1046,7 @@ public class GameHandlerTest {
                 players,
                 players.get(0),
                 GameMode.Discovery,
-                Arrays.asList(CharacterCard.Acrobat, CharacterCard.Archer),
+                Arrays.asList(CharacterCard.Bruiser, CharacterCard.HermitAndCub),
                 Collections.singletonList(initialPlacement)
         );
 
