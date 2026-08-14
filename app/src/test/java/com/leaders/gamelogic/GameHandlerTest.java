@@ -7,14 +7,18 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import androidx.annotation.NonNull;
 
+import com.leaders.gamelogic.actions.BanishmentAction;
+import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameConfig;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.Player;
+import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.GamePhaseType;
 import com.leaders.gamelogic.enums.TeamColor;
@@ -393,6 +397,54 @@ public class GameHandlerTest {
         assertEquals(GamePhaseType.Actions, listener.getLastPhaseChanged().getPhaseType());
     }
 
+    @Test
+    public void doAction_shouldApplyActionAndAppendItToCurrentPhase() throws Exception {
+        GameHistory history = createGameHistory(
+                GameMode.Strategist,
+                createPlayers(),
+                Collections.singletonList(CharacterCard.HermitAndCub)
+        );
+        BanishmentPhase phase = new BanishmentPhase(TeamColor.Black);
+        phase.start();
+        history.getEntries().add(phase);
+
+        GameHandler gameHandler = new GameHandler(history, new TestGameFlowListener(history));
+        BanishmentAction action = new BanishmentAction(CharacterCard.HermitAndCub, TeamColor.Black);
+
+        invokeDoAction(gameHandler, new GamePhase(GamePhaseType.Banishment,
+                history.getConfig().getPlayers().get(0)), action);
+
+        assertEquals(0, gameHandler.getCurrentGame().getRecruitableCards().size());
+        assertEquals(1, gameHandler.getCurrentGame().getBanishedCards(TeamColor.Black).size());
+        assertEquals(CharacterCard.HermitAndCub, gameHandler.getCurrentGame().getBanishedCards(TeamColor.Black).get(0));
+
+        assertEquals(1, phase.getActions().size());
+        assertSame(action, phase.getActions().get(0));
+    }
+
+    @Test
+    public void doAction_shouldThrowWhenNoCurrentPhaseExists() throws Exception {
+        GameHistory history = createGameHistory(
+                GameMode.Strategist,
+                createPlayers(),
+                Collections.singletonList(CharacterCard.HermitAndCub)
+        );
+        GameHandler gameHandler = new GameHandler(history, new TestGameFlowListener(history));
+        BanishmentAction action = new BanishmentAction(CharacterCard.HermitAndCub, TeamColor.Black);
+
+        try {
+            invokeDoAction(gameHandler, new GamePhase(
+                    GamePhaseType.Banishment, history.getConfig().getPlayers().get(0)), action);
+            fail("Expected IllegalStateException");
+        } catch (IllegalStateException exception) {
+            assertEquals("Cannot do an action outside of a game phase", exception.getMessage());
+        }
+
+        assertEquals(1, gameHandler.getCurrentGame().getRecruitableCards().size());
+        assertEquals(CharacterCard.HermitAndCub, gameHandler.getCurrentGame().getRecruitableCards().get(0));
+        assertTrue(history.getEntries().isEmpty());
+    }
+
     @SuppressWarnings("unchecked")
     private CompletableFuture<Void> invokeStartNextPhase(GameHandler gameHandler) throws Exception {
         Method method = GameHandler.class.getDeclaredMethod("startNextPhaseAsync");
@@ -424,6 +476,21 @@ public class GameHandlerTest {
         }
     }
 
+    private void invokeDoAction(GameHandler gameHandler, GamePhase currentPhase, BanishmentAction action) throws Exception {
+        Method method = GameHandler.class.getDeclaredMethod("doAction", GamePhase.class, IGameAction.class);
+        method.setAccessible(true);
+
+        try {
+            method.invoke(gameHandler, currentPhase, action);
+        } catch (InvocationTargetException exception) {
+            Throwable cause = exception.getCause();
+            if (cause instanceof Exception) {
+                throw (Exception) cause;
+            }
+            throw exception;
+        }
+    }
+
     private GameHistory createGameHistory() {
         return createGameHistory(GameMode.Discovery, createPlayers());
     }
@@ -433,11 +500,16 @@ public class GameHandlerTest {
     }
 
     private GameHistory createGameHistory(GameMode gameMode, List<Player> players) {
+        return createGameHistory(gameMode, players, Collections.emptyList());
+    }
+
+    private GameHistory createGameHistory(GameMode gameMode, List<Player> players,
+                                          List<CharacterCard> initialRecruitableCards) {
         GameConfig config = new GameConfig(
                 players,
                 players.get(0),
                 gameMode,
-                Collections.emptyList(),
+                initialRecruitableCards,
                 Collections.emptyList()
         );
         return new GameHistory(config, new ArrayList<>());
