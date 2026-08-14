@@ -49,6 +49,7 @@ public class GameHandlerTest {
         private final GameHistory history;
         private GamePhase lastPhaseChanged;
         private boolean phaseWasStartedWhenNotified;
+        private int inputRequiredCount;
         private int gameStartedCount;
         private int gameEndedCount;
         private CompletableFuture<Void> gameStartedResult = CompletableFuture.completedFuture(null);
@@ -83,6 +84,7 @@ public class GameHandlerTest {
         @NonNull
         @Override
         public CompletableFuture<InteractionResult> onInputRequired(@NonNull InteractionRequest request) {
+            inputRequiredCount++;
             return CompletableFuture.completedFuture(null);
         }
 
@@ -110,6 +112,10 @@ public class GameHandlerTest {
 
         boolean wasPhaseStartedWhenNotified() {
             return phaseWasStartedWhenNotified;
+        }
+
+        int getInputRequiredCount() {
+            return inputRequiredCount;
         }
     }
 
@@ -392,6 +398,8 @@ public class GameHandlerTest {
         assertFalse(result.isDone());
         assertTrue(turnStartPhase.hasStarted());
         assertTrue(turnStartPhase.hasEnded());
+        assertEquals(0, listener.getInputRequiredCount());
+        assertTrue(turnStartPhase.getActions().isEmpty());
 
         assertNotNull(listener.getLastPhaseChanged());
         assertEquals(GamePhaseType.Actions, listener.getLastPhaseChanged().getPhaseType());
@@ -540,6 +548,34 @@ public class GameHandlerTest {
         assertTrue(phase.getActions().isEmpty());
     }
 
+    @Test
+    public void runCurrentPhaseAsync_shouldCompleteTurnStartPhaseWithoutInputOrAction() {
+        GameHistory history = createGameHistory(GameMode.Discovery);
+
+        Turn turn = new Turn(TeamColor.Black);
+        history.getEntries().add(turn);
+
+        TurnStartPhase turnStartPhase = (TurnStartPhase) turn.getSubPhase(GamePhaseType.TurnStart);
+        turnStartPhase.start();
+
+        TestGameFlowListener listener = new TestGameFlowListener(history);
+        GameHandler gameHandler = new GameHandler(history, listener);
+        GamePhase currentPhase = new GamePhase(
+                GamePhaseType.TurnStart,
+                history.getConfig().getPlayers().get(0)
+        );
+
+        CompletableFuture<Void> result = invokeRunCurrentPhase(gameHandler, currentPhase);
+
+        result.join();
+
+        assertTrue(turnStartPhase.hasStarted());
+        assertTrue(turnStartPhase.hasEnded());
+        assertTrue(turnStartPhase.getActions().isEmpty());
+        assertEquals(0, listener.getInputRequiredCount());
+        assertFalse(turn.hasEnded());
+    }
+
     @SuppressWarnings("unchecked")
     private CompletableFuture<Void> invokeStartNextPhase(GameHandler gameHandler) throws Exception {
         Method method = GameHandler.class.getDeclaredMethod("startNextPhaseAsync");
@@ -598,6 +634,23 @@ public class GameHandlerTest {
                 throw (Exception) cause;
             }
             throw exception;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private CompletableFuture<Void> invokeRunCurrentPhase(GameHandler gameHandler, GamePhase currentPhase) {
+        try {
+            Method method = GameHandler.class.getDeclaredMethod("runCurrentPhaseAsync", GamePhase.class);
+            method.setAccessible(true);
+            return (CompletableFuture<Void>) method.invoke(gameHandler, currentPhase);
+        } catch (InvocationTargetException exception) {
+            Throwable cause = exception.getCause();
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            }
+            throw new RuntimeException(cause);
+        } catch (ReflectiveOperationException exception) {
+            throw new RuntimeException(exception);
         }
     }
 
