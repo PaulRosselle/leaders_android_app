@@ -23,6 +23,19 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public final class GameHandler {
+    private static final class GameEndedException extends RuntimeException {
+        @NonNull
+        private final Player winner;
+
+        private GameEndedException(@NonNull Player winner) {
+            this.winner = winner;
+        }
+
+        @NonNull
+        private Player getWinner() {
+            return winner;
+        }
+    }
 
     @NonNull
     private final Game currentGame;
@@ -58,6 +71,74 @@ public final class GameHandler {
     @NonNull
     public List<Player> getPlayers() {
         return currentHistory.getConfig().getPlayers();
+    }
+
+    /**
+     * Runs the game until it ends.
+     *
+     * @return a future completed when the game has ended
+     */
+    @NonNull
+    public CompletableFuture<Void> runAsync() {
+        // Start the game before scheduling the asynchronous game loop.
+        return gameFlowListener.onGameStarted(currentGame)
+                .thenCompose(ignored -> runGameLoopAsync())
+                // handle() allows asynchronous exceptions to be handled at the
+                // end of the future chain without blocking on its completion.
+                .handle(this::handleGameLoopResult)
+                .thenCompose(future -> future);
+    }
+
+    @NonNull
+    private CompletableFuture<Void> runGameLoopAsync() {
+        IPhase currentPhase = GameHistoryQuery.findCurrentPhase(currentHistory);
+        CompletableFuture<Void> phaseExecution;
+
+        if (currentPhase != null) {
+            GamePhase currentGamePhase = new GamePhase(
+                    GamePhaseType.getFromTransitionTarget(GameHistoryQuery.getPhaseTransitionTarget(currentPhase)),
+                    GameHistoryQuery.getPlayerFromTeam(currentHistory, GameHistoryQuery.getPhaseTeamColor(currentPhase))
+            );
+            phaseExecution = runCurrentPhaseAsync(currentGamePhase);
+        } else {
+            phaseExecution = startNextPhaseAsync();
+        }
+
+        // Chain the next loop iteration instead of blocking with join() or get().
+        // Each iteration starts only after the current asynchronous operation completes.
+        return phaseExecution.thenCompose(ignored -> runGameLoopAsync());
+    }
+
+    @NonNull
+    private CompletableFuture<Void> handleGameLoopResult(Void result, Throwable throwable) {
+        CompletableFuture<Void> handledResult;
+
+        if (throwable == null) {
+            handledResult = CompletableFuture.completedFuture(null);
+        } else {
+            // Asynchronous failures may be wrapped in CompletionException.
+            // Unwrap it before checking the type of the actual failure.
+            Throwable cause = throwable;
+            if (throwable instanceof java.util.concurrent.CompletionException
+                    && throwable.getCause() != null) {
+                cause = throwable.getCause();
+            }
+
+            if (cause instanceof GameEndedException) {
+                // GameEndedException is the internal signal used to stop the loop
+                // and notify the listener with the winning player.
+                GameEndedException gameEndedException = (GameEndedException) cause;
+                handledResult = gameFlowListener.onGameEnded(gameEndedException.getWinner());
+            } else {
+                // Only GameEndedException is handled here. All other failures
+                // remain exceptional so they are propagated to the caller.
+                CompletableFuture<Void> failedResult = new CompletableFuture<>();
+                failedResult.completeExceptionally(cause);
+                handledResult = failedResult;
+            }
+        }
+
+        return handledResult;
     }
 
     /**
