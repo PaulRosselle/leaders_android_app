@@ -45,6 +45,10 @@ public class GameHandlerTest {
         private final GameHistory history;
         private GamePhase lastPhaseChanged;
         private boolean phaseWasStartedWhenNotified;
+        private int gameStartedCount;
+        private int gameEndedCount;
+        private CompletableFuture<Void> gameStartedResult = CompletableFuture.completedFuture(null);
+        private CompletableFuture<Void> phaseChangedResult = CompletableFuture.completedFuture(null);
 
         private TestGameFlowListener(GameHistory history) {
             this.history = history;
@@ -53,12 +57,14 @@ public class GameHandlerTest {
         @NonNull
         @Override
         public CompletableFuture<Void> onGameStarted(@NonNull Game game) {
+            gameStartedCount++;
             return CompletableFuture.completedFuture(null);
         }
 
         @NonNull
         @Override
         public CompletableFuture<Void> onGameEnded(@NonNull Player winner) {
+            gameEndedCount++;
             return CompletableFuture.completedFuture(null);
         }
 
@@ -67,7 +73,7 @@ public class GameHandlerTest {
         public CompletableFuture<Void> onPhaseChanged(@NonNull GamePhase phase) {
             lastPhaseChanged = phase;
             phaseWasStartedWhenNotified = isCurrentPhaseStarted();
-            return CompletableFuture.completedFuture(null);
+            return phaseChangedResult;
         }
 
         @NonNull
@@ -327,6 +333,65 @@ public class GameHandlerTest {
         assertThrows(IllegalStateException.class, () -> invokeEndCurrentPhase(gameHandler));
     }
 
+    @Test
+    public void runAsync_shouldCallOnGameStartedOnce() {
+        GameHistory history = createGameHistory(GameMode.Discovery);
+        TestGameFlowListener listener = new TestGameFlowListener(history);
+
+        CompletableFuture<Void> failedStart = new CompletableFuture<>();
+        failedStart.completeExceptionally(new IllegalStateException("Test failure"));
+        listener.gameStartedResult = failedStart;
+
+        GameHandler gameHandler = new GameHandler(history, listener);
+
+        CompletableFuture<Void> result = gameHandler.runAsync();
+
+        assertTrue(result.isCompletedExceptionally());
+        assertEquals(1, listener.gameStartedCount);
+    }
+
+    @Test
+    public void runAsync_shouldStartNextPhaseWhenNoPhaseIsActive() {
+        GameHistory history = createGameHistory(GameMode.Discovery);
+        TestGameFlowListener listener = new TestGameFlowListener(history);
+        listener.phaseChangedResult = new CompletableFuture<>();
+
+        GameHandler gameHandler = new GameHandler(history, listener);
+
+        CompletableFuture<Void> result = gameHandler.runAsync();
+
+        assertFalse(result.isDone());
+        assertEquals(1, history.getEntries().size());
+        assertTrue(history.getEntries().get(0) instanceof Turn);
+        assertNotNull(listener.getLastPhaseChanged());
+        assertEquals(GamePhaseType.TurnStart, listener.getLastPhaseChanged().getPhaseType());
+        assertTrue(listener.wasPhaseStartedWhenNotified());
+    }
+
+    @Test
+    public void runAsync_shouldRunCurrentPhaseWhenPhaseIsActive() {
+        GameHistory history = createGameHistory(GameMode.Discovery);
+
+        Turn turn = new Turn(TeamColor.Black);
+        history.getEntries().add(turn);
+
+        TurnStartPhase turnStartPhase = (TurnStartPhase) turn.getSubPhase(GamePhaseType.TurnStart);
+        turnStartPhase.start();
+
+        TestGameFlowListener listener = new TestGameFlowListener(history);
+        listener.phaseChangedResult = new CompletableFuture<>();
+
+        GameHandler gameHandler = new GameHandler(history, listener);
+
+        CompletableFuture<Void> result = gameHandler.runAsync();
+
+        assertFalse(result.isDone());
+        assertTrue(turnStartPhase.hasStarted());
+        assertTrue(turnStartPhase.hasEnded());
+
+        assertNotNull(listener.getLastPhaseChanged());
+        assertEquals(GamePhaseType.Actions, listener.getLastPhaseChanged().getPhaseType());
+    }
 
     @SuppressWarnings("unchecked")
     private CompletableFuture<Void> invokeStartNextPhase(GameHandler gameHandler) throws Exception {
