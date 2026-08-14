@@ -2,7 +2,7 @@ package com.leaders.gamelogic.entities;
 
 import androidx.annotation.NonNull;
 
-public final class CharacterPlayableState {
+public final class PlayableCharacter {
     @NonNull
     private final Character character;
     @NonNull
@@ -10,8 +10,8 @@ public final class CharacterPlayableState {
     private final boolean mandatory;
     private final boolean canUseActiveAbility;
 
-    public CharacterPlayableState(@NonNull Character character, @NonNull Position position,
-                                  boolean mandatory, boolean canUseActiveAbility) {
+    public PlayableCharacter(@NonNull Character character, @NonNull Position position,
+                             boolean mandatory, boolean canUseActiveAbility) {
         this.character = character;
         this.position = position;
         this.mandatory = mandatory;

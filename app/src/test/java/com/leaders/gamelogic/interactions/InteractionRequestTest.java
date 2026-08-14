@@ -5,7 +5,7 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import com.leaders.gamelogic.entities.Character;
-import com.leaders.gamelogic.entities.CharacterPlayableState;
+import com.leaders.gamelogic.entities.PlayableCharacter;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
@@ -41,7 +41,7 @@ public class InteractionRequestTest {
         List<InteractionTarget> legalTargets = new ArrayList<>();
         List<InteractionResultType> legalResults = new ArrayList<>();
         Character contextCharacter = Character.create(CharacterType.LeaderQueen, TeamColor.Black);
-        InteractionRequest request = new InteractionRequest(InteractionType.CharacterPlayableStateExpected,
+        InteractionRequest request = new InteractionRequest(InteractionType.PlayableCharacterExpected,
                 new InteractionContext(contextCharacter),
                 legalTargets, legalResults
         );
@@ -49,7 +49,7 @@ public class InteractionRequestTest {
 
         legalTargets.add(new InteractionTarget(
                 TargetCategory.PlayableCharacter,
-                new CharacterPlayableState(
+                new PlayableCharacter(
                         Character.create(CharacterType.LeaderKing, TeamColor.Black),
                         new Position(3, 3),
                         false,

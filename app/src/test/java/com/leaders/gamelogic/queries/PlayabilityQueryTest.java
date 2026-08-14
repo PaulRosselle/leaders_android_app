@@ -9,7 +9,7 @@ import com.leaders.gamelogic.actions.CharacterActionMotion;
 import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Character;
-import com.leaders.gamelogic.entities.CharacterPlayableState;
+import com.leaders.gamelogic.entities.PlayableCharacter;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameConfig;
 import com.leaders.gamelogic.entities.GameHistory;
@@ -122,7 +122,7 @@ public class PlayabilityQueryTest {
         GameHistory gameHistory = createTestGameHistory();
         gameHistory.getEntries().add(turn);
 
-        List<CharacterPlayableState> states =
+        List<PlayableCharacter> states =
                 PlayabilityQuery.getCharacterPlayableStates(game, gameHistory);
 
         assertEquals(1, states.size());
@@ -166,7 +166,7 @@ public class PlayabilityQueryTest {
         GameHistory gameHistory = createTestGameHistory();
         gameHistory.getEntries().add(turn);
 
-        List<CharacterPlayableState> states =
+        List<PlayableCharacter> states =
                 PlayabilityQuery.getCharacterPlayableStates(game, gameHistory);
 
         assertEquals(1, states.size());
@@ -208,7 +208,7 @@ public class PlayabilityQueryTest {
         GameHistory gameHistory = createTestGameHistory();
         gameHistory.getEntries().add(turn);
 
-        List<CharacterPlayableState> states =
+        List<PlayableCharacter> states =
                 PlayabilityQuery.getCharacterPlayableStates(game, gameHistory);
 
         assertEquals(1, states.size());
@@ -230,7 +230,7 @@ public class PlayabilityQueryTest {
         GameHistory gameHistory = createTestGameHistory();
         gameHistory.getEntries().add(turn);
 
-        List<CharacterPlayableState> states = PlayabilityQuery.getCharacterPlayableStates(game, gameHistory);
+        List<PlayableCharacter> states = PlayabilityQuery.getCharacterPlayableStates(game, gameHistory);
 
         assertEquals(1, states.size());
         assertSame(bruiser, states.get(0).getCharacter());

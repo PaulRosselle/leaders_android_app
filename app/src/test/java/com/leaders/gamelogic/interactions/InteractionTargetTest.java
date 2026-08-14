@@ -7,7 +7,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
 import com.leaders.gamelogic.entities.Character;
-import com.leaders.gamelogic.entities.CharacterPlayableState;
+import com.leaders.gamelogic.entities.PlayableCharacter;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
@@ -29,17 +29,17 @@ public class InteractionTargetTest {
 
     @Test
     public void constructor_shouldSetCharacterTarget() {
-        CharacterPlayableState characterPlayableState = new CharacterPlayableState(
+        PlayableCharacter playableCharacter = new PlayableCharacter(
                 Character.create(CharacterType.LeaderKing, TeamColor.Black),
                 new Position(3, 3),
                 false,
                 false
         );
-        InteractionTarget target = new InteractionTarget(TargetCategory.PlayableCharacter, characterPlayableState);
+        InteractionTarget target = new InteractionTarget(TargetCategory.PlayableCharacter, playableCharacter);
 
         assertEquals(TargetCategory.PlayableCharacter, target.getCategory());
         assertNull(target.getChosenCard());
-        assertSame(characterPlayableState, target.getChosenCharacterPlayableState());
+        assertSame(playableCharacter, target.getChosenCharacterPlayableState());
         assertNull(target.getChosenPosition());
     }
 
@@ -65,15 +65,15 @@ public class InteractionTargetTest {
 
     @Test
     public void equals_shouldReturnTrueForIdenticalCharacterTargets() {
-        CharacterPlayableState characterPlayableState = new CharacterPlayableState(
+        PlayableCharacter playableCharacter = new PlayableCharacter(
                 Character.create(CharacterType.Bruiser, TeamColor.Black),
                 new Position(3, 3),
                 false,
                 true
         );
 
-        InteractionTarget first = new InteractionTarget(TargetCategory.PlayableCharacter, characterPlayableState);
-        InteractionTarget second = new InteractionTarget(TargetCategory.PlayableCharacter, characterPlayableState);
+        InteractionTarget first = new InteractionTarget(TargetCategory.PlayableCharacter, playableCharacter);
+        InteractionTarget second = new InteractionTarget(TargetCategory.PlayableCharacter, playableCharacter);
 
         assertEquals(first, second);
     }
@@ -113,7 +113,7 @@ public class InteractionTargetTest {
         InteractionTarget cardTarget = new InteractionTarget(TargetCategory.RecruitmentCard, CharacterCard.Archer);
         InteractionTarget characterTarget = new InteractionTarget(
                 TargetCategory.PlayableCharacter,
-                new CharacterPlayableState(
+                new PlayableCharacter(
                         Character.create(CharacterType.Nemesis, TeamColor.Black),
                         new Position(3, 3),
                         true,
@@ -152,7 +152,7 @@ public class InteractionTargetTest {
     public void toString_shouldContainTargetInformation() {
         InteractionTarget target = new InteractionTarget(
                 TargetCategory.PlayableCharacter,
-                new CharacterPlayableState(
+                new PlayableCharacter(
                         Character.create(CharacterType.Archer, TeamColor.Black),
                         new Position(3, 3),
                         false,

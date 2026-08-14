@@ -3,8 +3,7 @@ package com.leaders.gamelogic.interactions;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.leaders.gamelogic.entities.Character;
-import com.leaders.gamelogic.entities.CharacterPlayableState;
+import com.leaders.gamelogic.entities.PlayableCharacter;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterCard;
 
@@ -18,21 +17,21 @@ public final class InteractionTarget {
     private final CharacterCard chosenCard;
 
     @Nullable
-    private final CharacterPlayableState chosenCharacterPlayableState;
+    private final PlayableCharacter chosenPlayableCharacter;
 
     @Nullable
     private final Position chosenPosition;
 
     private InteractionTarget(@NonNull TargetCategory category,
                               @Nullable CharacterCard chosenCard,
-                              @Nullable CharacterPlayableState chosenCharacterPlayableState,
+                              @Nullable PlayableCharacter chosenPlayableCharacter,
                               @Nullable Position chosenPosition) {
         this.category = category;
-        if (!(chosenCard != null ^ chosenPosition != null ^ chosenCharacterPlayableState != null)) {
+        if (!(chosenCard != null ^ chosenPosition != null ^ chosenPlayableCharacter != null)) {
             throw new IllegalArgumentException("There can be only one target data per interaction");
         }
         this.chosenCard = chosenCard;
-        this.chosenCharacterPlayableState = chosenCharacterPlayableState;
+        this.chosenPlayableCharacter = chosenPlayableCharacter;
         this.chosenPosition = chosenPosition;
     }
 
@@ -44,8 +43,8 @@ public final class InteractionTarget {
         this(category, null, null, chosenPosition);
     }
 
-    public InteractionTarget(@NonNull TargetCategory category, @NonNull CharacterPlayableState chosenCharacterPlayableState) {
-        this(category, null, chosenCharacterPlayableState, null);
+    public InteractionTarget(@NonNull TargetCategory category, @NonNull PlayableCharacter chosenPlayableCharacter) {
+        this(category, null, chosenPlayableCharacter, null);
     }
 
     @NonNull
@@ -59,8 +58,8 @@ public final class InteractionTarget {
     }
 
     @Nullable
-    public CharacterPlayableState getChosenCharacterPlayableState() {
-        return chosenCharacterPlayableState;
+    public PlayableCharacter getChosenCharacterPlayableState() {
+        return chosenPlayableCharacter;
     }
 
     @Nullable
@@ -80,20 +79,20 @@ public final class InteractionTarget {
         InteractionTarget target = (InteractionTarget) o;
         return category.equals(target.category) &&
                 Objects.equals(chosenCard, target.chosenCard) &&
-                Objects.equals(chosenCharacterPlayableState, target.chosenCharacterPlayableState) &&
+                Objects.equals(chosenPlayableCharacter, target.chosenPlayableCharacter) &&
                 Objects.equals(chosenPosition, target.chosenPosition);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(category, chosenCard, chosenCharacterPlayableState, chosenPosition);
+        return Objects.hash(category, chosenCard, chosenPlayableCharacter, chosenPosition);
     }
 
     @NonNull
     @Override
     public String toString() {
         String cardStr = chosenCard != null ? ", card=" + chosenCard : "";
-        String characterStr = chosenCharacterPlayableState != null ? ", character=" + chosenCharacterPlayableState : "";
+        String characterStr = chosenPlayableCharacter != null ? ", character=" + chosenPlayableCharacter : "";
         String positionStr = chosenPosition != null ? ", position=" + chosenPosition : "";
         return "InteractionTarget{category=" + category + cardStr + characterStr + positionStr + '}';
     }
