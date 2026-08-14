@@ -445,6 +445,101 @@ public class GameHandlerTest {
         assertTrue(history.getEntries().isEmpty());
     }
 
+    @Test
+    public void undoLastAction_shouldUndoAndRemoveLastAction() throws Exception {
+        GameHistory history = createGameHistory(
+                GameMode.Strategist,
+                createPlayers(),
+                Collections.singletonList(CharacterCard.HermitAndCub)
+        );
+        BanishmentPhase phase = new BanishmentPhase(TeamColor.Black);
+        phase.start();
+        history.getEntries().add(phase);
+
+        GameHandler gameHandler = new GameHandler(history, new TestGameFlowListener(history));
+        BanishmentAction action = new BanishmentAction(CharacterCard.HermitAndCub, TeamColor.Black);
+
+        invokeDoAction(gameHandler, new GamePhase(GamePhaseType.Banishment,
+                history.getConfig().getPlayers().get(0)), action);
+        invokeUndoLastAction(gameHandler);
+
+        assertTrue(phase.getActions().isEmpty());
+        assertEquals(1, gameHandler.getCurrentGame().getRecruitableCards().size());
+        assertEquals(CharacterCard.HermitAndCub,
+                gameHandler.getCurrentGame().getRecruitableCards().get(0));
+        assertTrue(gameHandler.getCurrentGame().getBanishedCards(TeamColor.Black).isEmpty());
+    }
+
+    @Test
+    public void undoLastAction_shouldThrowWhenNoCurrentPhaseExists() throws Exception {
+        GameHistory history = createGameHistory();
+        GameHandler gameHandler = new GameHandler(history, new TestGameFlowListener(history));
+
+        try {
+            invokeUndoLastAction(gameHandler);
+            fail("Expected IllegalStateException");
+        } catch (IllegalStateException exception) {
+            assertEquals("Cannot undo an action outside of a game phase or within an empty phase",
+                    exception.getMessage());
+        }
+    }
+
+    @Test
+    public void undoLastAction_shouldThrowWhenCurrentPhaseIsEmpty() throws Exception {
+        GameHistory history = createGameHistory();
+        BanishmentPhase phase = new BanishmentPhase(TeamColor.Black);
+        phase.start();
+        history.getEntries().add(phase);
+
+        GameHandler gameHandler = new GameHandler(history, new TestGameFlowListener(history));
+
+        try {
+            invokeUndoLastAction(gameHandler);
+            fail("Expected IllegalStateException");
+        } catch (IllegalStateException exception) {
+            assertEquals("Cannot undo an action outside of a game phase or within an empty phase",
+                    exception.getMessage());
+        }
+    }
+
+    @Test
+    public void doAction_thenUndoLastAction_shouldRestorePreviousGameState() throws Exception {
+        GameHistory history = createGameHistory(
+                GameMode.Strategist,
+                createPlayers(),
+                Collections.singletonList(CharacterCard.HermitAndCub)
+        );
+        BanishmentPhase phase = new BanishmentPhase(TeamColor.Black);
+        phase.start();
+        history.getEntries().add(phase);
+
+        GameHandler gameHandler = new GameHandler(history, new TestGameFlowListener(history));
+
+        int initialRecruitableCardsCount = gameHandler.getCurrentGame().getRecruitableCards().size();
+        List<CharacterCard> initialBanishedCards =
+                new ArrayList<>(gameHandler.getCurrentGame().getBanishedCards(TeamColor.Black));
+
+        BanishmentAction action = new BanishmentAction(CharacterCard.HermitAndCub, TeamColor.Black);
+
+        invokeDoAction(gameHandler, new GamePhase(GamePhaseType.Banishment,
+                history.getConfig().getPlayers().get(0)), action);
+
+        assertEquals(initialRecruitableCardsCount - 1,
+                gameHandler.getCurrentGame().getRecruitableCards().size());
+        assertEquals(initialBanishedCards.size() + 1,
+                gameHandler.getCurrentGame().getBanishedCards(TeamColor.Black).size());
+        assertEquals(1, phase.getActions().size());
+
+        invokeUndoLastAction(gameHandler);
+
+        assertEquals(initialRecruitableCardsCount,
+                gameHandler.getCurrentGame().getRecruitableCards().size());
+        assertEquals(initialBanishedCards.size(),
+                gameHandler.getCurrentGame().getBanishedCards(TeamColor.Black).size());
+        assertTrue(gameHandler.getCurrentGame().getBanishedCards(TeamColor.Black).containsAll(initialBanishedCards));
+        assertTrue(phase.getActions().isEmpty());
+    }
+
     @SuppressWarnings("unchecked")
     private CompletableFuture<Void> invokeStartNextPhase(GameHandler gameHandler) throws Exception {
         Method method = GameHandler.class.getDeclaredMethod("startNextPhaseAsync");
@@ -482,6 +577,21 @@ public class GameHandlerTest {
 
         try {
             method.invoke(gameHandler, currentPhase, action);
+        } catch (InvocationTargetException exception) {
+            Throwable cause = exception.getCause();
+            if (cause instanceof Exception) {
+                throw (Exception) cause;
+            }
+            throw exception;
+        }
+    }
+
+    private void invokeUndoLastAction(GameHandler gameHandler) throws Exception {
+        Method method = GameHandler.class.getDeclaredMethod("undoLastAction");
+        method.setAccessible(true);
+
+        try {
+            method.invoke(gameHandler);
         } catch (InvocationTargetException exception) {
             Throwable cause = exception.getCause();
             if (cause instanceof Exception) {

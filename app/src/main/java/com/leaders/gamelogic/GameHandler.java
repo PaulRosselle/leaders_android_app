@@ -272,6 +272,25 @@ public final class GameHandler {
     }
 
     /**
+     * Undoes the last action of the current phase.
+     *
+     * @throws IllegalStateException if no current phase exists or the current phase has no actions
+     */
+    private void undoLastAction() {
+        IPhase currentPhase = GameHistoryQuery.findCurrentPhase(currentHistory);
+        if (currentPhase == null || currentPhase.getActions().isEmpty()) {
+            throw new IllegalStateException("Cannot undo an action outside of a game phase or within an empty phase");
+        }
+
+        List<IGameAction> actions = currentPhase.getActions();
+        IGameAction lastAction = actions.get(actions.size() - 1);
+        actions.remove(actions.size() - 1);
+
+        GameActionHandler actionHandler = GameActionHandlerFactory.create(currentGame, lastAction);
+        actionHandler.undoAction();
+    }
+
+    /**
      * Checks whether the current game has ended.
      *
      * @param currentPhase current game phase
