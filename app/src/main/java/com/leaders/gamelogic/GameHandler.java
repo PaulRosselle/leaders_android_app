@@ -255,8 +255,67 @@ public final class GameHandler {
         return CompletableFuture.completedFuture(null);
     }
 
+    /**
+     * Runs the actions phase until the player chooses to end it.
+     *
+     * @param currentPhase current actions phase
+     * @return a future completed when the actions phase should end
+     */
     private CompletableFuture<Void> runActionsPhaseAsync(@NonNull GamePhase currentPhase) {
-        return CompletableFuture.completedFuture(null);
+        return runSelectPlayableCharacterAsync(currentPhase).thenCompose(result -> {
+            CompletableFuture<Void> iterationExecution;
+            boolean continuePhase = true;
+
+            switch (result.getResultType()) {
+                case PlayableCharacterChosen:
+                    // Each character action resolution creates its own builder,
+                    // so every iteration starts with a fresh action state.
+                    iterationExecution = runPlayCharacterAsync(currentPhase, getPlayableCharacterFromResult(result));
+                    break;
+                case UndoLastAction:
+                    undoLastAction();
+                    iterationExecution = CompletableFuture.completedFuture(null);
+                    break;
+                case EndPhase:
+                    iterationExecution = CompletableFuture.completedFuture(null);
+                    continuePhase = false;
+                    break;
+                default:
+                    throw new IllegalStateException(
+                            "Invalid interaction result : illegal type \"" +
+                                    result.getResultType() + "\" for actions phase"
+                    );
+            }
+
+            if (continuePhase) {
+                iterationExecution = iterationExecution.thenCompose(
+                        ignored -> runActionsPhaseAsync(currentPhase)
+                );
+            }
+
+            return iterationExecution;
+        });
+    }
+
+    /**
+     * Returns the playable character selected by the interaction result.
+     *
+     * @param result the interaction result containing the selected playable character
+     * @return the selected playable character
+     * @throws IllegalStateException if the interaction result does not contain a valid playable character
+     */
+    @NonNull
+    private static PlayableCharacter getPlayableCharacterFromResult(@NonNull InteractionResult result) {
+        InteractionTarget chosenTarget = result.getChosenTarget();
+        PlayableCharacter playableCharacter = chosenTarget == null ?
+                null : chosenTarget.getChosenCharacterPlayableState();
+
+        if (chosenTarget == null ||
+                chosenTarget.getCategory() != TargetCategory.PlayableCharacter ||
+                playableCharacter == null) {
+            throw new IllegalStateException("Invalid interaction result : playable character missing");
+        }
+        return playableCharacter;
     }
 
     /**
