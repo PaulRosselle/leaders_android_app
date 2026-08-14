@@ -10,6 +10,7 @@ import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.PlayableCharacter;
 import com.leaders.gamelogic.entities.Player;
+import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.GamePhaseType;
 import com.leaders.gamelogic.enums.TeamColor;
@@ -36,6 +37,7 @@ import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.GameHistoryQuery;
 import com.leaders.gamelogic.queries.PhaseTransitionQuery;
 import com.leaders.gamelogic.queries.PlayabilityQuery;
+import com.leaders.gamelogic.queries.RecruitmentQuery;
 import com.leaders.gamelogic.resolvers.CharacterActionResolver;
 
 import java.util.ArrayList;
@@ -464,7 +466,66 @@ public final class GameHandler {
     }
 
     private CompletableFuture<Void> runRecruitmentPhaseAsync(@NonNull GamePhase currentPhase) {
+        // Future coordination of the complete recruitment phase.
         return CompletableFuture.completedFuture(null);
+    }
+
+    /**
+     * Requests the player to select a card that can currently be recruited.
+     *
+     * @return the selected character card
+     */
+    private CompletableFuture<CharacterCard> runSelectRecruitmentCardAsync() {
+        List<CharacterCard> recruitableCards = RecruitmentQuery.getRecruitableCards(currentGame, currentHistory);
+
+        List<InteractionTarget> legalTargets = new ArrayList<>();
+        for (CharacterCard recruitableCard : recruitableCards) {
+            legalTargets.add(new InteractionTarget(TargetCategory.RecruitmentCard, recruitableCard));
+        }
+
+        InteractionRequest request = new InteractionRequest(
+                InteractionType.CharacterCardExpected,
+                new InteractionContext(),
+                legalTargets,
+                List.of(InteractionResultType.CardChosen)
+        );
+
+        // Request an input to select the recruited card
+        return gameFlowListener.onInputRequired(request).thenApply(result -> {
+            if (result.getResultType() != InteractionResultType.CardChosen) {
+                throw new IllegalStateException(
+                        "Invalid interaction result : illegal type \"" +
+                                result.getResultType() +
+                                "\" for recruitment card selection"
+                );
+            }
+
+            return getCharacterCardFromResult(result);
+        });
+    }
+
+    /**
+     * Retrieves the character card selected by the given interaction result.
+     *
+     * @param result the interaction result containing the selected recruitment target
+     * @return the selected character card
+     * @throws IllegalStateException if the interaction result does not contain a
+     *                               valid recruitment target or if the selected
+     *                               character card is missing
+     */
+    @NonNull
+    private static CharacterCard getCharacterCardFromResult(@NonNull InteractionResult result) {
+        InteractionTarget chosenTarget = result.getChosenTarget();
+        CharacterCard chosenCard = chosenTarget == null ? null : chosenTarget.getChosenCard();
+
+        if (chosenTarget == null ||
+                chosenTarget.getCategory() != TargetCategory.RecruitmentCard ||
+                chosenCard == null) {
+            throw new IllegalStateException(
+                    "Invalid interaction result : chosen card missing for recruitment"
+            );
+        }
+        return chosenCard;
     }
 
     private CompletableFuture<Void> runTurnEndPhaseAsync(@NonNull GamePhase currentPhase) {
