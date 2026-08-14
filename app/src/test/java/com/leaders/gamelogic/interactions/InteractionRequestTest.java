@@ -56,7 +56,7 @@ public class InteractionRequestTest {
                         false
                 ))
         );
-        legalResults.add(InteractionResultType.CharacterChosen);
+        legalResults.add(InteractionResultType.PlayableCharacterChosen);
 
         assertTrue(request.getLegalTargets().isEmpty());
         assertTrue(request.getLegalResults().isEmpty());
