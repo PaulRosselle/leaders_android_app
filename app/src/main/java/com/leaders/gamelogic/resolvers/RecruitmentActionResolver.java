@@ -219,7 +219,7 @@ public final class RecruitmentActionResolver {
         return validPositions;
     }
 
-    @NonNull
+    @Nullable
     private InteractionFeedback buildCancellationFeedback(@NonNull RecruitmentActionBuilder builder) {
         List<RecruitmentActionMotion> cancellationMotions = new ArrayList<>();
         // We go through every feedback motion in reverse order and add them as remove motions
@@ -230,6 +230,9 @@ public final class RecruitmentActionResolver {
                         feedback.getRecruitmentActionMotions().get(j)
                 ));
             }
+        }
+        if (cancellationMotions.isEmpty()) {
+            return null;
         }
         return InteractionFeedback.createForRecruitmentAction(cancellationMotions);
     }

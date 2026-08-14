@@ -1052,7 +1052,7 @@ public class GameHandlerTest {
 
     @Test
     public void runSelectRecruitmentCardAsync_shouldRequestRecruitableCards() throws Exception {
-        GameHistory history = createRecruitmentGameHistory();
+        GameHistory history = createSelectRecruitmentCardGameHistory();
         TestGameFlowListener listener = new TestGameFlowListener(history);
 
         CharacterCard expectedCard = CharacterCard.Archer;
@@ -1091,7 +1091,7 @@ public class GameHandlerTest {
     @Test
     public void runSelectRecruitmentCardAsync_shouldRejectIllegalInteractionResult()
             throws Exception {
-        GameHistory history = createRecruitmentGameHistory();
+        GameHistory history = createSelectRecruitmentCardGameHistory();
         TestGameFlowListener listener = new TestGameFlowListener(history);
 
         listener.inputRequiredResults.add(new InteractionResult(
@@ -1120,7 +1120,7 @@ public class GameHandlerTest {
     @Test
     public void runSelectRecruitmentCardAsync_shouldRejectMissingSelectedCard()
             throws Exception {
-        GameHistory history = createRecruitmentGameHistory();
+        GameHistory history = createSelectRecruitmentCardGameHistory();
         TestGameFlowListener listener = new TestGameFlowListener(history);
 
         listener.inputRequiredResults.add(new InteractionResult(
@@ -1149,7 +1149,7 @@ public class GameHandlerTest {
     @Test
     public void runSelectRecruitmentCardAsync_shouldRejectWrongTargetCategory()
             throws Exception {
-        GameHistory history = createRecruitmentGameHistory();
+        GameHistory history = createSelectRecruitmentCardGameHistory();
         TestGameFlowListener listener = new TestGameFlowListener(history);
 
         listener.inputRequiredResults.add(new InteractionResult(
@@ -1176,6 +1176,176 @@ public class GameHandlerTest {
                     exception.getCause().getMessage()
             );
         }
+    }
+
+    @Test
+    public void runRecruitCardAsync_shouldApplyCompletedRecruitment() {
+        GameHistory history = createRecruitCardGameHistory();
+        TestGameFlowListener listener = new TestGameFlowListener(history);
+
+        Position recruitmentPosition = new Position(3, 2);
+        Character archer = Character.create(CharacterType.Archer, TeamColor.Black);
+        listener.inputRequiredResults.add(new InteractionResult(
+                InteractionResultType.PositionChosen,
+                new InteractionContext(archer),
+                new InteractionTarget(
+                        TargetCategory.RecruitmentDestination,
+                        recruitmentPosition
+                )
+        ));
+
+        GameHandler gameHandler = new GameHandler(history, listener);
+        GamePhase currentPhase = new GamePhase(
+                GamePhaseType.Recruitment,
+                history.getConfig().getPlayers().get(0)
+        );
+
+        invokeRunRecruitCardAsync(gameHandler, currentPhase, CharacterCard.Archer).join();
+
+        RecruitmentPhase recruitmentPhase = (RecruitmentPhase)
+                ((Turn) history.getEntries().get(0)).getSubPhase(GamePhaseType.Recruitment);
+
+        assertEquals(1, listener.getInputRequiredCount());
+        assertEquals(1, recruitmentPhase.getActions().size());
+        assertTrue(recruitmentPhase.getActions().get(0) instanceof RecruitmentAction);
+
+        RecruitmentAction action = (RecruitmentAction) recruitmentPhase.getActions().get(0);
+        assertEquals(1, action.getMotions().size());
+        assertEquals(CharacterType.Archer,
+                action.getMotions().get(0).getCharacter().getCharacterType());
+        assertEquals(recruitmentPosition,
+                action.getMotions().get(0).getPosition());
+
+        assertEquals(CharacterType.Archer,
+                gameHandler.getCurrentGame().getBoard()
+                        .getCell(recruitmentPosition)
+                        .getCharacter()
+                        .getCharacterType());
+    }
+
+    @Test
+    public void runRecruitCardAsync_shouldCancelRecruitmentWithoutApplyingAction() {
+        GameHistory history = createRecruitCardGameHistory();
+        TestGameFlowListener listener = new TestGameFlowListener(history);
+
+        listener.inputRequiredResults.add(new InteractionResult(
+                InteractionResultType.CancelAction,
+                new InteractionContext(),
+                null
+        ));
+
+        GameHandler gameHandler = new GameHandler(history, listener);
+        GamePhase currentPhase = new GamePhase(
+                GamePhaseType.Recruitment,
+                history.getConfig().getPlayers().get(0)
+        );
+
+        invokeRunRecruitCardAsync(gameHandler, currentPhase, CharacterCard.Archer).join();
+
+        RecruitmentPhase recruitmentPhase = (RecruitmentPhase)
+                ((Turn) history.getEntries().get(0)).getSubPhase(GamePhaseType.Recruitment);
+
+        assertEquals(1, listener.getInputRequiredCount());
+        assertTrue(recruitmentPhase.getActions().isEmpty());
+        assertEquals(0, listener.getFeedbackCount());
+    }
+
+    @Test
+    public void runRecruitCardAsync_shouldHandlePartialRecruitmentCancellation() {
+        GameHistory history = createRecruitCardGameHistory();
+        TestGameFlowListener listener = new TestGameFlowListener(history);
+
+        Character hermit = Character.create(CharacterType.Hermit, TeamColor.Black);
+        Position firstRecruitmentPosition = new Position(3, 2);
+
+        listener.inputRequiredResults.add(new InteractionResult(
+                InteractionResultType.PositionChosen,
+                new InteractionContext(hermit),
+                new InteractionTarget(
+                        TargetCategory.RecruitmentDestination,
+                        firstRecruitmentPosition
+                )
+        ));
+
+        listener.inputRequiredResults.add(new InteractionResult(
+                InteractionResultType.CancelAction,
+                new InteractionContext(),
+                null
+        ));
+
+        GameHandler gameHandler = new GameHandler(history, listener);
+        GamePhase currentPhase = new GamePhase(
+                GamePhaseType.Recruitment,
+                history.getConfig().getPlayers().get(0)
+        );
+
+        invokeRunRecruitCardAsync(
+                gameHandler,
+                currentPhase,
+                CharacterCard.HermitAndCub
+        ).join();
+
+        RecruitmentPhase recruitmentPhase = (RecruitmentPhase)
+                ((Turn) history.getEntries().get(0)).getSubPhase(GamePhaseType.Recruitment);
+
+        assertEquals(2, listener.getInputRequiredCount());
+        assertEquals(2, listener.getFeedbackCount());
+        assertNotNull(listener.getLastFeedback());
+        assertTrue(recruitmentPhase.getActions().isEmpty());
+    }
+
+    @Test
+    public void runRecruitCardAsync_shouldRecruitTwoCharactersForHermitAndCub() {
+        GameHistory history = createRecruitCardGameHistory();
+        TestGameFlowListener listener = new TestGameFlowListener(history);
+
+        Character hermit = Character.create(CharacterType.Hermit, TeamColor.Black);
+        Position firstRecruitmentPosition = new Position(3, 2);
+        Character cub = Character.create(CharacterType.Cub, TeamColor.Black);
+        Position secondRecruitmentPosition = new Position(4, 2);
+
+        listener.inputRequiredResults.add(new InteractionResult(
+                InteractionResultType.PositionChosen,
+                new InteractionContext(hermit),
+                new InteractionTarget(
+                        TargetCategory.RecruitmentDestination,
+                        firstRecruitmentPosition
+                )
+        ));
+
+        listener.inputRequiredResults.add(new InteractionResult(
+                InteractionResultType.PositionChosen,
+                new InteractionContext(cub),
+                new InteractionTarget(
+                        TargetCategory.RecruitmentDestination,
+                        secondRecruitmentPosition
+                )
+        ));
+
+        GameHandler gameHandler = new GameHandler(history, listener);
+        GamePhase currentPhase = new GamePhase(
+                GamePhaseType.Recruitment,
+                history.getConfig().getPlayers().get(0)
+        );
+
+        invokeRunRecruitCardAsync(
+                gameHandler,
+                currentPhase,
+                CharacterCard.HermitAndCub
+        ).join();
+
+        RecruitmentPhase recruitmentPhase = (RecruitmentPhase)
+                ((Turn) history.getEntries().get(0)).getSubPhase(GamePhaseType.Recruitment);
+
+        assertEquals(2, listener.getInputRequiredCount());
+        assertEquals(1, recruitmentPhase.getActions().size());
+
+        RecruitmentAction action =
+                (RecruitmentAction) recruitmentPhase.getActions().get(0);
+
+        assertEquals(2, action.getMotions().size());
+        assertEquals(firstRecruitmentPosition, action.getMotions().get(0).getPosition());
+        assertEquals(secondRecruitmentPosition, action.getMotions().get(1).getPosition());
     }
 
     @SuppressWarnings("unchecked")
@@ -1349,6 +1519,34 @@ public class GameHandlerTest {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    private CompletableFuture<Void> invokeRunRecruitCardAsync(GameHandler gameHandler,
+                                                              GamePhase currentPhase,
+                                                              CharacterCard recruitedCard) {
+        try {
+            Method method = GameHandler.class.getDeclaredMethod(
+                    "runRecruitCardAsync",
+                    GamePhase.class,
+                    CharacterCard.class
+            );
+            method.setAccessible(true);
+
+            return (CompletableFuture<Void>) method.invoke(
+                    gameHandler,
+                    currentPhase,
+                    recruitedCard
+            );
+        } catch (InvocationTargetException exception) {
+            Throwable cause = exception.getCause();
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            }
+            throw new RuntimeException(cause);
+        } catch (ReflectiveOperationException exception) {
+            throw new RuntimeException(exception);
+        }
+    }
+
     private GameHistory createGameHistory() {
         return createGameHistory(GameMode.Discovery, createPlayers());
     }
@@ -1409,12 +1607,43 @@ public class GameHandlerTest {
         return history;
     }
 
-    private GameHistory createRecruitmentGameHistory() {
+    private GameHistory createSelectRecruitmentCardGameHistory() {
         GameHistory history = createGameHistory(
                 GameMode.Discovery,
                 createPlayers(),
                 Arrays.asList(CharacterCard.Archer, CharacterCard.Bruiser)
         );
+
+        Turn turn = new Turn(TeamColor.Black);
+        history.getEntries().add(turn);
+        turn.getSubPhase(GamePhaseType.TurnStart).start();
+        turn.getSubPhase(GamePhaseType.TurnStart).end();
+        turn.getSubPhase(GamePhaseType.Actions).start();
+        turn.getSubPhase(GamePhaseType.Actions).end();
+        turn.getSubPhase(GamePhaseType.Recruitment).start();
+
+        return history;
+    }
+
+
+    private GameHistory createRecruitCardGameHistory() {
+        List<Player> players = createPlayers();
+
+        Character leader = Character.create(CharacterType.LeaderKing, TeamColor.Black);
+
+        RecruitmentAction initialPlacement = new RecruitmentAction(Collections.singletonList(
+                new RecruitmentActionMotion(RecruitmentMotionType.Add, leader, new Position(3, 0))
+        ));
+
+        GameConfig config = new GameConfig(
+                players,
+                players.get(0),
+                GameMode.Discovery,
+                Arrays.asList(CharacterCard.Acrobat, CharacterCard.Archer),
+                Collections.singletonList(initialPlacement)
+        );
+
+        GameHistory history = new GameHistory(config, new ArrayList<>());
 
         Turn turn = new Turn(TeamColor.Black);
         history.getEntries().add(turn);

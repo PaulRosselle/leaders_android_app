@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 
 import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.actions.IGameAction;
+import com.leaders.gamelogic.actions.RecruitmentAction;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
@@ -33,12 +34,14 @@ import com.leaders.gamelogic.interactions.InteractionResult;
 import com.leaders.gamelogic.interactions.InteractionResultType;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.interactions.InteractionType;
+import com.leaders.gamelogic.interactions.RecruitmentActionBuilder;
 import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.GameHistoryQuery;
 import com.leaders.gamelogic.queries.PhaseTransitionQuery;
 import com.leaders.gamelogic.queries.PlayabilityQuery;
 import com.leaders.gamelogic.queries.RecruitmentQuery;
 import com.leaders.gamelogic.resolvers.CharacterActionResolver;
+import com.leaders.gamelogic.resolvers.RecruitmentActionResolver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -430,6 +433,11 @@ public final class GameHandler {
     private CompletableFuture<Void> resolveCharacterActionAsync(@NonNull GamePhase currentPhase,
                                                                 @NonNull CharacterActionBuilder builder,
                                                                 @NonNull CharacterActionResolver resolver) {
+        // Cancellation stops the resolution before the action is applied to the game.
+        if (builder.isBuildCancelled()) {
+            return CompletableFuture.completedFuture(null);
+        }
+
         InteractionRequest request = resolver.getNextInteraction(builder);
 
         // No further input is required, so the resolver can build and execute the action.
@@ -441,10 +449,6 @@ public final class GameHandler {
 
         // Request the next input required to continue resolving the action.
         return gameFlowListener.onInputRequired(request).thenCompose(result -> {
-            // Cancellation stops the resolution before the action is applied to the game.
-            if (result.getResultType() == InteractionResultType.CancelAction) {
-                return CompletableFuture.completedFuture(null);
-            }
             builder.addResult(result);
 
             // A feedback may be generated from the newly received input.
@@ -526,6 +530,74 @@ public final class GameHandler {
             );
         }
         return chosenCard;
+    }
+
+    /**
+     * Resolves the recruitment of the selected character card.
+     *
+     * @param currentPhase current game phase
+     * @param recruitedCard card selected for recruitment
+     * @return a future completed when the recruitment has been resolved
+     */
+    @NonNull
+    private CompletableFuture<Void> runRecruitCardAsync(@NonNull GamePhase currentPhase,
+                                                        @NonNull CharacterCard recruitedCard) {
+        TeamColor recruitmentColor = currentPhase.getPhasePlayer().getTeamColor();
+        RecruitmentActionBuilder builder = new RecruitmentActionBuilder(
+                recruitedCard,
+                recruitmentColor,
+                new ArrayList<>(),
+                new ArrayList<>()
+        );
+
+        RecruitmentActionResolver resolver = new RecruitmentActionResolver(currentGame, recruitedCard, recruitmentColor);
+
+        return resolveRecruitmentActionAsync(currentPhase, builder, resolver);
+    }
+
+    /**
+     * Resolves a recruitment action by requesting the required player inputs until the recruitment
+     * is complete or canceled.
+     *
+     * @param currentPhase current game phase
+     * @param builder builder containing the current recruitment state
+     * @param resolver resolver providing the next interaction and resulting action
+     * @return a future completed when the recruitment has been resolved
+     */
+    @NonNull
+    private CompletableFuture<Void> resolveRecruitmentActionAsync(@NonNull GamePhase currentPhase,
+                                                                  @NonNull RecruitmentActionBuilder builder,
+                                                                  @NonNull RecruitmentActionResolver resolver) {
+        // Cancellation stops the resolution before the action is applied to the game.
+        if (builder.isBuildCancelled()) {
+            return CompletableFuture.completedFuture(null);
+        }
+
+        InteractionRequest request = resolver.getNextInteraction(builder);
+
+        // No further input is required, so the resolver can build and execute the action.
+        if (request == null) {
+            RecruitmentAction action = resolver.buildAction(builder);
+            doAction(currentPhase, action);
+            return CompletableFuture.completedFuture(null);
+        }
+
+        return gameFlowListener.onInputRequired(request).thenCompose(result -> {
+            builder.addResult(result);
+
+            InteractionFeedback feedback = resolver.getNextFeedback(builder);
+            if (feedback == null) {
+                return resolveRecruitmentActionAsync(currentPhase, builder, resolver);
+            }
+
+            builder.addFeedback(feedback);
+            return gameFlowListener.onFeedback(feedback)
+                    .thenCompose(ignored -> resolveRecruitmentActionAsync(
+                            currentPhase,
+                            builder,
+                            resolver
+                    ));
+        });
     }
 
     private CompletableFuture<Void> runTurnEndPhaseAsync(@NonNull GamePhase currentPhase) {

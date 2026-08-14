@@ -35,4 +35,18 @@ public abstract class GameActionBuilder {
     public void addFeedback(@NonNull InteractionFeedback feedback) {
         interactionFeedbacks.add(feedback);
     }
+
+    /**
+     * Returns whether the action build has been canceled.
+     *
+     * @return {@code true} if the action build has been canceled, {@code false} otherwise
+     */
+    public boolean isBuildCancelled() {
+        for (InteractionResult result : interactionResults) {
+            if (result.getResultType() == InteractionResultType.CancelAction) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
