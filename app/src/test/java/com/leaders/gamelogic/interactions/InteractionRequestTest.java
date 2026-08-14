@@ -41,7 +41,7 @@ public class InteractionRequestTest {
         List<InteractionTarget> legalTargets = new ArrayList<>();
         List<InteractionResultType> legalResults = new ArrayList<>();
         Character contextCharacter = Character.create(CharacterType.LeaderQueen, TeamColor.Black);
-        InteractionRequest request = new InteractionRequest(InteractionType.CharacterExpected,
+        InteractionRequest request = new InteractionRequest(InteractionType.CharacterPlayableStateExpected,
                 new InteractionContext(contextCharacter),
                 legalTargets, legalResults
         );
