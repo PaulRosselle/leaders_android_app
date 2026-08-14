@@ -1037,7 +1037,7 @@ public class GameHandlerTest {
         characters.add(archer);
 
         RecruitmentAction initialPlacement = new RecruitmentAction(Arrays.asList(
-                new RecruitmentActionMotion(RecruitmentMotionType.Add, leader, new Position(0, 0)),
+                new RecruitmentActionMotion(RecruitmentMotionType.Add, leader, new Position(3, 0)),
                 new RecruitmentActionMotion(RecruitmentMotionType.Add, acrobat, new Position(3, 3)),
                 new RecruitmentActionMotion(RecruitmentMotionType.Add, archer, new Position(3, 4))
         ));
@@ -1046,7 +1046,7 @@ public class GameHandlerTest {
                 players,
                 players.get(0),
                 GameMode.Discovery,
-                Arrays.asList(CharacterCard.Acrobat, CharacterCard.Archer),
+                Arrays.asList(CharacterCard.Bruiser, CharacterCard.HermitAndCub),
                 Collections.singletonList(initialPlacement)
         );
 
