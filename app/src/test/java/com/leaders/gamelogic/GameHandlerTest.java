@@ -1050,6 +1050,134 @@ public class GameHandlerTest {
         assertEquals(1, listener.getInputRequiredCount());
     }
 
+    @Test
+    public void runSelectRecruitmentCardAsync_shouldRequestRecruitableCards() throws Exception {
+        GameHistory history = createRecruitmentGameHistory();
+        TestGameFlowListener listener = new TestGameFlowListener(history);
+
+        CharacterCard expectedCard = CharacterCard.Archer;
+        listener.inputRequiredResults.add(new InteractionResult(
+                InteractionResultType.CardChosen,
+                new InteractionContext(),
+                new InteractionTarget(TargetCategory.RecruitmentCard, expectedCard)
+        ));
+
+        GameHandler gameHandler = new GameHandler(history, listener);
+
+        CharacterCard result =
+                invokeRunSelectRecruitmentCardAsync(gameHandler).join();
+
+        assertSame(expectedCard, result);
+        assertEquals(1, listener.getInputRequiredCount());
+
+        InteractionRequest request = listener.getLastInputRequired();
+
+        assertNotNull(request);
+        assertEquals(InteractionType.CharacterCardExpected, request.getRequestType());
+        assertEquals(
+                Collections.singletonList(InteractionResultType.CardChosen),
+                request.getLegalResults()
+        );
+
+        assertEquals(2, request.getLegalTargets().size());
+        assertTrue(request.getLegalTargets().stream()
+                .allMatch(target -> target.getCategory() == TargetCategory.RecruitmentCard));
+        assertTrue(request.getLegalTargets().stream()
+                .anyMatch(target -> target.getChosenCard() == CharacterCard.Archer));
+        assertTrue(request.getLegalTargets().stream()
+                .anyMatch(target -> target.getChosenCard() == CharacterCard.Bruiser));
+    }
+
+    @Test
+    public void runSelectRecruitmentCardAsync_shouldRejectIllegalInteractionResult()
+            throws Exception {
+        GameHistory history = createRecruitmentGameHistory();
+        TestGameFlowListener listener = new TestGameFlowListener(history);
+
+        listener.inputRequiredResults.add(new InteractionResult(
+                InteractionResultType.CancelAction,
+                new InteractionContext(),
+                null
+        ));
+
+        GameHandler gameHandler = new GameHandler(history, listener);
+
+        CompletableFuture<CharacterCard> result =
+                invokeRunSelectRecruitmentCardAsync(gameHandler);
+
+        try {
+            result.join();
+            fail("Expected IllegalStateException");
+        } catch (java.util.concurrent.CompletionException exception) {
+            assertTrue(exception.getCause() instanceof IllegalStateException);
+            assertEquals(
+                    "Invalid interaction result : illegal type \"CancelAction\" for recruitment card selection",
+                    exception.getCause().getMessage()
+            );
+        }
+    }
+
+    @Test
+    public void runSelectRecruitmentCardAsync_shouldRejectMissingSelectedCard()
+            throws Exception {
+        GameHistory history = createRecruitmentGameHistory();
+        TestGameFlowListener listener = new TestGameFlowListener(history);
+
+        listener.inputRequiredResults.add(new InteractionResult(
+                InteractionResultType.CardChosen,
+                new InteractionContext(),
+                null
+        ));
+
+        GameHandler gameHandler = new GameHandler(history, listener);
+
+        CompletableFuture<CharacterCard> result =
+                invokeRunSelectRecruitmentCardAsync(gameHandler);
+
+        try {
+            result.join();
+            fail("Expected IllegalStateException");
+        } catch (java.util.concurrent.CompletionException exception) {
+            assertTrue(exception.getCause() instanceof IllegalStateException);
+            assertEquals(
+                    "Invalid interaction result : chosen card missing for recruitment",
+                    exception.getCause().getMessage()
+            );
+        }
+    }
+
+    @Test
+    public void runSelectRecruitmentCardAsync_shouldRejectWrongTargetCategory()
+            throws Exception {
+        GameHistory history = createRecruitmentGameHistory();
+        TestGameFlowListener listener = new TestGameFlowListener(history);
+
+        listener.inputRequiredResults.add(new InteractionResult(
+                InteractionResultType.CardChosen,
+                new InteractionContext(),
+                new InteractionTarget(
+                        TargetCategory.RecruitmentDestination,
+                        CharacterCard.Archer
+                )
+        ));
+
+        GameHandler gameHandler = new GameHandler(history, listener);
+
+        CompletableFuture<CharacterCard> result =
+                invokeRunSelectRecruitmentCardAsync(gameHandler);
+
+        try {
+            result.join();
+            fail("Expected IllegalStateException");
+        } catch (java.util.concurrent.CompletionException exception) {
+            assertTrue(exception.getCause() instanceof IllegalStateException);
+            assertEquals(
+                    "Invalid interaction result : chosen card missing for recruitment",
+                    exception.getCause().getMessage()
+            );
+        }
+    }
+
     @SuppressWarnings("unchecked")
     private CompletableFuture<Void> invokeStartNextPhase(GameHandler gameHandler) throws Exception {
         Method method = GameHandler.class.getDeclaredMethod("startNextPhaseAsync");
@@ -1199,6 +1327,28 @@ public class GameHandlerTest {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    private CompletableFuture<CharacterCard> invokeRunSelectRecruitmentCardAsync(
+            GameHandler gameHandler) throws Exception {
+        Method method = GameHandler.class.getDeclaredMethod(
+                "runSelectRecruitmentCardAsync"
+        );
+        method.setAccessible(true);
+
+        try {
+            CompletableFuture<CharacterCard> result =
+                    (CompletableFuture<CharacterCard>) method.invoke(gameHandler);
+            assertNotNull(result);
+            return result;
+        } catch (InvocationTargetException exception) {
+            Throwable cause = exception.getCause();
+            if (cause instanceof Exception) {
+                throw (Exception) cause;
+            }
+            throw exception;
+        }
+    }
+
     private GameHistory createGameHistory() {
         return createGameHistory(GameMode.Discovery, createPlayers());
     }
@@ -1255,6 +1405,24 @@ public class GameHandlerTest {
         turn.getSubPhase(GamePhaseType.TurnStart).start();
         turn.getSubPhase(GamePhaseType.TurnStart).end();
         turn.getSubPhase(GamePhaseType.Actions).start();
+
+        return history;
+    }
+
+    private GameHistory createRecruitmentGameHistory() {
+        GameHistory history = createGameHistory(
+                GameMode.Discovery,
+                createPlayers(),
+                Arrays.asList(CharacterCard.Archer, CharacterCard.Bruiser)
+        );
+
+        Turn turn = new Turn(TeamColor.Black);
+        history.getEntries().add(turn);
+        turn.getSubPhase(GamePhaseType.TurnStart).start();
+        turn.getSubPhase(GamePhaseType.TurnStart).end();
+        turn.getSubPhase(GamePhaseType.Actions).start();
+        turn.getSubPhase(GamePhaseType.Actions).end();
+        turn.getSubPhase(GamePhaseType.Recruitment).start();
 
         return history;
     }
