@@ -3,7 +3,7 @@ package com.leaders.gamelogic.queries;
 import androidx.annotation.NonNull;
 
 import com.leaders.gamelogic.entities.Cell;
-import com.leaders.gamelogic.entities.CharacterPlayableState;
+import com.leaders.gamelogic.entities.PlayableCharacter;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.historyentries.IPhase;
@@ -27,14 +27,14 @@ public final class PlayabilityQuery {
      * @return the playable state of the character
      */
     @NonNull
-    private static CharacterPlayableState getState(@NonNull Game game, @NonNull Cell characterCell, boolean mandatory) {
-        return new CharacterPlayableState(
+    private static PlayableCharacter getState(@NonNull Game game, @NonNull Cell characterCell, boolean mandatory) {
+        return new PlayableCharacter(
                 characterCell.getCharacter(), characterCell.getPosition(), mandatory,
                 CharacterAbilityQuery.canUseActiveAbility(game, characterCell.getCharacter()));
     }
 
     /**
-     * Returns the playable states of all characters for the current action phase.
+     * Returns the playable characters for the current action phase.
      *
      * <p>A character can only be playable during a valid {@link ActionsPhase}.
      * If a character has an immediate action requirement, only that character is
@@ -48,15 +48,14 @@ public final class PlayabilityQuery {
      * @throws IllegalStateException if the current phase is not an {@link ActionsPhase}
      */
     @NonNull
-    public static List<CharacterPlayableState> getCharacterPlayableStates(@NonNull Game game,
-                                                                          @NonNull GameHistory gameHistory) {
+    public static List<PlayableCharacter> getPlayableCharacters(@NonNull Game game, @NonNull GameHistory gameHistory) {
         IPhase currentPhase = GameHistoryQuery.findCurrentPhase(gameHistory);
         if (!(currentPhase instanceof ActionsPhase)) {
             throw new IllegalStateException("A character cannot be playable outside of a valid actions phase");
         }
         ActionsPhase actionsPhase = (ActionsPhase) currentPhase;
 
-        List<CharacterPlayableState> characterPlayableStates = new ArrayList<>();
+        List<PlayableCharacter> playableCharacters = new ArrayList<>();
         List<Cell> characterCells = BoardQuery.findCharacterCells(game.getBoard(), null, null);
         for (Cell characterCell : characterCells) {
             // If there is a character forced to play immediately, we return them alone
@@ -65,9 +64,9 @@ public final class PlayabilityQuery {
             }
             // If a character is allowed to act, we add them to the list
             if (CharacterAbilityQuery.canAct(actionsPhase, characterCell.getCharacter())) {
-                characterPlayableStates.add(getState(game, characterCell, CharacterAbilityQuery.mustAct()));
+                playableCharacters.add(getState(game, characterCell, CharacterAbilityQuery.mustAct()));
             }
         }
-        return characterPlayableStates;
+        return playableCharacters;
     }
 }

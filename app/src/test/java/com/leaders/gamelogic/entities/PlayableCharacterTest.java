@@ -9,7 +9,7 @@ import com.leaders.gamelogic.enums.TeamColor;
 
 import org.junit.Test;
 
-public class CharacterPlayableStateTest {
+public class PlayableCharacterTest {
 
     @Test
     public void constructor_shouldStoreCharacter() {
@@ -19,8 +19,8 @@ public class CharacterPlayableStateTest {
         );
         Position position = new Position(3, 3);
 
-        CharacterPlayableState state =
-                new CharacterPlayableState(character, position, true, false);
+        PlayableCharacter state =
+                new PlayableCharacter(character, position, true, false);
 
         assertSame(character, state.getCharacter());
     }
@@ -33,8 +33,8 @@ public class CharacterPlayableStateTest {
         );
         Position position = new Position(3, 3);
 
-        CharacterPlayableState state =
-                new CharacterPlayableState(character, position, true, false);
+        PlayableCharacter state =
+                new PlayableCharacter(character, position, true, false);
 
         assertSame(position, state.getPosition());
     }
@@ -47,8 +47,8 @@ public class CharacterPlayableStateTest {
         );
         Position position = new Position(3, 3);
 
-        CharacterPlayableState state =
-                new CharacterPlayableState(character, position, true, false);
+        PlayableCharacter state =
+                new PlayableCharacter(character, position, true, false);
 
         assertTrue(state.isMandatory());
     }
@@ -61,8 +61,8 @@ public class CharacterPlayableStateTest {
         );
         Position position = new Position(3, 3);
 
-        CharacterPlayableState state =
-                new CharacterPlayableState(character, position, false, true);
+        PlayableCharacter state =
+                new PlayableCharacter(character, position, false, true);
 
         assertTrue(state.canUseActiveAbility());
     }
@@ -75,8 +75,8 @@ public class CharacterPlayableStateTest {
         );
         Position position = new Position(3, 3);
 
-        CharacterPlayableState state =
-                new CharacterPlayableState(character, position, false, false);
+        PlayableCharacter state =
+                new PlayableCharacter(character, position, false, false);
 
         assertFalse(state.isMandatory());
         assertFalse(state.canUseActiveAbility());

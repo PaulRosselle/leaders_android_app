@@ -134,13 +134,9 @@ public class RecruitmentActionResolverTest {
         assertNotNull(request);
         assertNotNull(request.getContext());
 
-        CharacterType expectedType =
-                CharacterType.getCharacterTypesMatchingCard(card).get(1);
-
-        assertEquals(
-                expectedType,
-                request.getContext().getCharacter().getCharacterType()
-        );
+        assertNotNull(request.getContext().getCharacter());
+        CharacterType expectedType = CharacterType.getCharacterTypesMatchingCard(card).get(1);
+        assertEquals(expectedType, request.getContext().getCharacter().getCharacterType());
     }
 
     @Test

@@ -6,6 +6,7 @@ import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
+import com.leaders.gamelogic.entities.PlayableCharacter;
 import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.GamePhaseType;
@@ -18,10 +19,20 @@ import com.leaders.gamelogic.historyentries.Segment;
 import com.leaders.gamelogic.historyentries.segments.BanishmentPhase;
 import com.leaders.gamelogic.historyentries.segments.Turn;
 import com.leaders.gamelogic.historyentries.segments.TurnEndPhase;
+import com.leaders.gamelogic.historyentries.segments.TurnPhase;
 import com.leaders.gamelogic.interactions.IGameFlowListener;
+import com.leaders.gamelogic.interactions.InteractionContext;
+import com.leaders.gamelogic.interactions.InteractionRequest;
+import com.leaders.gamelogic.interactions.InteractionResult;
+import com.leaders.gamelogic.interactions.InteractionResultType;
+import com.leaders.gamelogic.interactions.InteractionTarget;
+import com.leaders.gamelogic.interactions.InteractionType;
+import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.GameHistoryQuery;
 import com.leaders.gamelogic.queries.PhaseTransitionQuery;
+import com.leaders.gamelogic.queries.PlayabilityQuery;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -240,6 +251,74 @@ public final class GameHandler {
 
     private CompletableFuture<Void> runActionsPhaseAsync(@NonNull GamePhase currentPhase) {
         return CompletableFuture.completedFuture(null);
+    }
+
+    /**
+     * Determines the legal results for playable character selection.
+     *
+     * @param currentPhase current actions phase
+     * @param playableCharacters characters currently playable
+     * @return the legal interaction results
+     */
+    private List<InteractionResultType> getPlayableCharacterSelectionLegalResults(@NonNull GamePhase currentPhase,
+                                                                                  @NonNull List<PlayableCharacter> playableCharacters) {
+        List<InteractionResultType> legalResults = new ArrayList<>();
+
+        legalResults.add(InteractionResultType.PlayableCharacterChosen);
+
+        // An action can only be undone when the current turn actions list isn't empty.
+        Turn currentTurn = GameHistoryQuery.findCurrentTurn(currentHistory);
+        if (currentTurn == null) {
+            throw new IllegalStateException("Character selection is only allowed within the actions phase of a turn");
+        }
+        TurnPhase currentTurnPhase = currentTurn.getSubPhase(currentPhase.getPhaseType());
+        if (!currentTurnPhase.getActions().isEmpty()) {
+            legalResults.add(InteractionResultType.UndoLastAction);
+        }
+
+        // The actions phase can only end when no playable character is mandatory.
+        boolean canEndTurn = true;
+        for (PlayableCharacter playableCharacter : playableCharacters) {
+            if (playableCharacter.isMandatory()) {
+                canEndTurn = false;
+                break;
+            }
+        }
+        if (canEndTurn) {
+            legalResults.add(InteractionResultType.EndPhase);
+        }
+
+        return legalResults;
+    }
+
+    /**
+     * Requests the player to select one of the currently playable characters.
+     * Determines the legal interaction results from the current game state.
+     *
+     * @param currentPhase current game phase
+     * @return the interaction result returned by the game flow listener
+     */
+    private CompletableFuture<InteractionResult> runSelectPlayableCharacterAsync(@NonNull GamePhase currentPhase) {
+        List<PlayableCharacter> playableCharacters = PlayabilityQuery.getPlayableCharacters(currentGame, currentHistory);
+
+        List<InteractionTarget> legalTargets = new ArrayList<>();
+        for (PlayableCharacter playableCharacter : playableCharacters) {
+            legalTargets.add(new InteractionTarget(TargetCategory.PlayableCharacter, playableCharacter));
+        }
+
+        List<InteractionResultType> legalResults = getPlayableCharacterSelectionLegalResults(
+                currentPhase,
+                playableCharacters
+        );
+
+        InteractionRequest request = new InteractionRequest(
+                InteractionType.PositionExpected,
+                new InteractionContext(),
+                legalTargets,
+                legalResults
+        );
+
+        return gameFlowListener.onInputRequired(request);
     }
 
     private CompletableFuture<Void> runRecruitmentPhaseAsync(@NonNull GamePhase currentPhase) {

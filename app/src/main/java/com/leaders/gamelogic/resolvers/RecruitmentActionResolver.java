@@ -60,7 +60,7 @@ public final class RecruitmentActionResolver {
      * or to cancel the recruitment.</p>
      *
      * <p>No further interaction is returned once all characters associated with
-     * the card have been processed or the recruitment has been cancelled.</p>
+     * the card have been processed or the recruitment has been canceled.</p>
      *
      * @param builder the builder containing the results and feedbacks already
      *                produced for this recruitment
@@ -131,7 +131,8 @@ public final class RecruitmentActionResolver {
         return InteractionFeedback.createForRecruitmentAction(
                 List.of(new RecruitmentActionMotion(
                         RecruitmentMotionType.Add,
-                        result.getContext().getCharacter(),
+                        Objects.requireNonNull(result.getContext().getCharacter(),
+                                "A character is required for a recruitment result context to be valid"),
                         getRecruitmentPosition(result)
                 ))
         );
