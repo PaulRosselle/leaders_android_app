@@ -192,8 +192,11 @@ public final class GameHandler {
      * @return a future completed when the phase has been executed and ended
      */
     private CompletableFuture<Void> runCurrentPhaseAsync(@NonNull GamePhase currentPhase) {
-        CompletableFuture<Void> phaseExecution;
+        // Check for game end before executing any phase-specific behavior.
+        // This is common to all game phases and is therefore handled here.
+        checkGameEnded(currentPhase);
 
+        CompletableFuture<Void> phaseExecution;
         switch (currentPhase.getPhaseType()) {
             case TurnStart: phaseExecution = runTurnStartPhaseAsync(currentPhase); break;
             case Actions: phaseExecution = runActionsPhaseAsync(currentPhase); break;
@@ -231,6 +234,7 @@ public final class GameHandler {
     }
 
     private CompletableFuture<Void> runTurnStartPhaseAsync(@NonNull GamePhase currentPhase) {
+        // There is no automatic action to perform during turn start at the moment
         return CompletableFuture.completedFuture(null);
     }
 
