@@ -1075,9 +1075,10 @@ public class GameHandlerTest {
         ));
 
         GameHandler gameHandler = new GameHandler(history, listener);
+        GamePhase currentPhase = new GamePhase(GamePhaseType.Recruitment, history.getConfig().getPlayers().get(0));
 
         SelectableCharacterCard result =
-                invokeRunSelectRecruitmentCardAsync(gameHandler).join();
+                invokeRunSelectRecruitmentCardAsync(gameHandler, currentPhase).join();
 
         assertSame(expectedCard, result);
         assertEquals(1, listener.getInputRequiredCount());
@@ -1118,8 +1119,9 @@ public class GameHandlerTest {
         ));
 
         GameHandler gameHandler = new GameHandler(history, listener);
+        GamePhase currentPhase = new GamePhase(GamePhaseType.Recruitment, history.getConfig().getPlayers().get(0));
 
-        CompletableFuture<SelectableCharacterCard> result = invokeRunSelectRecruitmentCardAsync(gameHandler);
+        CompletableFuture<SelectableCharacterCard> result = invokeRunSelectRecruitmentCardAsync(gameHandler, currentPhase);
 
         try {
             result.join();
@@ -1146,9 +1148,10 @@ public class GameHandlerTest {
         ));
 
         GameHandler gameHandler = new GameHandler(history, listener);
+        GamePhase currentPhase = new GamePhase(GamePhaseType.Recruitment, history.getConfig().getPlayers().get(0));
 
         CompletableFuture<SelectableCharacterCard> result =
-                invokeRunSelectRecruitmentCardAsync(gameHandler);
+                invokeRunSelectRecruitmentCardAsync(gameHandler, currentPhase);
 
         try {
             result.join();
@@ -1181,9 +1184,10 @@ public class GameHandlerTest {
         ));
 
         GameHandler gameHandler = new GameHandler(history, listener);
+        GamePhase currentPhase = new GamePhase(GamePhaseType.Recruitment, history.getConfig().getPlayers().get(0));
 
         CompletableFuture<SelectableCharacterCard> result =
-                invokeRunSelectRecruitmentCardAsync(gameHandler);
+                invokeRunSelectRecruitmentCardAsync(gameHandler, currentPhase);
 
         try {
             result.join();
@@ -1195,6 +1199,62 @@ public class GameHandlerTest {
                     exception.getCause().getMessage()
             );
         }
+    }
+
+    @Test
+    public void runSelectRecruitmentCardAsync_shouldUndoLastActionAndRequestAnotherCard() throws Exception {
+        GameHistory history = createRecruitCardGameHistory();
+        TestGameFlowListener listener = new TestGameFlowListener(history);
+
+        Turn turn = (Turn) history.getEntries().get(0);
+        RecruitmentPhase recruitmentPhase =
+                (RecruitmentPhase) turn.getSubPhase(GamePhaseType.Recruitment);
+
+        Character archer = Character.create(CharacterType.Archer, TeamColor.Black);
+        Position recruitmentPosition = new Position(3, 2);
+
+        RecruitmentAction recruitmentAction = new RecruitmentAction(Collections.singletonList(
+                new RecruitmentActionMotion(
+                        RecruitmentMotionType.Add,
+                        archer,
+                        recruitmentPosition
+                )
+        ));
+
+        recruitmentPhase.getActions().add(recruitmentAction);
+
+        GameHandler gameHandler = new GameHandler(history, listener);
+        GamePhase currentPhase = new GamePhase(
+                GamePhaseType.Recruitment,
+                history.getConfig().getPlayers().get(0)
+        );
+
+        SelectableCharacterCard selectedCard = new SelectableCharacterCard(
+                CharacterCard.Acrobat,
+                CharacterCardSelectionStatus.Recruitable
+        );
+
+        listener.inputRequiredResults.add(new InteractionResult(
+                InteractionResultType.UndoLastAction,
+                new InteractionContext(),
+                null
+        ));
+
+        listener.inputRequiredResults.add(new InteractionResult(
+                InteractionResultType.SelectableCharacterCardChosen,
+                new InteractionContext(),
+                new InteractionTarget(
+                        TargetCategory.RecruitmentCard,
+                        selectedCard
+                )
+        ));
+
+        SelectableCharacterCard result =
+                invokeRunSelectRecruitmentCardAsync(gameHandler, currentPhase).join();
+
+        assertEquals(selectedCard, result);
+        assertEquals(2, listener.getInputRequiredCount());
+        assertTrue(recruitmentPhase.getActions().isEmpty());
     }
 
     @Test
@@ -1425,7 +1485,7 @@ public class GameHandlerTest {
 
     @Test
     public void runRecruitmentPhaseAsync_shouldApplyMultipleCharacterRecruitment() {
-        GameHistory history = createRecruitmentPhaseGameHistory(CharacterCard.HermitAndCub);
+        GameHistory history = createRecruitmentPhaseGameHistory();
         TestGameFlowListener listener = new TestGameFlowListener(history);
 
         SelectableCharacterCard selectedCard = new SelectableCharacterCard(
@@ -1729,15 +1789,16 @@ public class GameHandlerTest {
 
     @SuppressWarnings("unchecked")
     private CompletableFuture<SelectableCharacterCard> invokeRunSelectRecruitmentCardAsync(
-            GameHandler gameHandler) throws Exception {
+            GameHandler gameHandler, @NonNull GamePhase currentPhase) throws Exception {
         Method method = GameHandler.class.getDeclaredMethod(
-                "runSelectRecruitmentCardAsync"
+                "runSelectRecruitmentCardAsync",
+                GamePhase.class
         );
         method.setAccessible(true);
 
         try {
             CompletableFuture<SelectableCharacterCard> result =
-                    (CompletableFuture<SelectableCharacterCard>) method.invoke(gameHandler);
+                    (CompletableFuture<SelectableCharacterCard>) method.invoke(gameHandler, currentPhase);
             assertNotNull(result);
             return result;
         } catch (InvocationTargetException exception) {
@@ -1912,7 +1973,7 @@ public class GameHandlerTest {
         return history;
     }
 
-    private GameHistory createRecruitmentPhaseGameHistory(CharacterCard recruitableCard) {
+    private GameHistory createRecruitmentPhaseGameHistory() {
         List<Player> players = createPlayers();
 
         Character leader = Character.create(CharacterType.LeaderKing, TeamColor.Black);
@@ -1929,7 +1990,7 @@ public class GameHandlerTest {
                 players,
                 players.get(0),
                 GameMode.Discovery,
-                Collections.singletonList(recruitableCard),
+                Collections.singletonList(CharacterCard.HermitAndCub),
                 Collections.singletonList(initialPlacement)
         );
 

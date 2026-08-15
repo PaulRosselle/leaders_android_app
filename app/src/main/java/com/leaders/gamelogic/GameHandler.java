@@ -325,6 +325,24 @@ public final class GameHandler {
     }
 
     /**
+     * Checks whether the current turn phase contains actions that can be undone.
+     *
+     * @param currentPhase the current game phase
+     * @return {@code true} if the current turn phase contains at least one action,
+     *         {@code false} otherwise
+     * @throws IllegalStateException if no current turn is found
+     */
+    private boolean currentTurnPhaseContainsActions(@NonNull GamePhase currentPhase) {
+        // An action can only be undone when the current turn actions list isn't empty.
+        Turn currentTurn = GameHistoryQuery.findCurrentTurn(currentHistory);
+        if (currentTurn == null) {
+            throw new IllegalStateException("No current turn phase found to check for actions");
+        }
+        TurnPhase currentTurnPhase = currentTurn.getSubPhase(currentPhase.getPhaseType());
+        return !currentTurnPhase.getActions().isEmpty();
+    }
+
+    /**
      * Determines the legal results for playable character selection.
      *
      * @param currentPhase current actions phase
@@ -338,12 +356,7 @@ public final class GameHandler {
         legalResults.add(InteractionResultType.PlayableCharacterChosen);
 
         // An action can only be undone when the current turn actions list isn't empty.
-        Turn currentTurn = GameHistoryQuery.findCurrentTurn(currentHistory);
-        if (currentTurn == null) {
-            throw new IllegalStateException("Character selection is only allowed within the actions phase of a turn");
-        }
-        TurnPhase currentTurnPhase = currentTurn.getSubPhase(currentPhase.getPhaseType());
-        if (!currentTurnPhase.getActions().isEmpty()) {
+        if (currentTurnPhaseContainsActions(currentPhase)) {
             legalResults.add(InteractionResultType.UndoLastAction);
         }
 
@@ -483,14 +496,9 @@ public final class GameHandler {
             return CompletableFuture.completedFuture(null);
         }
 
-        return runSelectRecruitmentCardAsync()
-                .thenCompose(selectableCard -> {
-                    if (selectableCard == null) {
-                        return CompletableFuture.completedFuture(null);
-                    }
-
-                    return runRecruitCardAsync(currentPhase, selectableCard.getCharacterCard());
-                })
+        return runSelectRecruitmentCardAsync(currentPhase)
+                .thenCompose(selectableCard ->
+                        runRecruitCardAsync(currentPhase, selectableCard.getCharacterCard()))
                 .thenCompose(ignored -> runRecruitmentPhaseAsync(currentPhase));
     }
 
@@ -499,7 +507,8 @@ public final class GameHandler {
      *
      * @return the selected character card
      */
-    private CompletableFuture<SelectableCharacterCard> runSelectRecruitmentCardAsync() {
+    @NonNull
+    private CompletableFuture<SelectableCharacterCard> runSelectRecruitmentCardAsync(@NonNull GamePhase currentPhase) {
         List<SelectableCharacterCard> selectableRecruitmentCards =
                 RecruitmentQuery.getSelectableRecruitmentCards(currentGame, currentHistory);
 
@@ -508,24 +517,36 @@ public final class GameHandler {
             legalTargets.add(new InteractionTarget(TargetCategory.RecruitmentCard, selectableRecruitmentCard));
         }
 
+        List<InteractionResultType> legalResults = new ArrayList<>();
+        legalResults.add(InteractionResultType.SelectableCharacterCardChosen);
+        // A recruitment action can only be undone in Strategist mode.
+        if (getGameMode() == GameMode.Strategist && currentTurnPhaseContainsActions(currentPhase)) {
+            legalResults.add(InteractionResultType.UndoLastAction);
+        }
+
         InteractionRequest request = new InteractionRequest(
                 InteractionType.SelectableCharacterCardExpected,
                 new InteractionContext(),
                 legalTargets,
-                List.of(InteractionResultType.SelectableCharacterCardChosen)
+                legalResults
         );
 
         // Request an input to select the recruited card
-        return gameFlowListener.onInputRequired(request).thenApply(result -> {
+        return gameFlowListener.onInputRequired(request).thenCompose(result -> {
+            // Since recruitments are mandatory
+            if (result.getResultType() == InteractionResultType.UndoLastAction) {
+                undoLastAction();
+                return runSelectRecruitmentCardAsync(currentPhase);
+            }
+
             if (result.getResultType() != InteractionResultType.SelectableCharacterCardChosen) {
                 throw new IllegalStateException(
                         "Invalid interaction result : illegal type \"" +
-                                result.getResultType() +
-                                "\" for recruitment card selection"
+                                result.getResultType() + "\" for recruitment card selection"
                 );
             }
 
-            return getSelectableCharacterCardFromResult(result);
+            return CompletableFuture.completedFuture(getSelectableCharacterCardFromResult(result));
         });
     }
 
