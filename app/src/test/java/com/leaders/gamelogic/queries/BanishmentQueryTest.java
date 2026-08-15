@@ -1,7 +1,7 @@
 package com.leaders.gamelogic.queries;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import com.leaders.gamelogic.entities.Board;
@@ -10,7 +10,9 @@ import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameConfig;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.Player;
+import com.leaders.gamelogic.entities.SelectableCharacterCard;
 import com.leaders.gamelogic.enums.CharacterCard;
+import com.leaders.gamelogic.enums.CharacterCardSelectionStatus;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.TeamColor;
@@ -19,6 +21,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 
 public class BanishmentQueryTest {
 
@@ -49,13 +52,8 @@ public class BanishmentQueryTest {
         ), new ArrayList<>());
     }
 
-    private void addRecruitedCharacter(
-            Game game,
-            CharacterType characterType,
-            TeamColor teamColor) {
-        game.getRecruitedCharacters().add(
-                Character.create(characterType, teamColor)
-        );
+    private void addRecruitedCharacter(Game game, CharacterType characterType, TeamColor teamColor) {
+        game.getRecruitedCharacters().add(Character.create(characterType, teamColor));
     }
 
     @Test
@@ -79,11 +77,7 @@ public class BanishmentQueryTest {
         Game game = createTestGame();
         GameHistory history = createTestGameHistory(GameMode.Strategist);
 
-        addRecruitedCharacter(
-                game,
-                CharacterType.Archer,
-                TeamColor.Black
-        );
+        addRecruitedCharacter(game, CharacterType.Archer, TeamColor.Black);
 
         assertFalse(BanishmentQuery.canBanish(game, history, TeamColor.Black));
     }
@@ -103,26 +97,10 @@ public class BanishmentQueryTest {
         Game game = createTestGame();
         GameHistory history = createTestGameHistory(GameMode.Strategist);
 
-        addRecruitedCharacter(
-                game,
-                CharacterType.Archer,
-                TeamColor.Black
-        );
-        addRecruitedCharacter(
-                game,
-                CharacterType.Acrobat,
-                TeamColor.Black
-        );
-        addRecruitedCharacter(
-                game,
-                CharacterType.Bruiser,
-                TeamColor.White
-        );
-        addRecruitedCharacter(
-                game,
-                CharacterType.Assassin,
-                TeamColor.White
-        );
+        addRecruitedCharacter(game, CharacterType.Archer, TeamColor.Black);
+        addRecruitedCharacter(game, CharacterType.Acrobat, TeamColor.Black);
+        addRecruitedCharacter(game, CharacterType.Bruiser, TeamColor.White);
+        addRecruitedCharacter(game, CharacterType.Assassin, TeamColor.White);
 
         game.addBanishedCard(TeamColor.Black, CharacterCard.Archer);
 
@@ -145,51 +123,80 @@ public class BanishmentQueryTest {
         Game game = createTestGame();
         GameHistory history = createTestGameHistory(GameMode.Strategist);
 
-        addRecruitedCharacter(
-                game,
-                CharacterType.Archer,
-                TeamColor.Black
-        );
-        addRecruitedCharacter(
-                game,
-                CharacterType.Acrobat,
-                TeamColor.Black
-        );
-        addRecruitedCharacter(
-                game,
-                CharacterType.ClawLauncher,
-                TeamColor.Black
-        );
-        addRecruitedCharacter(
-                game,
-                CharacterType.Bruiser,
-                TeamColor.White
-        );
-        addRecruitedCharacter(
-                game,
-                CharacterType.Assassin,
-                TeamColor.White
-        );
-        addRecruitedCharacter(
-                game,
-                CharacterType.Illusionist,
-                TeamColor.White
-        );
+        addRecruitedCharacter(game, CharacterType.Archer, TeamColor.Black);
+        addRecruitedCharacter(game, CharacterType.Acrobat, TeamColor.Black);
+        addRecruitedCharacter(game, CharacterType.ClawLauncher, TeamColor.Black);
+        addRecruitedCharacter(game, CharacterType.Bruiser, TeamColor.White);
+        addRecruitedCharacter(game, CharacterType.Assassin, TeamColor.White);
+        addRecruitedCharacter(game, CharacterType.Illusionist, TeamColor.White);
 
         assertFalse(BanishmentQuery.canBanish(game, history, TeamColor.Black));
         assertFalse(BanishmentQuery.canBanish(game, history, TeamColor.White));
     }
 
     @Test
-    public void getBanishableCards_shouldReturnRecruitableCards() {
+    public void getSelectableBanishmentCards_shouldMarkRecruitableCardsAsBanishable() {
         Game game = createTestGame();
 
         game.getRecruitableCards().add(CharacterCard.Archer);
         game.getRecruitableCards().add(CharacterCard.Bruiser);
 
-        assertSame(
-                game.getRecruitableCards(),
-                BanishmentQuery.getBanishableCards(game)
-        );
+        List<SelectableCharacterCard> selectableCards =
+                BanishmentQuery.getSelectableBanishmentCards(game);
+
+        assertEquals(2, selectableCards.size());
+
+        assertEquals(CharacterCard.Archer, selectableCards.get(0).getCharacterCard());
+        assertEquals(CharacterCardSelectionStatus.Banishable, selectableCards.get(0).getSelectionStatus());
+
+        assertEquals(CharacterCard.Bruiser, selectableCards.get(1).getCharacterCard());
+        assertEquals(CharacterCardSelectionStatus.Banishable, selectableCards.get(1).getSelectionStatus());
+    }
+
+    @Test
+    public void getSelectableBanishmentCards_shouldIncludeAlreadyBannedCards() {
+        Game game = createTestGame();
+
+        game.getRecruitableCards().add(CharacterCard.Archer);
+
+        game.addBanishedCard(TeamColor.Black, CharacterCard.Acrobat);
+
+        List<SelectableCharacterCard> selectableCards = BanishmentQuery.getSelectableBanishmentCards(game);
+
+        assertEquals(2, selectableCards.size());
+
+        assertEquals(CharacterCard.Archer, selectableCards.get(0).getCharacterCard());
+        assertEquals(CharacterCardSelectionStatus.Banishable, selectableCards.get(0).getSelectionStatus());
+
+        assertEquals(CharacterCard.Acrobat, selectableCards.get(1).getCharacterCard());
+        assertEquals(CharacterCardSelectionStatus.AlreadyBanned, selectableCards.get(1).getSelectionStatus());
+    }
+
+    @Test
+    public void getSelectableBanishmentCards_shouldIncludeAlreadyBannedCardsFromBothTeams() {
+        Game game = createTestGame();
+
+        game.addBanishedCard(TeamColor.Black, CharacterCard.Archer);
+        game.addBanishedCard(TeamColor.White, CharacterCard.Bruiser);
+
+        List<SelectableCharacterCard> selectableCards = BanishmentQuery.getSelectableBanishmentCards(game);
+
+        assertEquals(2, selectableCards.size());
+
+        assertEquals(CharacterCard.Archer, selectableCards.get(0).getCharacterCard());
+        assertEquals(CharacterCardSelectionStatus.AlreadyBanned, selectableCards.get(0).getSelectionStatus());
+
+        assertEquals(CharacterCard.Bruiser, selectableCards.get(1).getCharacterCard());
+        assertEquals(CharacterCardSelectionStatus.AlreadyBanned,
+               selectableCards.get(1).getSelectionStatus());
+    }
+
+    @Test
+    public void getSelectableBanishmentCards_shouldReturnEmptyWhenNoCardsAreAvailable() {
+        Game game = createTestGame();
+
+        List<SelectableCharacterCard> selectableCards = BanishmentQuery.getSelectableBanishmentCards(game);
+
+        assertTrue(selectableCards.isEmpty());
     }
 }
