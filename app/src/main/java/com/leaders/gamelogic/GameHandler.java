@@ -11,6 +11,7 @@ import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.PlayableCharacter;
 import com.leaders.gamelogic.entities.Player;
+import com.leaders.gamelogic.entities.SelectableCharacterCard;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.GamePhaseType;
@@ -479,24 +480,25 @@ public final class GameHandler {
      *
      * @return the selected character card
      */
-    private CompletableFuture<CharacterCard> runSelectRecruitmentCardAsync() {
-        List<CharacterCard> recruitableCards = RecruitmentQuery.getRecruitableCards(currentGame, currentHistory);
+    private CompletableFuture<SelectableCharacterCard> runSelectRecruitmentCardAsync() {
+        List<SelectableCharacterCard> selectableRecruitmentCards =
+                RecruitmentQuery.getSelectableRecruitmentCards(currentGame, currentHistory);
 
         List<InteractionTarget> legalTargets = new ArrayList<>();
-        for (CharacterCard recruitableCard : recruitableCards) {
-            legalTargets.add(new InteractionTarget(TargetCategory.RecruitmentCard, recruitableCard));
+        for (SelectableCharacterCard selectableRecruitmentCard : selectableRecruitmentCards) {
+            legalTargets.add(new InteractionTarget(TargetCategory.RecruitmentCard, selectableRecruitmentCard));
         }
 
         InteractionRequest request = new InteractionRequest(
-                InteractionType.CharacterCardExpected,
+                InteractionType.SelectableCharacterCardExpected,
                 new InteractionContext(),
                 legalTargets,
-                List.of(InteractionResultType.CardChosen)
+                List.of(InteractionResultType.SelectableCharacterCardChosen)
         );
 
         // Request an input to select the recruited card
         return gameFlowListener.onInputRequired(request).thenApply(result -> {
-            if (result.getResultType() != InteractionResultType.CardChosen) {
+            if (result.getResultType() != InteractionResultType.SelectableCharacterCardChosen) {
                 throw new IllegalStateException(
                         "Invalid interaction result : illegal type \"" +
                                 result.getResultType() +
@@ -504,7 +506,7 @@ public final class GameHandler {
                 );
             }
 
-            return getCharacterCardFromResult(result);
+            return getSelectableCharacterCardFromResult(result);
         });
     }
 
@@ -518,9 +520,9 @@ public final class GameHandler {
      *                               character card is missing
      */
     @NonNull
-    private static CharacterCard getCharacterCardFromResult(@NonNull InteractionResult result) {
+    private static SelectableCharacterCard getSelectableCharacterCardFromResult(@NonNull InteractionResult result) {
         InteractionTarget chosenTarget = result.getChosenTarget();
-        CharacterCard chosenCard = chosenTarget == null ? null : chosenTarget.getChosenCard();
+        SelectableCharacterCard chosenCard = chosenTarget == null ? null : chosenTarget.getChosenSelectableCharacterCard();
 
         if (chosenTarget == null ||
                 chosenTarget.getCategory() != TargetCategory.RecruitmentCard ||

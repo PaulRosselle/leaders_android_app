@@ -7,7 +7,9 @@ import static org.junit.Assert.assertTrue;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.PlayableCharacter;
 import com.leaders.gamelogic.entities.Position;
+import com.leaders.gamelogic.entities.SelectableCharacterCard;
 import com.leaders.gamelogic.enums.CharacterCard;
+import com.leaders.gamelogic.enums.CharacterCardSelectionStatus;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.TeamColor;
 
@@ -20,10 +22,14 @@ public class InteractionRequestTest {
 
     @Test
     public void constructor_shouldSetValues() {
-        InteractionType type = InteractionType.CharacterCardExpected;
+        InteractionType type = InteractionType.SelectableCharacterCardExpected;
         List<InteractionTarget> legalTargets = List.of(
-                new InteractionTarget(TargetCategory.RecruitmentCard, CharacterCard.Archer));
-        List<InteractionResultType> legalResults = List.of(InteractionResultType.CardChosen);
+                new InteractionTarget(TargetCategory.RecruitmentCard,
+                        new SelectableCharacterCard(
+                                CharacterCard.Archer,
+                                CharacterCardSelectionStatus.Recruitable
+                        )));
+        List<InteractionResultType> legalResults = List.of(InteractionResultType.SelectableCharacterCardChosen);
 
         Character contextCharacter = Character.create(CharacterType.LeaderQueen, TeamColor.Black);
         InteractionRequest request = new InteractionRequest(type,
@@ -79,10 +85,10 @@ public class InteractionRequestTest {
     public void getLegalResults_shouldReturnUnmodifiableList() {
         Character contextCharacter = Character.create(CharacterType.LeaderQueen, TeamColor.Black);
         InteractionRequest request = new InteractionRequest(
-                InteractionType.CharacterCardExpected,
+                InteractionType.SelectableCharacterCardExpected,
                 new InteractionContext(contextCharacter),
                 List.of(),
-                List.of(InteractionResultType.CardChosen)
+                List.of(InteractionResultType.SelectableCharacterCardChosen)
         );
 
         assertThrows(
