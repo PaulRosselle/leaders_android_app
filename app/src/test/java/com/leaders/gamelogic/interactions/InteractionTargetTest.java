@@ -9,7 +9,9 @@ import static org.junit.Assert.assertSame;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.PlayableCharacter;
 import com.leaders.gamelogic.entities.Position;
+import com.leaders.gamelogic.entities.SelectableCharacterCard;
 import com.leaders.gamelogic.enums.CharacterCard;
+import com.leaders.gamelogic.enums.CharacterCardSelectionStatus;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.TeamColor;
 
@@ -19,10 +21,15 @@ public class InteractionTargetTest {
 
     @Test
     public void constructor_shouldSetCardTarget() {
-        InteractionTarget target = new InteractionTarget(TargetCategory.RecruitmentCard, CharacterCard.Archer);
+        SelectableCharacterCard expectedCard = new SelectableCharacterCard(
+                CharacterCard.Archer,
+                CharacterCardSelectionStatus.Recruitable
+        );
+
+        InteractionTarget target = new InteractionTarget(TargetCategory.RecruitmentCard, expectedCard);
 
         assertEquals(TargetCategory.RecruitmentCard, target.getCategory());
-        assertEquals(CharacterCard.Archer, target.getChosenCard());
+        assertEquals(expectedCard, target.getChosenSelectableCharacterCard());
         assertNull(target.getChosenCharacterPlayableState());
         assertNull(target.getChosenPosition());
     }
@@ -38,7 +45,7 @@ public class InteractionTargetTest {
         InteractionTarget target = new InteractionTarget(TargetCategory.PlayableCharacter, playableCharacter);
 
         assertEquals(TargetCategory.PlayableCharacter, target.getCategory());
-        assertNull(target.getChosenCard());
+        assertNull(target.getChosenSelectableCharacterCard());
         assertSame(playableCharacter, target.getChosenCharacterPlayableState());
         assertNull(target.getChosenPosition());
     }
@@ -50,15 +57,27 @@ public class InteractionTargetTest {
         InteractionTarget target = new InteractionTarget(TargetCategory.RecruitmentDestination, position);
 
         assertEquals(TargetCategory.RecruitmentDestination, target.getCategory());
-        assertNull(target.getChosenCard());
+        assertNull(target.getChosenSelectableCharacterCard());
         assertNull(target.getChosenCharacterPlayableState());
         assertSame(position, target.getChosenPosition());
     }
 
     @Test
     public void equals_shouldReturnTrueForIdenticalCardTargets() {
-        InteractionTarget first = new InteractionTarget(TargetCategory.RecruitmentCard, CharacterCard.Archer);
-        InteractionTarget second = new InteractionTarget(TargetCategory.RecruitmentCard, CharacterCard.Archer);
+        InteractionTarget first = new InteractionTarget(
+                TargetCategory.RecruitmentCard,
+                new SelectableCharacterCard(
+                        CharacterCard.Archer,
+                        CharacterCardSelectionStatus.Recruitable
+                )
+        );
+        InteractionTarget second = new InteractionTarget(
+                TargetCategory.RecruitmentCard,
+                new SelectableCharacterCard(
+                        CharacterCard.Archer,
+                        CharacterCardSelectionStatus.Recruitable
+                )
+        );
 
         assertEquals(first, second);
     }
@@ -102,15 +121,33 @@ public class InteractionTargetTest {
 
     @Test
     public void equals_shouldReturnFalseWhenChosenDataDiffer() {
-        InteractionTarget first = new InteractionTarget(TargetCategory.RecruitmentCard, CharacterCard.Archer);
-        InteractionTarget second = new InteractionTarget(TargetCategory.RecruitmentCard, CharacterCard.Assassin);
+        InteractionTarget first = new InteractionTarget(
+                TargetCategory.RecruitmentCard,
+                new SelectableCharacterCard(
+                        CharacterCard.Archer,
+                        CharacterCardSelectionStatus.Recruitable
+                )
+        );
+        InteractionTarget second = new InteractionTarget(
+                TargetCategory.RecruitmentCard,
+                new SelectableCharacterCard(
+                        CharacterCard.Assassin,
+                        CharacterCardSelectionStatus.Recruitable
+                )
+        );
 
         assertNotEquals(first, second);
     }
 
     @Test
     public void equals_shouldReturnFalseWhenTargetDataTypesDiffer() {
-        InteractionTarget cardTarget = new InteractionTarget(TargetCategory.RecruitmentCard, CharacterCard.Archer);
+        InteractionTarget cardTarget = new InteractionTarget(
+                TargetCategory.RecruitmentCard,
+                new SelectableCharacterCard(
+                        CharacterCard.Archer,
+                        CharacterCardSelectionStatus.Recruitable
+                )
+        );
         InteractionTarget characterTarget = new InteractionTarget(
                 TargetCategory.PlayableCharacter,
                 new PlayableCharacter(
@@ -128,7 +165,10 @@ public class InteractionTargetTest {
     public void equals_shouldReturnFalseForNull() {
         InteractionTarget target = new InteractionTarget(
                 TargetCategory.RecruitmentCard,
-                CharacterCard.Archer
+                new SelectableCharacterCard(
+                        CharacterCard.Archer,
+                        CharacterCardSelectionStatus.Recruitable
+                )
         );
 
         assertNotNull(target);

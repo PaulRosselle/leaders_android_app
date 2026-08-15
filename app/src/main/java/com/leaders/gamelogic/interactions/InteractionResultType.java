@@ -1,7 +1,7 @@
 package com.leaders.gamelogic.interactions;
 
 public enum InteractionResultType {
-    CardChosen,
+    SelectableCharacterCardChosen,
     PlayableCharacterChosen,
     PositionChosen,
     NoChoice,

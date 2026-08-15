@@ -8,15 +8,20 @@ import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
+import com.leaders.gamelogic.entities.SelectableCharacterCard;
 import com.leaders.gamelogic.enums.CharacterCard;
+import com.leaders.gamelogic.enums.CharacterCardSelectionStatus;
 import com.leaders.gamelogic.enums.CharacterType;
+import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.historyentries.IPhase;
 import com.leaders.gamelogic.historyentries.segments.RecruitmentPhase;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public final class RecruitmentQuery {
 
@@ -46,11 +51,23 @@ public final class RecruitmentQuery {
         return recruitmentCount < fullTeamSize ? 1 : 0;
     }
 
+    @NonNull
+    private static List<CharacterCard> getGameModeRecruitmentCards(@NonNull Game game,
+                                                                   @NonNull GameHistory gameHistory) {
+        // The recruitment is restricted to a pool of 3 randomly chosen cards in Discovery mode
+        if (gameHistory.getConfig().getGameMode() == GameMode.Discovery) {
+            return game.getRecruitableCards().stream().limit(3).collect(Collectors.toList());
+        }
+        // By default, all recruitable cards are returned
+        return game.getRecruitableCards();
+    }
+
     /**
      * Returns the list of cards recruitable during the current recruitment phase.
      */
     @NonNull
-    public static List<CharacterCard> getRecruitableCards(@NonNull Game game, @NonNull GameHistory gameHistory) {
+    private static List<CharacterCard> getValidRecruitmentCards(@NonNull Game game,
+                                                                @NonNull GameHistory gameHistory) {
         // We only return a list if a recruitment phase is in progress.
         IPhase currentPhase = GameHistoryQuery.findCurrentPhase(gameHistory);
         if (!(currentPhase instanceof RecruitmentPhase)) {
@@ -82,7 +99,7 @@ public final class RecruitmentQuery {
         // If the recruited card count is still under the limit, we can return every card
         // with characters able to be placed on the board.
         List<CharacterCard> recruitableCards = new java.util.ArrayList<>();
-        for (CharacterCard recruitableCard : game.getRecruitableCards()) {
+        for (CharacterCard recruitableCard : getGameModeRecruitmentCards(game, gameHistory)) {
             if (CharacterType.getCharacterTypesMatchingCard(recruitableCard).size() <= recruitmentCells.size()) {
                 recruitableCards.add(recruitableCard);
             }
@@ -90,6 +107,33 @@ public final class RecruitmentQuery {
         return recruitableCards;
 
 
+    }
+
+    @NonNull
+    public static List<SelectableCharacterCard> getSelectableRecruitmentCards(@NonNull Game game,
+                                                                              @NonNull GameHistory gameHistory) {
+        List<SelectableCharacterCard> selectableCards = new ArrayList<>();
+        List<CharacterCard> validRecruitableCards = getValidRecruitmentCards(game, gameHistory);
+        // First, we add recruitable cards
+        for (CharacterCard recruitableCard : getGameModeRecruitmentCards(game, gameHistory)) {
+            if (validRecruitableCards.contains(recruitableCard)) {
+                selectableCards.add(new SelectableCharacterCard(recruitableCard,
+                        CharacterCardSelectionStatus.Recruitable));
+            } else {
+                selectableCards.add(new SelectableCharacterCard(recruitableCard,
+                        CharacterCardSelectionStatus.RecruitmentImpossible));
+            }
+        }
+
+        // Then we add banished cards as an indication
+        for (TeamColor playerTeamColor : TeamColor.values()) {
+            for (CharacterCard banishedCard : game.getBanishedCards(playerTeamColor)) {
+                selectableCards.add(new SelectableCharacterCard(banishedCard,
+                        CharacterCardSelectionStatus.AlreadyBanned));
+            }
+        }
+
+        return selectableCards;
     }
 
     /**

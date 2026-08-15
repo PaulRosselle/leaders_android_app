@@ -292,13 +292,11 @@ public class RecruitmentActionResolverTest {
     }
 
     @Test
-    public void getNextFeedback_cancelWithoutPreviousFeedback_createsEmptyCancellationFeedback() {
+    public void getNextFeedback_cancelWithoutPreviousFeedback_createsNoFeedback() {
         CharacterCard card = getSingleCharacterCard();
-        RecruitmentActionResolver resolver =
-                new RecruitmentActionResolver(game, card, TEAM);
+        RecruitmentActionResolver resolver = new RecruitmentActionResolver(game, card, TEAM);
 
-        CharacterType characterType =
-                CharacterType.getCharacterTypesMatchingCard(card).get(0);
+        CharacterType characterType = CharacterType.getCharacterTypesMatchingCard(card).get(0);
 
         Character character = Character.create(characterType, TEAM);
 
@@ -316,18 +314,15 @@ public class RecruitmentActionResolverTest {
 
         InteractionFeedback feedback = resolver.getNextFeedback(builder);
 
-        assertNotNull(feedback);
-        assertTrue(feedback.getRecruitmentActionMotions().isEmpty());
+        assertNull(feedback);
     }
 
     @Test
     public void getNextFeedback_cancelAfterOnePlacement_createsRemoveMotion() {
         CharacterCard card = getSingleCharacterCard();
-        RecruitmentActionResolver resolver =
-                new RecruitmentActionResolver(game, card, TEAM);
+        RecruitmentActionResolver resolver = new RecruitmentActionResolver(game, card, TEAM);
 
-        CharacterType characterType =
-                CharacterType.getCharacterTypesMatchingCard(card).get(0);
+        CharacterType characterType = CharacterType.getCharacterTypesMatchingCard(card).get(0);
 
         Character character = Character.create(characterType, TEAM);
         Position position = getFirstLegalRecruitmentPosition();
@@ -362,13 +357,11 @@ public class RecruitmentActionResolverTest {
                         List.of(addFeedback)
                 );
 
-        InteractionFeedback cancellationFeedback =
-                resolver.getNextFeedback(builder);
+        InteractionFeedback cancellationFeedback = resolver.getNextFeedback(builder);
 
         assertNotNull(cancellationFeedback);
 
-        List<RecruitmentActionMotion> motions =
-                cancellationFeedback.getRecruitmentActionMotions();
+        List<RecruitmentActionMotion> motions = cancellationFeedback.getRecruitmentActionMotions();
 
         assertEquals(1, motions.size());
 

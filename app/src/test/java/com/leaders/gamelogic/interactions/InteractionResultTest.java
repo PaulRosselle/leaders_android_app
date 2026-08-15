@@ -5,7 +5,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
 import com.leaders.gamelogic.entities.Character;
+import com.leaders.gamelogic.entities.SelectableCharacterCard;
 import com.leaders.gamelogic.enums.CharacterCard;
+import com.leaders.gamelogic.enums.CharacterCardSelectionStatus;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.TeamColor;
 
@@ -25,12 +27,17 @@ public class InteractionResultTest {
 
     @Test
     public void constructor_shouldSetResultTypeAndTarget() {
-        InteractionTarget target = new InteractionTarget(TargetCategory.RecruitmentCard, CharacterCard.Archer);
+        InteractionTarget target = new InteractionTarget(
+                TargetCategory.RecruitmentCard,
+                new SelectableCharacterCard(
+                        CharacterCard.Archer,
+                        CharacterCardSelectionStatus.Recruitable
+                ));
         Character contextCharacter = Character.create(CharacterType.Archer, TeamColor.Black);
-        InteractionResult result = new InteractionResult(InteractionResultType.CardChosen,
+        InteractionResult result = new InteractionResult(InteractionResultType.SelectableCharacterCardChosen,
                 new InteractionContext(contextCharacter), target);
 
-        assertEquals(InteractionResultType.CardChosen, result.getResultType());
+        assertEquals(InteractionResultType.SelectableCharacterCardChosen, result.getResultType());
         assertSame(target, result.getChosenTarget());
     }
 }

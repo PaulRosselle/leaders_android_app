@@ -25,7 +25,9 @@ import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.PlayableCharacter;
 import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.entities.Position;
+import com.leaders.gamelogic.entities.SelectableCharacterCard;
 import com.leaders.gamelogic.enums.CharacterCard;
+import com.leaders.gamelogic.enums.CharacterCardSelectionStatus;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.GamePhaseType;
@@ -1055,16 +1057,17 @@ public class GameHandlerTest {
         GameHistory history = createSelectRecruitmentCardGameHistory();
         TestGameFlowListener listener = new TestGameFlowListener(history);
 
-        CharacterCard expectedCard = CharacterCard.Archer;
+        SelectableCharacterCard expectedCard = new SelectableCharacterCard(
+                CharacterCard.Archer, CharacterCardSelectionStatus.Recruitable);
         listener.inputRequiredResults.add(new InteractionResult(
-                InteractionResultType.CardChosen,
+                InteractionResultType.SelectableCharacterCardChosen,
                 new InteractionContext(),
                 new InteractionTarget(TargetCategory.RecruitmentCard, expectedCard)
         ));
 
         GameHandler gameHandler = new GameHandler(history, listener);
 
-        CharacterCard result =
+        SelectableCharacterCard result =
                 invokeRunSelectRecruitmentCardAsync(gameHandler).join();
 
         assertSame(expectedCard, result);
@@ -1073,9 +1076,9 @@ public class GameHandlerTest {
         InteractionRequest request = listener.getLastInputRequired();
 
         assertNotNull(request);
-        assertEquals(InteractionType.CharacterCardExpected, request.getRequestType());
+        assertEquals(InteractionType.SelectableCharacterCardExpected, request.getRequestType());
         assertEquals(
-                Collections.singletonList(InteractionResultType.CardChosen),
+                Collections.singletonList(InteractionResultType.SelectableCharacterCardChosen),
                 request.getLegalResults()
         );
 
@@ -1083,9 +1086,14 @@ public class GameHandlerTest {
         assertTrue(request.getLegalTargets().stream()
                 .allMatch(target -> target.getCategory() == TargetCategory.RecruitmentCard));
         assertTrue(request.getLegalTargets().stream()
-                .anyMatch(target -> target.getChosenCard() == CharacterCard.Archer));
+                .anyMatch(target -> expectedCard.equals(target.getChosenSelectableCharacterCard())));
         assertTrue(request.getLegalTargets().stream()
-                .anyMatch(target -> target.getChosenCard() == CharacterCard.Bruiser));
+                .anyMatch(target -> {
+                    SelectableCharacterCard selectableCharacterCard = target.getChosenSelectableCharacterCard();
+                    assertNotNull(selectableCharacterCard);
+                    return selectableCharacterCard.getCharacterCard() == CharacterCard.Bruiser &&
+                            selectableCharacterCard.getSelectionStatus() == CharacterCardSelectionStatus.Recruitable;
+                }));
     }
 
     @Test
@@ -1102,8 +1110,7 @@ public class GameHandlerTest {
 
         GameHandler gameHandler = new GameHandler(history, listener);
 
-        CompletableFuture<CharacterCard> result =
-                invokeRunSelectRecruitmentCardAsync(gameHandler);
+        CompletableFuture<SelectableCharacterCard> result = invokeRunSelectRecruitmentCardAsync(gameHandler);
 
         try {
             result.join();
@@ -1124,14 +1131,14 @@ public class GameHandlerTest {
         TestGameFlowListener listener = new TestGameFlowListener(history);
 
         listener.inputRequiredResults.add(new InteractionResult(
-                InteractionResultType.CardChosen,
+                InteractionResultType.SelectableCharacterCardChosen,
                 new InteractionContext(),
                 null
         ));
 
         GameHandler gameHandler = new GameHandler(history, listener);
 
-        CompletableFuture<CharacterCard> result =
+        CompletableFuture<SelectableCharacterCard> result =
                 invokeRunSelectRecruitmentCardAsync(gameHandler);
 
         try {
@@ -1153,17 +1160,20 @@ public class GameHandlerTest {
         TestGameFlowListener listener = new TestGameFlowListener(history);
 
         listener.inputRequiredResults.add(new InteractionResult(
-                InteractionResultType.CardChosen,
+                InteractionResultType.SelectableCharacterCardChosen,
                 new InteractionContext(),
                 new InteractionTarget(
-                        TargetCategory.RecruitmentDestination,
-                        CharacterCard.Archer
+                        TargetCategory.RecruitmentDestination, // Should be RecruitmentCard
+                        new SelectableCharacterCard(
+                                CharacterCard.Archer,
+                                CharacterCardSelectionStatus.Recruitable
+                        )
                 )
         ));
 
         GameHandler gameHandler = new GameHandler(history, listener);
 
-        CompletableFuture<CharacterCard> result =
+        CompletableFuture<SelectableCharacterCard> result =
                 invokeRunSelectRecruitmentCardAsync(gameHandler);
 
         try {
@@ -1498,7 +1508,7 @@ public class GameHandlerTest {
     }
 
     @SuppressWarnings("unchecked")
-    private CompletableFuture<CharacterCard> invokeRunSelectRecruitmentCardAsync(
+    private CompletableFuture<SelectableCharacterCard> invokeRunSelectRecruitmentCardAsync(
             GameHandler gameHandler) throws Exception {
         Method method = GameHandler.class.getDeclaredMethod(
                 "runSelectRecruitmentCardAsync"
@@ -1506,8 +1516,8 @@ public class GameHandlerTest {
         method.setAccessible(true);
 
         try {
-            CompletableFuture<CharacterCard> result =
-                    (CompletableFuture<CharacterCard>) method.invoke(gameHandler);
+            CompletableFuture<SelectableCharacterCard> result =
+                    (CompletableFuture<SelectableCharacterCard>) method.invoke(gameHandler);
             assertNotNull(result);
             return result;
         } catch (InvocationTargetException exception) {

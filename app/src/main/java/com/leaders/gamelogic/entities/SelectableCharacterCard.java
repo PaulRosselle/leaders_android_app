@@ -27,4 +27,35 @@ public final class SelectableCharacterCard {
     public CharacterCardSelectionStatus getSelectionStatus() {
         return selectionStatus;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        SelectableCharacterCard that = (SelectableCharacterCard) o;
+        return characterCard == that.characterCard
+                && selectionStatus == that.selectionStatus;
+    }
+
+    @Override
+    public int hashCode() {
+        return java.util.Objects.hash(
+                characterCard,
+                selectionStatus
+        );
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "SelectableCharacterCard{" +
+                "characterCard=" + characterCard +
+                ", selectionStatus=" + selectionStatus +
+                '}';
+    }
 }
