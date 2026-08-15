@@ -93,6 +93,14 @@ public class RecruitmentQueryTest {
     }
 
     @Test
+    public void canRecruit_shouldReturnTrueWhenRecruitmentIsAllowedAndCellIsAvailableOutsideOfRecruitmentPhase() {
+        Game game = createTestGame(new Board());
+        GameHistory history = createTestGameHistory();
+
+        assertTrue(RecruitmentQuery.canRecruit(game, history, TeamColor.Black));
+    }
+
+    @Test
     public void canRecruit_shouldReturnTrueForSecondPlayerAfterOneRecruitment() {
         Game game = createTestGame(new Board());
         GameHistory history = createTestGameHistory();
@@ -159,17 +167,6 @@ public class RecruitmentQueryTest {
         addRecruitmentPhase(history);
 
         assertFalse(RecruitmentQuery.canRecruit(game, history, TeamColor.Black));
-    }
-
-    @Test
-    public void canRecruit_shouldThrowWhenNotInRecruitmentPhase() {
-        Game game = createTestGame(new Board());
-        GameHistory history = createTestGameHistory();
-
-        assertThrows(
-                IllegalStateException.class,
-                () -> RecruitmentQuery.canRecruit(game, history, TeamColor.Black)
-        );
     }
 
     @Test

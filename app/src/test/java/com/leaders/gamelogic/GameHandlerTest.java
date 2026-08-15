@@ -75,7 +75,6 @@ public class GameHandlerTest {
         private InteractionFeedback lastFeedback;
         private int feedbackCount;
         private CompletableFuture<Void> phaseChangedResult = CompletableFuture.completedFuture(null);
-        private Player winner;
 
         private TestGameFlowListener(GameHistory history) {
             this.history = history;
@@ -91,7 +90,6 @@ public class GameHandlerTest {
         @NonNull
         @Override
         public CompletableFuture<Void> onGameEnded(@NonNull Player winner) {
-            this.winner = winner;
             return CompletableFuture.completedFuture(null);
         }
 
@@ -163,8 +161,6 @@ public class GameHandlerTest {
         InteractionFeedback getLastFeedback() {
             return lastFeedback;
         }
-
-        Player getWinner() { return winner; }
     }
 
     @Test
@@ -1761,7 +1757,7 @@ public class GameHandlerTest {
     }
 
     @Test
-    public void runTurnEndPhaseAsync_shouldRemoveBarrageWarningWhenNoBarrageIsDetected() throws Exception {
+    public void runTurnEndPhaseAsync_shouldRemoveBarrageWarningWhenNoBarrageIsDetected() {
         GameHistory history = createTurnEndGameHistory(false, 1);
         GameHandler gameHandler = new GameHandler(history, new TestGameFlowListener(history));
         GamePhase currentPhase = new GamePhase(
@@ -1782,7 +1778,7 @@ public class GameHandlerTest {
     }
 
     @Test
-    public void runTurnEndPhaseAsync_shouldAddBarrageWarningWhenBarrageIsDetected() throws Exception {
+    public void runTurnEndPhaseAsync_shouldAddBarrageWarningWhenBarrageIsDetected() {
         GameHistory history = createTurnEndGameHistory(true, 0);
         GameHandler gameHandler = new GameHandler(history, new TestGameFlowListener(history));
         GamePhase currentPhase = new GamePhase(
@@ -1803,7 +1799,7 @@ public class GameHandlerTest {
     }
 
     @Test
-    public void runTurnEndPhaseAsync_shouldNotRemoveWarningWhenNoWarningExists() throws Exception {
+    public void runTurnEndPhaseAsync_shouldNotRemoveWarningWhenNoWarningExists() {
         GameHistory history = createTurnEndGameHistory(false, 0);
         GameHandler gameHandler = new GameHandler(history, new TestGameFlowListener(history));
         GamePhase currentPhase = new GamePhase(
@@ -1864,7 +1860,7 @@ public class GameHandlerTest {
             Method getWinner = exception.getClass().getDeclaredMethod("getWinner");
             getWinner.setAccessible(true);
 
-            assertSame(players.get(1), (Player) getWinner.invoke(exception));
+            assertSame(players.get(1), getWinner.invoke(exception));
         }
     }
 
@@ -2387,8 +2383,6 @@ public class GameHandlerTest {
                 Collections.singletonList(initialPlacement)
         );
 
-        GameHistory history = new GameHistory(config, new ArrayList<>());;
-
-        return history;
+        return new GameHistory(config, new ArrayList<>());
     }
 }
