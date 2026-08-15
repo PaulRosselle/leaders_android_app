@@ -7,6 +7,7 @@ import com.leaders.gamelogic.actions.BanishmentAction;
 import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.actions.RecruitmentAction;
+import com.leaders.gamelogic.actions.WarningAction;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
@@ -17,6 +18,7 @@ import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.GamePhaseType;
 import com.leaders.gamelogic.enums.TeamColor;
+import com.leaders.gamelogic.enums.WarningType;
 import com.leaders.gamelogic.factories.CharacterActionResolverFactory;
 import com.leaders.gamelogic.factories.GameActionHandlerFactory;
 import com.leaders.gamelogic.factories.GameFactory;
@@ -40,6 +42,7 @@ import com.leaders.gamelogic.interactions.RecruitmentActionBuilder;
 import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BanishmentQuery;
 import com.leaders.gamelogic.queries.GameHistoryQuery;
+import com.leaders.gamelogic.queries.GameQuery;
 import com.leaders.gamelogic.queries.PhaseTransitionQuery;
 import com.leaders.gamelogic.queries.PlayabilityQuery;
 import com.leaders.gamelogic.queries.RecruitmentQuery;
@@ -648,6 +651,15 @@ public final class GameHandler {
     }
 
     private CompletableFuture<Void> runTurnEndPhaseAsync(@NonNull GamePhase currentPhase) {
+        TeamColor teamColor = currentPhase.getPhasePlayer().getTeamColor();
+
+        if (GameQuery.isBarrageDetected(currentGame, teamColor)) {
+            doAction(currentPhase, new WarningAction(WarningType.Barrage, teamColor, 1));
+            checkGameEnded(currentPhase);
+        } else if (currentGame.getPlayerWarningCount(teamColor, WarningType.Barrage) > 0) {
+            doAction(currentPhase, new WarningAction(WarningType.Barrage, teamColor, -1));
+        }
+
         return CompletableFuture.completedFuture(null);
     }
 
