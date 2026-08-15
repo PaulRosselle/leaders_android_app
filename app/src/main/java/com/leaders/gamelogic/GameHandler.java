@@ -743,6 +743,11 @@ public final class GameHandler {
      * @param currentPhase current game phase
      */
     private void checkGameEnded(@NonNull GamePhase currentPhase) {
-        // Not implemented yet
+        TeamColor winnerTeam = GameQuery.getWinnerTeam(currentGame, currentPhase.getPhasePlayer().getTeamColor());
+
+        if (winnerTeam != null) {
+            Player winner = GameHistoryQuery.getPlayerFromTeam(currentHistory, winnerTeam);
+            throw new GameEndedException(winner);
+        }
     }
 }
