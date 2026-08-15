@@ -470,9 +470,28 @@ public final class GameHandler {
         });
     }
 
+    /**
+     * Runs the recruitment phase until no further recruitment is possible.
+     *
+     * @param currentPhase current recruitment phase
+     * @return a future completed when the recruitment phase is finished
+     */
     private CompletableFuture<Void> runRecruitmentPhaseAsync(@NonNull GamePhase currentPhase) {
-        // Future coordination of the complete recruitment phase.
-        return CompletableFuture.completedFuture(null);
+        TeamColor recruitmentTeamColor = currentPhase.getPhasePlayer().getTeamColor();
+
+        if (!RecruitmentQuery.canRecruit(currentGame, currentHistory, recruitmentTeamColor)) {
+            return CompletableFuture.completedFuture(null);
+        }
+
+        return runSelectRecruitmentCardAsync()
+                .thenCompose(selectableCard -> {
+                    if (selectableCard == null) {
+                        return CompletableFuture.completedFuture(null);
+                    }
+
+                    return runRecruitCardAsync(currentPhase, selectableCard.getCharacterCard());
+                })
+                .thenCompose(ignored -> runRecruitmentPhaseAsync(currentPhase));
     }
 
     /**

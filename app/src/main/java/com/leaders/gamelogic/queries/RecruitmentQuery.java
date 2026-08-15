@@ -30,8 +30,16 @@ public final class RecruitmentQuery {
     }
 
     public static boolean canRecruit(@NonNull Game game, @NonNull GameHistory gameHistory, @NonNull TeamColor teamColor) {
-        return getRecruitmentLimit(game, gameHistory, teamColor) > 0
+        return getRecruitmentLimit(game, gameHistory, teamColor) > getCurrentRecruitmentCount(gameHistory)
                 && !BoardQuery.getRecruitmentCells(game.getBoard(), teamColor).isEmpty();
+    }
+
+    private static int getCurrentRecruitmentCount(@NonNull GameHistory gameHistory) {
+        IPhase currentPhase = GameHistoryQuery.findCurrentPhase(gameHistory);
+        if (!(currentPhase instanceof RecruitmentPhase)) {
+            throw new IllegalStateException("Cannot get the current recruitment count outside of a recruitment phase");
+        }
+        return ((RecruitmentPhase) currentPhase).getRecruitmentActions().size();
     }
 
     /**
@@ -71,7 +79,7 @@ public final class RecruitmentQuery {
         // We only return a list if a recruitment phase is in progress.
         IPhase currentPhase = GameHistoryQuery.findCurrentPhase(gameHistory);
         if (!(currentPhase instanceof RecruitmentPhase)) {
-            return List.of();
+            throw new IllegalStateException("Cannot get valid recruitment cards outside of a recruitment phase");
         }
 
         RecruitmentPhase recruitmentPhase = (RecruitmentPhase) currentPhase;
