@@ -1821,6 +1821,53 @@ public class GameHandlerTest {
         assertTrue(turnEndPhase.getActions().isEmpty());
     }
 
+    @Test
+    public void checkGameEnded_shouldNotThrowWhenThereIsNoWinner() throws Exception {
+        GameHistory history = createCheckGameEndedGameHistory();
+        GameHandler gameHandler = new GameHandler(history, new TestGameFlowListener(history));
+
+        GamePhase currentPhase = new GamePhase(
+                GamePhaseType.TurnEnd,
+                history.getConfig().getPlayers().get(0)
+        );
+
+        invokeCheckGameEnded(gameHandler, currentPhase);
+    }
+
+    @Test
+    public void checkGameEnded_shouldSignalWinnerWhenThereIsAWinner() throws Exception {
+        List<Player> players = createPlayers();
+        List<IGameAction> initialPlacements = Collections.singletonList(
+                new WarningAction(WarningType.Barrage, TeamColor.Black, 2)
+        );
+
+        GameConfig config = new GameConfig(
+                players,
+                players.get(0),
+                GameMode.Discovery,
+                Collections.emptyList(),
+                initialPlacements
+        );
+        GameHistory history = new GameHistory(config, new ArrayList<>());
+        GameHandler gameHandler = new GameHandler(history, new TestGameFlowListener(history));
+
+        GamePhase currentPhase = new GamePhase(
+                GamePhaseType.TurnEnd,
+                players.get(0)
+        );
+
+        try {
+            invokeCheckGameEnded(gameHandler, currentPhase);
+            fail("Expected GameEndedException");
+        } catch (Exception exception) {
+            assertEquals("GameEndedException", exception.getClass().getSimpleName());
+            Method getWinner = exception.getClass().getDeclaredMethod("getWinner");
+            getWinner.setAccessible(true);
+
+            assertSame(players.get(1), (Player) getWinner.invoke(exception));
+        }
+    }
+
     @SuppressWarnings("unchecked")
     private CompletableFuture<Void> invokeStartNextPhase(GameHandler gameHandler) throws Exception {
         Method method = GameHandler.class.getDeclaredMethod("startNextPhaseAsync");
@@ -2089,6 +2136,25 @@ public class GameHandlerTest {
         }
     }
 
+    private void invokeCheckGameEnded(GameHandler gameHandler,
+                                      GamePhase currentPhase) throws Exception {
+        Method method = GameHandler.class.getDeclaredMethod(
+                "checkGameEnded",
+                GamePhase.class
+        );
+        method.setAccessible(true);
+
+        try {
+            method.invoke(gameHandler, currentPhase);
+        } catch (InvocationTargetException exception) {
+            Throwable cause = exception.getCause();
+            if (cause instanceof Exception) {
+                throw (Exception) cause;
+            }
+            throw exception;
+        }
+    }
+
     private GameHistory createGameHistory() {
         return createGameHistory(GameMode.Discovery, createPlayers());
     }
@@ -2103,12 +2169,19 @@ public class GameHandlerTest {
 
     private GameHistory createGameHistory(GameMode gameMode, List<Player> players,
                                           List<CharacterCard> initialRecruitableCards) {
+        Character leaderBlack = Character.create(CharacterType.LeaderKing, TeamColor.Black);
+        Character leaderWhite = Character.create(CharacterType.LeaderQueen, TeamColor.White);
+        RecruitmentAction initialPlacement = new RecruitmentAction(Arrays.asList(
+                new RecruitmentActionMotion(RecruitmentMotionType.Add, leaderBlack, new Position(3, 0)),
+                new RecruitmentActionMotion(RecruitmentMotionType.Add, leaderWhite, new Position(3, 6))
+        ));
+
         GameConfig config = new GameConfig(
                 players,
                 players.get(0),
                 gameMode,
                 initialRecruitableCards,
-                Collections.emptyList()
+                List.of(initialPlacement)
         );
         return new GameHistory(config, new ArrayList<>());
     }
@@ -2116,7 +2189,8 @@ public class GameHandlerTest {
     private GameHistory createPlayableCharacterGameHistory(@NonNull List<Character> characters) {
         List<Player> players = createPlayers();
 
-        Character leader = Character.create(CharacterType.LeaderKing, TeamColor.Black);
+        Character leaderBlack = Character.create(CharacterType.LeaderKing, TeamColor.Black);
+        Character leaderWhite = Character.create(CharacterType.LeaderQueen, TeamColor.White);
         Character acrobat = Character.create(CharacterType.Acrobat, TeamColor.Black);
         Character archer = Character.create(CharacterType.Archer, TeamColor.Black);
 
@@ -2124,7 +2198,8 @@ public class GameHandlerTest {
         characters.add(archer);
 
         RecruitmentAction initialPlacement = new RecruitmentAction(Arrays.asList(
-                new RecruitmentActionMotion(RecruitmentMotionType.Add, leader, new Position(3, 0)),
+                new RecruitmentActionMotion(RecruitmentMotionType.Add, leaderBlack, new Position(3, 0)),
+                new RecruitmentActionMotion(RecruitmentMotionType.Add, leaderWhite, new Position(3, 6)),
                 new RecruitmentActionMotion(RecruitmentMotionType.Add, acrobat, new Position(3, 3)),
                 new RecruitmentActionMotion(RecruitmentMotionType.Add, archer, new Position(3, 4))
         ));
@@ -2171,10 +2246,12 @@ public class GameHandlerTest {
     private GameHistory createRecruitCardGameHistory() {
         List<Player> players = createPlayers();
 
-        Character leader = Character.create(CharacterType.LeaderKing, TeamColor.Black);
+        Character leaderBlack = Character.create(CharacterType.LeaderKing, TeamColor.Black);
+        Character leaderWhite = Character.create(CharacterType.LeaderQueen, TeamColor.White);
 
-        RecruitmentAction initialPlacement = new RecruitmentAction(Collections.singletonList(
-                new RecruitmentActionMotion(RecruitmentMotionType.Add, leader, new Position(3, 0))
+        RecruitmentAction initialPlacement = new RecruitmentAction(Arrays.asList(
+                new RecruitmentActionMotion(RecruitmentMotionType.Add, leaderBlack, new Position(3, 0)),
+                new RecruitmentActionMotion(RecruitmentMotionType.Add, leaderWhite, new Position(3, 6))
         ));
 
         GameConfig config = new GameConfig(
@@ -2201,14 +2278,12 @@ public class GameHandlerTest {
     private GameHistory createRecruitmentPhaseGameHistory() {
         List<Player> players = createPlayers();
 
-        Character leader = Character.create(CharacterType.LeaderKing, TeamColor.Black);
+        Character leaderBlack = Character.create(CharacterType.LeaderKing, TeamColor.Black);
+        Character leaderWhite = Character.create(CharacterType.LeaderQueen, TeamColor.White);
 
-        RecruitmentAction initialPlacement = new RecruitmentAction(Collections.singletonList(
-                new RecruitmentActionMotion(
-                        RecruitmentMotionType.Add,
-                        leader,
-                        new Position(3, 0)
-                )
+        RecruitmentAction initialPlacement = new RecruitmentAction(Arrays.asList(
+                new RecruitmentActionMotion(RecruitmentMotionType.Add, leaderBlack, new Position(3, 0)),
+                new RecruitmentActionMotion(RecruitmentMotionType.Add, leaderWhite, new Position(3, 6))
         ));
 
         GameConfig config = new GameConfig(
@@ -2291,5 +2366,29 @@ public class GameHandlerTest {
                 new Player(TeamColor.Black, "Black Player"),
                 new Player(TeamColor.White, "White Player")
         );
+    }
+
+    private GameHistory createCheckGameEndedGameHistory() {
+        List<Player> players = createPlayers();
+
+        Character leaderBlack = Character.create(CharacterType.LeaderKing, TeamColor.Black);
+        Character leaderWhite = Character.create(CharacterType.LeaderQueen, TeamColor.White);
+
+        RecruitmentAction initialPlacement = new RecruitmentAction(Arrays.asList(
+                new RecruitmentActionMotion(RecruitmentMotionType.Add, leaderBlack, new Position(3, 0)),
+                new RecruitmentActionMotion(RecruitmentMotionType.Add, leaderWhite, new Position(3, 6))
+        ));
+
+        GameConfig config = new GameConfig(
+                players,
+                players.get(0),
+                GameMode.Discovery,
+                Arrays.asList(CharacterCard.Bruiser, CharacterCard.HermitAndCub),
+                Collections.singletonList(initialPlacement)
+        );
+
+        GameHistory history = new GameHistory(config, new ArrayList<>());;
+
+        return history;
     }
 }
