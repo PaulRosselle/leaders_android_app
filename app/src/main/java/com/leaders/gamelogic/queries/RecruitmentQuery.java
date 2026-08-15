@@ -37,7 +37,7 @@ public final class RecruitmentQuery {
     private static int getCurrentRecruitmentCount(@NonNull GameHistory gameHistory) {
         IPhase currentPhase = GameHistoryQuery.findCurrentPhase(gameHistory);
         if (!(currentPhase instanceof RecruitmentPhase)) {
-            throw new IllegalStateException("Cannot get the current recruitment count outside of a recruitment phase");
+           return 0;
         }
         return ((RecruitmentPhase) currentPhase).getRecruitmentActions().size();
     }
