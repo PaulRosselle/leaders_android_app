@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="DecorativeBackgroundView">
+        <attr name="corner_top_left_visible" format="boolean"/>
+        <attr name="corner_top_right_visible" format="boolean"/>
+        <attr name="corner_bottom_right_visible" format="boolean"/>
+        <attr name="corner_bottom_left_visible" format="boolean"/>
+    </declare-styleable>
+</resources>
