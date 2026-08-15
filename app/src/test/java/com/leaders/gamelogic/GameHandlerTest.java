@@ -59,6 +59,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 public class GameHandlerTest {
     private static class TestGameFlowListener implements IGameFlowListener {
@@ -1638,6 +1639,121 @@ public class GameHandlerTest {
                         .getCharacterType());
     }
 
+    @Test
+    public void runBanishmentPhaseAsync_shouldRequestAndApplySelectedCard() {
+        GameHistory history = createGameHistory(
+                GameMode.Strategist,
+                createPlayers(),
+                Collections.singletonList(CharacterCard.Archer)
+        );
+        BanishmentPhase banishmentPhase = new BanishmentPhase(TeamColor.Black);
+        banishmentPhase.start();
+        history.getEntries().add(banishmentPhase);
+
+        TestGameFlowListener listener = new TestGameFlowListener(history);
+        SelectableCharacterCard selectedCard = new SelectableCharacterCard(
+                CharacterCard.Archer,
+                CharacterCardSelectionStatus.Banishable
+        );
+        listener.inputRequiredResults.add(new InteractionResult(
+                InteractionResultType.SelectableCharacterCardChosen,
+                new InteractionContext(),
+                new InteractionTarget(TargetCategory.BanishmentCard, selectedCard)
+        ));
+
+        GameHandler gameHandler = new GameHandler(history, listener);
+        GamePhase currentPhase = new GamePhase(
+                GamePhaseType.Banishment,
+                history.getConfig().getPlayers().get(0)
+        );
+
+        invokeRunBanishmentPhaseAsync(gameHandler, currentPhase).join();
+
+        assertEquals(1, listener.getInputRequiredCount());
+        assertEquals(InteractionType.SelectableCharacterCardExpected,
+                listener.getLastInputRequired().getRequestType());
+        assertEquals(1, listener.getLastInputRequired().getLegalResults().size());
+        assertEquals(InteractionResultType.SelectableCharacterCardChosen,
+                listener.getLastInputRequired().getLegalResults().get(0));
+        assertEquals(1, listener.getLastInputRequired().getLegalTargets().size());
+        assertEquals(TargetCategory.BanishmentCard,
+                listener.getLastInputRequired().getLegalTargets().get(0).getCategory());
+        assertEquals(1, banishmentPhase.getActions().size());
+        assertTrue(banishmentPhase.getActions().get(0) instanceof BanishmentAction);
+
+        BanishmentAction action = (BanishmentAction) banishmentPhase.getActions().get(0);
+        assertEquals(CharacterCard.Archer, action.getCharacterCard());
+        assertEquals(TeamColor.Black, action.getTeamColor());
+        assertFalse(gameHandler.getCurrentGame().getRecruitableCards().contains(CharacterCard.Archer));
+        assertTrue(gameHandler.getCurrentGame().getBanishedCards(TeamColor.Black).contains(CharacterCard.Archer));
+    }
+
+    @Test
+    public void runBanishmentPhaseAsync_shouldRejectIllegalInteractionResult() {
+        GameHistory history = createGameHistory(
+                GameMode.Strategist,
+                createPlayers(),
+                Collections.singletonList(CharacterCard.Archer)
+        );
+        BanishmentPhase banishmentPhase = new BanishmentPhase(TeamColor.Black);
+        banishmentPhase.start();
+        history.getEntries().add(banishmentPhase);
+
+        TestGameFlowListener listener = new TestGameFlowListener(history);
+        listener.inputRequiredResults.add(new InteractionResult(
+                InteractionResultType.CancelAction,
+                new InteractionContext(),
+                null
+        ));
+
+        GameHandler gameHandler = new GameHandler(history, listener);
+        GamePhase currentPhase = new GamePhase(
+                GamePhaseType.Banishment,
+                history.getConfig().getPlayers().get(0)
+        );
+
+        try {
+            invokeRunBanishmentPhaseAsync(gameHandler, currentPhase).join();
+            fail("Expected IllegalStateException");
+        } catch (CompletionException exception) {
+            assertTrue(exception.getCause() instanceof IllegalStateException);
+        }
+        assertTrue(banishmentPhase.getActions().isEmpty());
+    }
+
+    @Test
+    public void runBanishmentPhaseAsync_shouldRejectMissingSelectedCard() {
+        GameHistory history = createGameHistory(
+                GameMode.Strategist,
+                createPlayers(),
+                Collections.singletonList(CharacterCard.Archer)
+        );
+        BanishmentPhase banishmentPhase = new BanishmentPhase(TeamColor.Black);
+        banishmentPhase.start();
+        history.getEntries().add(banishmentPhase);
+
+        TestGameFlowListener listener = new TestGameFlowListener(history);
+        listener.inputRequiredResults.add(new InteractionResult(
+                InteractionResultType.SelectableCharacterCardChosen,
+                new InteractionContext(),
+                null
+        ));
+
+        GameHandler gameHandler = new GameHandler(history, listener);
+        GamePhase currentPhase = new GamePhase(
+                GamePhaseType.Banishment,
+                history.getConfig().getPlayers().get(0)
+        );
+
+        try {
+            invokeRunBanishmentPhaseAsync(gameHandler, currentPhase).join();
+            fail("Expected IllegalStateException");
+        } catch (CompletionException exception) {
+            assertTrue(exception.getCause() instanceof IllegalStateException);
+        }
+        assertTrue(banishmentPhase.getActions().isEmpty());
+    }
+
     @SuppressWarnings("unchecked")
     private CompletableFuture<Void> invokeStartNextPhase(GameHandler gameHandler) throws Exception {
         Method method = GameHandler.class.getDeclaredMethod("startNextPhaseAsync");
@@ -1853,6 +1969,26 @@ public class GameHandlerTest {
                     gameHandler,
                     currentPhase
             );
+        } catch (InvocationTargetException exception) {
+            Throwable cause = exception.getCause();
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            }
+            throw new RuntimeException(cause);
+        } catch (ReflectiveOperationException exception) {
+            throw new RuntimeException(exception);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private CompletableFuture<Void> invokeRunBanishmentPhaseAsync(
+            GameHandler gameHandler,
+            GamePhase currentPhase) {
+        try {
+            Method method = GameHandler.class.getDeclaredMethod("runBanishmentPhaseAsync", GamePhase.class);
+            method.setAccessible(true);
+
+            return (CompletableFuture<Void>) method.invoke(gameHandler, currentPhase);
         } catch (InvocationTargetException exception) {
             Throwable cause = exception.getCause();
             if (cause instanceof RuntimeException) {

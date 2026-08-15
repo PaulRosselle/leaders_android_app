@@ -3,6 +3,7 @@ package com.leaders.gamelogic;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.leaders.gamelogic.actions.BanishmentAction;
 import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.actions.RecruitmentAction;
@@ -37,6 +38,7 @@ import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.interactions.InteractionType;
 import com.leaders.gamelogic.interactions.RecruitmentActionBuilder;
 import com.leaders.gamelogic.interactions.TargetCategory;
+import com.leaders.gamelogic.queries.BanishmentQuery;
 import com.leaders.gamelogic.queries.GameHistoryQuery;
 import com.leaders.gamelogic.queries.PhaseTransitionQuery;
 import com.leaders.gamelogic.queries.PlayabilityQuery;
@@ -45,6 +47,7 @@ import com.leaders.gamelogic.resolvers.CharacterActionResolver;
 import com.leaders.gamelogic.resolvers.RecruitmentActionResolver;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -546,26 +549,28 @@ public final class GameHandler {
                 );
             }
 
-            return CompletableFuture.completedFuture(getSelectableCharacterCardFromResult(result));
+            return CompletableFuture.completedFuture(
+                    getSelectableCharacterCardFromResult(result, TargetCategory.RecruitmentCard));
         });
     }
 
     /**
      * Retrieves the character card selected by the given interaction result.
      *
-     * @param result the interaction result containing the selected recruitment target
+     * @param result the interaction result containing the selected character card target
      * @return the selected character card
      * @throws IllegalStateException if the interaction result does not contain a
-     *                               valid recruitment target or if the selected
+     *                               valid character card target or if the selected
      *                               character card is missing
      */
     @NonNull
-    private static SelectableCharacterCard getSelectableCharacterCardFromResult(@NonNull InteractionResult result) {
+    private static SelectableCharacterCard getSelectableCharacterCardFromResult(@NonNull InteractionResult result,
+                                                                                @NonNull TargetCategory legalCategory) {
         InteractionTarget chosenTarget = result.getChosenTarget();
         SelectableCharacterCard chosenCard = chosenTarget == null ? null : chosenTarget.getChosenSelectableCharacterCard();
 
         if (chosenTarget == null ||
-                chosenTarget.getCategory() != TargetCategory.RecruitmentCard ||
+                chosenTarget.getCategory() != legalCategory ||
                 chosenCard == null) {
             throw new IllegalStateException(
                     "Invalid interaction result : chosen card missing for recruitment"
@@ -647,7 +652,37 @@ public final class GameHandler {
     }
 
     private CompletableFuture<Void> runBanishmentPhaseAsync(@NonNull GamePhase currentPhase) {
-        return CompletableFuture.completedFuture(null);
+        List<SelectableCharacterCard> selectableBanishmentCards =
+                BanishmentQuery.getSelectableBanishmentCards(currentGame);
+
+        List<InteractionTarget> legalTargets = new ArrayList<>();
+        for (SelectableCharacterCard selectableBanishmentCard : selectableBanishmentCards) {
+            legalTargets.add(new InteractionTarget(TargetCategory.BanishmentCard, selectableBanishmentCard));
+        }
+
+        InteractionRequest request = new InteractionRequest(
+                InteractionType.SelectableCharacterCardExpected,
+                new InteractionContext(),
+                legalTargets,
+                Collections.singletonList(InteractionResultType.SelectableCharacterCardChosen)
+        );
+
+        return gameFlowListener.onInputRequired(request).thenAccept(result -> {
+            if (result.getResultType() != InteractionResultType.SelectableCharacterCardChosen) {
+                throw new IllegalStateException(
+                        "Invalid interaction result : illegal type \"" +
+                                result.getResultType() +
+                                "\" for banishment card selection"
+                );
+            }
+
+            SelectableCharacterCard selectedCard = getSelectableCharacterCardFromResult(result, TargetCategory.BanishmentCard);
+            BanishmentAction action = new BanishmentAction(
+                    selectedCard.getCharacterCard(),
+                    currentPhase.getPhasePlayer().getTeamColor()
+            );
+            doAction(currentPhase, action);
+        });
     }
 
     /**
