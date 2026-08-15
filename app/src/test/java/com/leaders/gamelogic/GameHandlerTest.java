@@ -17,6 +17,7 @@ import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.actions.RecruitmentAction;
 import com.leaders.gamelogic.actions.RecruitmentActionMotion;
+import com.leaders.gamelogic.actions.WarningAction;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameConfig;
@@ -33,6 +34,7 @@ import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.GamePhaseType;
 import com.leaders.gamelogic.enums.RecruitmentMotionType;
 import com.leaders.gamelogic.enums.TeamColor;
+import com.leaders.gamelogic.enums.WarningType;
 import com.leaders.gamelogic.historyentries.segments.ActionsPhase;
 import com.leaders.gamelogic.historyentries.segments.BanishmentPhase;
 import com.leaders.gamelogic.historyentries.segments.RecruitmentPhase;
@@ -73,6 +75,7 @@ public class GameHandlerTest {
         private InteractionFeedback lastFeedback;
         private int feedbackCount;
         private CompletableFuture<Void> phaseChangedResult = CompletableFuture.completedFuture(null);
+        private Player winner;
 
         private TestGameFlowListener(GameHistory history) {
             this.history = history;
@@ -88,6 +91,7 @@ public class GameHandlerTest {
         @NonNull
         @Override
         public CompletableFuture<Void> onGameEnded(@NonNull Player winner) {
+            this.winner = winner;
             return CompletableFuture.completedFuture(null);
         }
 
@@ -159,6 +163,8 @@ public class GameHandlerTest {
         InteractionFeedback getLastFeedback() {
             return lastFeedback;
         }
+
+        Player getWinner() { return winner; }
     }
 
     @Test
@@ -1754,6 +1760,67 @@ public class GameHandlerTest {
         assertTrue(banishmentPhase.getActions().isEmpty());
     }
 
+    @Test
+    public void runTurnEndPhaseAsync_shouldRemoveBarrageWarningWhenNoBarrageIsDetected() throws Exception {
+        GameHistory history = createTurnEndGameHistory(false, 1);
+        GameHandler gameHandler = new GameHandler(history, new TestGameFlowListener(history));
+        GamePhase currentPhase = new GamePhase(
+                GamePhaseType.TurnEnd,
+                history.getConfig().getPlayers().get(0)
+        );
+
+        invokeRunTurnEndPhaseAsync(gameHandler, currentPhase).join();
+
+        assertEquals(0, gameHandler.getCurrentGame()
+                .getPlayerWarningCount(TeamColor.Black, WarningType.Barrage));
+
+        TurnEndPhase turnEndPhase = (TurnEndPhase) ((Turn) history.getEntries().get(0))
+                .getSubPhase(GamePhaseType.TurnEnd);
+        assertEquals(2, turnEndPhase.getActions().size());
+        assertTrue(turnEndPhase.getActions().get(1) instanceof WarningAction);
+        assertEquals(-1, ((WarningAction) turnEndPhase.getActions().get(1)).getCountChange());
+    }
+
+    @Test
+    public void runTurnEndPhaseAsync_shouldAddBarrageWarningWhenBarrageIsDetected() throws Exception {
+        GameHistory history = createTurnEndGameHistory(true, 0);
+        GameHandler gameHandler = new GameHandler(history, new TestGameFlowListener(history));
+        GamePhase currentPhase = new GamePhase(
+                GamePhaseType.TurnEnd,
+                history.getConfig().getPlayers().get(0)
+        );
+
+        invokeRunTurnEndPhaseAsync(gameHandler, currentPhase).join();
+
+        assertEquals(1, gameHandler.getCurrentGame()
+                .getPlayerWarningCount(TeamColor.Black, WarningType.Barrage));
+
+        TurnEndPhase turnEndPhase = (TurnEndPhase) ((Turn) history.getEntries().get(0))
+                .getSubPhase(GamePhaseType.TurnEnd);
+        assertEquals(1, turnEndPhase.getActions().size());
+        assertTrue(turnEndPhase.getActions().get(0) instanceof WarningAction);
+        assertEquals(1, ((WarningAction) turnEndPhase.getActions().get(0)).getCountChange());
+    }
+
+    @Test
+    public void runTurnEndPhaseAsync_shouldNotRemoveWarningWhenNoWarningExists() throws Exception {
+        GameHistory history = createTurnEndGameHistory(false, 0);
+        GameHandler gameHandler = new GameHandler(history, new TestGameFlowListener(history));
+        GamePhase currentPhase = new GamePhase(
+                GamePhaseType.TurnEnd,
+                history.getConfig().getPlayers().get(0)
+        );
+
+        invokeRunTurnEndPhaseAsync(gameHandler, currentPhase).join();
+
+        assertEquals(0, gameHandler.getCurrentGame()
+                .getPlayerWarningCount(TeamColor.Black, WarningType.Barrage));
+
+        TurnEndPhase turnEndPhase = (TurnEndPhase) ((Turn) history.getEntries().get(0))
+                .getSubPhase(GamePhaseType.TurnEnd);
+        assertTrue(turnEndPhase.getActions().isEmpty());
+    }
+
     @SuppressWarnings("unchecked")
     private CompletableFuture<Void> invokeStartNextPhase(GameHandler gameHandler) throws Exception {
         Method method = GameHandler.class.getDeclaredMethod("startNextPhaseAsync");
@@ -2000,6 +2067,28 @@ public class GameHandlerTest {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    private CompletableFuture<Void> invokeRunTurnEndPhaseAsync(GameHandler gameHandler,
+                                                               GamePhase currentPhase) {
+        try {
+            Method method = GameHandler.class.getDeclaredMethod(
+                    "runTurnEndPhaseAsync",
+                    GamePhase.class
+            );
+            method.setAccessible(true);
+
+            return (CompletableFuture<Void>) method.invoke(gameHandler, currentPhase);
+        } catch (InvocationTargetException exception) {
+            Throwable cause = exception.getCause();
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            }
+            throw new RuntimeException(cause);
+        } catch (ReflectiveOperationException exception) {
+            throw new RuntimeException(exception);
+        }
+    }
+
     private GameHistory createGameHistory() {
         return createGameHistory(GameMode.Discovery, createPlayers());
     }
@@ -2140,6 +2229,59 @@ public class GameHandlerTest {
         turn.getSubPhase(GamePhaseType.Actions).start();
         turn.getSubPhase(GamePhaseType.Actions).end();
         turn.getSubPhase(GamePhaseType.Recruitment).start();
+
+        return history;
+    }
+
+    private GameHistory createTurnEndGameHistory(boolean barrageDetected, int initialWarningCount) {
+        List<Player> players = createPlayers();
+        List<IGameAction> initialPlacements = new ArrayList<>();
+
+        initialPlacements.add(new RecruitmentAction(Collections.singletonList(
+                new RecruitmentActionMotion(
+                        RecruitmentMotionType.Add,
+                        Character.create(CharacterType.LeaderKing, TeamColor.Black),
+                        new Position(0, 0)
+                )
+        )));
+        initialPlacements.add(new RecruitmentAction(Collections.singletonList(
+                new RecruitmentActionMotion(
+                        RecruitmentMotionType.Add,
+                        Character.create(CharacterType.LeaderKing, TeamColor.White),
+                        new Position(6, 3)
+                )
+        )));
+
+        if (barrageDetected) {
+            for (int y = 0; y <= 6; y++) {
+                initialPlacements.add(new RecruitmentAction(Collections.singletonList(
+                        new RecruitmentActionMotion(
+                                RecruitmentMotionType.Add,
+                                Character.create(CharacterType.Archer, TeamColor.Black),
+                                new Position(3, y)
+                        )
+                )));
+            }
+        }
+
+        GameConfig config = new GameConfig(
+                players,
+                players.get(0),
+                GameMode.Discovery,
+                Collections.emptyList(),
+                initialPlacements
+        );
+        GameHistory history = new GameHistory(config, new ArrayList<>());
+        Turn turn = new Turn(TeamColor.Black);
+        history.getEntries().add(turn);
+
+        if (initialWarningCount > 0) {
+            turn.getSubPhase(GamePhaseType.TurnEnd).getActions().add(
+                    new WarningAction(WarningType.Barrage, TeamColor.Black, initialWarningCount)
+            );
+        }
+
+        turn.getSubPhase(GamePhaseType.TurnEnd).start();
 
         return history;
     }
