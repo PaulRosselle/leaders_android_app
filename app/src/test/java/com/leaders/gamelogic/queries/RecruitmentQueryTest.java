@@ -2,10 +2,13 @@ package com.leaders.gamelogic.queries;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import androidx.annotation.NonNull;
 
+import com.leaders.gamelogic.actions.RecruitmentAction;
+import com.leaders.gamelogic.actions.RecruitmentActionMotion;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
@@ -13,16 +16,20 @@ import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameConfig;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.Player;
+import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.entities.SelectableCharacterCard;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterCardSelectionStatus;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.GameMode;
+import com.leaders.gamelogic.enums.RecruitmentMotionType;
 import com.leaders.gamelogic.enums.TeamColor;
+import com.leaders.gamelogic.historyentries.segments.RecruitmentPhase;
 import com.leaders.gamelogic.historyentries.segments.Turn;
 
 import org.junit.Test;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -77,49 +84,92 @@ public class RecruitmentQueryTest {
     }
 
     @Test
-    public void canRecruit_shouldReturnTrueWhenTeamCanRecruitAndCellIsAvailable() {
+    public void canRecruit_shouldReturnTrueWhenRecruitmentIsAllowedAndCellIsAvailable() {
         Game game = createTestGame(new Board());
         GameHistory history = createTestGameHistory();
+        addRecruitmentPhase(history);
 
         assertTrue(RecruitmentQuery.canRecruit(game, history, TeamColor.Black));
     }
 
     @Test
-    public void canRecruit_shouldReturnTrueForSecondPlayerWhenTheyHaveNoRecruitments() {
+    public void canRecruit_shouldReturnTrueForSecondPlayerAfterOneRecruitment() {
         Game game = createTestGame(new Board());
         GameHistory history = createTestGameHistory();
+        addRecruitmentPhase(history);
 
-        // White is the first player.
-        // Black therefore receives the special first-recruitment limit of 2.
+        addRecruitmentAction(history, TeamColor.Black);
+
         assertTrue(RecruitmentQuery.canRecruit(game, history, TeamColor.Black));
     }
 
     @Test
-    public void canRecruit_shouldReturnFalseWhenTeamIsFull() {
+    public void canRecruit_shouldReturnFalseForSecondPlayerAfterTwoRecruitments() {
         Game game = createTestGame(new Board());
         GameHistory history = createTestGameHistory();
+        addRecruitmentPhase(history);
 
-        addRecruitedCharacter(game, CharacterType.Archer, TeamColor.Black);
-        addRecruitedCharacter(game, CharacterType.Acrobat, TeamColor.Black);
-        addRecruitedCharacter(game, CharacterType.Assassin, TeamColor.Black);
-        addRecruitedCharacter(game, CharacterType.Bruiser, TeamColor.Black);
+        addRecruitmentAction(history, TeamColor.Black);
+        addRecruitmentAction(history, TeamColor.Black);
 
         assertFalse(RecruitmentQuery.canRecruit(game, history, TeamColor.Black));
+    }
+
+    @Test
+    public void canRecruit_shouldReturnFalseForFirstPlayerAfterOneRecruitment() {
+        Game game = createTestGame(new Board());
+        GameHistory history = createTestGameHistory();
+        addRecruitmentPhase(history);
+
+        addRecruitmentAction(history, TeamColor.White);
+
+        assertFalse(RecruitmentQuery.canRecruit(game, history, TeamColor.White));
+    }
+
+    @Test
+    public void canRecruit_shouldIgnoreRecruitmentsFromPreviousTurns() {
+        Game game = createTestGame(new Board());
+        GameHistory history = createTestGameHistory();
+
+        addRecruitmentPhase(history);
+        addRecruitmentAction(history, TeamColor.White);
+
+        Turn previousTurn = (Turn) history.getEntries().get(0);
+
+        Turn currentTurn = createTestTurn();
+        history.getEntries().add(currentTurn);
+        currentTurn.getSubPhasesInOrder()[2].start();
+
+        assertTrue(RecruitmentQuery.canRecruit(game, history, TeamColor.White));
+
+        assertEquals(1, ((RecruitmentPhase) previousTurn.getSubPhasesInOrder()[2]).getRecruitmentActions().size());
+        assertEquals(0, getCurrentRecruitmentPhase(history).getRecruitmentActions().size());
     }
 
     @Test
     public void canRecruit_shouldReturnFalseWhenNoRecruitmentCellIsAvailable() {
         Board board = new Board();
 
-        // Fill every recruitment cell for Black.
         for (Cell cell : BoardQuery.getRecruitmentCells(board, TeamColor.Black)) {
             cell.setCharacter(Character.create(CharacterType.Archer, TeamColor.Black));
         }
 
         Game game = createTestGame(board);
         GameHistory history = createTestGameHistory();
+        addRecruitmentPhase(history);
 
         assertFalse(RecruitmentQuery.canRecruit(game, history, TeamColor.Black));
+    }
+
+    @Test
+    public void canRecruit_shouldThrowWhenNotInRecruitmentPhase() {
+        Game game = createTestGame(new Board());
+        GameHistory history = createTestGameHistory();
+
+        assertThrows(
+                IllegalStateException.class,
+                () -> RecruitmentQuery.canRecruit(game, history, TeamColor.Black)
+        );
     }
 
     @Test
@@ -178,13 +228,16 @@ public class RecruitmentQueryTest {
     }
 
     @Test
-    public void getValidRecruitmentCards_shouldReturnEmptyOutsideRecruitmentPhase() {
+    public void getValidRecruitmentCards_shouldThrowsOutsideOfRecruitmentPhase() {
         Game game = createTestGame(new Board());
         game.getRecruitableCards().add(CharacterCard.Archer);
 
         GameHistory history = createTestGameHistory();
 
-        assertTrue(invokeGetValidRecruitmentCards(game, history).isEmpty());
+        assertThrows(
+                IllegalStateException.class,
+                () -> invokeGetValidRecruitmentCards(game, history)
+        );
     }
 
     @Test
@@ -311,26 +364,19 @@ public class RecruitmentQueryTest {
     }
 
     @Test
-    public void getSelectableRecruitmentCards_shouldReturnEmptyOutsideRecruitmentPhaseForRecruitableCards() {
+    public void getSelectableRecruitmentCards_shouldThrowOutsideRecruitmentPhaseForRecruitableCards() {
         Game game = createTestGame(new Board());
         game.getRecruitableCards().add(CharacterCard.Archer);
 
         GameHistory history = createTestGameHistory();
 
-        List<SelectableCharacterCard> cards =
-                RecruitmentQuery.getSelectableRecruitmentCards(
+
+        assertThrows(
+                IllegalStateException.class,
+                () -> RecruitmentQuery.getSelectableRecruitmentCards(
                         game,
                         history
-                );
-
-        assertEquals(1, cards.size());
-        assertEquals(
-                CharacterCard.Archer,
-                cards.get(0).getCharacterCard()
-        );
-        assertEquals(
-                CharacterCardSelectionStatus.RecruitmentImpossible,
-                cards.get(0).getSelectionStatus()
+                )
         );
     }
 
@@ -343,7 +389,29 @@ public class RecruitmentQueryTest {
 
             return (List<CharacterCard>) method.invoke(null, game, gameHistory);
         } catch (Exception e) {
-            throw new AssertionError("Unable to invoke getValidRecruitableCards", e);
+            if (e instanceof InvocationTargetException) {
+                Throwable targetException = ((InvocationTargetException) e).getTargetException();
+                throw (IllegalStateException) targetException;
+            } else {
+                throw new AssertionError("Unable to invoke getValidRecruitableCards", e);
+            }
         }
+    }
+
+    private RecruitmentPhase getCurrentRecruitmentPhase(@NonNull GameHistory gameHistory) {
+        return (RecruitmentPhase) GameHistoryQuery.findCurrentPhase(gameHistory);
+    }
+
+    private void addRecruitmentAction(@NonNull GameHistory gameHistory, @NonNull TeamColor teamColor) {
+        RecruitmentPhase recruitmentPhase = getCurrentRecruitmentPhase(gameHistory);
+        Character character = Character.create(CharacterType.Archer, teamColor);
+
+        recruitmentPhase.getActions().add(new RecruitmentAction(List.of(
+                new RecruitmentActionMotion(
+                        RecruitmentMotionType.Add,
+                        character,
+                        new Position(3, 2)
+                )
+        )));
     }
 }

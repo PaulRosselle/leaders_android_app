@@ -2,6 +2,7 @@ package com.leaders.gamelogic.queries;
 
 import static org.junit.Assert.assertEquals;
 
+import com.leaders.gamelogic.actions.RecruitmentAction;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
@@ -100,6 +101,7 @@ public class PhaseTransitionQueryTest {
 
     @Test
     public void getNextPhase_shouldReturnRecruitmentWhenRecruitmentIsPossible() {
+        Game game = createTestGame();
         GameHistory history = createTestGameHistory(GameMode.Discovery);
         Turn turn = createTestTurn();
         history.getEntries().add(turn);
@@ -108,7 +110,11 @@ public class PhaseTransitionQueryTest {
         actionsPhase.start();
         actionsPhase.end();
 
-        GamePhase nextPhase = getNextPhase(history);
+        RecruitmentPhase recruitmentPhase =
+                (RecruitmentPhase) turn.getSubPhasesInOrder()[2];
+        recruitmentPhase.start();
+
+        GamePhase nextPhase = PhaseTransitionQuery.getNextPhase(game, history);
 
         assertEquals(GamePhaseType.Recruitment, nextPhase.getPhaseType());
         assertEquals(TeamColor.Black, nextPhase.getPhasePlayer().getTeamColor());
@@ -125,10 +131,10 @@ public class PhaseTransitionQueryTest {
         actionsPhase.start();
         actionsPhase.end();
 
-        addRecruitedCharacter(game, CharacterType.Archer);
-        addRecruitedCharacter(game, CharacterType.Acrobat);
-        addRecruitedCharacter(game, CharacterType.Assassin);
-        addRecruitedCharacter(game, CharacterType.Bruiser);
+        RecruitmentPhase recruitmentPhase =
+                (RecruitmentPhase) turn.getSubPhasesInOrder()[2];
+        recruitmentPhase.start();
+        recruitmentPhase.getActions().add(new RecruitmentAction(new ArrayList<>()));
 
         GamePhase nextPhase = PhaseTransitionQuery.getNextPhase(game, history);
 
