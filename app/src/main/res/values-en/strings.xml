@@ -12,4 +12,5 @@
     <string name="no">no</string>
     <string name="back">back</string>
     <string name="go_back_to_main_menu">Go back to main menu ?</string>
+    <string name="crash_log_message">A problem caused the application to close.\n\nBy sending us a report, you will help us identify the cause and fix it quickly.</string>
 </resources>

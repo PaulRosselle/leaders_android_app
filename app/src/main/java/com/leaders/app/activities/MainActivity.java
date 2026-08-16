@@ -14,15 +14,48 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.leaders.R;
+import com.leaders.app.entities.crash.CrashLog;
 import com.leaders.app.enums.ActivityType;
+import com.leaders.app.utilities.JsonUtils;
+import com.leaders.app.views.CrashLogView;
 import com.leaders.app.views.MainMenuView;
 
 public final class MainActivity extends BaseActivity {
+    private CrashLogView clvCrashDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         startLightAnimation();
+    }
+
+    @Override
+    protected void initViews() {
+        super.initViews();
+
+        clvCrashDialog = findViewById(R.id.clvCrashDialog_actMain);
+    }
+
+    @Override
+    protected void initListeners() {
+        super.initListeners();
+
+        MainMenuView mmvMainMenu = findViewById(R.id.mmvMainMenu_actMain);
+        mmvMainMenu.setOnPuzzlesClickListener(this::btnNotImplementedClick);
+        mmvMainMenu.setOnPlayClickListener(this::btnNotImplementedClick);
+        mmvMainMenu.setOnReplayClickListener(this::btnNotImplementedClick);
+        mmvMainMenu.setOnRulesClickListener(this::btnNotImplementedClick);
+        mmvMainMenu.setOnSettingsClickListener(this::btnNotImplementedClick);
+    }
+
+    @Override
+    protected void initDatas() {
+        super.initDatas();
+
+        CrashLog crashLog = JsonUtils.loadCrashLog(this);
+        if (crashLog != null) {
+            clvCrashDialog.show(crashLog);
+        }
     }
 
     @Override
@@ -54,19 +87,6 @@ public final class MainActivity extends BaseActivity {
     @Override
     public ActivityType getActivityType() {
         return ActivityType.Main;
-    }
-
-    @Override
-    protected void initListeners() {
-        super.initListeners();
-
-        MainMenuView mmvMainMenu = findViewById(R.id.mmvMainMenu_actMain);
-
-        mmvMainMenu.setOnPuzzlesClickListener(this::btnNotImplementedClick);
-        mmvMainMenu.setOnPlayClickListener(this::btnNotImplementedClick);
-        mmvMainMenu.setOnReplayClickListener(this::btnNotImplementedClick);
-        mmvMainMenu.setOnRulesClickListener(this::btnNotImplementedClick);
-        mmvMainMenu.setOnSettingsClickListener(this::btnNotImplementedClick);
     }
 
     private void startLightAnimation() {

@@ -1,6 +1,8 @@
-package com.leaders.app.entities.crash;
+package com.leaders.app.entities;
 
 import android.app.Application;
+
+import com.leaders.app.entities.crash.CrashLoggingHandler;
 
 public final class LeadersApplication extends Application {
 

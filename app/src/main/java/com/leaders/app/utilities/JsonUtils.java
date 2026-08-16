@@ -24,8 +24,8 @@ public final class JsonUtils {
 
     private static final String CRASH_LOG_FILENAME = "crash_log.json";
 
-    private JsonUtils() {
-        // Utility class
+    private JsonUtils(){
+        throw new AssertionError("Cannot instantiate utility class");
     }
 
     //region GENERIC FILE METHODS
