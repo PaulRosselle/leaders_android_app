@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="alert_dialog_theme" parent="Theme.AppCompat.Dialog.Alert">
+        <item name="android:background">@color/darker_background</item>
+        <item name="android:textColor">@color/app_golden</item>
+        <item name="android:textColorPrimary">@color/font</item>
+    </style>
+
+    <style name="alert_dialog_items_theme" parent="Theme.AppCompat.Dialog.Alert">
+        <item name="android:background">@color/darker_background</item>
+        <item name="android:textColor">@color/app_golden</item>
+        <item name="android:textColorPrimary">@color/font</item>
+    </style>
+</resources>

@@ -9,4 +9,8 @@
     <string name="main_menu_background">décor du menu principal</string>
     <string name="main_menu_button_icon">icône de bouton du menu principal</string>
     <string name="main_title">titre du jeu</string>
+    <string name="yes">oui</string>
+    <string name="no">non</string>
+    <string name="back">retour</string>
+    <string name="go_back_to_main_menu">Revenir au menu principal ?</string>
 </resources>

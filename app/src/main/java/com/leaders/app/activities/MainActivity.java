@@ -1,7 +1,6 @@
 package com.leaders.app.activities;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
@@ -15,18 +14,54 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.leaders.R;
+import com.leaders.app.enums.ActivityType;
 import com.leaders.app.views.MainMenuView;
 
-public final class MainActivity extends AppCompatActivity {
+public final class MainActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
         startLightAnimation();
+    }
+
+    @Override
+    protected int getLayoutResId() {
+        return R.layout.activity_main;
+    }
+
+    @Override
+    protected Integer getBtnBackResId() {
+        return null;
+    }
+
+    @Override
+    protected boolean isImmersiveActivity() {
+        return false;
+    }
+
+    @Override
+    protected boolean overrideOnBackPressed() {
+        return false;
+    }
+
+    @Override
+    protected boolean askForConfirmationBeforeFinish() {
+        return false;
+    }
+
+    @NonNull
+    @Override
+    public ActivityType getActivityType() {
+        return ActivityType.Main;
+    }
+
+    @Override
+    protected void initListeners() {
+        super.initListeners();
 
         MainMenuView mmvMainMenu = findViewById(R.id.mmvMainMenu_actMain);
+
         mmvMainMenu.setOnPuzzlesClickListener(this::btnNotImplementedClick);
         mmvMainMenu.setOnPlayClickListener(this::btnNotImplementedClick);
         mmvMainMenu.setOnReplayClickListener(this::btnNotImplementedClick);
@@ -59,11 +94,8 @@ public final class MainActivity extends AppCompatActivity {
         lightAnimations.start();
     }
 
-    private ObjectAnimator getAnimator(@NonNull ImageView imvToAnimate,
-                                       @NonNull Property<View, Float> property,
-                                       int duration,
-                                       Interpolator interpolator,
-                                       int repeatMode,
+    private ObjectAnimator getAnimator(@NonNull ImageView imvToAnimate, @NonNull Property<View, Float> property,
+                                       int duration, @NonNull Interpolator interpolator, int repeatMode,
                                        float... values) {
         ObjectAnimator animator = ObjectAnimator.ofFloat(imvToAnimate, property, values);
         animator.setDuration(duration);

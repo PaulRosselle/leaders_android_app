@@ -8,4 +8,8 @@
     <string name="main_menu_background">main menu background</string>
     <string name="main_menu_button_icon">main menu button icon</string>
     <string name="main_title">main title</string>
+    <string name="yes">yes</string>
+    <string name="no">no</string>
+    <string name="back">back</string>
+    <string name="go_back_to_main_menu">Go back to main menu ?</string>
 </resources>
