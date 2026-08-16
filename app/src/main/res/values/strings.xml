@@ -16,4 +16,11 @@
     <string name="crash_log_message">Un problème a provoqué la fermeture de l\'application.\n\nEn nous envoyant un rapport, vous nous aiderez à en identifier la cause et à le corriger rapidement.</string>
     <string name="title_puzzles_selection">PuzzleS</string>
     <string name="play">jouer</string>
+    <string name="new_puzzle">Nouveau puzzle</string>
+    <string name="edit_puzzle">Modifier</string>
+    <string name="remove">Supprimer</string>
+    <string name="import_puzzle">Importer</string>
+    <string name="export_puzzle">Exporter</string>
+    <string name="select_all">Tout sélectionner</string>
+    <string name="unselect_all">Tout déselectionner</string>
 </resources>
