@@ -9,7 +9,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.leaders.R;
 
-public class MainMenuView extends ConstraintLayout {
+public final class MainMenuView extends ConstraintLayout {
     public MainMenuView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         inflate(context, R.layout.view_main_menu, this);

@@ -1,13 +1,12 @@
 package com.leaders.app.activities.puzzle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.enums.ActivityType;
 
-public class PuzzleSelectionActivity extends BaseActivity {
+public final class PuzzleSelectionActivity extends BaseActivity {
 
     @Override
     protected int getLayoutResId() {
@@ -19,7 +18,6 @@ public class PuzzleSelectionActivity extends BaseActivity {
         return R.id.gdlRoot_actPuzzleSelection;
     }
 
-    @Nullable
     @Override
     protected Integer getBtnBackResId() {
         return R.id.btnBack_actPuzzleSelection;

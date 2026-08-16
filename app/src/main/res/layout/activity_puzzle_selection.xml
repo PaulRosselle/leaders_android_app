@@ -26,6 +26,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <com.leaders.app.views.DecorativeBackgroundView
+        android:id="@+id/decorativeBackgroundView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -117,6 +118,15 @@
             android:orientation="vertical"
             android:padding="8dp" />
     </ScrollView>
+
+    <com.leaders.app.views.OrnateFrameView
+        android:id="@+id/ofvPuzzles_actPuzzleSelection"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@+id/scvPuzzles_actPuzzleSelection"
+        app:layout_constraintEnd_toEndOf="@+id/scvPuzzles_actPuzzleSelection"
+        app:layout_constraintStart_toStartOf="@+id/scvPuzzles_actPuzzleSelection"
+        app:layout_constraintTop_toTopOf="@+id/scvPuzzles_actPuzzleSelection" />
 
     <Button
         android:id="@+id/btnPlay_actPuzzleSelection"

@@ -5,4 +5,5 @@
     <dimen name="round_button_icon_size">48dp</dimen>
     <dimen name="default_text_font_size">20dp</dimen>
     <dimen name="title_font_size">34dp</dimen>
+    <dimen name="ornate_corner_size">24dp</dimen>
 </resources>

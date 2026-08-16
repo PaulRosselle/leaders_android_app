@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/clyBg_vwOrnateFrame"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/rect_stroke"
+    android:backgroundTint="@color/app_golden"
+    android:backgroundTintMode="multiply">
+
+    <ImageView
+        android:id="@+id/imvCornerBg1_vwOrnateFrame"
+        android:layout_width="@dimen/ornate_corner_size"
+        android:layout_height="@dimen/ornate_corner_size"
+        android:clickable="false"
+        android:importantForAccessibility="no"
+        android:rotation="90"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/ornate_corner" />
+
+    <ImageView
+        android:id="@+id/imvCornerBg2_vwOrnateFrame"
+        android:layout_width="@dimen/ornate_corner_size"
+        android:layout_height="@dimen/ornate_corner_size"
+        android:clickable="false"
+        android:importantForAccessibility="no"
+        android:rotation="180"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/ornate_corner" />
+
+    <ImageView
+        android:id="@+id/imvCornerBg3_vwOrnateFrame"
+        android:layout_width="@dimen/ornate_corner_size"
+        android:layout_height="@dimen/ornate_corner_size"
+        android:clickable="false"
+        android:importantForAccessibility="no"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        app:srcCompat="@drawable/ornate_corner" />
+
+    <ImageView
+        android:id="@+id/imvCornerBg4_vwOrnateFrame"
+        android:layout_width="@dimen/ornate_corner_size"
+        android:layout_height="@dimen/ornate_corner_size"
+        android:clickable="false"
+        android:importantForAccessibility="no"
+        android:rotation="270"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        app:srcCompat="@drawable/ornate_corner" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
