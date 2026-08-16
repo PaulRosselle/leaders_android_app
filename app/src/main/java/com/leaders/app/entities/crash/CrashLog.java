@@ -5,7 +5,7 @@ import androidx.annotation.NonNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class CrashLog {
+public final class CrashLog {
     private final int sdkLevel;
     @NonNull
     private final String appVersion;
