@@ -10,6 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.Guideline;
+import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
@@ -22,20 +24,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class BaseActivity extends AppCompatActivity {
-
     protected List<Handler> handlersToInterruptOnFinish;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         handlersToInterruptOnFinish = new ArrayList<>();
-        if (isImmersiveActivity()) {
-            applyImmersiveMode();
-        }
+        // Handle system bar insets manually using the root guideline.
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+
         setContentView(getLayoutResId());
+
         initViews();
         initListeners();
         initDatas();
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+
+        if (isImmersiveActivity() && hasFocus) {
+            applyImmersiveMode();
+        }
     }
 
     /**
@@ -43,7 +54,13 @@ public abstract class BaseActivity extends AppCompatActivity {
      * Called after the activity layout has been set.
      */
     protected void initViews() {
-        // No default implementation
+        // Dynamically positions the root guideline below the status bar area.
+        Guideline gdlRoot = findViewById(getRootGuidelineResId());
+        ViewCompat.setOnApplyWindowInsetsListener(gdlRoot, (v, insets) -> {
+            ((Guideline) v).setGuidelineBegin(insets.getInsets(WindowInsetsCompat.Type.statusBars()).top);
+            return insets;
+        });
+        ViewCompat.requestApplyInsets(gdlRoot);
     }
 
     /**
@@ -78,6 +95,13 @@ public abstract class BaseActivity extends AppCompatActivity {
      * @return the layout resource ID
      */
     protected abstract int getLayoutResId();
+
+    /**
+     * Returns the resource ID of the root view.
+     *
+     * @return the root view resource ID
+     */
+    protected abstract int getRootGuidelineResId();
 
     /**
      * Returns the resource ID of the button used to navigate back.
@@ -119,11 +143,11 @@ public abstract class BaseActivity extends AppCompatActivity {
     private void applyImmersiveMode() {
         WindowInsetsControllerCompat windowInsetsController =
                 WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
-        // Configure the behavior of the hidden system bars.
+        // Configure the behavior of the hidden navigation bar.
         windowInsetsController.setSystemBarsBehavior(
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         );
-        windowInsetsController.hide(WindowInsetsCompat.Type.systemBars());
+        windowInsetsController.hide(WindowInsetsCompat.Type.navigationBars());
     }
 
     /**

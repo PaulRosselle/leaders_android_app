@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    tools:theme="@style/Theme.LeadersAndroidApp"
+    tools:context=".app.activities.puzzle.PuzzleSelectionActivity"
+    tools:ignore="SpUsage">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gdlRoot_actPuzzleSelection"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="0dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gdl50V_actPuzzleSelection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintGuide_percent="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.leaders.app.views.DecorativeBackgroundView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+    </com.leaders.app.views.DecorativeBackgroundView>
+
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnBack_actPuzzleSelection"
+        android:layout_width="@dimen/round_button_size"
+        android:layout_height="@dimen/round_button_size"
+        android:layout_marginStart="8dp"
+        android:background="@color/transparent"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        app:icon="@drawable/icon_back"
+        app:iconGravity="textStart"
+        app:iconPadding="0dp"
+        app:iconSize="@dimen/round_button_icon_size"
+        app:iconTint="@color/font"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actPuzzleSelection"
+        app:layout_constraintVertical_bias="0.0"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnPuzzleActions_actPuzzleSelection"
+        android:layout_width="@dimen/round_button_size"
+        android:layout_height="@dimen/round_button_size"
+        android:layout_marginEnd="8dp"
+        android:background="@color/transparent"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        app:icon="@drawable/icon_more_actions"
+        app:iconGravity="textStart"
+        app:iconPadding="0dp"
+        app:iconSize="@dimen/round_button_icon_size"
+        app:iconTint="@color/font"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actPuzzleSelection"
+        app:layout_constraintVertical_bias="0.0"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <TextView
+        android:id="@+id/txvTitle_actPuzzleSelection"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/bourbon_test_regular"
+        android:text="@string/title_puzzles_selection"
+        android:textAllCaps="false"
+        android:textColor="@color/app_golden"
+        android:textSize="@dimen/title_font_size"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actPuzzleSelection"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <ScrollView
+        android:id="@+id/scvPuzzles_actPuzzleSelection"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="16dp"
+        android:background="@color/darker_background"
+        app:layout_constraintBottom_toTopOf="@+id/btnPlay_actPuzzleSelection"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnBack_actPuzzleSelection">
+
+        <LinearLayout
+            android:id="@+id/llyPuzzles_actPuzzleSelection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp" />
+    </ScrollView>
+
+    <Button
+        android:id="@+id/btnPlay_actPuzzleSelection"
+        android:layout_width="250dp"
+        android:layout_height="@dimen/round_button_size"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/darker_background"
+        android:fontFamily="@font/bobby_jones_condensed"
+        android:includeFontPadding="false"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:padding="0dp"
+        android:paddingStart="38dp"
+        android:paddingEnd="8dp"
+        android:text="@string/play"
+        android:textColor="@color/font"
+        android:textSize="24dp"
+        app:cornerRadius="8dp"
+        app:icon="@drawable/icon_arrow_head"
+        app:iconGravity="end"
+        app:iconPadding="0dp"
+        app:iconSize="24dp"
+        app:iconTint="@color/font"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio=""
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        app:strokeColor="@color/font"
+        app:strokeWidth="1dp"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

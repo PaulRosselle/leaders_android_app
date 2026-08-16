@@ -14,4 +14,6 @@
     <string name="back">retour</string>
     <string name="go_back_to_main_menu">Revenir au menu principal ?</string>
     <string name="crash_log_message">Un problème a provoqué la fermeture de l\'application.\n\nEn nous envoyant un rapport, vous nous aiderez à en identifier la cause et à le corriger rapidement.</string>
+    <string name="title_puzzles_selection">PuzzleS</string>
+    <string name="play">jouer</string>
 </resources>

@@ -3,5 +3,6 @@
     <dimen name="decorative_background_corner_size">70dp</dimen>
     <dimen name="round_button_size">60dp</dimen>
     <dimen name="round_button_icon_size">48dp</dimen>
-    <dimen name="settings_font_size">20dp</dimen>
+    <dimen name="default_text_font_size">20dp</dimen>
+    <dimen name="title_font_size">34dp</dimen>
 </resources>
