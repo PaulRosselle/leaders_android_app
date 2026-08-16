@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rules">rules</string>
+    <string name="settings">settings</string>
+    <string name="puzzles">puzzles</string>
+    <string name="replay">replay</string>
+    <string name="duel">duel</string>
+    <string name="main_menu_background">main menu background</string>
+    <string name="main_menu_button_icon">main menu button icon</string>
+    <string name="main_title">main title</string>
+</resources>

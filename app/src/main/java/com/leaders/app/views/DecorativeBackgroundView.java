@@ -22,10 +22,10 @@ public class DecorativeBackgroundView extends ConstraintLayout {
         ImageView imvBottomLeft = findViewById(R.id.imvCornerBottomLeft_vwDecorativeBackground);
         // Loading XML attributes
         try (TypedArray customAttrs = context.obtainStyledAttributes(attrs, R.styleable.DecorativeBackgroundView)) {
-            setImvCornerVisible(imvTopLeft, customAttrs.getBoolean(R.styleable.DecorativeBackgroundView_corner_top_left_visible, true));
-            setImvCornerVisible(imvTopRight, customAttrs.getBoolean(R.styleable.DecorativeBackgroundView_corner_top_right_visible, true));
-            setImvCornerVisible(imvBottomRight, customAttrs.getBoolean(R.styleable.DecorativeBackgroundView_corner_bottom_right_visible, true));
-            setImvCornerVisible(imvBottomLeft, customAttrs.getBoolean(R.styleable.DecorativeBackgroundView_corner_bottom_left_visible, true));
+            setImvCornerVisible(imvTopLeft, customAttrs.getBoolean(R.styleable.DecorativeBackgroundView_cornerTopLeftVisible, true));
+            setImvCornerVisible(imvTopRight, customAttrs.getBoolean(R.styleable.DecorativeBackgroundView_cornerTopRightVisible, true));
+            setImvCornerVisible(imvBottomRight, customAttrs.getBoolean(R.styleable.DecorativeBackgroundView_cornerBottomRightVisible, true));
+            setImvCornerVisible(imvBottomLeft, customAttrs.getBoolean(R.styleable.DecorativeBackgroundView_cornerBottomLeftVisible, true));
         }
     }
 

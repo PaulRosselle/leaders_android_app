@@ -12,8 +12,10 @@ import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.leaders.R;
+import com.leaders.app.views.MainMenuView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,7 +23,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        
         startLightAnimation();
+
+        MainMenuView mmvMainMenu = findViewById(R.id.mmvMainMenu_actMain);
+        mmvMainMenu.setOnPuzzlesClickListener(this::btnNotImplementedClick);
+        mmvMainMenu.setOnPlayClickListener(this::btnNotImplementedClick);
+        mmvMainMenu.setOnReplayClickListener(this::btnNotImplementedClick);
+        mmvMainMenu.setOnRulesClickListener(this::btnNotImplementedClick);
+        mmvMainMenu.setOnSettingsClickListener(this::btnNotImplementedClick);
     }
 
     private void startLightAnimation() {
@@ -61,5 +71,9 @@ public class MainActivity extends AppCompatActivity {
         animator.setRepeatCount(ValueAnimator.INFINITE);
         animator.setRepeatMode(repeatMode);
         return animator;
+    }
+
+    private void btnNotImplementedClick(View v) {
+        Toast.makeText(v.getContext(), "Not implemented", Toast.LENGTH_SHORT).show();
     }
 }

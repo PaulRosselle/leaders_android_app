@@ -9,22 +9,26 @@
 
 
     <com.leaders.app.views.DecorativeBackgroundView
+        android:id="@+id/decorativeBackgroundView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+    </com.leaders.app.views.DecorativeBackgroundView>
 
     <ImageView
         android:id="@+id/imvLightHalo_actMain"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
+        android:importantForAccessibility="no"
         android:scaleX="1.5"
         android:scaleY="1.5"
-        app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -36,6 +40,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
+        android:importantForAccessibility="no"
         android:scaleX="1.5"
         android:scaleY="1.5"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -47,27 +52,26 @@
         app:srcCompat="@drawable/main_menu_bg_rays" />
 
     <ImageView
-        android:id="@+id/imvMainMenu_actMain"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:adjustViewBounds="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.75"
-        app:srcCompat="@drawable/main_menu_bg" />
-
-    <ImageView
         android:id="@+id/imvMainTitle_actMain"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
-        app:layout_constraintBottom_toTopOf="@+id/imvMainMenu_actMain"
+        android:contentDescription="@string/main_title"
+        app:layout_constraintBottom_toTopOf="@+id/mmvMainMenu_actMain"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/logo_leaders" />
+
+    <com.leaders.app.views.MainMenuView
+        android:id="@+id/mmvMainMenu_actMain"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.75" />
 </androidx.constraintlayout.widget.ConstraintLayout>

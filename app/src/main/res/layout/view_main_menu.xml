@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/imvBg_vwMainMenu"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/main_menu_background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/main_menu_bg" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gdlR1T_vwMainMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.062" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gdlR2T_vwMainMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.215" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gdlR3T_vwMainMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.513" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gdlC1L_vwMainMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.042" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gdlC1R_vwMainMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.356" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gdlC2L_vwMainMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.343" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gdlC2R_vwMainMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.657" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gdlC3L_vwMainMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.642" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gdlC3R_vwMainMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.956" />
+
+    <com.leaders.app.views.MainMenuButtonView
+        android:id="@+id/mmbvPuzzles_vwMainMenu"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC2R_vwMainMenu"
+        app:layout_constraintStart_toStartOf="@+id/gdlC2L_vwMainMenu"
+        app:layout_constraintTop_toTopOf="@+id/gdlR1T_vwMainMenu"
+        app:layout_constraintVertical_bias="0.0"
+        app:iconResId="@drawable/icon_puzzle"
+        app:textResId="@string/puzzles" />
+
+    <com.leaders.app.views.MainMenuButtonView
+        android:id="@+id/mmbvPlay_vwMainMenu"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC1R_vwMainMenu"
+        app:layout_constraintStart_toStartOf="@+id/gdlC1L_vwMainMenu"
+        app:layout_constraintTop_toTopOf="@+id/gdlR2T_vwMainMenu"
+        app:layout_constraintVertical_bias="0.0"
+        app:iconResId="@drawable/icon_pvp"
+        app:textResId="@string/duel" />
+
+    <com.leaders.app.views.MainMenuButtonView
+        android:id="@+id/mmbvRules_vwMainMenu"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC1R_vwMainMenu"
+        app:layout_constraintStart_toStartOf="@+id/gdlC1L_vwMainMenu"
+        app:layout_constraintTop_toTopOf="@+id/gdlR3T_vwMainMenu"
+        app:layout_constraintVertical_bias="0.0"
+        app:iconResId="@drawable/icon_rules"
+        app:textResId="@string/rules" />
+
+    <com.leaders.app.views.MainMenuButtonView
+        android:id="@+id/mmbvSettings_vwMainMenu"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC3R_vwMainMenu"
+        app:layout_constraintStart_toStartOf="@+id/gdlC3L_vwMainMenu"
+        app:layout_constraintTop_toTopOf="@+id/gdlR3T_vwMainMenu"
+        app:layout_constraintVertical_bias="0.0"
+        app:iconResId="@drawable/icon_settings_menu"
+        app:textResId="@string/settings" />
+
+    <com.leaders.app.views.MainMenuButtonView
+        android:id="@+id/mmbvReplay_vwMainMenu"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC3R_vwMainMenu"
+        app:layout_constraintStart_toStartOf="@+id/gdlC3L_vwMainMenu"
+        app:layout_constraintTop_toTopOf="@+id/gdlR2T_vwMainMenu"
+        app:layout_constraintVertical_bias="0.0"
+        app:iconResId="@drawable/icon_replay"
+        app:textResId="@string/replay" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
