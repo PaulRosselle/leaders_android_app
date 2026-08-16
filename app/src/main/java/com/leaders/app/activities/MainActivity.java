@@ -17,13 +17,13 @@ import android.widget.Toast;
 import com.leaders.R;
 import com.leaders.app.views.MainMenuView;
 
-public class MainActivity extends AppCompatActivity {
+public final class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
+
         startLightAnimation();
 
         MainMenuView mmvMainMenu = findViewById(R.id.mmvMainMenu_actMain);
