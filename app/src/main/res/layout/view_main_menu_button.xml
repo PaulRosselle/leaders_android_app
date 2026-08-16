@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/circular_ripple"
+    app:layout_constraintDimensionRatio="1:1"
+    tools:ignore="SpUsage">
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gdlTextStart_vwMainMenuButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.62" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gdlTextBottom_vwMainMenuButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.83" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gdlIconTop_vwMainMenuButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.05" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gdlIconStart_vwMainMenuButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.05" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gdlIconEnd_vwMainMenuButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.95" />
+
+    <ImageView
+        android:id="@+id/imvIcon_vwMainMenuButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/main_menu_button_icon"
+        app:tint="@color/darker_background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlIconEnd_vwMainMenuButton"
+        app:layout_constraintStart_toStartOf="@+id/gdlIconStart_vwMainMenuButton"
+        app:layout_constraintTop_toTopOf="@+id/gdlIconTop_vwMainMenuButton"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/icon_pvp" />
+
+    <TextView
+        android:id="@+id/txvText_vwMainMenuButton"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:autoSizeMaxTextSize="24dp"
+        android:autoSizeMinTextSize="14dp"
+        android:autoSizePresetSizes="20dp"
+        android:autoSizeStepGranularity="1dp"
+        android:autoSizeTextType="uniform"
+        android:fontFamily="@font/futura"
+        android:gravity="center_horizontal|top"
+        android:text="@string/duel"
+        android:textAlignment="gravity"
+        android:textAllCaps="true"
+        android:textColor="@color/darker_background"
+        android:textSize="20dp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/gdlTextBottom_vwMainMenuButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/gdlTextStart_vwMainMenuButton"
+        app:layout_constraintVertical_bias="0.0" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

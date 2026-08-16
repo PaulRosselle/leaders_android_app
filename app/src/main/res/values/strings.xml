@@ -1,3 +1,11 @@
 <resources>
-    <string name="app_name">Leaders Android App</string>
+    <string name="app_name" translatable="false">Leaders</string>
+    <string name="rules">règles</string>
+    <string name="settings">options</string>
+    <string name="puzzles">puzzles</string>
+    <string name="replay">replay</string>
+    <string name="duel">duel</string>
+    <string name="main_menu_background">décor du menu principal</string>
+    <string name="main_menu_button_icon">icône de bouton du menu principal</string>
+    <string name="main_title">titre du jeu</string>
 </resources>

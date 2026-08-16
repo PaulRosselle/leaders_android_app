@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="DecorativeBackgroundView">
+        <attr name="cornerTopLeftVisible" format="boolean"/>
+        <attr name="cornerTopRightVisible" format="boolean"/>
+        <attr name="cornerBottomRightVisible" format="boolean"/>
+        <attr name="cornerBottomLeftVisible" format="boolean"/>
+    </declare-styleable>
+
+    <declare-styleable name="MainMenuButtonView">
+        <attr name="iconResId" format="reference"/>
+        <attr name="textResId" format="reference|string"/>
+    </declare-styleable>
+</resources>
