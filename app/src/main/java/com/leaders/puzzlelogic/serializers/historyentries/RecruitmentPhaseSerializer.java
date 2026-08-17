@@ -1,4 +1,4 @@
-package com.leaders.puzzlelogic.serializers;
+package com.leaders.puzzlelogic.serializers.historyentries;
 
 import androidx.annotation.NonNull;
 
@@ -7,6 +7,10 @@ import com.leaders.gamelogic.actions.RecruitmentAction;
 import com.leaders.gamelogic.actions.TransitionAction;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.historyentries.segments.RecruitmentPhase;
+import com.leaders.puzzlelogic.serializers.IJsonSerializer;
+import com.leaders.puzzlelogic.serializers.SerializationContext;
+import com.leaders.puzzlelogic.serializers.actions.RecruitmentActionSerializer;
+import com.leaders.puzzlelogic.serializers.actions.TransitionActionSerializer;
 
 import org.json.JSONArray;
 import org.json.JSONException;

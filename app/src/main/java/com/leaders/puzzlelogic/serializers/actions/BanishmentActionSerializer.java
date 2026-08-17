@@ -1,10 +1,12 @@
-package com.leaders.puzzlelogic.serializers;
+package com.leaders.puzzlelogic.serializers.actions;
 
 import androidx.annotation.NonNull;
 
 import com.leaders.gamelogic.actions.BanishmentAction;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.TeamColor;
+import com.leaders.puzzlelogic.serializers.IJsonSerializer;
+import com.leaders.puzzlelogic.serializers.SerializationContext;
 
 import org.json.JSONException;
 import org.json.JSONObject;

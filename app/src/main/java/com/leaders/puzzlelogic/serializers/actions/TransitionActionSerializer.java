@@ -1,10 +1,12 @@
-package com.leaders.puzzlelogic.serializers;
+package com.leaders.puzzlelogic.serializers.actions;
 
 import androidx.annotation.NonNull;
 
 import com.leaders.gamelogic.actions.TransitionAction;
 import com.leaders.gamelogic.enums.TransitionTarget;
 import com.leaders.gamelogic.enums.TransitionType;
+import com.leaders.puzzlelogic.serializers.IJsonSerializer;
+import com.leaders.puzzlelogic.serializers.SerializationContext;
 
 import org.json.JSONException;
 import org.json.JSONObject;

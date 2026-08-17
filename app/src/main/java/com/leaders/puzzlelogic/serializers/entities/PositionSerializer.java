@@ -1,8 +1,10 @@
-package com.leaders.puzzlelogic.serializers;
+package com.leaders.puzzlelogic.serializers.entities;
 
 import androidx.annotation.NonNull;
 
 import com.leaders.gamelogic.entities.Position;
+import com.leaders.puzzlelogic.serializers.IJsonSerializer;
+import com.leaders.puzzlelogic.serializers.SerializationContext;
 
 import org.json.JSONException;
 import org.json.JSONObject;

@@ -1,4 +1,4 @@
-package com.leaders.puzzlelogic.serializers;
+package com.leaders.puzzlelogic.serializers.entities;
 
 import androidx.annotation.NonNull;
 
@@ -7,6 +7,10 @@ import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.historyentries.IHistoryEntry;
 import com.leaders.gamelogic.historyentries.segments.BanishmentPhase;
 import com.leaders.gamelogic.historyentries.segments.Turn;
+import com.leaders.puzzlelogic.serializers.historyentries.BanishmentPhaseSerializer;
+import com.leaders.puzzlelogic.serializers.IJsonSerializer;
+import com.leaders.puzzlelogic.serializers.SerializationContext;
+import com.leaders.puzzlelogic.serializers.historyentries.TurnSerializer;
 
 import org.json.JSONArray;
 import org.json.JSONException;

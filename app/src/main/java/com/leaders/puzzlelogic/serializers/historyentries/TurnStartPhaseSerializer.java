@@ -1,4 +1,4 @@
-package com.leaders.puzzlelogic.serializers;
+package com.leaders.puzzlelogic.serializers.historyentries;
 
 import androidx.annotation.NonNull;
 
@@ -6,17 +6,21 @@ import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.actions.TransitionAction;
 import com.leaders.gamelogic.enums.TeamColor;
-import com.leaders.gamelogic.historyentries.segments.ActionsPhase;
+import com.leaders.gamelogic.historyentries.segments.TurnStartPhase;
+import com.leaders.puzzlelogic.serializers.IJsonSerializer;
+import com.leaders.puzzlelogic.serializers.SerializationContext;
+import com.leaders.puzzlelogic.serializers.actions.CharacterActionSerializer;
+import com.leaders.puzzlelogic.serializers.actions.TransitionActionSerializer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public final class ActionsPhaseSerializer implements IJsonSerializer<ActionsPhase> {
+public final class TurnStartPhaseSerializer implements IJsonSerializer<TurnStartPhase> {
     @NonNull
     @Override
-    public ActionsPhase getFromJson(@NonNull JSONObject jsonObject,
-                                    @NonNull SerializationContext srlContext) throws JSONException {
+    public TurnStartPhase getFromJson(@NonNull JSONObject jsonObject,
+                                      @NonNull SerializationContext srlContext) throws JSONException {
         TransitionActionSerializer transitionActionSerializer =
                 new TransitionActionSerializer();
         CharacterActionSerializer characterActionSerializer =
@@ -43,8 +47,8 @@ public final class ActionsPhaseSerializer implements IJsonSerializer<ActionsPhas
         TeamColor turnTeamColor =
                 TeamColor.valueOf(jsonObject.getString("turn_team_color"));
 
-        ActionsPhase phase =
-                new ActionsPhase(startAction, endAction, turnTeamColor);
+        TurnStartPhase phase =
+                new TurnStartPhase(startAction, endAction, turnTeamColor);
 
         JSONArray jaActions = jsonObject.getJSONArray("actions");
         for (int i = 0; i < jaActions.length(); i++) {
@@ -61,7 +65,7 @@ public final class ActionsPhaseSerializer implements IJsonSerializer<ActionsPhas
 
     @NonNull
     @Override
-    public JSONObject getAsJson(@NonNull ActionsPhase object) throws JSONException {
+    public JSONObject getAsJson(@NonNull TurnStartPhase object) throws JSONException {
         TransitionActionSerializer transitionActionSerializer =
                 new TransitionActionSerializer();
         CharacterActionSerializer characterActionSerializer =

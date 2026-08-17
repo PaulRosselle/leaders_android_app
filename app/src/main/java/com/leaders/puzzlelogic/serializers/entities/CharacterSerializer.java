@@ -1,4 +1,4 @@
-package com.leaders.puzzlelogic.serializers;
+package com.leaders.puzzlelogic.serializers.entities;
 
 import androidx.annotation.NonNull;
 
@@ -8,6 +8,8 @@ import org.json.JSONObject;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.TeamColor;
+import com.leaders.puzzlelogic.serializers.IJsonSerializer;
+import com.leaders.puzzlelogic.serializers.SerializationContext;
 
 import java.util.UUID;
 

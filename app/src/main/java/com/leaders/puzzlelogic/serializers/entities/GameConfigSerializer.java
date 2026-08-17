@@ -1,4 +1,4 @@
-package com.leaders.puzzlelogic.serializers;
+package com.leaders.puzzlelogic.serializers.entities;
 
 import androidx.annotation.NonNull;
 
@@ -13,6 +13,13 @@ import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.GameActionType;
 import com.leaders.gamelogic.enums.GameMode;
+import com.leaders.puzzlelogic.serializers.IJsonSerializer;
+import com.leaders.puzzlelogic.serializers.actions.RecruitmentActionSerializer;
+import com.leaders.puzzlelogic.serializers.SerializationContext;
+import com.leaders.puzzlelogic.serializers.actions.TransitionActionSerializer;
+import com.leaders.puzzlelogic.serializers.actions.WarningActionSerializer;
+import com.leaders.puzzlelogic.serializers.actions.BanishmentActionSerializer;
+import com.leaders.puzzlelogic.serializers.actions.CharacterActionSerializer;
 
 import org.json.JSONArray;
 import org.json.JSONException;

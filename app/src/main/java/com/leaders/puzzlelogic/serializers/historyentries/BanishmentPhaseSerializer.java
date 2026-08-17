@@ -1,26 +1,28 @@
-package com.leaders.puzzlelogic.serializers;
+package com.leaders.puzzlelogic.serializers.historyentries;
 
 import androidx.annotation.NonNull;
 
-import com.leaders.gamelogic.actions.CharacterAction;
+import com.leaders.gamelogic.actions.BanishmentAction;
 import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.actions.TransitionAction;
 import com.leaders.gamelogic.enums.TeamColor;
-import com.leaders.gamelogic.historyentries.segments.TurnStartPhase;
+import com.leaders.gamelogic.historyentries.segments.BanishmentPhase;
+import com.leaders.puzzlelogic.serializers.IJsonSerializer;
+import com.leaders.puzzlelogic.serializers.SerializationContext;
+import com.leaders.puzzlelogic.serializers.actions.BanishmentActionSerializer;
+import com.leaders.puzzlelogic.serializers.actions.TransitionActionSerializer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public final class TurnStartPhaseSerializer implements IJsonSerializer<TurnStartPhase> {
+public final class BanishmentPhaseSerializer implements IJsonSerializer<BanishmentPhase> {
     @NonNull
     @Override
-    public TurnStartPhase getFromJson(@NonNull JSONObject jsonObject,
-                                      @NonNull SerializationContext srlContext) throws JSONException {
-        TransitionActionSerializer transitionActionSerializer =
-                new TransitionActionSerializer();
-        CharacterActionSerializer characterActionSerializer =
-                new CharacterActionSerializer();
+    public BanishmentPhase getFromJson(@NonNull JSONObject jsonObject,
+                                       @NonNull SerializationContext srlContext) throws JSONException {
+        TransitionActionSerializer transitionActionSerializer = new TransitionActionSerializer();
+        BanishmentActionSerializer banishmentActionSerializer = new BanishmentActionSerializer();
 
         TransitionAction startAction = null;
         if (jsonObject.has("start_action") && !jsonObject.isNull("start_action")) {
@@ -40,16 +42,14 @@ public final class TurnStartPhaseSerializer implements IJsonSerializer<TurnStart
             );
         }
 
-        TeamColor turnTeamColor =
-                TeamColor.valueOf(jsonObject.getString("turn_team_color"));
+        TeamColor teamColor = TeamColor.valueOf(jsonObject.getString("team_color"));
 
-        TurnStartPhase phase =
-                new TurnStartPhase(startAction, endAction, turnTeamColor);
+        BanishmentPhase phase = new BanishmentPhase(startAction, endAction, teamColor);
 
         JSONArray jaActions = jsonObject.getJSONArray("actions");
         for (int i = 0; i < jaActions.length(); i++) {
-            CharacterAction action =
-                    characterActionSerializer.getFromJson(
+            BanishmentAction action =
+                    banishmentActionSerializer.getFromJson(
                             jaActions.getJSONObject(i),
                             srlContext
                     );
@@ -61,11 +61,9 @@ public final class TurnStartPhaseSerializer implements IJsonSerializer<TurnStart
 
     @NonNull
     @Override
-    public JSONObject getAsJson(@NonNull TurnStartPhase object) throws JSONException {
-        TransitionActionSerializer transitionActionSerializer =
-                new TransitionActionSerializer();
-        CharacterActionSerializer characterActionSerializer =
-                new CharacterActionSerializer();
+    public JSONObject getAsJson(BanishmentPhase object) throws JSONException {
+        TransitionActionSerializer transitionActionSerializer = new TransitionActionSerializer();
+        BanishmentActionSerializer banishmentActionSerializer = new BanishmentActionSerializer();
 
         JSONObject jsonObject = new JSONObject();
 
@@ -83,15 +81,11 @@ public final class TurnStartPhaseSerializer implements IJsonSerializer<TurnStart
             );
         }
 
-        jsonObject.put("turn_team_color", object.getTurnTeamColor().name());
+        jsonObject.put("team_color", object.getTeamColor().name());
 
         JSONArray jaActions = new JSONArray();
         for (IGameAction action : object.getActions()) {
-            jaActions.put(
-                    characterActionSerializer.getAsJson(
-                            (CharacterAction) action
-                    )
-            );
+            jaActions.put(banishmentActionSerializer.getAsJson((BanishmentAction) action));
         }
 
         jsonObject.put("actions", jaActions);

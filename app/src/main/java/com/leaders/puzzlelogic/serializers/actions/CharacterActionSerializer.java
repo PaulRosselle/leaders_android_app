@@ -1,10 +1,13 @@
-package com.leaders.puzzlelogic.serializers;
+package com.leaders.puzzlelogic.serializers.actions;
 
 import androidx.annotation.NonNull;
 
 import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.actions.CharacterActionMotion;
 import com.leaders.gamelogic.entities.Character;
+import com.leaders.puzzlelogic.serializers.IJsonSerializer;
+import com.leaders.puzzlelogic.serializers.SerializationContext;
+import com.leaders.puzzlelogic.serializers.entities.CharacterSerializer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
