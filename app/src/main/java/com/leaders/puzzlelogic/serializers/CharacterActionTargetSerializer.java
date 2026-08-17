@@ -9,7 +9,7 @@ import com.leaders.gamelogic.entities.Position;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class CharacterActionTargetSerializer implements IJsonSerializer<CharacterActionTarget> {
+public final class CharacterActionTargetSerializer implements IJsonSerializer<CharacterActionTarget> {
     @NonNull
     @Override
     public CharacterActionTarget getFromJson(@NonNull JSONObject jsonObject,
@@ -38,6 +38,7 @@ public class CharacterActionTargetSerializer implements IJsonSerializer<Characte
         if (object.getDestPos() != null) {
             jsonObject.put("dest_pos", positionSerializer.getAsJson(object.getDestPos()));
         }
-        return null;
+
+        return jsonObject;
     }
 }

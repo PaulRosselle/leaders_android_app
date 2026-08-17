@@ -7,7 +7,7 @@ import com.leaders.gamelogic.entities.Position;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class PositionSerializer implements IJsonSerializer<Position> {
+public final class PositionSerializer implements IJsonSerializer<Position> {
     @NonNull
     @Override
     public Position getFromJson(@NonNull JSONObject jsonObject,

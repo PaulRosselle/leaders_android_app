@@ -11,7 +11,7 @@ import com.leaders.gamelogic.enums.TeamColor;
 
 import java.util.UUID;
 
-public class CharacterSerializer implements IJsonSerializer<Character> {
+public final class CharacterSerializer implements IJsonSerializer<Character> {
     @NonNull
     public Character getFromJson(@NonNull JSONObject jsonObject,
                                  @NonNull SerializationContext srlContext) throws JSONException {
