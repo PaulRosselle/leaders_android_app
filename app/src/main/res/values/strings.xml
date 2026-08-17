@@ -23,4 +23,8 @@
     <string name="export_puzzle">Exporter</string>
     <string name="select_all">Tout sélectionner</string>
     <string name="unselect_all">Tout déselectionner</string>
+    <string name="puzzle_solved">Puzzle résolu !</string>
+    <string name="checkbox">Case à cocher</string>
+    <string name="official_puzzle_name_format">Puzzle #%03d</string>
+    <string name="by_author">par %s</string>
 </resources>
