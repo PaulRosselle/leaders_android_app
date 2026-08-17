@@ -8,11 +8,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class PositionSerializer implements IJsonSerializer<Position> {
+    @NonNull
     @Override
-    public Position getFromJson(@NonNull JSONObject jsonObject) throws JSONException {
+    public Position getFromJson(@NonNull JSONObject jsonObject,
+                                @NonNull SerializationContext srlContext) throws JSONException {
         return new Position(jsonObject.getInt("x"), jsonObject.getInt("y"));
     }
 
+    @NonNull
     @Override
     public JSONObject getAsJson(Position object) throws JSONException {
         JSONObject joPosition = new JSONObject();

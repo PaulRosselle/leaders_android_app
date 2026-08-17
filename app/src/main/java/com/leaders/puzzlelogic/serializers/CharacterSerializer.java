@@ -11,12 +11,12 @@ import com.leaders.gamelogic.enums.TeamColor;
 
 import java.util.UUID;
 
-public class CharacterSerializer {
+public class CharacterSerializer implements IJsonSerializer<Character> {
     @NonNull
     public Character getFromJson(@NonNull JSONObject jsonObject,
-                                 @NonNull SerializationContext serializationContext) throws JSONException {
+                                 @NonNull SerializationContext srlContext) throws JSONException {
         UUID uuid = UUID.fromString(jsonObject.getString("uuid"));
-        Character mappedCharacter = serializationContext.getCharactersMap().get(uuid);
+        Character mappedCharacter = srlContext.getCharactersMap().get(uuid);
         if (mappedCharacter != null) {
             return mappedCharacter;
         }
@@ -25,10 +25,11 @@ public class CharacterSerializer {
                 CharacterType.valueOf(jsonObject.getString("character_type")),
                 TeamColor.valueOf(jsonObject.getString("team_color"))
         );
-        serializationContext.getCharactersMap().put(uuid, newCharacter);
+        srlContext.getCharactersMap().put(uuid, newCharacter);
         return newCharacter;
     }
 
+    @NonNull
     public JSONObject getAsJson(@NonNull Character character) throws JSONException {
         JSONObject joCharacter = new JSONObject();
         joCharacter.put("uuid", character.getId());
