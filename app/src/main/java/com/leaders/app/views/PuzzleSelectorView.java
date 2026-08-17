@@ -1,7 +1,10 @@
 package com.leaders.app.views;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,33 +21,57 @@ import com.leaders.puzzlelogic.entities.PuzzleSave;
 
 import org.json.JSONObject;
 
-public class PuzzleSelectorView extends ConstraintLayout {
+public final class PuzzleSelectorView extends ConstraintLayout {
+    public interface OnPuzzleClickListener {
+        void onPuzzleClick(@NonNull PuzzleSelectorView psvSender);
+    }
+
+    public interface OnPuzzleLongClickListener {
+        boolean onPuzzleLongClick(@NonNull PuzzleSelectorView psvSender);
+    }
+
     private MaterialButton btnMain;
     private ImageView imvSolved;
     private ImageView imvChecked;
-    private boolean isSelectedPuzzle;
+    private boolean checkboxVisible;
     private boolean isChecked;
     private TextView txvName;
     private TextView txvAuthor;
     private final PuzzleSave puzzleSave;
+    private final String puzzleSolvedToast;
+
+
+    @Nullable
+    private OnPuzzleClickListener onPuzzleClickListener;
+    @Nullable
+    private OnPuzzleLongClickListener onPuzzleLongClickListener;
 
 
     public PuzzleSelectorView(@NonNull Context context, @Nullable AttributeSet attrs) {
-        // TODO - remove
-        this(context, new OfficialPuzzleSave(context, 1, false, new JSONObject()));
+        // Dummy constructor to allow instanciation in editor
+        this(context, new OfficialPuzzleSave(context, 1, new JSONObject(), false));
     }
 
     public PuzzleSelectorView(@NonNull Context context, @NonNull PuzzleSave puzzleSave) {
         super(context, null);
         this.puzzleSave = puzzleSave;
+        puzzleSolvedToast = String.format(context.getString(
+                puzzleSave.isSolved() ? R.string.puzzle_solved_format : R.string.puzzle_unsolved_format),
+                puzzleSave.getName()
+        );
 
         inflate(context, R.layout.view_puzzle_selector, this);
+
         initViews();
+        initListeners();
         loadPuzzleSave();
 
-        setSelectedPuzzle(false);
+        // We apply the default selection behavior
+        setCheckboxVisible(false);
         setChecked(false);
     }
+
+
 
     private void initViews() {
         imvSolved = findViewById(R.id.imvPuzzleSolved_vwPuzzleSelector);
@@ -52,13 +79,23 @@ public class PuzzleSelectorView extends ConstraintLayout {
         btnMain = findViewById(R.id.btnMain_vwPuzzleSelector);
         txvName = findViewById(R.id.txvPuzzleName_vwPuzzleSelector);
         txvAuthor = findViewById(R.id.txvPuzzleAuthor_vwPuzzleSelector);
+    }
 
-        btnMain.setOnClickListener(v -> setSelectedPuzzle(!isSelectedPuzzle));
-        imvSolved.setOnLongClickListener(v -> {
-            Toast.makeText(getContext(), "Puzzle non complété", Toast.LENGTH_SHORT).show();
-            btnMain.performLongClick();
+    @SuppressLint("ClickableViewAccessibility")
+    private void initListeners() {
+        btnMain.setOnClickListener(v -> {
+            if (onPuzzleClickListener != null) {
+                onPuzzleClickListener.onPuzzleClick(PuzzleSelectorView.this);
+            }
+        });
+        btnMain.setOnLongClickListener(v -> {
+            if (onPuzzleLongClickListener != null) {
+                return onPuzzleLongClickListener.onPuzzleLongClick(PuzzleSelectorView.this);
+            }
             return false;
         });
+
+        imvSolved.setOnTouchListener(this::onImvSolvedTouch);
     }
 
     private void loadPuzzleSave() {
@@ -78,15 +115,33 @@ public class PuzzleSelectorView extends ConstraintLayout {
         }
     }
 
-    public void setSelectedPuzzle(boolean isSelectedPuzzle) {
-        this.isSelectedPuzzle = isSelectedPuzzle;
+    public void setCheckboxVisible(boolean checkboxVisible) {
+        this.checkboxVisible = checkboxVisible;
+        updateCheckboxVisibleState();
+    }
+
+    public void setChecked(boolean isChecked) {
+        this.isChecked = isChecked;
+        updateCheckedState();
+    }
+
+    public boolean isChecked() {
+        return isChecked;
+    }
+
+    private void updateCheckboxVisibleState() {
+        imvChecked.setVisibility(checkboxVisible ? VISIBLE : INVISIBLE);
+    }
+
+    private void updateCheckedState() {
+        imvChecked.setImageResource(isChecked ? R.drawable.checked_box : R.drawable.unchecked_box);
 
         int strokeWidth = getResources().getDimensionPixelSize(R.dimen.default_stroke_width);
         int bgColorId = R.color.darker_background;
         int strokeColorId = R.color.font;
         int nameColorId = R.color.font;
         int authorColorId = R.color.font;
-        if (isSelectedPuzzle) {
+        if (isChecked) {
             strokeWidth *= 2;
             bgColorId = R.color.black;
             strokeColorId = R.color.white;
@@ -101,24 +156,31 @@ public class PuzzleSelectorView extends ConstraintLayout {
         txvAuthor.setTextColor(getResources().getColor(authorColorId, getContext().getTheme()));
     }
 
-    public boolean isSelectedPuzzle() {
-        return isSelectedPuzzle;
+    public void setOnPuzzleClickListener(@Nullable OnPuzzleClickListener onPuzzleClickListener) {
+        this.onPuzzleClickListener = onPuzzleClickListener;
     }
 
-    public void setChecked(boolean isChecked) {
-        this.isChecked = isChecked;
-        imvChecked.setImageResource(isChecked ? R.drawable.checked_box : R.drawable.unchecked_box);
+    public void setOnPuzzleLongClickListener(@Nullable OnPuzzleLongClickListener onPuzzleLongClickListener) {
+        this.onPuzzleLongClickListener = onPuzzleLongClickListener;
     }
 
-    public boolean isChecked() {
-        return isChecked;
+    public PuzzleSave getPuzzleSave() {
+        return puzzleSave;
     }
 
-    public void setOnPuzzleClickListener(@NonNull OnClickListener onBtnClickListener) {
-        btnMain.setOnClickListener(onBtnClickListener);
-    }
+    private boolean onImvSolvedTouch(View v, MotionEvent event) {
+        if (event.getActionMasked() == MotionEvent.ACTION_UP) {
+            Toast.makeText(v.getContext(), puzzleSolvedToast, Toast.LENGTH_SHORT).show();
+        }
 
-    public void setOnPuzzleLongClickListener(@NonNull OnLongClickListener onBtnLongClickListener) {
-        btnMain.setOnLongClickListener(onBtnLongClickListener);
+        // Every motion event impacting imvSolved must be repercuted to btnMain
+        MotionEvent forwardedEvent = MotionEvent.obtain(event);
+        try {
+            btnMain.dispatchTouchEvent(forwardedEvent);
+        } finally {
+            forwardedEvent.recycle();
+        }
+
+        return true;
     }
 }

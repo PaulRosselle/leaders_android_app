@@ -86,6 +86,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/icon_empty_crown"
         app:tint="@color/app_golden"
-        android:contentDescription="@string/puzzle_solved" />
+        android:contentDescription="@string/puzzle_solved_format" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

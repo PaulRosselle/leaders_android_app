@@ -9,6 +9,7 @@
     tools:context=".app.activities.puzzle.PuzzleSelectionActivity"
     tools:ignore="SpUsage">
 
+
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/gdlRoot_actPuzzleSelection"
         android:layout_width="wrap_content"
@@ -32,9 +33,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-    </com.leaders.app.views.DecorativeBackgroundView>
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="gone" />
 
 
     <com.google.android.material.button.MaterialButton
@@ -96,49 +96,91 @@
         app:layout_constraintTop_toTopOf="@+id/gdlRoot_actPuzzleSelection"
         app:layout_constraintVertical_bias="0.0" />
 
-    <ScrollView
-        android:id="@+id/scvPuzzles_actPuzzleSelection"
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/mbtgPuzzlesCategory_actPuzzleSelection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnBack_actPuzzleSelection"
+        app:layout_constraintVertical_bias="0.0"
+        app:singleSelection="true"
+        app:selectionRequired="true">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOfficial_actPuzzleSelection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="@font/bobby_jones_regular"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/official_puzzles"
+            android:textColor="@color/font"
+            android:textSize="@dimen/default_text_font_size"
+            app:backgroundTint="@color/toggle_button_tint"
+            app:cornerRadius="8dp"
+            app:strokeColor="@color/font"
+            app:strokeWidth="@dimen/default_stroke_width" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCustom_actPuzzleSelection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="@font/bobby_jones_regular"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/custom"
+            android:textColor="@color/font"
+            android:textSize="@dimen/default_text_font_size"
+            app:backgroundTint="@color/toggle_button_tint"
+            app:cornerRadius="8dp"
+            app:strokeColor="@color/font"
+            app:strokeWidth="@dimen/default_stroke_width" />
+
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <com.leaders.app.views.OrnateFrameView
+        android:id="@+id/ofvPuzzles_actPuzzleSelection"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="16dp"
-        android:background="@color/darker_background"
-        app:layout_constraintBottom_toTopOf="@+id/btnPlay_actPuzzleSelection"
+        app:layout_constraintBottom_toTopOf="@id/btnPlay_actPuzzleSelection"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnBack_actPuzzleSelection">
+        app:layout_constraintTop_toBottomOf="@id/mbtgPuzzlesCategory_actPuzzleSelection">
 
-        <LinearLayout
-            android:id="@+id/llyPuzzles_actPuzzleSelection"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="8dp" >
+        <ScrollView
+            android:id="@+id/scvPuzzles_actPuzzleSelection"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <com.leaders.app.views.PuzzleSelectorView
+            <com.leaders.app.views.PuzzleSelectorGroupView
+                android:id="@+id/psgvPuzzles_actPuzzleSelection"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginVertical="4dp" />
+                android:layout_height="wrap_content"
+                android:orientation="vertical"/>
+        </ScrollView>
 
-            <com.leaders.app.views.PuzzleSelectorView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginVertical="4dp" />
-        </LinearLayout>
-    </ScrollView>
+    </com.leaders.app.views.OrnateFrameView>
 
-    <com.leaders.app.views.OrnateFrameView
-        android:id="@+id/ofvPuzzles_actPuzzleSelection"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="@+id/scvPuzzles_actPuzzleSelection"
-        app:layout_constraintEnd_toEndOf="@+id/scvPuzzles_actPuzzleSelection"
-        app:layout_constraintStart_toStartOf="@+id/scvPuzzles_actPuzzleSelection"
-        app:layout_constraintTop_toTopOf="@+id/scvPuzzles_actPuzzleSelection" />
-
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnPlay_actPuzzleSelection"
         android:layout_width="250dp"
         android:layout_height="@dimen/round_button_size"
@@ -169,6 +211,7 @@
         app:strokeColor="@color/font"
         app:strokeWidth="@dimen/default_stroke_width"
         tools:ignore="SpeakableTextPresentCheck" />
+
 
     <View
         android:id="@+id/vwDialogBg_actPuzzleSelection"

@@ -3,7 +3,6 @@ package com.leaders.app.views;
 import static androidx.core.util.TypedValueCompat.dpToPx;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -17,6 +16,7 @@ import androidx.core.content.res.ResourcesCompat;
 
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
+import com.leaders.app.utilities.ButtonUtils;
 
 public final class ActionsMenuView extends LinearLayout {
     public ActionsMenuView(@NonNull Context context, @Nullable AttributeSet attrs) {
@@ -53,7 +53,7 @@ public final class ActionsMenuView extends LinearLayout {
         btnAction.setIconPadding((int) dpToPx(8, metrics));
         btnAction.setIconSize((int) dpToPx(24, metrics));
         // Every button is initialized as enabled
-        setButtonEnabled(btnAction, true);
+        ButtonUtils.setButtonEnabled(btnAction, true);
         addView(btnAction, getButtonLP());
     }
 
@@ -62,24 +62,9 @@ public final class ActionsMenuView extends LinearLayout {
         for (int i = 0; i < getChildCount(); i++) {
             MaterialButton btnChild = (MaterialButton) getChildAt(i);
             if (Integer.parseInt(btnChild.getTag().toString()) == btnTag) {
-                setButtonEnabled(btnChild, enabled);
+                ButtonUtils.setButtonEnabled(btnChild, enabled);
             }
         }
-    }
-
-    private void setButtonEnabled(@NonNull MaterialButton button, boolean enabled) {
-        button.setEnabled(enabled);
-        int colorId;
-        if (enabled) {
-            colorId = R.color.font;
-        } else {
-            colorId = R.color.darker_font;
-        }
-        int colorValue = getContext().getColor(colorId);
-        button.setTextColor(colorValue);
-        ColorStateList colorStateList = AppCompatResources.getColorStateList(getContext(), colorId);
-        button.setIconTint(colorStateList);
-        button.setStrokeColor(colorStateList);
     }
 
     private LinearLayout.LayoutParams getButtonLP() {

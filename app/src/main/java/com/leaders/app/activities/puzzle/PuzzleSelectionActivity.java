@@ -5,10 +5,22 @@ import android.view.View;
 import androidx.annotation.NonNull;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.enums.ActivityType;
+import com.leaders.app.utilities.ButtonUtils;
 import com.leaders.app.views.ActionsMenuView;
+import com.leaders.app.views.PuzzleSelectorGroupView;
+import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
+import com.leaders.puzzlelogic.entities.OfficialPuzzleSave;
+import com.leaders.puzzlelogic.entities.PuzzleSave;
+import com.leaders.puzzlelogic.enums.PuzzleCategory;
+
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public final class PuzzleSelectionActivity extends BaseActivity {
     private enum PuzzleSelectionAction {
@@ -48,29 +60,40 @@ public final class PuzzleSelectionActivity extends BaseActivity {
 
         private View.OnClickListener getOnClickListener(PuzzleSelectionActivity activity) {
             switch (this) {
-                case Add: return activity::newPuzzleClick;
-                case Edit: return activity::editPuzzleClick;
-                case Remove: return activity::removeClick;
-                case Import: return activity::importClick;
-                case Export: return activity::exportClick;
-                case SelectAll: return activity::selectAllClick;
-                case UnselectAll: return activity::unselectAllClick;
+                case Add: return activity::onNewPuzzleClick;
+                case Edit: return activity::onEditPuzzleClick;
+                case Remove: return activity::onRemoveClick;
+                case Import: return activity::onImportClick;
+                case Export: return activity::onExportClick;
+                case SelectAll: return activity::onSelectAllClick;
+                case UnselectAll: return activity::onUnselectAllClick;
                 default: throw new IllegalStateException("No click listener found for puzzle action: " + this);
             }
         }
     }
 
-
     private View vwDialogBg;
     private MaterialButton btnPuzzleActions;
+    private MaterialButton btnPlay;
     private ActionsMenuView amvPuzzleActions;
+    private MaterialButtonToggleGroup mbtgPuzzlesCategory;
+    private PuzzleSelectorGroupView psgvPuzzles;
+    private PuzzleCategory puzzlesCategory;
+
+    private List<OfficialPuzzleSave> officialPuzzleSaves;
+    private List<CustomPuzzleSave> customPuzzleSaves;
 
     @Override
     protected void initViews() {
         super.initViews();
+
         vwDialogBg = findViewById(R.id.vwDialogBg_actPuzzleSelection);
+        btnPlay = findViewById(R.id.btnPlay_actPuzzleSelection);
         btnPuzzleActions = findViewById(R.id.btnPuzzleActions_actPuzzleSelection);
         amvPuzzleActions = findViewById(R.id.amvPuzzleActions_actPuzzleSelection);
+        mbtgPuzzlesCategory = findViewById(R.id.mbtgPuzzlesCategory_actPuzzleSelection);
+        psgvPuzzles = findViewById(R.id.psgvPuzzles_actPuzzleSelection);
+
         for (PuzzleSelectionAction action : PuzzleSelectionAction.values()) {
             amvPuzzleActions.addActionButton(
                     action.getIconResId(),
@@ -84,8 +107,30 @@ public final class PuzzleSelectionActivity extends BaseActivity {
     @Override
     protected void initListeners() {
         super.initListeners();
+
         vwDialogBg.setOnClickListener(this::hidePuzzleActions);
         btnPuzzleActions.setOnClickListener(this::btnPuzzleActionsClick);
+        psgvPuzzles.setSelectionChangeListener(this::onPuzzleSelectionChange);
+        mbtgPuzzlesCategory.addOnButtonCheckedListener(this::onPuzzleCategoryChange);
+    }
+
+    @Override
+    protected void initDatas() {
+        super.initDatas();
+
+        officialPuzzleSaves = new ArrayList<>();
+        // TODO - replace with json datas loading
+        for (int i = 1; i < 10; i++) {
+            officialPuzzleSaves.add(new OfficialPuzzleSave(this, i, new JSONObject(), i % 3 == 0));
+        }
+
+        customPuzzleSaves = new ArrayList<>();
+        // TODO - replace with json datas loading
+        for (int i = 1; i < 10; i++) {
+            customPuzzleSaves.add(new CustomPuzzleSave("TEST NAME", "Test Author", new JSONObject(), i % 2 == 0));
+        }
+
+        ((MaterialButton) (findViewById(R.id.btnOfficial_actPuzzleSelection))).setChecked(true);
     }
 
     @Override
@@ -124,6 +169,25 @@ public final class PuzzleSelectionActivity extends BaseActivity {
         return ActivityType.PuzzleSelection;
     }
 
+    private List<? extends PuzzleSave> getPuzzlesFromCategory() {
+        return puzzlesCategory == PuzzleCategory.Official ? officialPuzzleSaves : customPuzzleSaves;
+    }
+
+    private void onPuzzleCategoryChange(MaterialButtonToggleGroup group, int checkedId, boolean isChecked) {
+        if (!isChecked) {
+            return;
+        }
+
+        puzzlesCategory = checkedId == R.id.btnOfficial_actPuzzleSelection ?
+                PuzzleCategory.Official : PuzzleCategory.Custom;
+        psgvPuzzles.setPuzzles(getPuzzlesFromCategory());
+    }
+
+    private void onPuzzleSelectionChange() {
+        // A single puzzle must be selected
+        ButtonUtils.setButtonEnabled(btnPlay, psgvPuzzles.getSelectedPuzzles().size() == 1);
+    }
+
     //region PUZZLE ACTIONS METHODS
 
     private void hidePuzzleActions(View v) {
@@ -132,46 +196,50 @@ public final class PuzzleSelectionActivity extends BaseActivity {
     }
 
     private void btnPuzzleActionsClick(View v) {
-        // TODO
-        int puzzlesCount = 0;
-        boolean displayOfficialPuzzles = true;
-        int selectedPuzzlesCount = 0;
+        int puzzlesCount = getPuzzlesFromCategory().size();
+        int selectedPuzzlesCount = psgvPuzzles.getSelectedPuzzles().size();
 
         // Before showing the actions menu, we must update the available actions based on the puzzle selection
-        amvPuzzleActions.setButtonEnabled(PuzzleSelectionAction.Edit.ordinal(), selectedPuzzlesCount == 1 && !displayOfficialPuzzles);
-        amvPuzzleActions.setButtonEnabled(PuzzleSelectionAction.Remove.ordinal(), selectedPuzzlesCount > 0 && !displayOfficialPuzzles);
-        amvPuzzleActions.setButtonEnabled(PuzzleSelectionAction.Export.ordinal(), selectedPuzzlesCount > 0);
-        amvPuzzleActions.setButtonEnabled(PuzzleSelectionAction.SelectAll.ordinal(), selectedPuzzlesCount < puzzlesCount);
-        amvPuzzleActions.setButtonEnabled(PuzzleSelectionAction.UnselectAll.ordinal(), selectedPuzzlesCount > 0);
+        amvPuzzleActions.setButtonEnabled(PuzzleSelectionAction.Edit.ordinal(),
+                selectedPuzzlesCount == 1 && puzzlesCategory == PuzzleCategory.Custom);
+        amvPuzzleActions.setButtonEnabled(PuzzleSelectionAction.Remove.ordinal(),
+                selectedPuzzlesCount > 0 && puzzlesCategory == PuzzleCategory.Custom);
+        amvPuzzleActions.setButtonEnabled(PuzzleSelectionAction.Export.ordinal(),
+                selectedPuzzlesCount > 0);
+        amvPuzzleActions.setButtonEnabled(PuzzleSelectionAction.SelectAll.ordinal(),
+                selectedPuzzlesCount < puzzlesCount);
+        amvPuzzleActions.setButtonEnabled(PuzzleSelectionAction.UnselectAll.ordinal(),
+                selectedPuzzlesCount > 0);
+
         amvPuzzleActions.setVisibility(View.VISIBLE);
         vwDialogBg.setVisibility(View.VISIBLE);
     }
 
-    public void newPuzzleClick(View v) {
+    public void onNewPuzzleClick(View v) {
         // TODO
     }
 
-    public void editPuzzleClick(View v) {
+    public void onEditPuzzleClick(View v) {
         // TODO
     }
 
-    public void removeClick(View v) {
+    public void onRemoveClick(View v) {
         // TODO
     }
 
-    public void importClick(View v) {
+    public void onImportClick(View v) {
         // TODO
     }
 
-    public void exportClick(View v) {
+    public void onExportClick(View v) {
         // TODO
     }
 
-    public void selectAllClick(View v) {
+    public void onSelectAllClick(View v) {
         // TODO
     }
 
-    public void unselectAllClick(View v) {
+    public void onUnselectAllClick(View v) {
         // TODO
     }
 

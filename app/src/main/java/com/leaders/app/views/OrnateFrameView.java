@@ -32,8 +32,8 @@ public final class OrnateFrameView extends ConstraintLayout {
                 imvCorner.setImageTintList(colorTintList);
             }
 
-            ConstraintLayout clyBg = findViewById(R.id.clyBg_vwOrnateFrame);
-            clyBg.setBackgroundTintList(colorTintList);
+            ImageView imvRectLines = findViewById(R.id.imvRectLines_vwOrnateFrame);
+            imvRectLines.setImageTintList(colorTintList);
         }
     }
 }

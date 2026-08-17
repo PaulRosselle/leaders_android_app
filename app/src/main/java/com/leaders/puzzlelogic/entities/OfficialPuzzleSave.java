@@ -11,7 +11,7 @@ import org.json.JSONObject;
 
 public final class OfficialPuzzleSave extends PuzzleSave {
     private final int id;
-    public OfficialPuzzleSave(@NonNull Context context, int id, boolean solved, @NonNull JSONObject datas) {
+    public OfficialPuzzleSave(@NonNull Context context, int id, @NonNull JSONObject datas, boolean solved) {
         super(String.format(context.getString(R.string.official_puzzle_name_format), id), datas, solved);
         this.id = id;
     }

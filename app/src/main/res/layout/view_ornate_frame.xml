@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/clyBg_vwOrnateFrame"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/rect_stroke"
-    android:backgroundTint="@color/app_golden"
-    android:backgroundTintMode="multiply">
+    android:background="@color/darker_background">
 
     <ImageView
         android:id="@+id/imvCornerBg1_vwOrnateFrame"
@@ -70,5 +67,17 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0"
         app:srcCompat="@drawable/ornate_corner" />
+
+    <ImageView
+        android:id="@+id/imvRectLines_vwOrnateFrame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:tintMode="multiply"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/rect_stroke"
+        app:tint="@color/app_golden" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
