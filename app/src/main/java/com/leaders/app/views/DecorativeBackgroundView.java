@@ -11,7 +11,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.leaders.R;
 
-public class DecorativeBackgroundView extends ConstraintLayout {
+public final class DecorativeBackgroundView extends ConstraintLayout {
     public DecorativeBackgroundView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         inflate(context, R.layout.view_decorative_background, this);

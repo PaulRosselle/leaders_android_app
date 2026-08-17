@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name" translatable="false">Leaders</string>
+    <string name="app_version" translatable="false">v0.2.0</string>
     <string name="rules">règles</string>
     <string name="settings">options</string>
     <string name="puzzles">puzzles</string>
@@ -8,4 +9,25 @@
     <string name="main_menu_background">décor du menu principal</string>
     <string name="main_menu_button_icon">icône de bouton du menu principal</string>
     <string name="main_title">titre du jeu</string>
+    <string name="yes">oui</string>
+    <string name="no">non</string>
+    <string name="back">retour</string>
+    <string name="go_back_to_main_menu">Revenir au menu principal ?</string>
+    <string name="crash_log_message">Un problème a provoqué la fermeture de l\'application.\n\nEn nous envoyant un rapport, vous nous aiderez à en identifier la cause et à le corriger rapidement.</string>
+    <string name="title_puzzles_selection">PuzzleS</string>
+    <string name="play">jouer</string>
+    <string name="new_puzzle">Nouveau puzzle</string>
+    <string name="edit_puzzle">Modifier</string>
+    <string name="remove">Supprimer</string>
+    <string name="import_puzzle">Importer</string>
+    <string name="export_puzzle">Exporter</string>
+    <string name="select_all">Tout sélectionner</string>
+    <string name="unselect_all">Tout déselectionner</string>
+    <string name="puzzle_solved_format">%s résolu !</string>
+    <string name="checkbox">Case à cocher</string>
+    <string name="official_puzzle_name_format">Puzzle #%03d</string>
+    <string name="by_author">par %s</string>
+    <string name="official_puzzles">officiels</string>
+    <string name="custom">personnalisés</string>
+    <string name="puzzle_unsolved_format">%s non résolu</string>
 </resources>

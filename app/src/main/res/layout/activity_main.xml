@@ -7,17 +7,20 @@
     android:background="@color/background"
     tools:context=".app.activities.MainActivity">
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gdlRoot_actMain"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="0dp" />
 
     <com.leaders.app.views.DecorativeBackgroundView
-        android:id="@+id/decorativeBackgroundView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-    </com.leaders.app.views.DecorativeBackgroundView>
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <ImageView
         android:id="@+id/imvLightHalo_actMain"
@@ -31,7 +34,7 @@
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actMain"
         app:layout_constraintVertical_bias="0.75"
         app:srcCompat="@drawable/main_menu_bg_halo" />
 
@@ -47,7 +50,7 @@
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actMain"
         app:layout_constraintVertical_bias="0.75"
         app:srcCompat="@drawable/main_menu_bg_rays" />
 
@@ -60,7 +63,7 @@
         app:layout_constraintBottom_toTopOf="@+id/mmvMainMenu_actMain"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actMain"
         app:srcCompat="@drawable/logo_leaders" />
 
     <com.leaders.app.views.MainMenuView
@@ -72,6 +75,16 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actMain"
         app:layout_constraintVertical_bias="0.75" />
+
+    <com.leaders.app.views.CrashLogView
+        android:id="@+id/clvCrashDialog_actMain"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actMain" />
 </androidx.constraintlayout.widget.ConstraintLayout>

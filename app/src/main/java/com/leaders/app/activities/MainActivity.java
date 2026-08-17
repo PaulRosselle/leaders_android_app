@@ -1,7 +1,6 @@
 package com.leaders.app.activities;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
@@ -15,23 +14,84 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.leaders.R;
+import com.leaders.app.entities.crash.CrashLog;
+import com.leaders.app.enums.ActivityType;
+import com.leaders.app.utilities.JsonUtils;
+import com.leaders.app.views.CrashLogView;
 import com.leaders.app.views.MainMenuView;
 
-public class MainActivity extends AppCompatActivity {
+public final class MainActivity extends BaseActivity {
+    private CrashLogView clvCrashDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        
         startLightAnimation();
+    }
+
+    @Override
+    protected void initViews() {
+        super.initViews();
+
+        clvCrashDialog = findViewById(R.id.clvCrashDialog_actMain);
+    }
+
+    @Override
+    protected void initListeners() {
+        super.initListeners();
 
         MainMenuView mmvMainMenu = findViewById(R.id.mmvMainMenu_actMain);
-        mmvMainMenu.setOnPuzzlesClickListener(this::btnNotImplementedClick);
+        mmvMainMenu.setOnPuzzlesClickListener(v -> goToActivity(ActivityType.PuzzleSelection));
         mmvMainMenu.setOnPlayClickListener(this::btnNotImplementedClick);
         mmvMainMenu.setOnReplayClickListener(this::btnNotImplementedClick);
         mmvMainMenu.setOnRulesClickListener(this::btnNotImplementedClick);
         mmvMainMenu.setOnSettingsClickListener(this::btnNotImplementedClick);
+    }
+
+    @Override
+    protected void initDatas() {
+        super.initDatas();
+
+        CrashLog crashLog = JsonUtils.loadCrashLog(this);
+        if (crashLog != null) {
+            clvCrashDialog.show(crashLog);
+        }
+    }
+
+    @Override
+    protected int getLayoutResId() {
+        return R.layout.activity_main;
+    }
+
+    @Override
+    protected int getRootGuidelineResId() {
+        return R.id.gdlRoot_actMain;
+    }
+
+    @Override
+    protected Integer getBtnBackResId() {
+        return null;
+    }
+
+    @Override
+    protected boolean isImmersiveActivity() {
+        return false;
+    }
+
+    @Override
+    protected boolean overrideOnBackPressed() {
+        return false;
+    }
+
+    @Override
+    protected boolean askForConfirmationBeforeFinish() {
+        return false;
+    }
+
+    @NonNull
+    @Override
+    public ActivityType getActivityType() {
+        return ActivityType.Main;
     }
 
     private void startLightAnimation() {
@@ -59,11 +119,8 @@ public class MainActivity extends AppCompatActivity {
         lightAnimations.start();
     }
 
-    private ObjectAnimator getAnimator(@NonNull ImageView imvToAnimate,
-                                       @NonNull Property<View, Float> property,
-                                       int duration,
-                                       Interpolator interpolator,
-                                       int repeatMode,
+    private ObjectAnimator getAnimator(@NonNull ImageView imvToAnimate, @NonNull Property<View, Float> property,
+                                       int duration, @NonNull Interpolator interpolator, int repeatMode,
                                        float... values) {
         ObjectAnimator animator = ObjectAnimator.ofFloat(imvToAnimate, property, values);
         animator.setDuration(duration);
