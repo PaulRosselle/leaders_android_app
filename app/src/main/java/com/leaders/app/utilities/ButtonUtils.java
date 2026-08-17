@@ -9,7 +9,7 @@ import androidx.appcompat.content.res.AppCompatResources;
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 
-public class ButtonUtils {
+public final class ButtonUtils {
     private ButtonUtils(){
         throw new AssertionError("Cannot instantiate utility class");
     }

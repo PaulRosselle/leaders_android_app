@@ -5,7 +5,7 @@ import android.content.Intent;
 
 import androidx.annotation.NonNull;
 
-public class ContactUtils {
+public final class ContactUtils {
     private final static String DEV_APP_EMAIL = "leaders.unofficial.app@gmail.com";
     private final static String EMAIL_MIME_TYPE = "message/rfc822";
 
