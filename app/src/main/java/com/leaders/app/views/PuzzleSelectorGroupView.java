@@ -84,10 +84,11 @@ public final class PuzzleSelectorGroupView extends LinearLayout {
 
     private Integer getClosestSelectedPuzzle(int refPuzzleIdx) {
         int closestIdx = Integer.MAX_VALUE;
-        for (int i = 0; i < getChildCount(); i++) {
-            if (((PuzzleSelectorView) getChildAt(i)).isChecked() &&
-                    Math.abs(i - refPuzzleIdx) < Math.abs((closestIdx - refPuzzleIdx))) {
-                closestIdx = i;
+        for (int puzzleIdx = 0; puzzleIdx < getChildCount(); puzzleIdx++) {
+            if (puzzleIdx != refPuzzleIdx &&
+                    ((PuzzleSelectorView) getChildAt(puzzleIdx)).isChecked() &&
+                    Math.abs(puzzleIdx - refPuzzleIdx) < Math.abs((closestIdx - refPuzzleIdx))) {
+                closestIdx = puzzleIdx;
             }
         }
 
@@ -118,9 +119,9 @@ public final class PuzzleSelectorGroupView extends LinearLayout {
 
     private boolean onPuzzleLongClick(@NonNull PuzzleSelectorView psvSender) {
         // Long click on an already selected puzzle outside of single selection mode does nothing
-        if (!singleSelection && psvSender.isChecked()) {
+        /*if (!singleSelection && psvSender.isChecked()) {
             return false;
-        }
+        }*/
 
         // A long click on a puzzle during single selection mode starts multi selection mode
         if (singleSelection) {

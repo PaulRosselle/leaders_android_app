@@ -21,6 +21,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public final class PuzzleSelectionActivity extends BaseActivity {
     private enum PuzzleSelectionAction {
@@ -120,14 +121,15 @@ public final class PuzzleSelectionActivity extends BaseActivity {
 
         officialPuzzleSaves = new ArrayList<>();
         // TODO - replace with json datas loading
-        for (int i = 1; i < 10; i++) {
-            officialPuzzleSaves.add(new OfficialPuzzleSave(this, i, new JSONObject(), i % 3 == 0));
+        Random random = new Random();
+        for (int i = 1; i < 40; i++) {
+            officialPuzzleSaves.add(new OfficialPuzzleSave(this, i, new JSONObject(), random.nextBoolean()));
         }
 
         customPuzzleSaves = new ArrayList<>();
         // TODO - replace with json datas loading
         for (int i = 1; i < 10; i++) {
-            customPuzzleSaves.add(new CustomPuzzleSave("TEST NAME", "Test Author", new JSONObject(), i % 2 == 0));
+            customPuzzleSaves.add(new CustomPuzzleSave("TEST NAME", "Test Author", new JSONObject(), random.nextBoolean()));
         }
 
         ((MaterialButton) (findViewById(R.id.btnOfficial_actPuzzleSelection))).setChecked(true);
