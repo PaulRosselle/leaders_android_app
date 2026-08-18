@@ -30,5 +30,6 @@
     <string name="custom">custom</string>
     <string name="puzzle_unsolved_format">%s not solved</string>
     <string name="go_back_to_puzzle_menu">Go back to puzzles menu ?</string>
+    <string name="board">board</string>
 
 </resources>
