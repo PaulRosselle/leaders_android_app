@@ -44,5 +44,8 @@
         </attr>
     </declare-styleable>
 
+    <declare-styleable name="CharacterCardPortraitGroupView">
+        <attr name="maxGroupSize" format="integer"/>
+    </declare-styleable>
 
 </resources>
