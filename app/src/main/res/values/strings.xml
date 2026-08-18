@@ -32,4 +32,23 @@
     <string name="puzzle_unsolved_format">%s non résolu</string>
     <string name="go_back_to_puzzle_menu">Revenir au menu des puzzles ?</string>
     <string name="board">plateau</string>
+    <string name="card_name_acrobat">acrobat</string>
+    <string name="card_name_archer">archère</string>
+    <string name="card_name_assassin">assassin</string>
+    <string name="card_name_brewmaster">tavernier</string>
+    <string name="card_name_bruiser">cogneur</string>
+    <string name="card_name_claw_launcher">lance grappin</string>
+    <string name="card_name_hermit_and_cub">viel ours &amp; ourson</string>
+    <string name="card_name_illusionist">illusionniste</string>
+    <string name="card_name_jailer">geôlier</string>
+    <string name="card_name_leader_king">roi</string>
+    <string name="card_name_leader_queen">reine</string>
+    <string name="card_name_manipulator">manipulatrice</string>
+    <string name="card_name_nemesis">nemesis</string>
+    <string name="card_name_protector">protecteur</string>
+    <string name="card_name_rider">cavalier</string>
+    <string name="card_name_royal_guard">garde royal</string>
+    <string name="card_name_vizier">vizir</string>
+    <string name="card_name_wanderer">rôdeuse</string>
+    <string name="color">couleur</string>
 </resources>

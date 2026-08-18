@@ -33,6 +33,8 @@ public class CharacterCardPortraitGroupView extends LinearLayout {
             int groupSize = customAttrs.getInteger(R.styleable.CharacterCardPortraitGroupView_maxGroupSize, 6);
             setPortraits(new ArrayList<>(), groupSize);
         }
+
+        setOrientation(HORIZONTAL);
     }
 
     public CharacterCardPortraitGroupView(@NonNull Context context,

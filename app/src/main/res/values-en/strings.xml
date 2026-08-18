@@ -31,5 +31,24 @@
     <string name="puzzle_unsolved_format">%s not solved</string>
     <string name="go_back_to_puzzle_menu">Go back to puzzles menu ?</string>
     <string name="board">board</string>
+    <string name="card_name_acrobat">acrobat</string>
+    <string name="card_name_archer">archer</string>
+    <string name="card_name_assassin">assassin</string>
+    <string name="card_name_brewmaster">brewmaster</string>
+    <string name="card_name_bruiser">bruiser</string>
+    <string name="card_name_claw_launcher">claw launcher</string>
+    <string name="card_name_hermit_and_cub">hermit &amp; cub</string>
+    <string name="card_name_illusionist">illusionist</string>
+    <string name="card_name_jailer">jailer</string>
+    <string name="card_name_leader_king">roi</string>
+    <string name="card_name_leader_queen">queen</string>
+    <string name="card_name_manipulator">manipulator</string>
+    <string name="card_name_nemesis">nemesis</string>
+    <string name="card_name_protector">protector</string>
+    <string name="card_name_rider">rider</string>
+    <string name="card_name_royal_guard">royal guard</string>
+    <string name="card_name_vizier">vizier</string>
+    <string name="card_name_wanderer">wanderer</string>
+    <string name="color">color</string>
 
 </resources>

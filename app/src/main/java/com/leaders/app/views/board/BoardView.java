@@ -84,15 +84,23 @@ public abstract class BoardView extends ConstraintLayout {
     protected void onSizeChanged(int width, int height, int oldWidth, int oldHeight) {
         super.onSizeChanged(width, height, oldWidth, oldHeight);
 
-        final int characterSize = Math.round(width * CHARACTER_SIZE_TO_BOARD_RATIO);
+        final int characterDisplaySize = getCharacterDisplaySize(width);
 
-        characterDisplayPool.setDisplaysSize(characterSize);
+        characterDisplayPool.setDisplaysSize(characterDisplaySize);
         for (Map.Entry<Position, CharacterDisplay> entry : characterDisplays.entrySet()) {
             CharacterDisplay display = entry.getValue();
-            display.setSize(characterSize);
+            display.setSize(characterDisplaySize);
             CellView cellView = getCellView(entry.getKey());
             display.setPosition(cellView.getX(), cellView.getY());
         }
+    }
+
+    public int getCharacterDisplaySize() {
+        return getCharacterDisplaySize(getWidth());
+    }
+
+    public int getCharacterDisplaySize(int boardWidth) {
+        return Math.round(boardWidth * CHARACTER_SIZE_TO_BOARD_RATIO);
     }
 
     public final void setOrientation(@NonNull BoardOrientation orientation) {

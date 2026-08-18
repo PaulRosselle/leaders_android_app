@@ -79,7 +79,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
 
         GameHistory gameHistory = new GameHistory(gameConfig, entries);
 
-        pebvBoard = findViewById(R.id.pebvBoard);
+        pebvBoard = findViewById(R.id.pebvBoard_actPuzzleEditor);
         pebvBoard.post(() -> pebvBoard.setBoard(GameFactory.create(gameHistory).getBoard()));
     }
 

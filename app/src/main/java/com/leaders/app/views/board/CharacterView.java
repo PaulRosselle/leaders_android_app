@@ -2,13 +2,20 @@ package com.leaders.app.views.board;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.TransitionDrawable;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.AppCompatImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.interpolator.view.animation.LinearOutSlowInInterpolator;
 
 import com.leaders.R;
 import com.leaders.gamelogic.entities.Character;
@@ -17,6 +24,8 @@ import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 
 public final class CharacterView extends AppCompatImageView {
+    private static final int SCALE_FOR_HIGHLIGHT_ANIMATION_DURATION = 200;
+
     @Nullable
     private InteractionTarget target;
 
@@ -90,5 +99,52 @@ public final class CharacterView extends AppCompatImageView {
     public void setAsActiveAbilityTarget(@NonNull InteractionTarget target) {
         this.target = target;
         setForeground(ContextCompat.getDrawable(getContext(), R.drawable.target_ability_character));
+    }
+
+    public void setAsPlayableTarget(@NonNull InteractionTarget target) {
+        this.target = target;
+        // There is no visual feedback within the characterView since playable characters
+        // must be highlighted using a CharacterHighlightView
+    }
+
+    @Nullable
+    public InteractionTarget getTarget() {
+        return target;
+    }
+
+    private float getScaleForHighlightValue() {
+        // Android float dimensions must be gotten through a typed value
+        TypedValue outValue = new TypedValue();
+        getResources().getValue(R.dimen.highlighted_token, outValue, true);
+        return outValue.getFloat();
+    }
+
+    public void scaleForHighlight(boolean highlighted, boolean animate) {
+        float scaleValue = highlighted ? getScaleForHighlightValue() : 1f;
+        if (animate) {
+            animate().scaleX(scaleValue).scaleY(scaleValue)
+                    .setInterpolator(new LinearOutSlowInInterpolator())
+                    .setDuration(SCALE_FOR_HIGHLIGHT_ANIMATION_DURATION)
+                    .start();
+        } else {
+            setScaleX(scaleValue);
+            setScaleY(scaleValue);
+        }
+    }
+
+    public void animateSetCharacter(@Nullable CharacterType characterType,
+                                    @NonNull TeamColor teamColor,
+                                    @Nullable Runnable animationEndRunnable) {
+        final int animDuration = 200;
+        Drawable[] drawables = new Drawable[2];
+        drawables[0] = getDrawable();
+        drawables[1] = AppCompatResources.getDrawable(getContext(), getCharacterDrawableId(characterType, teamColor));
+        TransitionDrawable fadeTransition = new TransitionDrawable(drawables);
+        fadeTransition.setCrossFadeEnabled(true);
+        setImageDrawable(fadeTransition);
+        fadeTransition.startTransition(animDuration);
+        if (animationEndRunnable != null) {
+            new Handler(Looper.getMainLooper()).postDelayed(animationEndRunnable, animDuration);
+        }
     }
 }

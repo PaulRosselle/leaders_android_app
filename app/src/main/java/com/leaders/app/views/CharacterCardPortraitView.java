@@ -20,6 +20,7 @@ public class CharacterCardPortraitView extends AppCompatImageView {
         super(context, attrs);
         // Nemesis is the default portrait (because I really like her design)
         setPortraitCard(CharacterCard.Nemesis);
+        setAdjustViewBounds(true);
     }
 
     public void setPortraitCard(@NonNull CharacterCard portraitCard) {

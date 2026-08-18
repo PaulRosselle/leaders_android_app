@@ -7,4 +7,5 @@
     <dimen name="title_font_size">34dp</dimen>
     <dimen name="ornate_corner_size">24dp</dimen>
     <dimen name="default_stroke_width">1dp</dimen>
+    <dimen name="highlighted_token" format="float">0.87</dimen>
 </resources>
