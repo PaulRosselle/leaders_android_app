@@ -87,8 +87,11 @@ public abstract class BoardView extends ConstraintLayout {
         final int characterSize = Math.round(width * CHARACTER_SIZE_TO_BOARD_RATIO);
 
         characterDisplayPool.setDisplaysSize(characterSize);
-        for (CharacterDisplay characterDisplay : characterDisplays.values()) {
-            characterDisplay.setSize(characterSize);
+        for (Map.Entry<Position, CharacterDisplay> entry : characterDisplays.entrySet()) {
+            CharacterDisplay display = entry.getValue();
+            display.setSize(characterSize);
+            CellView cellView = getCellView(entry.getKey());
+            display.setPosition(cellView.getX(), cellView.getY());
         }
     }
 

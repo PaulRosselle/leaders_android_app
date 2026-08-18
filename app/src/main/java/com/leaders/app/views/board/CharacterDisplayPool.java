@@ -1,9 +1,9 @@
 package com.leaders.app.views.board;
 
 import android.content.Context;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,10 +14,10 @@ public final class CharacterDisplayPool {
     @NonNull
     private final List<CharacterDisplay> available;
 
-    public CharacterDisplayPool(@NonNull Context context, @NonNull ConstraintLayout clyParent) {
+    public CharacterDisplayPool(@NonNull Context context, @NonNull ViewGroup parentView) {
         available = new ArrayList<>();
         for (int i = 0; i < CHARACTERS_POOL_SIZE; i++) {
-            available.add(new CharacterDisplay(context, clyParent));
+            available.add(new CharacterDisplay(context, parentView));
         }
     }
 

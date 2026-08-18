@@ -4,6 +4,7 @@ import static android.view.View.GONE;
 
 import android.content.Context;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
@@ -22,7 +23,7 @@ public class CharacterDisplay {
     private final CharacterHighlightView highlightView;
 
 
-    public CharacterDisplay(@NonNull Context context, @NonNull ConstraintLayout parentView) {
+    public CharacterDisplay(@NonNull Context context, @NonNull ViewGroup parentView) {
         characterView = new CharacterView(context);
         parentView.addView(characterView, getDefaultLayoutParams());
 
@@ -43,10 +44,11 @@ public class CharacterDisplay {
     }
 
     private void setSize(@NonNull View view, int size) {
-        ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) view.getLayoutParams();
+        ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
         layoutParams.height = size;
         layoutParams.width = size;
         view.setLayoutParams(layoutParams);
+        view.requestLayout();
     }
 
     @NonNull
@@ -71,9 +73,7 @@ public class CharacterDisplay {
         );
 
         params.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
-        params.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
-        params.startToStart = ConstraintLayout.LayoutParams.PARENT_ID;
-        params.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID;
+        params.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
 
         return params;
     }
