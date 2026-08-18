@@ -14,7 +14,7 @@ import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.TeamColor;
 
-public class CharacterView extends AppCompatImageView {
+public final class CharacterView extends AppCompatImageView {
     @Nullable
     private CharacterType characterType;
     @NonNull

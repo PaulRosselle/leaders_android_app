@@ -26,7 +26,7 @@
         app:layout_constraintGuide_percent="0.5"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <com.leaders.app.views.DecorativeBackgroundView
+    <com.leaders.app.views.decoration.DecorativeBackgroundView
         android:id="@+id/decorativeBackgroundView"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -145,7 +145,7 @@
 
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
-    <com.leaders.app.views.OrnateFrameView
+    <com.leaders.app.views.decoration.OrnateFrameView
         android:id="@+id/ofvPuzzles_actPuzzleSelection"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -178,7 +178,7 @@
                 android:orientation="vertical"/>
         </ScrollView>
 
-    </com.leaders.app.views.OrnateFrameView>
+    </com.leaders.app.views.decoration.OrnateFrameView>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnPlay_actPuzzleSelection"

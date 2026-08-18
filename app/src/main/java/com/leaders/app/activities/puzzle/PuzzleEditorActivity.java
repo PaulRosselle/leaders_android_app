@@ -1,21 +1,14 @@
-package com.leaders.app.activities;
+package com.leaders.app.activities.puzzle;
 
-import android.os.Bundle;
-
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.leaders.R;
+import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
 
-public class PuzzleEditorActivity extends BaseActivity {
+public final class PuzzleEditorActivity extends BaseActivity {
 
     @Override
     protected int getLayoutResId() {
@@ -27,7 +20,7 @@ public class PuzzleEditorActivity extends BaseActivity {
         return R.id.gdlRoot_actPuzzleEditor;
     }
 
-    @Nullable
+    @NonNull
     @Override
     protected Integer getBtnBackResId() {
         return R.id.btnBack_actPuzzleEditor;
@@ -51,7 +44,7 @@ public class PuzzleEditorActivity extends BaseActivity {
     @NonNull
     @Override
     public ActivityType getActivityType() {
-        return null;
+        return ActivityType.PuzzleEditor;
     }
 
     @Override

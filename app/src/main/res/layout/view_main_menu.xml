@@ -81,7 +81,7 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.956" />
 
-    <com.leaders.app.views.MainMenuButtonView
+    <com.leaders.app.views.mainmenu.MainMenuButtonView
         android:id="@+id/mmbvPuzzles_vwMainMenu"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -93,7 +93,7 @@
         app:iconResId="@drawable/icon_puzzle"
         app:textResId="@string/puzzles" />
 
-    <com.leaders.app.views.MainMenuButtonView
+    <com.leaders.app.views.mainmenu.MainMenuButtonView
         android:id="@+id/mmbvPlay_vwMainMenu"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -105,7 +105,7 @@
         app:iconResId="@drawable/icon_pvp"
         app:textResId="@string/duel" />
 
-    <com.leaders.app.views.MainMenuButtonView
+    <com.leaders.app.views.mainmenu.MainMenuButtonView
         android:id="@+id/mmbvRules_vwMainMenu"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -117,7 +117,7 @@
         app:iconResId="@drawable/icon_rules"
         app:textResId="@string/rules" />
 
-    <com.leaders.app.views.MainMenuButtonView
+    <com.leaders.app.views.mainmenu.MainMenuButtonView
         android:id="@+id/mmbvSettings_vwMainMenu"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -129,7 +129,7 @@
         app:iconResId="@drawable/icon_settings_menu"
         app:textResId="@string/settings" />
 
-    <com.leaders.app.views.MainMenuButtonView
+    <com.leaders.app.views.mainmenu.MainMenuButtonView
         android:id="@+id/mmbvReplay_vwMainMenu"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/background"
     tools:theme="@style/Theme.LeadersAndroidApp"
-    tools:context=".app.activities.PuzzleEditorActivity"
+    tools:context=".app.activities.puzzle.PuzzleEditorActivity"
     tools:ignore="SpUsage">
 
     <androidx.constraintlayout.widget.Guideline
@@ -16,7 +16,7 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_begin="0dp" />
 
-    <com.leaders.app.views.DecorativeBackgroundView
+    <com.leaders.app.views.decoration.DecorativeBackgroundView
         android:id="@+id/decorativeBackgroundView"
         android:layout_width="0dp"
         android:layout_height="0dp"

@@ -17,8 +17,8 @@ import com.leaders.R;
 import com.leaders.app.entities.crash.CrashLog;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.utilities.JsonUtils;
-import com.leaders.app.views.CrashLogView;
-import com.leaders.app.views.MainMenuView;
+import com.leaders.app.views.mainmenu.CrashLogView;
+import com.leaders.app.views.mainmenu.MainMenuView;
 
 public final class MainActivity extends BaseActivity {
     private CrashLogView clvCrashDialog;
