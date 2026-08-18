@@ -30,4 +30,5 @@
     <string name="official_puzzles">officiels</string>
     <string name="custom">personnalisés</string>
     <string name="puzzle_unsolved_format">%s non résolu</string>
+    <string name="go_back_to_puzzle_menu">Revenir au menu des puzzles ?</string>
 </resources>

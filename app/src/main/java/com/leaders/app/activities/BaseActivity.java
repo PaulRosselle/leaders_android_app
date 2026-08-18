@@ -72,7 +72,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
                 @Override
                 public void handleOnBackPressed() {
-                    goToMainActivityOnBackPressed();
+                    doOnBackPressed();
                 }
             });
         }
@@ -232,7 +232,7 @@ public abstract class BaseActivity extends AppCompatActivity {
      * Handles navigation to the main activity when the back action is triggered.
      * Implementations may require user confirmation before navigating away.
      */
-    protected void goToMainActivityOnBackPressed() {
+    protected void doOnBackPressed() {
         if (askForConfirmationBeforeFinish()) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.alert_dialog_theme);
             builder.setTitle(R.string.back);
@@ -260,6 +260,6 @@ public abstract class BaseActivity extends AppCompatActivity {
      * @param v the clicked view
      */
     protected void btnBackClick(View v) {
-        goToMainActivityOnBackPressed();
+        doOnBackPressed();
     }
 }
