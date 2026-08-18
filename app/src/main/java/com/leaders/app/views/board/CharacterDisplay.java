@@ -79,7 +79,10 @@ public class CharacterDisplay {
     }
 
     public void reset() {
+        // TODO - take into account in progress animations ?
+
         characterView.clearTarget();
+
         characterView.setVisibility(GONE);
         shadowView.setVisibility(GONE);
         highlightView.setVisibility(GONE);

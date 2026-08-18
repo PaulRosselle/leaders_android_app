@@ -3,13 +3,12 @@ package com.leaders.app.views.board;
 import android.content.Context;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CharacterDisplayPool {
+public final class CharacterDisplayPool {
     private static final int CHARACTERS_POOL_SIZE = 36;
 
     @NonNull

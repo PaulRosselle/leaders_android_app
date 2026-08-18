@@ -7,8 +7,16 @@ import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
+import com.leaders.app.views.board.PuzzleEditorBoardView;
 
 public final class PuzzleEditorActivity extends BaseActivity {
+    private PuzzleEditorBoardView pebvBoard;
+
+    protected void initViews() {
+        super.initViews();
+
+        pebvBoard = findViewById(R.id.pebvBoard);
+    }
 
     @Override
     protected int getLayoutResId() {

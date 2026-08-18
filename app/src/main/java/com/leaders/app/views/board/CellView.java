@@ -14,7 +14,7 @@ import com.leaders.gamelogic.interactions.InteractionTarget;
 
 import java.util.Objects;
 
-public class CellView extends AppCompatImageView {
+public final class CellView extends AppCompatImageView {
     @Nullable
     private InteractionTarget target;
 

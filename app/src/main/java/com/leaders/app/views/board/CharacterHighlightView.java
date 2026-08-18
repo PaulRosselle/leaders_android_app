@@ -10,7 +10,7 @@ import androidx.appcompat.widget.AppCompatImageView;
 
 import com.leaders.R;
 
-public class CharacterHighlightView extends AppCompatImageView {
+public final class CharacterHighlightView extends AppCompatImageView {
     private static final int HIGHLIGHT_ANIMATION_DURATION = 800;
 
     public CharacterHighlightView(@NonNull Context context) {

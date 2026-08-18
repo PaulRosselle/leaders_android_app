@@ -21,16 +21,16 @@ import java.util.Map;
 import java.util.Objects;
 
 public abstract class BoardView extends ConstraintLayout {
-    private static final float CHARACTER_SIZE_RATIO = 0.1410f;
+    private static final float CHARACTER_SIZE_TO_BOARD_RATIO = 0.1410f;
 
     protected ImageView imvBoard;
-
     private final List<CellView> cellViews;
-    protected CharacterDisplayPool characterDisplayPool;
+    private final CharacterDisplayPool characterDisplayPool;
 
     @NonNull
-    protected Map<Position, CellView> cellViewsMap;
+    protected final Map<Position, CellView> cellViewsMap;
     private final Map<Position, CharacterDisplay> characterDisplays;
+
     @NonNull
     protected BoardOrientation orientation;
 
@@ -38,23 +38,17 @@ public abstract class BoardView extends ConstraintLayout {
     public BoardView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
-        inflate(context, R.layout.view_board, this);
-
         cellViews = new ArrayList<>();
         cellViewsMap = new HashMap<>();
         characterDisplays = new HashMap<>();
-        orientation = BoardOrientation.Default;
 
-        initViews();
-    }
+        inflate(context, R.layout.view_board, this);
 
-    private void initViews() {
         imvBoard = findViewById(R.id.imvBoard_vwBoard);
-
         initCellViews();
         characterDisplayPool = new CharacterDisplayPool(getContext(), this);
 
-        setOrientation(orientation);
+        setOrientation(BoardOrientation.Default);
     }
 
     private int[] getCellViewIds() {
@@ -90,7 +84,7 @@ public abstract class BoardView extends ConstraintLayout {
     protected void onSizeChanged(int width, int height, int oldWidth, int oldHeight) {
         super.onSizeChanged(width, height, oldWidth, oldHeight);
 
-        final int characterSize = Math.round(width * CHARACTER_SIZE_RATIO);
+        final int characterSize = Math.round(width * CHARACTER_SIZE_TO_BOARD_RATIO);
 
         characterDisplayPool.setDisplaysSize(characterSize);
         for (CharacterDisplay characterDisplay : characterDisplays.values()) {
@@ -120,6 +114,13 @@ public abstract class BoardView extends ConstraintLayout {
                 cellViewIdx += cellViewIdxStep;
             }
         }
+
+        // Since Position -> CellView mapping can have changed, we must update character
+        // displays so they stay on top of their corresponding cell position
+        for (Map.Entry<Position, CharacterDisplay> entry : characterDisplays.entrySet()) {
+            CellView cellView = getCellView(entry.getKey());
+            entry.getValue().setPosition(cellView.getX(), cellView.getY());
+        }
     }
 
     public final void setBoard(@NonNull Board board) {
@@ -148,10 +149,12 @@ public abstract class BoardView extends ConstraintLayout {
         }
     }
 
+    @NonNull
     protected final CharacterDisplay acquireCharacterDisplay(@NonNull Position position) {
-        return characterDisplays.put(position,  characterDisplayPool.acquire());
+        CharacterDisplay characterDisplay = characterDisplayPool.acquire();
+        characterDisplays.put(position, characterDisplay);
+        return characterDisplay;
     }
-
 
     protected final void releaseCharacterDisplay(@NonNull Position position) {
         characterDisplayPool.release(Objects.requireNonNull(characterDisplays.remove(position),
@@ -168,7 +171,7 @@ public abstract class BoardView extends ConstraintLayout {
         }
     }
 
-    protected CellView getCellView(@NonNull Position position) {
+    protected final CellView getCellView(@NonNull Position position) {
         return Objects.requireNonNull(cellViewsMap.get(position), "No CellView found at Position:" + position);
     }
 }
