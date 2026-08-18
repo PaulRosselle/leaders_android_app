@@ -49,29 +49,29 @@ public final class CharacterView extends AppCompatImageView {
         boolean isWhite = teamColor == TeamColor.White;
 
         if (characterType == null) {
-            return isWhite ? R.drawable.empty_token_w : R.drawable.empty_token_b;
+            return isWhite ? R.drawable.character_piece_empty_w : R.drawable.character_piece_empty_b;
         }
 
         switch (characterType) {
-            case Acrobat: return isWhite ? R.drawable.acrobat_token_w : R.drawable.acrobat_token_b;
-            case Archer: return isWhite ? R.drawable.archer_token_w : R.drawable.archer_token_b;
-            case Assassin: return isWhite ? R.drawable.assassin_token_w : R.drawable.assassin_token_b;
-            case Brewmaster: return isWhite ? R.drawable.brewmaster_token_w : R.drawable.brewmaster_token_b;
-            case Bruiser: return isWhite ? R.drawable.bruiser_token_w : R.drawable.bruiser_token_b;
-            case ClawLauncher: return isWhite ? R.drawable.claw_launcher_token_w : R.drawable.claw_launcher_token_b;
-            case Cub: return isWhite ? R.drawable.cub_token_w : R.drawable.cub_token_b;
-            case Hermit: return isWhite ? R.drawable.hermit_token_w : R.drawable.hermit_token_b;
-            case Illusionist: return isWhite ? R.drawable.illusionist_token_w : R.drawable.illusionist_token_b;
-            case Jailer: return isWhite ? R.drawable.jailer_token_w : R.drawable.jailer_token_b;
-            case LeaderKing: return isWhite ? R.drawable.leader_king_token_w : R.drawable.leader_king_token_b;
-            case LeaderQueen: return isWhite ? R.drawable.leader_queen_token_w : R.drawable.leader_queen_token_b;
-            case Manipulator: return isWhite ? R.drawable.manipulator_token_w : R.drawable.manipulator_token_b;
-            case Nemesis: return isWhite ? R.drawable.nemesis_token_w : R.drawable.nemesis_token_b;
-            case Protector: return isWhite ? R.drawable.protector_token_w : R.drawable.protector_token_b;
+            case Acrobat: return isWhite ? R.drawable.character_piece_acrobat_w : R.drawable.character_piece_acrobat_b;
+            case Archer: return isWhite ? R.drawable.character_piece_archer_w : R.drawable.character_piece_archer_b;
+            case Assassin: return isWhite ? R.drawable.character_piece_assassin_w : R.drawable.character_piece_assassin_b;
+            case Brewmaster: return isWhite ? R.drawable.character_piece_brewmaster_w : R.drawable.character_piece_brewmaster_b;
+            case Bruiser: return isWhite ? R.drawable.character_piece_bruiser_w : R.drawable.character_piece_bruiser_b;
+            case ClawLauncher: return isWhite ? R.drawable.character_piece_claw_launcher_w : R.drawable.character_piece_claw_launcher_b;
+            case Cub: return isWhite ? R.drawable.character_piece_cub_w : R.drawable.character_piece_cub_b;
+            case Hermit: return isWhite ? R.drawable.character_piece_hermit_w : R.drawable.character_piece_hermit_b;
+            case Illusionist: return isWhite ? R.drawable.character_piece_illusionist_w : R.drawable.character_piece_illusionist_b;
+            case Jailer: return isWhite ? R.drawable.character_piece_jailer_w : R.drawable.character_piece_jailer_b;
+            case LeaderKing: return isWhite ? R.drawable.character_piece_leader_king_w : R.drawable.character_piece_leader_king_b;
+            case LeaderQueen: return isWhite ? R.drawable.character_piece_leader_queen_w : R.drawable.character_piece_leader_queen_b;
+            case Manipulator: return isWhite ? R.drawable.character_piece_manipulator_w : R.drawable.character_piece_manipulator_b;
+            case Nemesis: return isWhite ? R.drawable.character_piece_nemesis_w : R.drawable.character_piece_nemesis_b;
+            case Protector: return isWhite ? R.drawable.character_piece_protector_w : R.drawable.character_piece_protector_b;
             case Rider: return isWhite ? R.drawable.rider_token_w : R.drawable.rider_token_b;
-            case RoyalGuard: return isWhite ? R.drawable.royal_guard_token_w : R.drawable.royal_guard_token_b;
-            case Vizier: return isWhite ? R.drawable.vizier_token_w : R.drawable.vizier_token_b;
-            case Wanderer: return isWhite ? R.drawable.wanderer_token_w : R.drawable.wanderer_token_b;
+            case RoyalGuard: return isWhite ? R.drawable.character_piece_royal_guard_w : R.drawable.character_piece_royal_guard_b;
+            case Vizier: return isWhite ? R.drawable.character_piece_vizier_w : R.drawable.character_piece_vizier_b;
+            case Wanderer: return isWhite ? R.drawable.character_piece_wanderer_w : R.drawable.character_piece_wanderer_b;
             default: throw new IllegalArgumentException("No drawable found for character: " + characterType);
         }
     }
