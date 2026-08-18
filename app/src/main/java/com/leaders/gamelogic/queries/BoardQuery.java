@@ -192,7 +192,7 @@ public final class BoardQuery {
     /**
      * Returns the starting row index for the specified team on the given column.
      *
-     * <p>Black team starts on the last row of each column, while the other team
+     * <p>White team starts on the last row of each column, while the other team
      * starts on the first row.</p>
      *
      * @param x the column index.
@@ -200,7 +200,7 @@ public final class BoardQuery {
      * @return the starting row index for the specified team.
      */
     private static int getTeamStartingRow(int x, @NonNull TeamColor teamColor) {
-        return teamColor == TeamColor.Black ? Board.getRowCount(x) - 1 : 0;
+        return teamColor == TeamColor.White ? Board.getRowCount(x) - 1 : 0;
     }
 
     /**

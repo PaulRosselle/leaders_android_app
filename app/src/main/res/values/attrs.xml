@@ -15,4 +15,34 @@
     <declare-styleable name="OrnateFrameView">
         <attr name="colorTint" format="reference"/>
     </declare-styleable>
+
+    <declare-styleable name="CharacterView">
+        <attr name="teamColor" format="enum">
+            <enum name="Black" value="0" />
+            <enum name="White" value="1" />
+        </attr>
+        <attr name="characterType" format="enum">
+            <enum name="Acrobat" value="0" />
+            <enum name="Archer" value="1" />
+            <enum name="Assassin" value="2" />
+            <enum name="Brewmaster" value="3" />
+            <enum name="Bruiser" value="4" />
+            <enum name="ClawLauncher" value="5" />
+            <enum name="Cub" value="6" />
+            <enum name="Hermit" value="7" />
+            <enum name="Illusionist" value="8" />
+            <enum name="Jailer" value="9" />
+            <enum name="LeaderKing" value="10" />
+            <enum name="LeaderQueen" value="11" />
+            <enum name="Manipulator" value="12" />
+            <enum name="Nemesis" value="13" />
+            <enum name="Protector" value="14" />
+            <enum name="Rider" value="15" />
+            <enum name="RoyalGuard" value="16" />
+            <enum name="Vizier" value="17" />
+            <enum name="Wanderer" value="18" />
+        </attr>
+    </declare-styleable>
+
+
 </resources>

@@ -1,4 +1,4 @@
-package com.leaders.app.views;
+package com.leaders.app.views.mainmenu;
 
 import android.content.Context;
 import android.content.res.TypedArray;

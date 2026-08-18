@@ -14,7 +14,7 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_begin="0dp" />
 
-    <com.leaders.app.views.DecorativeBackgroundView
+    <com.leaders.app.views.decoration.DecorativeBackgroundView
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -66,7 +66,7 @@
         app:layout_constraintTop_toTopOf="@+id/gdlRoot_actMain"
         app:srcCompat="@drawable/logo_leaders" />
 
-    <com.leaders.app.views.MainMenuView
+    <com.leaders.app.views.mainmenu.MainMenuView
         android:id="@+id/mmvMainMenu_actMain"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -78,7 +78,7 @@
         app:layout_constraintTop_toTopOf="@+id/gdlRoot_actMain"
         app:layout_constraintVertical_bias="0.75" />
 
-    <com.leaders.app.views.CrashLogView
+    <com.leaders.app.views.mainmenu.CrashLogView
         android:id="@+id/clvCrashDialog_actMain"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

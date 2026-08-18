@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.view.View;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -53,6 +54,7 @@ public abstract class BaseActivity extends AppCompatActivity {
      * Initializes the activity views.
      * Called after the activity layout has been set.
      */
+    @CallSuper
     protected void initViews() {
         // Dynamically positions the root guideline below the status bar area.
         Guideline gdlRoot = findViewById(getRootGuidelineResId());
@@ -67,12 +69,13 @@ public abstract class BaseActivity extends AppCompatActivity {
      * Initializes the activity listeners and back navigation behavior.
      * Called after the activity views have been initialized.
      */
+    @CallSuper
     protected void initListeners() {
         if (overrideOnBackPressed()) {
             getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
                 @Override
                 public void handleOnBackPressed() {
-                    goToMainActivityOnBackPressed();
+                    doOnBackPressed();
                 }
             });
         }
@@ -85,6 +88,7 @@ public abstract class BaseActivity extends AppCompatActivity {
      * Initializes the activity data.
      * Called after the activity listeners have been initialized.
      */
+    @CallSuper
     protected void initDatas() {
         // No default implementation
     }
@@ -184,8 +188,8 @@ public abstract class BaseActivity extends AppCompatActivity {
      * @param activityType the activity to navigate to
      * @param transitionType the transition to use
      */
-    public void goToActivity(@NonNull ActivityType activityType,
-                             @NonNull ActivityTransitionType transitionType) {
+    public final void goToActivity(@NonNull ActivityType activityType,
+                                   @NonNull ActivityTransitionType transitionType) {
         goToActivity(activityType.getIntent(this), transitionType);
     }
 
@@ -194,7 +198,7 @@ public abstract class BaseActivity extends AppCompatActivity {
      *
      * @param activityType the activity to navigate to
      */
-    public void goToActivity(@NonNull ActivityType activityType) {
+    public final void goToActivity(@NonNull ActivityType activityType) {
         // The default activity transition animation is SlideRight
         goToActivity(activityType.getIntent(this), ActivityTransitionType.SlideRight);
     }
@@ -204,7 +208,7 @@ public abstract class BaseActivity extends AppCompatActivity {
      *
      * @param intent the intent describing the activity to navigate to
      */
-    public void goToActivity(@NonNull Intent intent) {
+    public final void goToActivity(@NonNull Intent intent) {
         // The default activity transition animation is SlideRight
         goToActivity(intent, ActivityTransitionType.SlideRight);
     }
@@ -215,7 +219,7 @@ public abstract class BaseActivity extends AppCompatActivity {
      * @param intent the intent describing the activity to navigate to
      * @param transitionType the transition to use
      */
-    public void goToActivity(@NonNull Intent intent, @NonNull ActivityTransitionType transitionType) {
+    public final void goToActivity(@NonNull Intent intent, @NonNull ActivityTransitionType transitionType) {
         startActivity(intent);
         applyTransition(transitionType);
         finish();
@@ -224,7 +228,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     /**
      * Navigates to the main activity using the default back navigation transition.
      */
-    protected void goBackToMainActivity() {
+    protected final void goBackToMainActivity() {
         goToActivity(new Intent(this, MainActivity.class), ActivityTransitionType.SlideLeft);
     }
 
@@ -232,7 +236,7 @@ public abstract class BaseActivity extends AppCompatActivity {
      * Handles navigation to the main activity when the back action is triggered.
      * Implementations may require user confirmation before navigating away.
      */
-    protected void goToMainActivityOnBackPressed() {
+    protected void doOnBackPressed() {
         if (askForConfirmationBeforeFinish()) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.alert_dialog_theme);
             builder.setTitle(R.string.back);
@@ -259,7 +263,7 @@ public abstract class BaseActivity extends AppCompatActivity {
      *
      * @param v the clicked view
      */
-    protected void btnBackClick(View v) {
-        goToMainActivityOnBackPressed();
+    private void btnBackClick(View v) {
+        doOnBackPressed();
     }
 }

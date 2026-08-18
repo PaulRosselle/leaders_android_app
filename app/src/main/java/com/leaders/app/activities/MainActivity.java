@@ -10,6 +10,7 @@ import android.util.Property;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
+import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -17,8 +18,8 @@ import com.leaders.R;
 import com.leaders.app.entities.crash.CrashLog;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.utilities.JsonUtils;
-import com.leaders.app.views.CrashLogView;
-import com.leaders.app.views.MainMenuView;
+import com.leaders.app.views.mainmenu.CrashLogView;
+import com.leaders.app.views.mainmenu.MainMenuView;
 
 public final class MainActivity extends BaseActivity {
     private CrashLogView clvCrashDialog;
@@ -97,8 +98,7 @@ public final class MainActivity extends BaseActivity {
     private void startLightAnimation() {
         ImageView imvLightRays = findViewById(R.id.imvLightRays_actMain);
         ObjectAnimator raysRotation = getAnimator(imvLightRays, View.ROTATION, 60000,
-                new AccelerateDecelerateInterpolator(),
-                ValueAnimator.RESTART, 0f, 360f);
+                new LinearInterpolator(), ValueAnimator.RESTART, 0f, 360f);
         ObjectAnimator raysScaleX = getAnimator(imvLightRays, View.SCALE_X, 5000,
                 new AccelerateDecelerateInterpolator(),
                 ValueAnimator.REVERSE, 1.2f, 1.5f, 1.2f);
