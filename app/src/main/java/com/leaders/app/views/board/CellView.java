@@ -32,7 +32,7 @@ public class CellView extends AppCompatImageView {
 
     public void clearTarget() {
         target = null;
-        setVisibility(GONE);
+        setImageResource(R.drawable.empty_cell);
     }
 
     public void setAsRecruitmentDestinationTarget(@NonNull InteractionTarget target,
@@ -46,7 +46,6 @@ public class CellView extends AppCompatImageView {
                 (boardOrientation == BoardOrientation.Rotated && columnAxisPos < 0) ? 180f : 0f);
         setRotation(0f);
         setRotationX(0f);
-        setVisibility(VISIBLE);
     }
 
     public void setAsMovementDestinationTarget(@NonNull InteractionTarget target,
@@ -54,7 +53,6 @@ public class CellView extends AppCompatImageView {
         this.target = target;
         setImageResource(R.drawable.target_movement);
         setAsCharacterActionTarget(clvCharacter);
-        setVisibility(VISIBLE);
     }
 
     public void setAsActiveAbilityDestinationTarget(@NonNull InteractionTarget target,
@@ -62,7 +60,6 @@ public class CellView extends AppCompatImageView {
         this.target = target;
         setImageResource(R.drawable.target_ability_movement);
         setAsCharacterActionTarget(clvCharacter);
-        setVisibility(VISIBLE);
     }
 
     private void setAsCharacterActionTarget(@NonNull CellView clvCharacter) {
