@@ -8,22 +8,29 @@ import androidx.appcompat.widget.AppCompatImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 import com.leaders.R;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.TeamColor;
+import com.leaders.gamelogic.interactions.InteractionTarget;
 
 public final class CharacterView extends AppCompatImageView {
+    @Nullable
+    private InteractionTarget target;
 
     public CharacterView(Context context) {
         super(context);
+
+        target = null;
         setCharacter(null, TeamColor.Black);
     }
 
     public CharacterView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
+        target = null;
         try (TypedArray customAttrs = context.obtainStyledAttributes(attrs, R.styleable.CharacterView)) {
             int characterTypeOrd = customAttrs.getInteger(R.styleable.CharacterView_characterType, -1);
             CharacterType characterType = characterTypeOrd == -1 ? null : CharacterType.values()[characterTypeOrd];
@@ -73,5 +80,15 @@ public final class CharacterView extends AppCompatImageView {
             case Wanderer: return isWhite ? R.drawable.character_piece_wanderer_w : R.drawable.character_piece_wanderer_b;
             default: throw new IllegalArgumentException("No drawable found for character: " + characterType);
         }
+    }
+
+    public void clearTarget() {
+        target = null;
+        setForeground(null);
+    }
+
+    public void setAsActiveAbilityTarget(@NonNull InteractionTarget target) {
+        this.target = target;
+        setForeground(ContextCompat.getDrawable(getContext(), R.drawable.target_ability_character));
     }
 }

@@ -2,7 +2,6 @@ package com.leaders.app.views.board;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.view.View;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
@@ -12,12 +11,14 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.leaders.R;
 import com.leaders.app.enums.BoardOrientation;
 import com.leaders.gamelogic.entities.Board;
+import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Position;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public abstract class BoardView extends ConstraintLayout {
     private static final float CHARACTER_SIZE_RATIO = 0.1410f;
@@ -25,11 +26,11 @@ public abstract class BoardView extends ConstraintLayout {
     protected ImageView imvBoard;
 
     private final List<CellView> cellViews;
-    private final List<ImageView> characterShadowViews;
-    private final List<CharacterView> characterViews;
+    protected CharacterDisplayPool characterDisplayPool;
 
     @NonNull
     protected Map<Position, CellView> cellViewsMap;
+    private final Map<Position, CharacterDisplay> characterDisplays;
     @NonNull
     protected BoardOrientation orientation;
 
@@ -40,9 +41,8 @@ public abstract class BoardView extends ConstraintLayout {
         inflate(context, R.layout.view_board, this);
 
         cellViews = new ArrayList<>();
-        characterViews = new ArrayList<>();
-        characterShadowViews = new ArrayList<>();
         cellViewsMap = new HashMap<>();
+        characterDisplays = new HashMap<>();
         orientation = BoardOrientation.Default;
 
         initViews();
@@ -50,10 +50,11 @@ public abstract class BoardView extends ConstraintLayout {
 
     private void initViews() {
         imvBoard = findViewById(R.id.imvBoard_vwBoard);
+
         initCellViews();
-        initCharacterViews();
-        initCharacterShadowViews();
-        // TODO - init CharacterHighlight views
+        characterDisplayPool = new CharacterDisplayPool(getContext(), this);
+
+        setOrientation(orientation);
     }
 
     private int[] getCellViewIds() {
@@ -85,52 +86,21 @@ public abstract class BoardView extends ConstraintLayout {
         }
     }
 
-    private void initCharacterViews() {
-        for (int i = 0; i < getCharactersPoolSize(); i++) {
-            CharacterView characterView = new CharacterView(getContext(), null);
-            characterView.setVisibility(GONE);
-            characterViews.add(characterView);
-            addView(characterView);
-        }
-    }
-
-    private void initCharacterShadowViews() {
-        for (int i = 0; i < getCharactersPoolSize(); i++) {
-            ImageView characterShadowView = new ImageView(getContext(), null);
-            characterShadowView.setImageResource(R.drawable.character_piece_shadow);
-            characterShadowView.setVisibility(GONE);
-            characterShadowViews.add(characterShadowView);
-            addView(characterShadowView);
-        }
-    }
-
     @Override
-    protected void onSizeChanged(int weight, int height, int oldWidth, int oldHeight) {
-        super.onSizeChanged(weight, height, oldWidth, oldHeight);
+    protected void onSizeChanged(int width, int height, int oldWidth, int oldHeight) {
+        super.onSizeChanged(width, height, oldWidth, oldHeight);
 
-        final int characterSize = Math.round(weight * CHARACTER_SIZE_RATIO);
+        final int characterSize = Math.round(width * CHARACTER_SIZE_RATIO);
 
-        updatedViewsSize(characterViews, characterSize);
-        updatedViewsSize(characterShadowViews, characterSize);
-    }
-
-    private void updatedViewsSize(@NonNull List<? extends View> views, int size) {
-        for (View view : views) {
-            LayoutParams layoutParams = (LayoutParams) view.getLayoutParams();
-            layoutParams.height = size;
-            layoutParams.width = size;
-            view.setLayoutParams(layoutParams);
+        characterDisplayPool.setDisplaysSize(characterSize);
+        for (CharacterDisplay characterDisplay : characterDisplays.values()) {
+            characterDisplay.setSize(characterSize);
         }
     }
 
-    private int getCharactersPoolSize() {
-        if (cellViews.isEmpty()) {
-            throw new IllegalStateException("Cannot get character pool size before cells initialization");
-        }
-        return cellViews.size() - 1;
-    }
+    public final void setOrientation(@NonNull BoardOrientation orientation) {
+        this.orientation = orientation;
 
-    public void setOrientation(@NonNull BoardOrientation orientation) {
         cellViewsMap.clear();
 
         // Depending on the board orientation we add the tile in index order or in reverse
@@ -150,5 +120,55 @@ public abstract class BoardView extends ConstraintLayout {
                 cellViewIdx += cellViewIdxStep;
             }
         }
+    }
+
+    public final void setBoard(@NonNull Board board) {
+        clearTargets();
+
+        for (Cell cell : board.getCells().values()) {
+            Position cellPosition = cell.getPosition();
+            CharacterDisplay characterDisplay = characterDisplays.get(cellPosition);
+
+            if (cell.getCharacter() != null) {
+                if (characterDisplay == null) {
+                    characterDisplay = acquireCharacterDisplay(cellPosition);
+                }
+
+                characterDisplay.reset();
+                CharacterView characterView = characterDisplay.getCharacterView();
+                characterView.setVisibility(VISIBLE);
+                characterView.setCharacter(cell.getCharacter());
+
+                CellView cellView = getCellView(cellPosition);
+                characterDisplay.setPosition(cellView.getX(), cellView.getY());
+
+            } else if (characterDisplay != null) {
+                releaseCharacterDisplay(cellPosition);
+            }
+        }
+    }
+
+    protected final CharacterDisplay acquireCharacterDisplay(@NonNull Position position) {
+        return characterDisplays.put(position,  characterDisplayPool.acquire());
+    }
+
+
+    protected final void releaseCharacterDisplay(@NonNull Position position) {
+        characterDisplayPool.release(Objects.requireNonNull(characterDisplays.remove(position),
+                "CharacterDisplay to release not found"));
+    }
+
+    public final void clearTargets() {
+        for (Position position : cellViewsMap.keySet()) {
+            getCellView(position).clearTarget();
+            CharacterDisplay characterDisplay = characterDisplays.get(position);
+            if (characterDisplay != null) {
+                characterDisplay.getCharacterView().clearTarget();
+            }
+        }
+    }
+
+    protected CellView getCellView(@NonNull Position position) {
+        return Objects.requireNonNull(cellViewsMap.get(position), "No CellView found at Position:" + position);
     }
 }
