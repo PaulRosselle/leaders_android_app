@@ -15,19 +15,20 @@ import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.TeamColor;
 
 public final class CharacterView extends AppCompatImageView {
-    @Nullable
-    private CharacterType characterType;
-    @NonNull
-    private TeamColor teamColor;
+
+    public CharacterView(Context context) {
+        super(context);
+        setCharacter(null, TeamColor.Black);
+    }
 
     public CharacterView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
         try (TypedArray customAttrs = context.obtainStyledAttributes(attrs, R.styleable.CharacterView)) {
             int characterTypeOrd = customAttrs.getInteger(R.styleable.CharacterView_characterType, -1);
-            characterType = characterTypeOrd == -1 ? null : CharacterType.values()[characterTypeOrd];
+            CharacterType characterType = characterTypeOrd == -1 ? null : CharacterType.values()[characterTypeOrd];
             int teamColorOrd = customAttrs.getInteger(R.styleable.CharacterView_teamColor, TeamColor.Black.ordinal());
-            teamColor = TeamColor.values()[teamColorOrd];
+            TeamColor teamColor = TeamColor.values()[teamColorOrd];
 
             setCharacter(characterType, teamColor);
         }
@@ -39,8 +40,6 @@ public final class CharacterView extends AppCompatImageView {
 
     public void setCharacter(@Nullable CharacterType characterType,
                              @NonNull TeamColor teamColor) {
-        this.characterType = characterType;
-        this.teamColor = teamColor;
         setImageResource(getCharacterDrawableId(characterType, teamColor));
     }
 
@@ -74,15 +73,5 @@ public final class CharacterView extends AppCompatImageView {
             case Wanderer: return isWhite ? R.drawable.character_piece_wanderer_w : R.drawable.character_piece_wanderer_b;
             default: throw new IllegalArgumentException("No drawable found for character: " + characterType);
         }
-    }
-
-    @Nullable
-    public CharacterType getCharacterType() {
-        return characterType;
-    }
-
-    @NonNull
-    public TeamColor getTeamColor() {
-        return teamColor;
     }
 }
