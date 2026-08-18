@@ -10,17 +10,20 @@ import androidx.appcompat.widget.AppCompatImageView;
 
 import com.leaders.R;
 import com.leaders.app.enums.BoardOrientation;
-import com.leaders.gamelogic.entities.Cell;
-import com.leaders.gamelogic.entities.Position;
+import com.leaders.gamelogic.interactions.InteractionTarget;
+
+import java.util.Objects;
 
 public class CellView extends AppCompatImageView {
-    @NonNull
-    private Cell cell;
+    @Nullable
+    private InteractionTarget target;
 
     public CellView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        // Initialized with a default cell at (0,0)
-        cell = new Cell(new Position(0, 0));
+        target = null;
+
+        // Cell views are instanciated without a target
+        clearTarget();
     }
 
     private Point getCenter() {
@@ -28,35 +31,41 @@ public class CellView extends AppCompatImageView {
     }
 
     public void clearTarget() {
+        target = null;
         setVisibility(GONE);
     }
 
-    public void setAsRecruitmentTarget(@NonNull BoardOrientation boardOrientation) {
-        int columnAxisPos = cell.getPosition().getQ();
-        setImageResource(columnAxisPos == 0 ? R.drawable.target_recruitment_center : R.drawable.target_recruitment_side);
-        setRotationY(columnAxisPos > 0 || (boardOrientation == BoardOrientation.Rotated && columnAxisPos < 0) ? 180f : 0f);
+    public void setAsRecruitmentDestinationTarget(@NonNull InteractionTarget target,
+                                                  @NonNull BoardOrientation boardOrientation) {
+        this.target = target;
+        int columnAxisPos = Objects.requireNonNull(target.getChosenPosition(),
+                "Recruitment interaction target invalid: no position").getQ();
+        setImageResource(columnAxisPos == 0 ?
+                R.drawable.target_recruitment_center : R.drawable.target_recruitment_side);
+        setRotationY(columnAxisPos > 0 ||
+                (boardOrientation == BoardOrientation.Rotated && columnAxisPos < 0) ? 180f : 0f);
         setRotation(0f);
         setRotationX(0f);
         setVisibility(VISIBLE);
     }
 
-    public void setAsMovementTarget(@NonNull CellView clvCharacter) {
+    public void setAsMovementDestinationTarget(@NonNull InteractionTarget target,
+                                               @NonNull CellView clvCharacter) {
+        this.target = target;
         setImageResource(R.drawable.target_movement);
         setAsCharacterActionTarget(clvCharacter);
         setVisibility(VISIBLE);
     }
 
-    public void setAsAbilityMovementTarget(@NonNull CellView clvCharacter) {
+    public void setAsActiveAbilityDestinationTarget(@NonNull InteractionTarget target,
+                                                    @NonNull CellView clvCharacter) {
+        this.target = target;
         setImageResource(R.drawable.target_ability_movement);
         setAsCharacterActionTarget(clvCharacter);
         setVisibility(VISIBLE);
     }
 
     private void setAsCharacterActionTarget(@NonNull CellView clvCharacter) {
-        if (clvCharacter.cell.getCharacter() == null) {
-            throw new IllegalArgumentException("A character action cell cannot be target without a valid character cell");
-        }
-
         Point characterCenter = clvCharacter.getCenter();
         Point destCenter = getCenter();
 
@@ -71,12 +80,8 @@ public class CellView extends AppCompatImageView {
         setRotation((int) ((angle % 360 + 360) % 360));
     }
 
-    @NonNull
-    public Cell getCell() {
-        return cell;
-    }
-
-    public void setCell(@NonNull Cell cell) {
-        this.cell = cell;
+    @Nullable
+    public InteractionTarget getTarget() {
+        return target;
     }
 }

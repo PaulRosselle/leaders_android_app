@@ -221,4 +221,412 @@
         app:layout_constraintVertical_bias="0.0"
         app:srcCompat="@drawable/board" />
 
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC0R0_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC1R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC1L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR4_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC0R1_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC1R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC1L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR6_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC0R2_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC1R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC1L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR8_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC0R3_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC1R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC1L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR10_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC1R0_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC2R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC2L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR3_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC1R1_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC2R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC2L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR5_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC1R2_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC2R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC2L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR7_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC1R3_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC2R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC2L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR9_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC1R4_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC2R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC2L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR11_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC2R0_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC3R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC3L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR2_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC2R1_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC3R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC3L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR4_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC2R2_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC3R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC3L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR6_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC2R3_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC3R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC3L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR8_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC2R4_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC3R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC3L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR10_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC2R5_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC3R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC3L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR12_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC3R0_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC4R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC4L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR1_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC3R1_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC4R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC4L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR3_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC3R2_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC4R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC4L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR5_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC3R3_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC4R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC4L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR7_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC3R4_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC4R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC4L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR9_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC3R5_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC4R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC4L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR11_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC3R6_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC4R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC4L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR13_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC4R0_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC5R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC5L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR2_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC4R1_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC5R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC5L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR4_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC4R2_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC5R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC5L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR6_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC4R3_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC5R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC5L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR8_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC4R4_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC5R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC5L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR10_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC4R5_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC5R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC5L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR12_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC5R0_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC6R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC6L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR3_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC5R1_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC6R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC6L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR5_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC5R2_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC6R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC6L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR7_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC5R3_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC6R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC6L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR9_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC5R4_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC6R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC6L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR11_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC6R0_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC7R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC7L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR4_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC6R1_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC7R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC7L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR6_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC6R2_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC7R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC7L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR8_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.CellView
+        android:id="@+id/cvC6R3_vwBoard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC7R_vwBoard"
+        app:layout_constraintStart_toStartOf="@+id/gdlC7L_vwBoard"
+        app:layout_constraintTop_toTopOf="@+id/gdlR10_vwBoard"
+        app:layout_constraintVertical_bias="0.0" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
