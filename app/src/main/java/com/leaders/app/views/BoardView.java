@@ -20,8 +20,9 @@ public abstract class BoardView extends ConstraintLayout {
 
     private void initViews() {
         imvBoard = findViewById(R.id.imvBoard_vwBoard);
-        // TODO - init TileView list
+        // TODO - init CellView list
         // TODO - init CharacterView pool
+        // TODO - init ShadowView pool
         // TODO - init CharacterSelection view
     }
 }
