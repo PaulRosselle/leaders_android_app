@@ -24,7 +24,7 @@ import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 
 public final class CharacterView extends AppCompatImageView {
-    private static final int SCALE_FOR_HIGHLIGHT_ANIMATION_DURATION = 200;
+    private static final int SCALE_FOR_HIGHLIGHT_ANIMATION_DURATION = 120;
 
     @Nullable
     private InteractionTarget target;

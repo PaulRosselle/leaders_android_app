@@ -16,6 +16,8 @@ import com.leaders.app.utilities.CharacterCardUtils;
 import com.leaders.gamelogic.enums.CharacterCard;
 
 public final class CharacterNotificationView extends ConstraintLayout {
+    private static final int VISIBILITY_ANIMATION_DURATION = 200;
+
     private final CharacterCardPortraitView ptvPortrait;
     private final TextView txvTitle, txvInfo;
     @Nullable
@@ -68,17 +70,16 @@ public final class CharacterNotificationView extends ConstraintLayout {
     }
 
     public void show() {
-        animate().translationY(getHiddenPosY()).setDuration(0).start();
+        setTranslationY(getHiddenPosY());
         setVisibility(VISIBLE);
-        animate().translationY(0).setDuration(250)
-                .start();
+        animate().translationY(0).setDuration(VISIBILITY_ANIMATION_DURATION).start();
     }
 
     public void hide() {
-        animate().translationY(getHiddenPosY()).setDuration(250)
+        animate().translationY(getHiddenPosY()).setDuration(VISIBILITY_ANIMATION_DURATION)
                 .withEndAction(() -> {
             setVisibility(GONE);
-            animate().translationY(0).setDuration(0).start();
+            setTranslationY(0f);
         }).start();
     }
 }

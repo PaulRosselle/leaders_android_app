@@ -42,6 +42,7 @@ public final class CharacterEditorView extends ConstraintLayout {
     private LinearLayout llyPortraits;
 
 
+    private CharacterView selectedNewCharacter;
     private List<CharacterView> newCharacterViews;
     private CharacterHighlightView newCharacterHighlight;
 
@@ -63,6 +64,7 @@ public final class CharacterEditorView extends ConstraintLayout {
         llyPortraits = findViewById(R.id.llyPortraits_vwCharacterEditor);
         initPortraits();
 
+        selectedNewCharacter = null;
         newCharacterViews = new ArrayList<>();
         newCharacterHighlight = new CharacterHighlightView(getContext());
         addView(newCharacterHighlight, getCharacterHighlightLayoutParam());
@@ -110,6 +112,7 @@ public final class CharacterEditorView extends ConstraintLayout {
             removeView(characterView);
         }
         newCharacterViews.clear();
+        selectedNewCharacter = null;
         setViewVisible(newCharacterHighlight, editorMode == EditorMode.AddCardCharacters);
         setViewVisible(grpEditCharacter, editorMode == EditorMode.EditCharacter);
     }
@@ -151,7 +154,7 @@ public final class CharacterEditorView extends ConstraintLayout {
         }
 
         updateNewCharacterHighlightSize(characterDisplaySize);
-        highlighFirstCharacterView();
+        selectFirstNewCharacter();
     }
 
     public void startEditCharacterMode(@NonNull Character character) {
@@ -184,27 +187,38 @@ public final class CharacterEditorView extends ConstraintLayout {
                 removeView(characterView);
             }
         }
-    }
 
-    private void highlighFirstCharacterView() {
+        // TODO - comment
         if (!newCharacterViews.isEmpty()) {
-            highlightCharacterView(newCharacterViews.get(0));
+            selectFirstNewCharacter();
         }
     }
 
-    public void highlightCharacterView(@NonNull CharacterView characterView) {
+    private void selectFirstNewCharacter() {
+        if (!newCharacterViews.isEmpty()) {
+            selectNewCharacter(newCharacterViews.get(0));
+        }
+    }
+
+    public void selectNewCharacter(@NonNull CharacterView characterView) {
+        if (selectedNewCharacter == characterView) {
+            return;
+        }
+
+        selectedNewCharacter = characterView;
+
         newCharacterHighlight.stopAnimation();
         newCharacterHighlight.bringToFront();
 
         for (CharacterView newCharacterView : newCharacterViews) {
-            if (newCharacterView != characterView) {
-                newCharacterView.scaleForHighlight(false, false);
+            if (newCharacterView != selectedNewCharacter) {
+                newCharacterView.scaleForHighlight(false, true);
             }
         }
 
-        characterView.scaleForHighlight(true, false);
+        selectedNewCharacter.scaleForHighlight(true, true);
 
-        newCharacterHighlight.setX(characterView.getX());
+        newCharacterHighlight.setX(selectedNewCharacter.getX());
 
         newCharacterHighlight.startAnimation();
     }
@@ -267,5 +281,17 @@ public final class CharacterEditorView extends ConstraintLayout {
 
     public void setOnRemoveClick(@Nullable OnClickListener onClickListener) {
         btnRemove.setOnClickListener(onClickListener);
+    }
+
+    @NonNull
+    public Character getSelectedNewCharacter() {
+        if (selectedNewCharacter == null) {
+            throw new IllegalStateException("No selected new character found");
+        }
+
+        InteractionTarget target = Objects.requireNonNull(selectedNewCharacter.getTarget(),
+                "Target within new character list missing");
+        return Objects.requireNonNull(target.getChosenCharacterPlayableState(),
+                "Invalid new character target : character missing").getCharacter();
     }
 }

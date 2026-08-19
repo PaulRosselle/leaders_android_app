@@ -14,6 +14,7 @@ import com.leaders.app.utilities.PuzzleEditionUtils;
 import com.leaders.app.views.CharacterCardPortraitView;
 import com.leaders.app.views.CharacterEditorView;
 import com.leaders.app.views.CharacterNotificationView;
+import com.leaders.app.views.board.CharacterView;
 import com.leaders.app.views.board.PuzzleEditorBoardView;
 import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.actions.CharacterActionMotion;
@@ -226,7 +227,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
     }
 
     private void onNewCharacterClick(View v) {
-        // TODO
+        cevCharacterEditor.selectNewCharacter((CharacterView) v);
     }
 
     private void onSwitchColorClick(View v) {
