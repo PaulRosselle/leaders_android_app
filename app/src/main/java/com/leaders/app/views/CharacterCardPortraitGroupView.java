@@ -13,7 +13,7 @@ import com.leaders.gamelogic.enums.CharacterCard;
 
 import java.util.ArrayList;
 
-public class CharacterCardPortraitGroupView extends LinearLayout {
+public final class CharacterCardPortraitGroupView extends LinearLayout {
     private static final int PORTRAIT_DEFAULT_MARGIN = 2;
 
     private final ArrayList<CharacterCardPortraitView> characterCardPortraitViews;
@@ -96,6 +96,7 @@ public class CharacterCardPortraitGroupView extends LinearLayout {
 
     public void setPortraitsLongClickListener(OnLongClickListener onPortraitLongClickListener) {
         this.onPortraitLongClickListener = onPortraitLongClickListener;
+        updatePortraitsLongClickListener();
     }
 
     private void updatePortraitsClickListener() {

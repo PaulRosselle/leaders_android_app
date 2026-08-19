@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name" translatable="false">Leaders</string>
-    <string name="app_version" translatable="false">v0.2.0</string>
+    <string name="app_version" translatable="false">v0.3.0</string>
     <string name="rules">règles</string>
     <string name="settings">options</string>
     <string name="puzzles">puzzles</string>
@@ -51,4 +51,45 @@
     <string name="card_name_vizier">vizir</string>
     <string name="card_name_wanderer">rôdeuse</string>
     <string name="color">couleur</string>
+    <string name="error_toast_character_limited_to_one_per_team">Ce personnage est limité à un exemplaire par équipe</string>
+    <string name="error_toast_max_two_leaders_on_the_board">Deux Leaders sont déjà présents sur le plateau</string>
+    <string name="error_toast_limited_character">Ce personnage est limité à un seul exemplaire sur le plateau</string>
+    <string name="card_formatted_name_acrobat">AcRoBaTE</string>
+    <string name="card_formatted_name_archer">ARcHÈRE</string>
+    <string name="card_formatted_name_assassin">ASSaSSiN</string>
+    <string name="card_formatted_name_rider">cAVALIER</string>
+    <string name="card_formatted_name_bruiser">CogNEUR</string>
+    <string name="card_formatted_name_royal_guard">gARdE RoYAL</string>
+    <string name="card_formatted_name_brewmaster">TAverNieR</string>
+    <string name="card_formatted_name_claw_launcher">LAnCE-GRAPPiN</string>
+    <string name="card_formatted_name_hermit_and_cub">ViEiL OuRS &amp; OuRSoN</string>
+    <string name="card_formatted_name_jailer">GEOliER</string>
+    <string name="card_formatted_name_leader">LEADER</string>
+    <string name="card_formatted_name_vizier">VIZIR</string>
+    <string name="card_formatted_name_illusionist">IlluSiOniSTE</string>
+    <string name="card_formatted_name_manipulator">MAnIPUlATRicE</string>
+    <string name="card_formatted_name_nemesis">NÉMÉSiS</string>
+    <string name="card_formatted_name_protector">PRoTECtEuR</string>
+    <string name="card_formatted_name_wanderer">RÔdEuSE</string>
+    <string name="ability_info_active">Compétence\nactive</string>
+    <string name="ability_info_passive">Compétence\npassive</string>
+    <string name="ability_info_special">Compétence\nspéciale</string>
+    <string name="ability_info_leader">Particularité\ndes leaders</string>
+    <string name="card_description_acrobat">Saute en ligne droite par-dessus un personnage adjacent. Peut effectuer jusqu’à deux sauts consécutifs.</string>
+    <string name="card_description_leader">La partie se termine si un leader est capturé ou encerclé.\n\nUn leader ne peut pas terminer son action dans une position où il serait capturé.</string>
+    <string name="card_description_rider">Se déplace de deux cases en ligne droite.</string>
+    <string name="card_description_bruiser">Se déplace sur la case d’un ennemi adjacent et le pousse sur l’une des trois cases opposées de votre choix.</string>
+    <string name="card_description_manipulator">Déplace d’une case un ennemi visible en ligne droite et non-adjacent.</string>
+    <string name="card_description_royal_guard">Se déplace, depuis n’importe quelle case, sur une case adjacente à votre Leader, puis peut ensuite se déplacer d’une case.</string>
+    <string name="card_description_illusionist">Échange de position avec un Personnage visible en ligne droite et non-adjacent.</string>
+    <string name="card_description_claw_launcher">Se déplace jusqu’à un Personnage visible en ligne droite ou l’attire jusqu’à lui.</string>
+    <string name="card_description_brewmaster">Déplace d’une case un allié adjacent.</string>
+    <string name="card_description_wanderer">Se déplace sur n’importe quelle case non-adjacente à un ennemi.</string>
+    <string name="card_description_archer">Participe à la capture du Leader adverse à une distance de deux cases en ligne droite. Il n’est pas nécessaire que le Leader adverse soit visible.\n\nNe participe pas à la capture du Leader adverse s’il lui est adjacent.</string>
+    <string name="card_description_assassin">Capture le Leader adverse, même sans autre allié participant.</string>
+    <string name="card_description_jailer">Les ennemis adjacents ayant une compétence active ne peuvent pas l’utiliser.\n\nIl n’interrompt pas les actions en cours. Si un ennemi devient adjacent au geôlier au cours de son action, il peut la terminer normalement.</string>
+    <string name="card_description_protector">Les compétences des ennemis ne peuvent déplacer ni le protecteur, ni ses alliés adjacents.</string>
+    <string name="card_description_vizier">Votre Leader peut se déplacer d’une case supplémentaire lors de son action.</string>
+    <string name="card_description_nemesis">Ne peut pas effectuer d’action durant son tour.\n\nDoit se déplacer de 2 cases après chaque action déplaçant le leader adverse. S’il n’est pas possible de la déplacer de 2 cases sans revenir à sa case d’origine, ne se déplace que d’une case.</string>
+    <string name="card_description_hermit_and_cub">En les recrutant, vous prenez le contrôle du Vieil Ours et de l’Ourson. Cela ne compte que pour un seul recrutement.\n\nVous pouvez en déplacer un seul ou les deux à la suite. L’Ourson ne peut pas participer à la capture du leader adverse.</string>
 </resources>

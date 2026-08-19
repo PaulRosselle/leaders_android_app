@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.Group;
-import androidx.constraintlayout.widget.Guideline;
 
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
@@ -30,20 +29,25 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-public class CharacterEditorView extends ConstraintLayout {
+public final class CharacterEditorView extends ConstraintLayout {
+    private enum EditorMode {
+        SelectCardProtrait,
+        AddCardCharacters,
+        EditCharacter
+    }
+
+
     private static final int PORTRAITS_PER_GROUP = 6;
 
     private LinearLayout llyPortraits;
 
-    private Group grpAddCharacters;
-    private LinearLayout llyNewCharacters;
-    private CharacterHighlightView chvNewCharacterHighlight;
+
+    private List<CharacterView> newCharacterViews;
+    private CharacterHighlightView newCharacterHighlight;
 
     private Group grpEditCharacter;
     private CharacterView crvSwitchColor;
     private MaterialButton btnRemove;
-
-    private Guideline gdlLeft, gdlRight;
 
 
 
@@ -59,17 +63,13 @@ public class CharacterEditorView extends ConstraintLayout {
         llyPortraits = findViewById(R.id.llyPortraits_vwCharacterEditor);
         initPortraits();
 
-        grpAddCharacters = findViewById(R.id.grpAddCharacters_vwCharacterEditor);
-        llyNewCharacters = findViewById(R.id.llyNewCharacters_vwCharacterEditor);
-        chvNewCharacterHighlight = findViewById(R.id.chvNewCharacterHighlight_vwCharacterEditor);
-        chvNewCharacterHighlight.startAnimation();
+        newCharacterViews = new ArrayList<>();
+        newCharacterHighlight = new CharacterHighlightView(getContext());
+        addView(newCharacterHighlight, getCharacterHighlightLayoutParam());
 
         grpEditCharacter = findViewById(R.id.grpEditCharacter_vwCharacterEditor);
         crvSwitchColor = findViewById(R.id.crvSwitchColor_vwCharacterEditor);
         btnRemove = findViewById(R.id.btnRemove_vwCharacterEditor);
-
-        gdlLeft = findViewById(R.id.gdlLeft_vwCharacterEditor);
-        gdlRight = findViewById(R.id.gdlRight_vwCharacterEditor);
     }
 
     private void initPortraits() {
@@ -87,6 +87,8 @@ public class CharacterEditorView extends ConstraintLayout {
             }
             CharacterCardPortraitGroupView ptvPortraits =
                     new CharacterCardPortraitGroupView(context, portraitsCards, PORTRAITS_PER_GROUP);
+            ptvPortraits.setClickable(false);
+            ptvPortraits.setLongClickable(false);
             llyPortraits.addView(ptvPortraits, getPortraitsGroupLayoutParams());
         }
     }
@@ -102,23 +104,37 @@ public class CharacterEditorView extends ConstraintLayout {
         return layoutParams;
     }
 
-    public void startSelectCardMode() {
-        setViewVisible(llyPortraits, true);
-        setViewVisible(grpAddCharacters, false);
-        setViewVisible(grpEditCharacter, false);
+    private void updateMode(EditorMode editorMode) {
+        setViewVisible(llyPortraits, editorMode == EditorMode.SelectCardProtrait);
+        for (CharacterView characterView : newCharacterViews) {
+            removeView(characterView);
+        }
+        newCharacterViews.clear();
+        setViewVisible(newCharacterHighlight, editorMode == EditorMode.AddCardCharacters);
+        setViewVisible(grpEditCharacter, editorMode == EditorMode.EditCharacter);
     }
 
-    public void startAddCharactersMode(@NonNull List<Character> characters,
-                                       int characterDisplaySize,
-                                       @NonNull OnClickListener onCharacterClickListener) {
-        setViewVisible(llyPortraits, false);
-        setViewVisible(grpAddCharacters, true);
-        setViewVisible(grpEditCharacter, false);
+    public void startSelectCardMode() {
+        updateMode(EditorMode.SelectCardProtrait);
+    }
 
-        llyNewCharacters.removeAllViews();
+    public void startAddCardCharactersMode(@NonNull List<Character> characters,
+                                           int characterDisplaySize,
+                                           @NonNull OnClickListener onCharacterClickListener) {
+        updateMode(EditorMode.AddCardCharacters);
+
+        if (characters.isEmpty()) {
+            throw new IllegalArgumentException("AddCardCharacters mode should not be started without characters to add");
+        }
 
         Context context = getContext();
-        for (Character character : characters) {
+        int charactersCount = characters.size();
+        float editorWidth = getWidth();
+        float width = charactersCount > 2 ? editorWidth * 0.8f : editorWidth * 0.6f;
+        float characterOffset = (editorWidth - width) / 2f;
+
+        for (int i = 0; i < charactersCount; i++) {
+            Character character = characters.get(i);
             CharacterView characterView = new CharacterView(context);
             characterView.setOnClickListener(onCharacterClickListener);
             characterView.setCharacter(character);
@@ -127,21 +143,21 @@ public class CharacterEditorView extends ConstraintLayout {
                     TargetCategory.PlayableCharacter,
                     new PlayableCharacter(character, new Position(0, 0), false, false)
             ));
-            llyNewCharacters.addView(characterView, getCharacterLayoutParam(characterDisplaySize));
+
+            characterView.setX(characterOffset + ((i + 0.5f) * width / charactersCount) - (characterDisplaySize / 2f));
+
+            newCharacterViews.add(characterView);
+            addView(characterView, getCharacterLayoutParam(characterDisplaySize));
         }
 
-        adjustGuidelinesPos();
+        updateNewCharacterHighlightSize(characterDisplaySize);
         highlighFirstCharacterView();
     }
 
     public void startEditCharacterMode(@NonNull Character character) {
-        setViewVisible(llyPortraits, false);
-        setViewVisible(grpAddCharacters, false);
-        setViewVisible(grpEditCharacter, true);
+        updateMode(EditorMode.EditCharacter);
 
         crvSwitchColor.setCharacter(character);
-
-        adjustGuidelinesPos();
     }
 
     private void setViewVisible(View v, boolean visible) {
@@ -151,81 +167,97 @@ public class CharacterEditorView extends ConstraintLayout {
             v.setVisibility(GONE);
         }
     }
-    private void adjustGuidelinesPos() {
-        if (llyNewCharacters.getVisibility() == VISIBLE && llyNewCharacters.getChildCount() >= 3) {
-            gdlLeft.setGuidelinePercent(0.1f);
-            gdlRight.setGuidelinePercent(0.9f);
-        } else {
-            gdlLeft.setGuidelinePercent(0.3f);
-            gdlRight.setGuidelinePercent(0.7f);
-        }
-    }
 
     public void removeNewCharactersMatching(@Nullable TeamColor teamColor,
                                             @Nullable CharacterType characterType) {
-        ArrayList<CharacterView> childrenToRemove = new ArrayList<>();
+        for (int i = newCharacterViews.size() - 1; i >= 0; i--) {
+            CharacterView characterView = newCharacterViews.get(i);
 
-        for (int i = 0; i < llyNewCharacters.getChildCount(); i++) {
-            CharacterView characterView = (CharacterView) llyNewCharacters.getChildAt(i);
             InteractionTarget target = Objects.requireNonNull(characterView.getTarget(),
                     "Target within new character list missing");
             Character character = Objects.requireNonNull(target.getChosenCharacterPlayableState(),
                     "Invalid new character target : character missing").getCharacter();
 
             if ((teamColor == null || character.getTeamColor() == teamColor) &&
-                    (characterType == null) || character.getCharacterType() == characterType) {
-                childrenToRemove.add(characterView);
+                    (characterType == null || character.getCharacterType() == characterType)) {
+                newCharacterViews.remove(i);
+                removeView(characterView);
             }
         }
-
-        for (CharacterView childToRemove : childrenToRemove) {
-            llyNewCharacters.removeView(childToRemove);
-        }
-
-        adjustGuidelinesPos();
     }
 
     private void highlighFirstCharacterView() {
-        if (llyNewCharacters.getChildCount() > 0) {
-            highlightCharacterView((CharacterView) llyNewCharacters.getChildAt(0));
+        if (!newCharacterViews.isEmpty()) {
+            highlightCharacterView(newCharacterViews.get(0));
         }
     }
 
     public void highlightCharacterView(@NonNull CharacterView characterView) {
-        int[] characterLocation = new int[2];
-        int[] editorLocation = new int[2];
+        newCharacterHighlight.stopAnimation();
+        newCharacterHighlight.bringToFront();
 
-        characterView.getLocationOnScreen(characterLocation);
-        getLocationOnScreen(editorLocation);
-
-        chvNewCharacterHighlight.setX(characterLocation[0] - editorLocation[0]);
-        chvNewCharacterHighlight.setY(characterLocation[1] - editorLocation[1]);
-        chvNewCharacterHighlight.getLayoutParams().width = characterView.getWidth();
-        chvNewCharacterHighlight.getLayoutParams().height = characterView.getHeight();
+        for (CharacterView newCharacterView : newCharacterViews) {
+            if (newCharacterView != characterView) {
+                newCharacterView.scaleForHighlight(false, false);
+            }
+        }
 
         characterView.scaleForHighlight(true, false);
 
-        for (int i = 0; i < llyNewCharacters.getChildCount(); i++) {
-            CharacterView childCharacterView = (CharacterView) llyNewCharacters.getChildAt(i);
-            if (childCharacterView != characterView) {
-                childCharacterView.scaleForHighlight(false, false);
-            }
-        }
+        newCharacterHighlight.setX(characterView.getX());
+
+        newCharacterHighlight.startAnimation();
     }
 
     public int getNewCharactersCount() {
-        return llyNewCharacters.getChildCount();
+        return newCharacterViews.size();
     }
 
-    private LinearLayout.LayoutParams getCharacterLayoutParam(int characterSize) {
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(characterSize, characterSize);
-        layoutParams.weight = 1;
-        return layoutParams;
+    private LayoutParams getCharacterLayoutParam(int characterSize) {
+        LayoutParams params = new LayoutParams(characterSize, characterSize);
+
+        params.verticalBias = 0.5f;
+        params.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
+        params.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
+        params.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
+
+        return params;
+    }
+
+
+    private LayoutParams getCharacterHighlightLayoutParam() {
+        ConstraintLayout.LayoutParams params = new LayoutParams(
+                ConstraintLayout.LayoutParams.MATCH_CONSTRAINT,
+                ConstraintLayout.LayoutParams.MATCH_CONSTRAINT
+        );
+
+        params.verticalBias = 0.5f;
+        params.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
+        params.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
+        params.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
+
+        return params;
+    }
+
+    private void updateNewCharacterHighlightSize(int characterSize) {
+        LayoutParams params = (LayoutParams) newCharacterHighlight.getLayoutParams();
+
+        params.height = characterSize;
+        params.width = characterSize;
+
+        newCharacterHighlight.setLayoutParams(params);
     }
 
     public void setOnCardPortraitClick(@Nullable OnClickListener onClickListener) {
         for (int i = 0; i < llyPortraits.getChildCount(); i++) {
             ((CharacterCardPortraitGroupView) llyPortraits.getChildAt(i)).setPortraitsClickListener(onClickListener);
+        }
+    }
+
+
+    public void setOnCardPortraitLongClick(@Nullable OnLongClickListener onLongClickListener) {
+        for (int i = 0; i < llyPortraits.getChildCount(); i++) {
+            ((CharacterCardPortraitGroupView) llyPortraits.getChildAt(i)).setPortraitsLongClickListener(onLongClickListener);
         }
     }
 
@@ -235,9 +267,5 @@ public class CharacterEditorView extends ConstraintLayout {
 
     public void setOnRemoveClick(@Nullable OnClickListener onClickListener) {
         btnRemove.setOnClickListener(onClickListener);
-    }
-
-    public CharacterHighlightView getNewCharacterHighlight() {
-        return chvNewCharacterHighlight;
     }
 }

@@ -13,6 +13,7 @@ import com.leaders.app.enums.BoardOrientation;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Position;
+import com.leaders.gamelogic.interactions.InteractionTarget;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -99,7 +100,7 @@ public abstract class BoardView extends ConstraintLayout {
         return getCharacterDisplaySize(getWidth());
     }
 
-    public int getCharacterDisplaySize(int boardWidth) {
+    private int getCharacterDisplaySize(int boardWidth) {
         return Math.round(boardWidth * CHARACTER_SIZE_TO_BOARD_RATIO);
     }
 

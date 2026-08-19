@@ -12,7 +12,7 @@ import com.leaders.gamelogic.enums.CharacterCard;
 import java.util.Comparator;
 import java.util.List;
 
-public class CharacterCardUtils {
+public final  class CharacterCardUtils {
     private CharacterCardUtils(){
         throw new AssertionError("Cannot instantiate utility class");
     }
@@ -58,6 +58,56 @@ public class CharacterCardUtils {
             case RoyalGuard: return R.string.card_name_royal_guard;
             case Vizier: return R.string.card_name_vizier;
             case Wanderer: return R.string.card_name_wanderer;
+            default: throw new IllegalArgumentException("No name found for character card: " + characterCard);
+        }
+    }
+
+    public static int getFormattedNameId(@NonNull CharacterCard characterCard) {
+        switch (characterCard) {
+            case Acrobat: return R.string.card_formatted_name_acrobat;
+            case Archer: return R.string.card_formatted_name_archer;
+            case Assassin: return R.string.card_formatted_name_assassin;
+            case Brewmaster: return R.string.card_formatted_name_brewmaster;
+            case Bruiser: return R.string.card_formatted_name_bruiser;
+            case ClawLauncher: return R.string.card_formatted_name_claw_launcher;
+            case HermitAndCub: return R.string.card_formatted_name_hermit_and_cub;
+            case Illusionist: return R.string.card_formatted_name_illusionist;
+            case Jailer: return R.string.card_formatted_name_jailer;
+            case LeaderKing:
+            case LeaderQueen:
+                return R.string.card_formatted_name_leader;
+            case Manipulator: return R.string.card_formatted_name_manipulator;
+            case Nemesis: return R.string.card_formatted_name_nemesis;
+            case Protector: return R.string.card_formatted_name_protector;
+            case Rider: return R.string.card_formatted_name_rider;
+            case RoyalGuard: return R.string.card_formatted_name_royal_guard;
+            case Vizier: return R.string.card_formatted_name_vizier;
+            case Wanderer: return R.string.card_formatted_name_wanderer;
+            default: throw new IllegalArgumentException("No formatted name found for character card: " + characterCard);
+        }
+    }
+
+    public static int getDescriptionId(@NonNull CharacterCard characterCard) {
+        switch (characterCard) {
+            case Acrobat: return R.string.card_description_acrobat;
+            case Archer: return R.string.card_description_archer;
+            case Assassin: return R.string.card_description_assassin;
+            case Brewmaster: return R.string.card_description_brewmaster;
+            case Bruiser: return R.string.card_description_bruiser;
+            case ClawLauncher: return R.string.card_description_claw_launcher;
+            case HermitAndCub: return R.string.card_description_hermit_and_cub;
+            case Illusionist: return R.string.card_description_illusionist;
+            case Jailer: return R.string.card_description_jailer;
+            case LeaderKing:
+            case LeaderQueen:
+                return R.string.card_description_leader;
+            case Manipulator: return R.string.card_description_manipulator;
+            case Nemesis: return R.string.card_description_nemesis;
+            case Protector: return R.string.card_description_protector;
+            case Rider: return R.string.card_description_rider;
+            case RoyalGuard: return R.string.card_description_royal_guard;
+            case Vizier: return R.string.card_description_vizier;
+            case Wanderer: return R.string.card_description_wanderer;
             default: throw new IllegalArgumentException("No name found for character card: " + characterCard);
         }
     }

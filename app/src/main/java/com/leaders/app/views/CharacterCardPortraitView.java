@@ -10,7 +10,7 @@ import androidx.appcompat.widget.AppCompatImageView;
 import com.leaders.R;
 import com.leaders.gamelogic.enums.CharacterCard;
 
-public class CharacterCardPortraitView extends AppCompatImageView {
+public final class CharacterCardPortraitView extends AppCompatImageView {
     @NonNull
     private CharacterCard portraitCard;
 
@@ -50,5 +50,10 @@ public class CharacterCardPortraitView extends AppCompatImageView {
             case Wanderer: return R.drawable.card_portrait_wanderer;
             default: throw new IllegalArgumentException("No portrait drawable for card: " + portraitCard);
         }
+    }
+
+    @NonNull
+    public CharacterCard getPortraitCard() {
+        return portraitCard;
     }
 }

@@ -1,32 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:theme="@style/Theme.LeadersAndroidApp"
-    tools:ignore="SpUsage">
+    android:clickable="false"
+    android:longClickable="false"
+    tools:ignore="SpUsage"
+    tools:theme="@style/Theme.LeadersAndroidApp">
 
-
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/gdlLeft_vwCharacterEditor"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintGuide_percent="0.1" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/gdlRight_vwCharacterEditor"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintGuide_percent="0.9" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/gdlEditMiddle_vwCharacterEditor"
@@ -36,12 +18,15 @@
         app:layout_constraintGuide_percent="0.5" />
 
     <com.leaders.app.views.decoration.OrnateFrameView
+        android:id="@+id/ornateFrameView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clickable="false"
+        android:longClickable="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" >
+        app:layout_constraintTop_toTopOf="parent">
 
     </com.leaders.app.views.decoration.OrnateFrameView>
 
@@ -55,6 +40,7 @@
         android:layout_marginBottom="12dp"
         android:clickable="false"
         android:fadeScrollbars="false"
+        android:longClickable="false"
         android:scrollbarThumbVertical="@color/transparent_golden"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -67,39 +53,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clickable="false"
+            android:longClickable="false"
             android:orientation="vertical" />
     </ScrollView>
-
-    <androidx.constraintlayout.widget.Group
-        android:id="@+id/grpAddCharacters_vwCharacterEditor"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:constraint_referenced_ids="llyNewCharacters_vwCharacterEditor,chvNewCharacterHighlight_vwCharacterEditor"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <LinearLayout
-        android:id="@+id/llyNewCharacters_vwCharacterEditor"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/gdlRight_vwCharacterEditor"
-        app:layout_constraintStart_toStartOf="@+id/gdlLeft_vwCharacterEditor"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <com.leaders.app.views.board.CharacterHighlightView
-        android:id="@+id/chvNewCharacterHighlight_vwCharacterEditor"
-        android:layout_width="@dimen/round_button_size"
-        android:layout_height="@dimen/round_button_size"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/board" />
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/grpEditCharacter_vwCharacterEditor"
@@ -117,13 +73,15 @@
         android:id="@+id/txvColor_vwCharacterEditor"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:clickable="false"
         android:fontFamily="@font/bobby_jones_condensed"
+        android:longClickable="false"
         android:text="@string/color"
         android:textAlignment="center"
         android:textColor="@color/font"
         app:layout_constraintBottom_toTopOf="@+id/crvSwitchColor_vwCharacterEditor"
-        app:layout_constraintEnd_toStartOf="@+id/gdlEditMiddle_vwCharacterEditor"
-        app:layout_constraintStart_toStartOf="@+id/gdlLeft_vwCharacterEditor"
+        app:layout_constraintEnd_toEndOf="@+id/crvSwitchColor_vwCharacterEditor"
+        app:layout_constraintStart_toStartOf="@+id/crvSwitchColor_vwCharacterEditor"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0" />
 
@@ -131,13 +89,15 @@
         android:id="@+id/txvRemove_vwCharacterEditor"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:clickable="false"
         android:fontFamily="@font/bobby_jones_condensed"
+        android:longClickable="false"
         android:text="@string/remove"
         android:textAlignment="center"
         android:textColor="@color/font"
         app:layout_constraintBottom_toTopOf="@+id/btnRemove_vwCharacterEditor"
-        app:layout_constraintEnd_toStartOf="@+id/gdlRight_vwCharacterEditor"
-        app:layout_constraintStart_toStartOf="@+id/gdlEditMiddle_vwCharacterEditor"
+        app:layout_constraintEnd_toEndOf="@+id/btnRemove_vwCharacterEditor"
+        app:layout_constraintStart_toStartOf="@+id/btnRemove_vwCharacterEditor"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0" />
 
@@ -155,7 +115,8 @@
         app:iconTint="@color/font"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintEnd_toStartOf="@+id/gdlRight_vwCharacterEditor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.4"
         app:layout_constraintStart_toStartOf="@+id/gdlEditMiddle_vwCharacterEditor"
         app:layout_constraintTop_toTopOf="parent"
         app:strokeColor="@color/font"
@@ -166,9 +127,11 @@
         android:id="@+id/crvSwitchColor_vwCharacterEditor"
         android:layout_width="@dimen/round_button_size"
         android:layout_height="@dimen/round_button_size"
+        android:clickable="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/gdlEditMiddle_vwCharacterEditor"
-        app:layout_constraintStart_toStartOf="@+id/gdlLeft_vwCharacterEditor"
+        app:layout_constraintHorizontal_bias="0.6"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
