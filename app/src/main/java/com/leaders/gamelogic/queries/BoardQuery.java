@@ -200,7 +200,7 @@ public final class BoardQuery {
      * @return the starting row index for the specified team.
      */
     private static int getTeamStartingRow(int x, @NonNull TeamColor teamColor) {
-        return teamColor == TeamColor.White ? Board.getRowCount(x) - 1 : 0;
+        return teamColor == TeamColor.Black ? Board.getRowCount(x) - 1 : 0;
     }
 
     /**
