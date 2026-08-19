@@ -218,7 +218,7 @@ public final class PuzzleSelectionActivity extends BaseActivity {
     }
 
     public void onNewPuzzleClick(View v) {
-        // TODO
+        goToActivity(ActivityType.PuzzleEditor);
     }
 
     public void onEditPuzzleClick(View v) {

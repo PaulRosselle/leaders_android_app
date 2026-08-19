@@ -1,38 +1,51 @@
 package com.leaders.app.views.board;
 
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Context;
-import android.view.animation.Animation;
+import android.util.AttributeSet;
 import android.view.animation.LinearInterpolator;
-import android.view.animation.RotateAnimation;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
 
 import com.leaders.R;
 
 public final class CharacterHighlightView extends AppCompatImageView {
     private static final int HIGHLIGHT_ANIMATION_DURATION = 800;
+    private final ObjectAnimator animator;
+
+    public CharacterHighlightView(@NonNull Context context, @Nullable AttributeSet attrs) {
+        super(context, attrs);
+        setImageResource(R.drawable.character_highlight);
+
+        animator = ObjectAnimator.ofFloat(this, ROTATION, 0f, 360f);
+        animator.setDuration(HIGHLIGHT_ANIMATION_DURATION);
+        animator.setInterpolator(new LinearInterpolator());
+        animator.setRepeatCount(ValueAnimator.INFINITE);
+        animator.setRepeatMode(ValueAnimator.RESTART);
+    }
 
     public CharacterHighlightView(@NonNull Context context) {
-        super(context);
-        setImageResource(R.drawable.character_highlight);
+        this(context, null);
     }
 
     public void startAnimation() {
-        RotateAnimation rotateAnimation = new RotateAnimation(
-                0f, 360f,
-                Animation.RELATIVE_TO_SELF, 0.5f,
-                Animation.RELATIVE_TO_SELF, 0.5f
-        );
-
-        rotateAnimation.setDuration(HIGHLIGHT_ANIMATION_DURATION);
-        rotateAnimation.setRepeatCount(Animation.INFINITE);
-        rotateAnimation.setInterpolator(new LinearInterpolator());
-
-        startAnimation(rotateAnimation);
+        if (animator.isStarted()) {
+            stopAnimation();
+        }
+        animator.start();
     }
 
     public void stopAnimation() {
-        clearAnimation();
+        animator.cancel();
+        setRotation(0f);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        stopAnimation();
+        super.onDetachedFromWindow();
     }
 }

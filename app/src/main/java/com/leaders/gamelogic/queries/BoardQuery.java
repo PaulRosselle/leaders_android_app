@@ -200,7 +200,7 @@ public final class BoardQuery {
      * @return the starting row index for the specified team.
      */
     private static int getTeamStartingRow(int x, @NonNull TeamColor teamColor) {
-        return teamColor == TeamColor.White ? Board.getRowCount(x) - 1 : 0;
+        return teamColor == TeamColor.Black ? Board.getRowCount(x) - 1 : 0;
     }
 
     /**
@@ -236,8 +236,22 @@ public final class BoardQuery {
      */
     @NonNull
     public static Cell getLeaderStartingCell(@NonNull Board board, @NonNull TeamColor teamColor) {
+        return board.getCell(getLeaderStartingPosition(teamColor));
+    }
+
+    /**
+     * Returns the starting postion of the specified team's leader.
+     *
+     * <p>This position is determined by the game rules and does not depend on the
+     * current state of the board.</p>
+     *
+     * @param teamColor the team color of the leader.
+     * @return the leader's starting cell.
+     */
+    @NonNull
+    public static Position getLeaderStartingPosition(@NonNull TeamColor teamColor) {
         // Leaders start in the central column of the board, each on a different end of the Y axis
         int x = Board.COLUMN_COUNT / 2;
-        return board.getCell(new Position(x, getTeamStartingRow(x, teamColor)));
+        return new Position(x, getTeamStartingRow(x, teamColor));
     }
 }

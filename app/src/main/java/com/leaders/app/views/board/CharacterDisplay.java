@@ -12,7 +12,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.leaders.R;
 
-public class CharacterDisplay {
+public final class CharacterDisplay {
     @NonNull
     private final CharacterView characterView;
 
