@@ -175,11 +175,7 @@ public final class CharacterEditorView extends ConstraintLayout {
                                             @Nullable CharacterType characterType) {
         for (int i = newCharacterViews.size() - 1; i >= 0; i--) {
             CharacterView characterView = newCharacterViews.get(i);
-
-            InteractionTarget target = Objects.requireNonNull(characterView.getTarget(),
-                    "Target within new character list missing");
-            Character character = Objects.requireNonNull(target.getChosenCharacterPlayableState(),
-                    "Invalid new character target : character missing").getCharacter();
+            Character character = getCharacterFromView(characterView);
 
             if ((teamColor == null || character.getTeamColor() == teamColor) &&
                     (characterType == null || character.getCharacterType() == characterType)) {
@@ -283,15 +279,19 @@ public final class CharacterEditorView extends ConstraintLayout {
         btnRemove.setOnClickListener(onClickListener);
     }
 
+    private Character getCharacterFromView(@NonNull CharacterView characterView) {
+        InteractionTarget target = Objects.requireNonNull(characterView.getTarget(),
+                "Target within new character list missing");
+        return Objects.requireNonNull(target.getChosenCharacterPlayableState(),
+                "Invalid new character target : character missing").getCharacter();
+    }
+
     @NonNull
     public Character getSelectedNewCharacter() {
         if (selectedNewCharacter == null) {
             throw new IllegalStateException("No selected new character found");
         }
 
-        InteractionTarget target = Objects.requireNonNull(selectedNewCharacter.getTarget(),
-                "Target within new character list missing");
-        return Objects.requireNonNull(target.getChosenCharacterPlayableState(),
-                "Invalid new character target : character missing").getCharacter();
+        return getCharacterFromView(selectedNewCharacter);
     }
 }

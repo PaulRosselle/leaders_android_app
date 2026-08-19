@@ -42,7 +42,7 @@ public final class MainActivity extends BaseActivity {
         super.initListeners();
 
         MainMenuView mmvMainMenu = findViewById(R.id.mmvMainMenu_actMain);
-        mmvMainMenu.setOnPuzzlesClickListener(v -> goToActivity(ActivityType.PuzzleEditor));
+        mmvMainMenu.setOnPuzzlesClickListener(v -> goToActivity(ActivityType.PuzzleSelection));
         mmvMainMenu.setOnPlayClickListener(this::btnNotImplementedClick);
         mmvMainMenu.setOnReplayClickListener(this::btnNotImplementedClick);
         mmvMainMenu.setOnRulesClickListener(this::btnNotImplementedClick);
