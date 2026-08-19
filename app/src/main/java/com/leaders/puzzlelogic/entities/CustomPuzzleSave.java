@@ -2,6 +2,9 @@ package com.leaders.puzzlelogic.entities;
 
 import androidx.annotation.NonNull;
 
+import com.leaders.puzzlelogic.enums.PuzzleCategory;
+import com.leaders.puzzlelogic.enums.PuzzleLifetime;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -9,8 +12,10 @@ public final class CustomPuzzleSave extends PuzzleSave {
     @NonNull
     private final String author;
 
-    public CustomPuzzleSave(@NonNull String name, @NonNull String author, @NonNull JSONObject datas, boolean solved) {
-        super(name, datas, solved);
+    public CustomPuzzleSave(@NonNull String name, @NonNull String author,
+                            @NonNull PuzzleLifetime lifetime,
+                            @NonNull JSONObject datas, boolean solved) {
+        super(name, lifetime, datas, solved);
         this.author = author;
     }
 
@@ -29,5 +34,11 @@ public final class CustomPuzzleSave extends PuzzleSave {
     @Override
     public String getAuthor() {
         return author;
+    }
+
+    @NonNull
+    @Override
+    public PuzzleCategory getCategory() {
+        return PuzzleCategory.Custom;
     }
 }

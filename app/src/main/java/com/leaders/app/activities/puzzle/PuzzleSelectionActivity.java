@@ -16,6 +16,7 @@ import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
 import com.leaders.puzzlelogic.entities.OfficialPuzzleSave;
 import com.leaders.puzzlelogic.entities.PuzzleSave;
 import com.leaders.puzzlelogic.enums.PuzzleCategory;
+import com.leaders.puzzlelogic.enums.PuzzleLifetime;
 
 import org.json.JSONObject;
 
@@ -123,13 +124,25 @@ public final class PuzzleSelectionActivity extends BaseActivity {
         // TODO - replace with json datas loading
         Random random = new Random();
         for (int i = 1; i < 40; i++) {
-            officialPuzzleSaves.add(new OfficialPuzzleSave(this, i, new JSONObject(), random.nextBoolean()));
+            officialPuzzleSaves.add(
+                    new OfficialPuzzleSave(this, i,
+                            PuzzleLifetime.ActionsPhase,
+                            new JSONObject(),
+                            random.nextBoolean()
+                    )
+            );
         }
 
         customPuzzleSaves = new ArrayList<>();
         // TODO - replace with json datas loading
         for (int i = 1; i < 10; i++) {
-            customPuzzleSaves.add(new CustomPuzzleSave("TEST NAME", "Test Author", new JSONObject(), random.nextBoolean()));
+            customPuzzleSaves.add(
+                    new CustomPuzzleSave("TEST NAME", "Test Author",
+                            PuzzleLifetime.ActionsPhase,
+                            new JSONObject(),
+                            random.nextBoolean()
+                    )
+            );
         }
 
         ((MaterialButton) (findViewById(R.id.btnOfficial_actPuzzleSelection))).setChecked(true);
