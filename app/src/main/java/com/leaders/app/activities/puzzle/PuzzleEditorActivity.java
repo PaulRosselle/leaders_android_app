@@ -30,6 +30,7 @@ import com.leaders.gamelogic.factories.GameFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public final class PuzzleEditorActivity extends BaseActivity {
     private CharacterNotificationView cnvCardInfo;
@@ -52,6 +53,10 @@ public final class PuzzleEditorActivity extends BaseActivity {
     @Override
     protected void initListeners() {
         super.initListeners();
+
+        pebvBoard.setOnCellClickListener(this::onBoardCellClick);
+        pebvBoard.setOnCharacterClickListener(this::onBoardCharacterClick);
+        pebvBoard.setOnCharacterLongClickListener(this::onCharacterLongClick);
 
         cevCharacterEditor.setOnCardPortraitClick(this::onCardPortraitClick);
         cevCharacterEditor.setOnCardPortraitLongClick(this::onCardPortraitLongClick);
@@ -141,6 +146,18 @@ public final class PuzzleEditorActivity extends BaseActivity {
         return false;
     }
 
+    private void showCardDescriptionNotification(@NonNull CharacterCard characterCard) {
+        if (cnvCardInfo.getCharacterCard() == characterCard) {
+            cnvCardInfo.setCharacterCard(null);
+            cnvCardInfo.hide();
+        } else {
+            cnvCardInfo.setCharacterCard(characterCard);
+            if (cnvCardInfo.getVisibility() != View.VISIBLE) {
+                cnvCardInfo.show();
+            }
+        }
+    }
+
     private void onCardPortraitClick(View v) {
         if (interruptActionIfNeeded()) {
             return;
@@ -168,28 +185,25 @@ public final class PuzzleEditorActivity extends BaseActivity {
         cevCharacterEditor.startAddCardCharactersMode(
                 addableCharacers,
                 pebvBoard.getCharacterDisplaySize(),
-                this::onNewCharacterClick
+                this::onNewCharacterClick,
+                this::onCharacterLongClick
         );
     }
 
     private boolean onCardPortraitLongClick(View v) {
-        CharacterCard portraitCard = ((CharacterCardPortraitView) v).getPortraitCard();
-
-        if (cnvCardInfo.getCharacterCard() == portraitCard) {
-            cnvCardInfo.setCharacterCard(null);
-            cnvCardInfo.hide();
-        } else {
-            cnvCardInfo.setCharacterCard(portraitCard);
-            if (cnvCardInfo.getVisibility() != View.VISIBLE) {
-                cnvCardInfo.show();
-            }
-        }
-
+        showCardDescriptionNotification(((CharacterCardPortraitView) v).getPortraitCard());
         return true;
     }
 
     private void onNewCharacterClick(View v) {
         cevCharacterEditor.selectNewCharacter((CharacterView) v);
+    }
+
+    private boolean onCharacterLongClick(View v) {
+        CharacterType characterType = Objects.requireNonNull(((CharacterView) v).getCharacterType(),
+                "An empty character piece is not authorized in the puzzle editor");
+        showCardDescriptionNotification(characterType.getCharacterCard());
+        return true;
     }
 
     private void onSwitchColorClick(View v) {
@@ -200,6 +214,14 @@ public final class PuzzleEditorActivity extends BaseActivity {
     private void onRemoveClick(View v) {
         // TODO
         // TODO - hasActionInProgress = false à la fin du traitement
+    }
+
+    private void onBoardCellClick(View v) {
+        // TODO
+    }
+
+    private void onBoardCharacterClick(View v) {
+        // TODO
     }
 
     private boolean interruptActionIfNeeded() {

@@ -28,12 +28,14 @@ public final class CharacterView extends AppCompatImageView {
 
     @Nullable
     private InteractionTarget target;
+    @Nullable
+    private CharacterType characterType;
+    @NonNull
+    private TeamColor teamColor;
+
 
     public CharacterView(Context context) {
-        super(context);
-
-        target = null;
-        setCharacter(null, TeamColor.Black);
+        this(context, null);
     }
 
     public CharacterView(Context context, @Nullable AttributeSet attrs) {
@@ -42,9 +44,9 @@ public final class CharacterView extends AppCompatImageView {
         target = null;
         try (TypedArray customAttrs = context.obtainStyledAttributes(attrs, R.styleable.CharacterView)) {
             int characterTypeOrd = customAttrs.getInteger(R.styleable.CharacterView_characterType, -1);
-            CharacterType characterType = characterTypeOrd == -1 ? null : CharacterType.values()[characterTypeOrd];
+            characterType = characterTypeOrd == -1 ? null : CharacterType.values()[characterTypeOrd];
             int teamColorOrd = customAttrs.getInteger(R.styleable.CharacterView_teamColor, TeamColor.Black.ordinal());
-            TeamColor teamColor = TeamColor.values()[teamColorOrd];
+            teamColor = TeamColor.values()[teamColorOrd];
 
             setCharacter(characterType, teamColor);
         }
@@ -56,6 +58,8 @@ public final class CharacterView extends AppCompatImageView {
 
     public void setCharacter(@Nullable CharacterType characterType,
                              @NonNull TeamColor teamColor) {
+        this.characterType = characterType;
+        this.teamColor = teamColor;
         setImageResource(getCharacterDrawableId(characterType, teamColor));
     }
 
@@ -110,6 +114,16 @@ public final class CharacterView extends AppCompatImageView {
     @Nullable
     public InteractionTarget getTarget() {
         return target;
+    }
+
+    @Nullable
+    public CharacterType getCharacterType() {
+        return characterType;
+    }
+
+    @NonNull
+    public TeamColor getTeamColor() {
+        return teamColor;
     }
 
     private float getScaleForHighlightValue() {

@@ -13,7 +13,6 @@ import com.leaders.app.enums.BoardOrientation;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Position;
-import com.leaders.gamelogic.interactions.InteractionTarget;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,10 +29,14 @@ public abstract class BoardView extends ConstraintLayout {
 
     @NonNull
     protected final Map<Position, CellView> cellViewsMap;
-    private final Map<Position, CharacterDisplay> characterDisplays;
+    private final Map<Position, CharacterDisplay> characterDisplayMap;
 
     @NonNull
     protected BoardOrientation orientation;
+
+    private OnClickListener onCellClickListener;
+    private OnClickListener onCharacterClickListener;
+    private OnLongClickListener onCharacterLongClickListener;
 
 
     public BoardView(@NonNull Context context, @Nullable AttributeSet attrs) {
@@ -41,7 +44,7 @@ public abstract class BoardView extends ConstraintLayout {
 
         cellViews = new ArrayList<>();
         cellViewsMap = new HashMap<>();
-        characterDisplays = new HashMap<>();
+        characterDisplayMap = new HashMap<>();
 
         inflate(context, R.layout.view_board, this);
 
@@ -88,7 +91,7 @@ public abstract class BoardView extends ConstraintLayout {
         final int characterDisplaySize = getCharacterDisplaySize(width);
 
         characterDisplayPool.setDisplaysSize(characterDisplaySize);
-        for (Map.Entry<Position, CharacterDisplay> entry : characterDisplays.entrySet()) {
+        for (Map.Entry<Position, CharacterDisplay> entry : characterDisplayMap.entrySet()) {
             CharacterDisplay display = entry.getValue();
             display.setSize(characterDisplaySize);
             CellView cellView = getCellView(entry.getKey());
@@ -129,7 +132,7 @@ public abstract class BoardView extends ConstraintLayout {
 
         // Since Position -> CellView mapping can have changed, we must update character
         // displays so they stay on top of their corresponding cell position
-        for (Map.Entry<Position, CharacterDisplay> entry : characterDisplays.entrySet()) {
+        for (Map.Entry<Position, CharacterDisplay> entry : characterDisplayMap.entrySet()) {
             CellView cellView = getCellView(entry.getKey());
             entry.getValue().setPosition(cellView.getX(), cellView.getY());
         }
@@ -140,7 +143,7 @@ public abstract class BoardView extends ConstraintLayout {
 
         for (Cell cell : board.getCells().values()) {
             Position cellPosition = cell.getPosition();
-            CharacterDisplay characterDisplay = characterDisplays.get(cellPosition);
+            CharacterDisplay characterDisplay = characterDisplayMap.get(cellPosition);
 
             if (cell.getCharacter() != null) {
                 if (characterDisplay == null) {
@@ -164,19 +167,30 @@ public abstract class BoardView extends ConstraintLayout {
     @NonNull
     protected final CharacterDisplay acquireCharacterDisplay(@NonNull Position position) {
         CharacterDisplay characterDisplay = characterDisplayPool.acquire();
-        characterDisplays.put(position, characterDisplay);
+
+        characterDisplay.setOnCharacterClickListener(onCharacterClickListener);
+        characterDisplay.setOnCharacterLongClickListener(onCharacterLongClickListener);
+
+        characterDisplayMap.put(position, characterDisplay);
         return characterDisplay;
     }
 
     protected final void releaseCharacterDisplay(@NonNull Position position) {
-        characterDisplayPool.release(Objects.requireNonNull(characterDisplays.remove(position),
-                "CharacterDisplay to release not found"));
+        CharacterDisplay characterDisplay = Objects.requireNonNull(characterDisplayMap.remove(position),
+                "CharacterDisplay to release not found");
+
+        characterDisplay.reset();
+
+        characterDisplay.setOnCharacterClickListener(null);
+        characterDisplay.setOnCharacterLongClickListener(null);
+
+        characterDisplayPool.release(characterDisplay);
     }
 
     public final void clearTargets() {
         for (Position position : cellViewsMap.keySet()) {
             getCellView(position).clearTarget();
-            CharacterDisplay characterDisplay = characterDisplays.get(position);
+            CharacterDisplay characterDisplay = characterDisplayMap.get(position);
             if (characterDisplay != null) {
                 characterDisplay.getCharacterView().clearTarget();
             }
@@ -185,5 +199,29 @@ public abstract class BoardView extends ConstraintLayout {
 
     protected final CellView getCellView(@NonNull Position position) {
         return Objects.requireNonNull(cellViewsMap.get(position), "No CellView found at Position:" + position);
+    }
+
+    protected void setOnCellClickListener(OnClickListener onCellClickListener) {
+        this.onCellClickListener = onCellClickListener;
+
+        for (CellView cellView : cellViews) {
+            cellView.setOnClickListener(onCellClickListener);
+        }
+    }
+
+    protected void setOnCharacterClickListener(OnClickListener onCharacterClickListener) {
+        this.onCharacterClickListener = onCharacterClickListener;
+
+        for (CharacterDisplay characterDisplay : characterDisplayMap.values()) {
+            characterDisplay.setOnCharacterClickListener(onCharacterClickListener);
+        }
+    }
+
+    protected void setOnCharacterLongClickListener(OnLongClickListener onCharacterLongClickListener) {
+        this.onCharacterLongClickListener = onCharacterLongClickListener;
+
+        for (CharacterDisplay characterDisplay : characterDisplayMap.values()) {
+            characterDisplay.setOnCharacterLongClickListener(onCharacterLongClickListener);
+        }
     }
 }

@@ -98,4 +98,12 @@ public final class CharacterDisplay {
         view.setX(x);
         view.setY(y);
     }
+
+    public void setOnCharacterClickListener(View.OnClickListener onClickListener) {
+        characterView.setOnClickListener(onClickListener);
+    }
+
+    public void setOnCharacterLongClickListener(View.OnLongClickListener onLongClickListener) {
+        characterView.setOnLongClickListener(onLongClickListener);
+    }
 }
