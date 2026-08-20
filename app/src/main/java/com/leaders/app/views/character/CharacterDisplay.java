@@ -105,8 +105,17 @@ public final class CharacterDisplay {
         characterView.setOnLongClickListener(onLongClickListener);
     }
 
-    public void setHighlighted(boolean highlighted, boolean animate) {
-        characterView.scaleForHighlight(highlighted, animate);
+    public void setHighlighted(boolean highlighted, boolean animateCharacterScaling) {
+        characterView.scaleForHighlight(highlighted, animateCharacterScaling);
         highlightView.setVisibility(highlighted ? View.VISIBLE : View.GONE);
+    }
+
+
+    public void startHighlightAnimation() {
+        highlightView.startAnimation();
+    }
+
+    public void stopHighlightAnimation() {
+        highlightView.stopAnimation();
     }
 }
