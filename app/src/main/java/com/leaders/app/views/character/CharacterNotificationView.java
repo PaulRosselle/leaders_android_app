@@ -1,4 +1,4 @@
-package com.leaders.app.views;
+package com.leaders.app.views.character;
 
 import android.content.Context;
 import android.util.AttributeSet;

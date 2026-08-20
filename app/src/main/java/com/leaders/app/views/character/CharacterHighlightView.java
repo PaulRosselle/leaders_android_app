@@ -1,4 +1,4 @@
-package com.leaders.app.views.board;
+package com.leaders.app.views.character;
 
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;

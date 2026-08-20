@@ -123,7 +123,7 @@
         app:strokeWidth="@dimen/default_stroke_width"
         tools:ignore="SpeakableTextPresentCheck" />
 
-    <com.leaders.app.views.board.CharacterView
+    <com.leaders.app.views.character.CharacterView
         android:id="@+id/crvSwitchColor_vwCharacterEditor"
         android:layout_width="@dimen/round_button_size"
         android:layout_height="@dimen/round_button_size"

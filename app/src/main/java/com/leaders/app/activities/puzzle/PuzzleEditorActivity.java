@@ -16,10 +16,10 @@ import com.leaders.app.utilities.JsonUtils;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
 import com.leaders.puzzlelogic.utilities.PuzzleEditionUtils;
-import com.leaders.app.views.CharacterCardPortraitView;
+import com.leaders.app.views.character.CharacterCardPortraitView;
 import com.leaders.app.views.puzzle.CharacterEditorView;
-import com.leaders.app.views.CharacterNotificationView;
-import com.leaders.app.views.board.CharacterView;
+import com.leaders.app.views.character.CharacterNotificationView;
+import com.leaders.app.views.character.CharacterView;
 import com.leaders.app.views.board.PuzzleEditorBoardView;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Character;
@@ -218,6 +218,13 @@ public final class PuzzleEditorActivity extends BaseActivity {
 
     private void onBoardCellClick(View v) {
         // TODO
+
+        // New character
+        Character characterToAdd = cevCharacterEditor.getSelectedNewCharacter();
+        if (characterToAdd != null) {
+            // TODO - add animation
+        }
+        // Character movement
     }
 
     private void onBoardCharacterClick(View v) {

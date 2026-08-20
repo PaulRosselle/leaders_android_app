@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import com.leaders.R;
+import com.leaders.gamelogic.entities.Position;
 
 public final class PuzzleEditorBoardView extends BoardView {
     public PuzzleEditorBoardView(@NonNull Context context, @Nullable AttributeSet attrs) {

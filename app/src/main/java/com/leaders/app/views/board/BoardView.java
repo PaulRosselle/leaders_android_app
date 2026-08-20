@@ -10,6 +10,9 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.leaders.R;
 import com.leaders.app.enums.BoardOrientation;
+import com.leaders.app.views.character.CharacterDisplay;
+import com.leaders.app.views.character.CharacterDisplayPool;
+import com.leaders.app.views.character.CharacterView;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Position;

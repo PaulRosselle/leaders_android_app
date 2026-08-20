@@ -13,9 +13,9 @@ import androidx.constraintlayout.widget.Group;
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 import com.leaders.app.utilities.CharacterCardUtils;
-import com.leaders.app.views.CharacterCardPortraitGroupView;
-import com.leaders.app.views.board.CharacterHighlightView;
-import com.leaders.app.views.board.CharacterView;
+import com.leaders.app.views.character.CharacterCardPortraitGroupView;
+import com.leaders.app.views.character.CharacterHighlightView;
+import com.leaders.app.views.character.CharacterView;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.PlayableCharacter;
 import com.leaders.gamelogic.entities.Position;
@@ -291,10 +291,10 @@ public final class CharacterEditorView extends ConstraintLayout {
                 "Invalid new character target : character missing").getCharacter();
     }
 
-    @NonNull
+    @Nullable
     public Character getSelectedNewCharacter() {
         if (selectedNewCharacter == null) {
-            throw new IllegalStateException("No selected new character found");
+            return null;
         }
 
         return getCharacterFromView(selectedNewCharacter);
