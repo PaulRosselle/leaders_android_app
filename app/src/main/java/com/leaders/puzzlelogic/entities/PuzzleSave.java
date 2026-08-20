@@ -1,5 +1,6 @@
 package com.leaders.puzzlelogic.entities;
 
+import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 
 import com.leaders.puzzlelogic.enums.PuzzleCategory;
@@ -15,7 +16,7 @@ public abstract class PuzzleSave {
     private final PuzzleLifetime lifetime;
     @NonNull
     protected final JSONObject datas;
-    private final boolean solved;
+    private boolean solved;
 
     protected PuzzleSave(@NonNull String name, @NonNull PuzzleLifetime lifetime,
                          @NonNull JSONObject datas, boolean solved) {
@@ -25,8 +26,25 @@ public abstract class PuzzleSave {
         this.solved = solved;
     }
 
+    protected PuzzleSave(@NonNull JSONObject joPuzzleSave) throws JSONException {
+        this(
+                joPuzzleSave.getString("name"),
+                PuzzleLifetime.valueOf(joPuzzleSave.getString("lifetime")),
+                joPuzzleSave.getJSONObject("datas"),
+                joPuzzleSave.getBoolean("solved")
+        );
+    }
+
     @NonNull
-    public abstract JSONObject getAsJsonObject() throws JSONException;
+    @CallSuper
+    public JSONObject getAsJsonObject() throws JSONException {
+        JSONObject joPuzzleSave = new JSONObject();
+        joPuzzleSave.put("name", getName());
+        joPuzzleSave.put("lifetime", getLifetime().name());
+        joPuzzleSave.put("datas", datas);
+        joPuzzleSave.put("solved", isSolved());
+        return joPuzzleSave;
+    }
 
     @NonNull
     public final String getName() {
@@ -35,6 +53,10 @@ public abstract class PuzzleSave {
 
     @NonNull
     public abstract String getAuthor();
+
+    public void setSolved(boolean solved) {
+        this.solved = solved;
+    }
 
     public final boolean isSolved() {
         return solved;

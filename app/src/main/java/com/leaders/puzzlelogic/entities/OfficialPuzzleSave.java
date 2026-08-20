@@ -21,6 +21,11 @@ public final class OfficialPuzzleSave extends PuzzleSave {
         this.id = id;
     }
 
+    public OfficialPuzzleSave(JSONObject joPuzzle) throws JSONException {
+        super(joPuzzle);
+        this.id = joPuzzle.getInt("id");
+    }
+
     public int getId() {
         return id;
     }
@@ -28,9 +33,8 @@ public final class OfficialPuzzleSave extends PuzzleSave {
     @NonNull
     @Override
     public JSONObject getAsJsonObject() throws JSONException {
-        JSONObject joPuzzle = new JSONObject();
+        JSONObject joPuzzle = super.getAsJsonObject();
         joPuzzle.put("id", id);
-        joPuzzle.put("datas", datas);
         return joPuzzle;
     }
 
