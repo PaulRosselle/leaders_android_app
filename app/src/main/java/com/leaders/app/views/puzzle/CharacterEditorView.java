@@ -1,4 +1,4 @@
-package com.leaders.app.views;
+package com.leaders.app.views.puzzle;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -13,6 +13,7 @@ import androidx.constraintlayout.widget.Group;
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 import com.leaders.app.utilities.CharacterCardUtils;
+import com.leaders.app.views.CharacterCardPortraitGroupView;
 import com.leaders.app.views.board.CharacterHighlightView;
 import com.leaders.app.views.board.CharacterView;
 import com.leaders.gamelogic.entities.Character;

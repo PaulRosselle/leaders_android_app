@@ -1,4 +1,4 @@
-package com.leaders.app.views;
+package com.leaders.app.views.puzzle;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
