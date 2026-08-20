@@ -215,6 +215,8 @@ public final class PuzzleEditorActivity extends BaseActivity {
 
     private void applyDefaultInteractionState() {
         selectedBoardCharacter = null;
+
+        bdvBoard.clearTargets();
         bdvBoard.applyCharacterTargets(board);
         cevCharacterEditor.startSelectCardMode();
 
@@ -236,6 +238,20 @@ public final class PuzzleEditorActivity extends BaseActivity {
 
         // TODO - replace by an animation
         board.getCell(position).setCharacter(character);
+        bdvBoard.setBoard(board);
+
+        // TODO - delay after animation end
+        applyDefaultInteractionState();
+    }
+
+    private void replaceByNewCharacter(@NonNull PlayableCharacter destCharacter) {
+        Character character = cevCharacterEditor.getSelectedNewCharacter();
+        if (character == null) {
+            throw new IllegalStateException("A new character must be selected to be added to the board");
+        }
+
+        // TODO - replace by an animation
+        board.getCell(destCharacter.getPosition()).setCharacter(character);
         bdvBoard.setBoard(board);
 
         // TODO - delay after animation end
@@ -287,7 +303,9 @@ public final class PuzzleEditorActivity extends BaseActivity {
                 this::onNewCharacterClick,
                 this::onCharacterLongClick
         );
+
         bdvBoard.applyCellTargets();
+        bdvBoard.applyCharacterTargets(board);
     }
 
     private boolean onCardPortraitLongClick(View v) {
@@ -340,7 +358,25 @@ public final class PuzzleEditorActivity extends BaseActivity {
     }
 
     private void onBoardCharacterClick(View v) {
-        // TODO
+        if (hasInteractionInProgress) {
+            InteractionTarget target = ((CharacterView) v).getTarget();
+
+            // TODO - comment
+            if (target == null) {
+                cancelInteractionInProgress();
+                return;
+            }
+
+            bdvBoard.clearTargets();
+            PlayableCharacter playableCharacter = Objects.requireNonNull(target.getChosenPlayableCharacter(), "Invalid character target : playable character missing");
+            if (selectedBoardCharacter != null) {
+                swapCharacters(playableCharacter);
+            } else {
+                replaceByNewCharacter(playableCharacter);
+            }
+        } else {
+            // TODO
+        }
     }
 
     private void onNonInteractiveElementClick(View v) {
