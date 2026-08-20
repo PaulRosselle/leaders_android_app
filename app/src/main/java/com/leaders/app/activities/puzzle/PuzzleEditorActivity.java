@@ -277,6 +277,29 @@ public final class PuzzleEditorActivity extends BaseActivity {
         });
     }
 
+    private void switchCharacterColor() {
+        hasAnimationInProgress = true;
+
+        Character character = selectedBoardCharacter.getCharacter();
+        CharacterType characterType = character.getCharacterType();
+        TeamColor teamColor = character.getTeamColor().getOpposite();
+        Position position = selectedBoardCharacter.getPosition();
+
+        CharacterDisplay characterDisplay = bdvBoard.getCharacterDisplay(position);
+        characterDisplay.stopHighlightAnimation();
+        characterDisplay.getHighlightView().setVisibility(View.GONE);
+        characterDisplay.getCharacterView().scaleForHighlight(false, true);
+        characterDisplay.getCharacterView().animateSetCharacter(characterType, teamColor, () -> {
+            board.getCell(position).setCharacter(Character.transform(character, characterType, teamColor));
+            applyDefaultInteractionState();
+            hasAnimationInProgress = false;
+        });
+    }
+
+    private void removeCharacter() {
+        // TODO
+    }
+
     //endregion
 
     //region LISTENER METHODS
@@ -341,11 +364,19 @@ public final class PuzzleEditorActivity extends BaseActivity {
     }
 
     private void onSwitchColorClick(View v) {
-        // TODO
-        // TODO - hasActionInProgress = false à la fin du traitement
+        if (hasAnimationInProgress) {
+            return;
+        }
+
+        switchCharacterColor();
     }
 
     private void onRemoveClick(View v) {
+        if (hasAnimationInProgress) {
+            return;
+        }
+
+
         // TODO
         // TODO - hasActionInProgress = false à la fin du traitement
     }
@@ -406,6 +437,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
             selectedBoardCharacter = Objects.requireNonNull(target.getChosenPlayableCharacter(), "Invalid character target : playable character missing");
             bdvBoard.selectCharacterAt(selectedBoardCharacter.getPosition());
 
+            cevCharacterEditor.startEditCharacterMode(selectedBoardCharacter.getCharacter());
             bdvBoard.applyCellTargets();
             bdvBoard.applyCharacterTargets(board);
         }

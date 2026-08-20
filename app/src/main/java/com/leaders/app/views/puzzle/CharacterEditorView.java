@@ -168,7 +168,7 @@ public final class CharacterEditorView extends ConstraintLayout {
     public void startEditCharacterMode(@NonNull Character character) {
         updateMode(EditorMode.EditCharacter);
 
-        crvSwitchColor.setCharacter(character);
+        crvSwitchColor.setCharacter(character.getCharacterType(), character.getTeamColor().getOpposite());
     }
 
     private void setViewVisible(View v, boolean visible) {
