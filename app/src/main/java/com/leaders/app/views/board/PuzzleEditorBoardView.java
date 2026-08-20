@@ -15,4 +15,16 @@ public final class PuzzleEditorBoardView extends BoardView {
         imvBoard.setImageResource(R.drawable.board_editor);
         imvBoard.setForeground(ContextCompat.getDrawable(getContext(), R.drawable.cell_positions));
     }
+
+    public void setOnCellClickListener(OnClickListener onCellClickListener) {
+        super.setOnCellClickListener(onCellClickListener);
+    }
+
+    public void setOnCharacterClickListener(OnClickListener onCharacterClickListener) {
+        super.setOnCharacterClickListener(onCharacterClickListener);
+    }
+
+    public void setOnCharacterLongClickListener(OnLongClickListener onCharacterLongClickListener) {
+        super.setOnCharacterLongClickListener(onCharacterLongClickListener);
+    }
 }

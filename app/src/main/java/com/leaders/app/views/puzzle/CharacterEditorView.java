@@ -1,4 +1,4 @@
-package com.leaders.app.views;
+package com.leaders.app.views.puzzle;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -13,6 +13,7 @@ import androidx.constraintlayout.widget.Group;
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 import com.leaders.app.utilities.CharacterCardUtils;
+import com.leaders.app.views.CharacterCardPortraitGroupView;
 import com.leaders.app.views.board.CharacterHighlightView;
 import com.leaders.app.views.board.CharacterView;
 import com.leaders.gamelogic.entities.Character;
@@ -123,7 +124,8 @@ public final class CharacterEditorView extends ConstraintLayout {
 
     public void startAddCardCharactersMode(@NonNull List<Character> characters,
                                            int characterDisplaySize,
-                                           @NonNull OnClickListener onCharacterClickListener) {
+                                           @NonNull OnClickListener onNewCharacterClickListener,
+                                           @NonNull OnLongClickListener onNewCharacterLongClickListener) {
         updateMode(EditorMode.AddCardCharacters);
 
         if (characters.isEmpty()) {
@@ -139,8 +141,11 @@ public final class CharacterEditorView extends ConstraintLayout {
         for (int i = 0; i < charactersCount; i++) {
             Character character = characters.get(i);
             CharacterView characterView = new CharacterView(context);
-            characterView.setOnClickListener(onCharacterClickListener);
+
+            characterView.setOnClickListener(onNewCharacterClickListener);
+            characterView.setOnLongClickListener(onNewCharacterLongClickListener);
             characterView.setCharacter(character);
+
             // We use playable character target to link a character view with a new character
             characterView.setAsPlayableTarget(new InteractionTarget(
                     TargetCategory.PlayableCharacter,
@@ -279,7 +284,7 @@ public final class CharacterEditorView extends ConstraintLayout {
         btnRemove.setOnClickListener(onClickListener);
     }
 
-    private Character getCharacterFromView(@NonNull CharacterView characterView) {
+    private static Character getCharacterFromView(@NonNull CharacterView characterView) {
         InteractionTarget target = Objects.requireNonNull(characterView.getTarget(),
                 "Target within new character list missing");
         return Objects.requireNonNull(target.getChosenCharacterPlayableState(),

@@ -171,7 +171,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <com.leaders.app.views.PuzzleSelectorGroupView
+            <com.leaders.app.views.puzzle.PuzzleSelectorGroupView
                 android:id="@+id/psgvPuzzles_actPuzzleSelection"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

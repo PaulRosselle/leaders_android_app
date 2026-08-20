@@ -26,7 +26,7 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:visibility="gone" />
 
-    <com.leaders.app.views.PuzzleRulesView
+    <com.leaders.app.views.puzzle.PuzzleRulesView
         android:id="@+id/prvRules_actPuzzleEditor"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -94,7 +94,7 @@
         app:layout_constraintTop_toBottomOf="@+id/prvRules_actPuzzleEditor"
         app:layout_constraintVertical_bias="0.0" />
 
-    <com.leaders.app.views.CharacterEditorView
+    <com.leaders.app.views.puzzle.CharacterEditorView
         android:id="@+id/cevCharacterEditor_actPuzzleEditor"
         android:layout_width="0dp"
         android:layout_height="0dp"
