@@ -1,5 +1,6 @@
 package com.leaders.app.activities.puzzle;
 
+import android.content.Intent;
 import android.view.View;
 import android.widget.Toast;
 
@@ -10,6 +11,10 @@ import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
+import com.leaders.app.utilities.ExtraUtils;
+import com.leaders.app.utilities.JsonUtils;
+import com.leaders.gamelogic.entities.GameHistory;
+import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
 import com.leaders.puzzlelogic.utilities.PuzzleEditionUtils;
 import com.leaders.app.views.CharacterCardPortraitView;
 import com.leaders.app.views.CharacterEditorView;
@@ -33,6 +38,8 @@ public final class PuzzleEditorActivity extends BaseActivity {
 
     private Board board;
     private boolean hasActionInProgress;
+    private List<CustomPuzzleSave> customPuzzleSaves;
+    private Integer puzzleIdx;
 
     protected void initViews() {
         super.initViews();
@@ -58,7 +65,19 @@ public final class PuzzleEditorActivity extends BaseActivity {
     protected void initDatas() {
         super.initDatas();
 
-        board = GameFactory.create(PuzzleEditionUtils.getDefaultHistory()).getBoard();
+        customPuzzleSaves = JsonUtils.loadCustomPuzzles(this);
+
+        // When editing an existing puzzle, its index within customPuzzleSaves is sent through the intent
+        Intent intent = getIntent();
+        int intentPuzzleIdx = intent.getIntExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, -1);
+        puzzleIdx = intentPuzzleIdx != -1 ? intentPuzzleIdx : null;
+
+        // We load the current state of the board using the puzzle save game history
+        GameHistory puzzleGameHistory = puzzleIdx != null ?
+                customPuzzleSaves.get(puzzleIdx).getPuzzleGameHistory() :
+                PuzzleEditionUtils.getDefaultHistory();
+        board = GameFactory.create(puzzleGameHistory).getBoard();
+
         pebvBoard.post(() -> pebvBoard.setBoard(board));
     }
 

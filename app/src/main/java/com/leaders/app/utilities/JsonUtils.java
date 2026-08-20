@@ -269,7 +269,7 @@ public final class JsonUtils {
         }
     }
 
-    private static void saveCustomPuzzles(@NonNull Context context,
+    public static void saveCustomPuzzles(@NonNull Context context,
                                           @NonNull List<CustomPuzzleSave> customPuzzles) {
         try {
             JSONArray jaCustomPuzzles = new JSONArray();

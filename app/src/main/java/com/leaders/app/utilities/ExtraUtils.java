@@ -8,6 +8,7 @@ public final class ExtraUtils {
     public static final String EXTRA_PUZZLE_SOURCE = "EXTRA_PUZZLE_SOURCE";
     public static final String PUZZLE_SOURCE_OFFICIAL = "PUZZLE_SOURCE_OFFICIAL";
     public static final String PUZZLE_SOURCE_CUSTOM = "PUZZLE_SOURCE_CUSTOM";
+    public static final String EXTRA_PUZZLE_INDEX = "EXTRA_PUZZLE_INDEX";
 
     private ExtraUtils(){
         throw new AssertionError("Cannot instantiate utility class");

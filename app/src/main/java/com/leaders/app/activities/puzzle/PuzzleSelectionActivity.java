@@ -1,5 +1,6 @@
 package com.leaders.app.activities.puzzle;
 
+import android.content.Intent;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -10,19 +11,16 @@ import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.utilities.ButtonUtils;
+import com.leaders.app.utilities.ExtraUtils;
+import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.PuzzleSelectorGroupView;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
 import com.leaders.puzzlelogic.entities.OfficialPuzzleSave;
 import com.leaders.puzzlelogic.entities.PuzzleSave;
 import com.leaders.puzzlelogic.enums.PuzzleCategory;
-import com.leaders.puzzlelogic.enums.PuzzleLifetime;
 
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public final class PuzzleSelectionActivity extends BaseActivity {
     private enum PuzzleSelectionAction {
@@ -120,31 +118,10 @@ public final class PuzzleSelectionActivity extends BaseActivity {
     protected void initDatas() {
         super.initDatas();
 
-        officialPuzzleSaves = new ArrayList<>();
-        // TODO - replace with json datas loading
-        Random random = new Random();
-        for (int i = 1; i < 40; i++) {
-            officialPuzzleSaves.add(
-                    new OfficialPuzzleSave(this, i,
-                            PuzzleLifetime.ActionsPhase,
-                            new JSONObject(),
-                            random.nextBoolean()
-                    )
-            );
-        }
+        officialPuzzleSaves = JsonUtils.loadOfficialPuzzles(this);
+        customPuzzleSaves = JsonUtils.loadCustomPuzzles(this);
 
-        customPuzzleSaves = new ArrayList<>();
-        // TODO - replace with json datas loading
-        for (int i = 1; i < 10; i++) {
-            customPuzzleSaves.add(
-                    new CustomPuzzleSave("TEST NAME", "Test Author",
-                            PuzzleLifetime.ActionsPhase,
-                            new JSONObject(),
-                            random.nextBoolean()
-                    )
-            );
-        }
-
+        // This will cause "onPuzzleSelectionChange" to be called
         ((MaterialButton) (findViewById(R.id.btnOfficial_actPuzzleSelection))).setChecked(true);
     }
 
@@ -235,7 +212,11 @@ public final class PuzzleSelectionActivity extends BaseActivity {
     }
 
     public void onEditPuzzleClick(View v) {
-        // TODO
+        Intent intent = ActivityType.PuzzleEditor.getIntent(this);
+        CustomPuzzleSave selectedPuzzleSave = (CustomPuzzleSave) psgvPuzzles.getSelectedPuzzles().get(0);
+        int puzzleIdx = customPuzzleSaves.indexOf(selectedPuzzleSave);
+        intent.putExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, puzzleIdx);
+        goToActivity(intent);
     }
 
     public void onRemoveClick(View v) {

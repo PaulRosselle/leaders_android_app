@@ -1,0 +1,95 @@
+{
+  "puzzles": [
+    {
+      "name": "Puzzle #001",
+      "lifetime": "ActionsPhase",
+      "datas": {
+        "config": {
+          "players": [
+            {
+              "team_color": "Black",
+              "name": "Player"
+            },
+            {
+              "team_color": "White",
+              "name": "Puzzle"
+            }
+          ],
+          "first_player": {
+            "team_color": "Black",
+            "name": "Player"
+          },
+          "game_mode": "Strategist",
+          "initial_recruitable_cards": [],
+          "initial_placements": [
+            {
+              "motions": [
+                {
+                  "motion_type": "Add",
+                  "character": {
+                    "uuid": "07590ed5-b499-4c9f-8ada-654e4e267d53",
+                    "character_type": "LeaderKing",
+                    "team_color": "Black"
+                  },
+                  "position": {
+                    "x": 3,
+                    "y": 6
+                  }
+                },
+                {
+                  "motion_type": "Add",
+                  "character": {
+                    "uuid": "6524100b-05a2-4a9e-b2a1-aacac05b31d8",
+                    "character_type": "LeaderQueen",
+                    "team_color": "White"
+                  },
+                  "position": {
+                    "x": 3,
+                    "y": 0
+                  }
+                }
+              ],
+              "type": "Recruitment"
+            }
+          ]
+        },
+        "entries": [
+          {
+            "team_color": "Black",
+            "turn_start_phase": {
+              "start_action": {
+                "transition_type": "Start",
+                "transition_target": "TurnStartPhase"
+              },
+              "end_action": {
+                "transition_type": "End",
+                "transition_target": "TurnStartPhase"
+              },
+              "turn_team_color": "Black",
+              "actions": []
+            },
+            "actions_phase": {
+              "start_action": {
+                "transition_type": "Start",
+                "transition_target": "ActionsPhase"
+              },
+              "turn_team_color": "Black",
+              "actions": []
+            },
+            "recruitment_phase": {
+              "turn_team_color": "Black",
+              "actions": []
+            },
+            "turn_end_phase": {
+              "turn_team_color": "Black",
+              "actions": []
+            },
+            "type": "turn"
+          }
+        ]
+      },
+      "solved": false,
+      "id": 1
+    }
+  ]
+}

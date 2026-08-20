@@ -3,8 +3,11 @@ package com.leaders.puzzlelogic.entities;
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 
+import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.puzzlelogic.enums.PuzzleCategory;
 import com.leaders.puzzlelogic.enums.PuzzleLifetime;
+import com.leaders.puzzlelogic.serializers.SerializationContext;
+import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,7 +18,7 @@ public abstract class PuzzleSave {
     @NonNull
     private final PuzzleLifetime lifetime;
     @NonNull
-    protected final JSONObject datas;
+    protected JSONObject datas;
     private boolean solved;
 
     protected PuzzleSave(@NonNull String name, @NonNull PuzzleLifetime lifetime,
@@ -68,5 +71,21 @@ public abstract class PuzzleSave {
     @NonNull
     public PuzzleLifetime getLifetime() {
         return lifetime;
+    }
+
+    public void updatePuzzleGameHistory(@NonNull GameHistory gameHistory) {
+        try {
+            datas = (new GameHistorySerializer()).getAsJson(gameHistory);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public GameHistory getPuzzleGameHistory() {
+        try {
+            return (new GameHistorySerializer()).getFromJson(datas, new SerializationContext());
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
