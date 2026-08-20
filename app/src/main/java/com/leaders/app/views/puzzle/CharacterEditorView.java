@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -41,6 +42,7 @@ public final class CharacterEditorView extends ConstraintLayout {
     private static final int PORTRAITS_PER_GROUP = 6;
 
     private LinearLayout llyPortraits;
+    private ScrollView scvPortraits;
 
 
     private CharacterView selectedNewCharacter;
@@ -62,6 +64,7 @@ public final class CharacterEditorView extends ConstraintLayout {
     }
 
     private void initViews() {
+        scvPortraits = findViewById(R.id.scvPortraits_vwCharacterEditor);
         llyPortraits = findViewById(R.id.llyPortraits_vwCharacterEditor);
         initPortraits();
 
@@ -108,7 +111,7 @@ public final class CharacterEditorView extends ConstraintLayout {
     }
 
     private void updateMode(EditorMode editorMode) {
-        setViewVisible(llyPortraits, editorMode == EditorMode.SelectCardProtrait);
+        setViewVisible(scvPortraits, editorMode == EditorMode.SelectCardProtrait);
         for (CharacterView characterView : newCharacterViews) {
             removeView(characterView);
         }
@@ -263,12 +266,27 @@ public final class CharacterEditorView extends ConstraintLayout {
         newCharacterHighlight.setLayoutParams(params);
     }
 
+    private static Character getCharacterFromView(@NonNull CharacterView characterView) {
+        InteractionTarget target = Objects.requireNonNull(characterView.getTarget(),
+                "Target within new character list missing");
+        return Objects.requireNonNull(target.getChosenPlayableCharacter(),
+                "Invalid new character target : character missing").getCharacter();
+    }
+
+    @Nullable
+    public Character getSelectedNewCharacter() {
+        if (selectedNewCharacter == null) {
+            return null;
+        }
+
+        return getCharacterFromView(selectedNewCharacter);
+    }
+
     public void setOnCardPortraitClick(@Nullable OnClickListener onClickListener) {
         for (int i = 0; i < llyPortraits.getChildCount(); i++) {
             ((CharacterCardPortraitGroupView) llyPortraits.getChildAt(i)).setPortraitsClickListener(onClickListener);
         }
     }
-
 
     public void setOnCardPortraitLongClick(@Nullable OnLongClickListener onLongClickListener) {
         for (int i = 0; i < llyPortraits.getChildCount(); i++) {
@@ -284,19 +302,7 @@ public final class CharacterEditorView extends ConstraintLayout {
         btnRemove.setOnClickListener(onClickListener);
     }
 
-    private static Character getCharacterFromView(@NonNull CharacterView characterView) {
-        InteractionTarget target = Objects.requireNonNull(characterView.getTarget(),
-                "Target within new character list missing");
-        return Objects.requireNonNull(target.getChosenCharacterPlayableState(),
-                "Invalid new character target : character missing").getCharacter();
-    }
-
-    @Nullable
-    public Character getSelectedNewCharacter() {
-        if (selectedNewCharacter == null) {
-            return null;
-        }
-
-        return getCharacterFromView(selectedNewCharacter);
+    public void setOnPortraitsScrollViewClick(@Nullable OnClickListener onClickListener) {
+        scvPortraits.setOnClickListener(onClickListener);
     }
 }

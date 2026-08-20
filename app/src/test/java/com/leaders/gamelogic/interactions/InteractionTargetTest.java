@@ -30,7 +30,7 @@ public class InteractionTargetTest {
 
         assertEquals(TargetCategory.RecruitmentCard, target.getCategory());
         assertEquals(expectedCard, target.getChosenSelectableCharacterCard());
-        assertNull(target.getChosenCharacterPlayableState());
+        assertNull(target.getChosenPlayableCharacter());
         assertNull(target.getChosenPosition());
     }
 
@@ -46,7 +46,7 @@ public class InteractionTargetTest {
 
         assertEquals(TargetCategory.PlayableCharacter, target.getCategory());
         assertNull(target.getChosenSelectableCharacterCard());
-        assertSame(playableCharacter, target.getChosenCharacterPlayableState());
+        assertSame(playableCharacter, target.getChosenPlayableCharacter());
         assertNull(target.getChosenPosition());
     }
 
@@ -58,7 +58,7 @@ public class InteractionTargetTest {
 
         assertEquals(TargetCategory.RecruitmentDestination, target.getCategory());
         assertNull(target.getChosenSelectableCharacterCard());
-        assertNull(target.getChosenCharacterPlayableState());
+        assertNull(target.getChosenPlayableCharacter());
         assertSame(position, target.getChosenPosition());
     }
 
@@ -202,7 +202,7 @@ public class InteractionTargetTest {
 
         assertEquals(
                 "InteractionTarget{category=PlayableCharacter, character=" +
-                        target.getChosenCharacterPlayableState() + "}",
+                        target.getChosenPlayableCharacter() + "}",
                 target.toString()
         );
     }

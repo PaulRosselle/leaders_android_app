@@ -320,7 +320,7 @@ public final class GameHandler {
     private static PlayableCharacter getPlayableCharacterFromResult(@NonNull InteractionResult result) {
         InteractionTarget chosenTarget = result.getChosenTarget();
         PlayableCharacter playableCharacter = chosenTarget == null ?
-                null : chosenTarget.getChosenCharacterPlayableState();
+                null : chosenTarget.getChosenPlayableCharacter();
 
         if (chosenTarget == null ||
                 chosenTarget.getCategory() != TargetCategory.PlayableCharacter ||

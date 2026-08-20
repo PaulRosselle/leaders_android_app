@@ -32,7 +32,8 @@ public abstract class BoardView extends ConstraintLayout {
 
     @NonNull
     protected final Map<Position, CellView> cellViewsMap;
-    private final Map<Position, CharacterDisplay> characterDisplayMap;
+    @NonNull
+    protected final Map<Position, CharacterDisplay> characterDisplayMap;
 
     @NonNull
     protected BoardOrientation orientation;

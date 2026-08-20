@@ -13,7 +13,11 @@ import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.JsonUtils;
+import com.leaders.app.views.board.CellView;
 import com.leaders.gamelogic.entities.GameHistory;
+import com.leaders.gamelogic.entities.PlayableCharacter;
+import com.leaders.gamelogic.entities.Position;
+import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
 import com.leaders.puzzlelogic.utilities.PuzzleEditionUtils;
 import com.leaders.app.views.character.CharacterCardPortraitView;
@@ -34,19 +38,20 @@ import java.util.Objects;
 
 public final class PuzzleEditorActivity extends BaseActivity {
     private CharacterNotificationView cnvCardInfo;
-    private PuzzleEditorBoardView pebvBoard;
+    private PuzzleEditorBoardView bdvBoard;
     private CharacterEditorView cevCharacterEditor;
 
     private Board board;
-    private boolean hasActionInProgress;
+    private boolean hasInteractionInProgress;
     private List<CustomPuzzleSave> customPuzzleSaves;
     private Integer puzzleIdx;
+    private PlayableCharacter selectedBoardCharacter;
 
     protected void initViews() {
         super.initViews();
 
         cnvCardInfo = findViewById(R.id.cnvCardInfo_actPuzzleEditor);
-        pebvBoard = findViewById(R.id.pebvBoard_actPuzzleEditor);
+        bdvBoard = findViewById(R.id.bdvBoard_actPuzzleEditor);
         cevCharacterEditor = findViewById(R.id.cevCharacterEditor_actPuzzleEditor);
     }
 
@@ -54,10 +59,17 @@ public final class PuzzleEditorActivity extends BaseActivity {
     protected void initListeners() {
         super.initListeners();
 
-        pebvBoard.setOnCellClickListener(this::onBoardCellClick);
-        pebvBoard.setOnCharacterClickListener(this::onBoardCharacterClick);
-        pebvBoard.setOnCharacterLongClickListener(this::onCharacterLongClick);
+        // TODO - comment
+        findViewById(R.id.clyMain_actPuzzleEditor).setOnClickListener(this::onNonInteractiveElementClick);
+        cevCharacterEditor.setOnClickListener(this::onNonInteractiveElementClick);
+        cevCharacterEditor.setOnPortraitsScrollViewClick(this::onNonInteractiveElementClick);
 
+        // TODO - comment
+        bdvBoard.setOnCellClickListener(this::onBoardCellClick);
+        bdvBoard.setOnCharacterClickListener(this::onBoardCharacterClick);
+        bdvBoard.setOnCharacterLongClickListener(this::onCharacterLongClick);
+
+        // TODO - comment
         cevCharacterEditor.setOnCardPortraitClick(this::onCardPortraitClick);
         cevCharacterEditor.setOnCardPortraitLongClick(this::onCardPortraitLongClick);
         cevCharacterEditor.setOnSwitchColorClick(this::onSwitchColorClick);
@@ -83,7 +95,11 @@ public final class PuzzleEditorActivity extends BaseActivity {
                 PuzzleEditionUtils.getDefaultHistory();
         board = GameFactory.create(puzzleGameHistory).getBoard();
 
-        pebvBoard.post(() -> pebvBoard.setBoard(board));
+        bdvBoard.post(() -> {
+            bdvBoard.setBoard(board);
+            // TODO - comment
+            applyDefaultInteractionState();
+        });
     }
 
     @Override
@@ -158,19 +174,101 @@ public final class PuzzleEditorActivity extends BaseActivity {
         }
     }
 
+    private boolean interruptActionIfNeeded() {
+        // TODO - 2 responsabilités distinctes
+        // 1. Empêcher les méthodes ayant un impact sur le plateau de s'éxecuter
+        //    pendant qu'une action est déjà en cours
+
+        // 1. end
+
+        // 2. Annuler l'interaction en cours ->
+        bdvBoard.clearTargets();
+        cevCharacterEditor.startSelectCardMode();
+        // 2. end
+
+        // An action can't be canceled while its animation is in progress
+        /*if (FAddingNewToken || FBdvMain.isAnimatingTokenAction() ||
+                FBoard.hasActionInProgress() || FTcvCreation.getVisibility() != View.GONE) {
+            // If an action was in progress, we cancel it
+            if (!FBdvMain.isAnimatingTokenAction()) {
+                if (FBoard.hasActionInProgress()) {
+                    FBoard.cancelActionInProgress();
+                    FBdvMain.resetTilesMarkers();
+                    for (ArrayList<Tile> tiles : FBoard.getTiles()) {
+                        for (Tile tile : tiles) {
+                            TileView tileView = FBdvMain.getTileView(tile);
+                            if (tileView.isHighlighted()) {
+                                tileView.stopAnimateHighlight();
+                                tileView.setHighlight(false, false);
+                            }
+                        }
+                    }
+                }
+                onTokenActionInProgressCancelled();
+            }
+            return true;
+        }*/
+        return false;
+    }
+
+    //region INTERACTION METHODS
+
+    private void applyDefaultInteractionState() {
+        selectedBoardCharacter = null;
+        bdvBoard.applyCharacterTargets(board);
+        cevCharacterEditor.startSelectCardMode();
+
+        hasInteractionInProgress = false;
+    }
+
+    private void cancelInteractionInProgress() {
+        if (selectedBoardCharacter != null) {
+            bdvBoard.unselectCharacterAt(selectedBoardCharacter.getPosition());
+        }
+        applyDefaultInteractionState();
+    }
+
+    private void addNewCharacter(@NonNull Position position) {
+        Character character = cevCharacterEditor.getSelectedNewCharacter();
+        if (character == null) {
+            throw new IllegalStateException("A new character must be selected to be added to the board");
+        }
+
+        // TODO - replace by an animation
+        board.getCell(position).setCharacter(character);
+        bdvBoard.setBoard(board);
+
+        // TODO - delay after animation end
+        applyDefaultInteractionState();
+    }
+
+    private void moveCharacter(@NonNull Position position) {
+        // TODO
+    }
+
+    private void swapCharacters(@NonNull PlayableCharacter destCharacter) {
+        // TODO
+    }
+
+    //endregion
+
+    //region LISTENER METHODS
+
     private void onCardPortraitClick(View v) {
         if (interruptActionIfNeeded()) {
             return;
         }
 
-        hasActionInProgress = true;
+        // TODO - comment
+        hasInteractionInProgress = true;
+        bdvBoard.clearTargets();
 
         CharacterCard portraitCard = ((CharacterCardPortraitView) v).getPortraitCard();
         List<TeamColor> addableColors = new ArrayList<>();
         String errors = PuzzleEditionUtils.getCardAdditionErrors(this, board, portraitCard, addableColors);
         if (!errors.isEmpty()) {
             Toast.makeText(this, errors, Toast.LENGTH_SHORT).show();
-            hasActionInProgress = false;
+            hasInteractionInProgress = false;
             return;
         }
 
@@ -182,12 +280,14 @@ public final class PuzzleEditorActivity extends BaseActivity {
                 addableCharacers.add(token);
             }
         }
+
         cevCharacterEditor.startAddCardCharactersMode(
                 addableCharacers,
-                pebvBoard.getCharacterDisplaySize(),
+                bdvBoard.getCharacterDisplaySize(),
                 this::onNewCharacterClick,
                 this::onCharacterLongClick
         );
+        bdvBoard.applyCellTargets();
     }
 
     private boolean onCardPortraitLongClick(View v) {
@@ -217,54 +317,37 @@ public final class PuzzleEditorActivity extends BaseActivity {
     }
 
     private void onBoardCellClick(View v) {
-        // TODO
-
-        // New character
-        Character characterToAdd = cevCharacterEditor.getSelectedNewCharacter();
-        if (characterToAdd != null) {
-            // TODO - add animation
+        // TODO - comment
+        if (!hasInteractionInProgress) {
+            return;
         }
-        // Character movement
+
+        // TODO - comment
+        InteractionTarget target = ((CellView) v).getTarget();
+        if (target == null) {
+            cancelInteractionInProgress();
+            return;
+        }
+
+        // TODO - comment
+        bdvBoard.clearTargets();
+        Position position = Objects.requireNonNull(target.getChosenPosition(), "Invalid cell target : position missing");
+        if (selectedBoardCharacter != null) {
+            moveCharacter(position);
+        } else {
+            addNewCharacter(position);
+        }
     }
 
     private void onBoardCharacterClick(View v) {
         // TODO
     }
 
-    private boolean interruptActionIfNeeded() {
-        // TODO - 2 responsabilités distinctes
-        // 1. Empêcher les méthodes ayant un impact sur le plateau de s'éxecuter
-        //    pendant qu'une action est déjà en cours
-
-        // 1. end
-
-        // 2. Annuler l'interaction en cours ->
-        pebvBoard.clearTargets();
-        cevCharacterEditor.startSelectCardMode();
-        // 2. end
-
-        // An action can't be canceled while its animation is in progress
-        /*if (FAddingNewToken || FBdvMain.isAnimatingTokenAction() ||
-                FBoard.hasActionInProgress() || FTcvCreation.getVisibility() != View.GONE) {
-            // If an action was in progress, we cancel it
-            if (!FBdvMain.isAnimatingTokenAction()) {
-                if (FBoard.hasActionInProgress()) {
-                    FBoard.cancelActionInProgress();
-                    FBdvMain.resetTilesMarkers();
-                    for (ArrayList<Tile> tiles : FBoard.getTiles()) {
-                        for (Tile tile : tiles) {
-                            TileView tileView = FBdvMain.getTileView(tile);
-                            if (tileView.isHighlighted()) {
-                                tileView.stopAnimateHighlight();
-                                tileView.setHighlight(false, false);
-                            }
-                        }
-                    }
-                }
-                onTokenActionInProgressCancelled();
-            }
-            return true;
-        }*/
-        return false;
+    private void onNonInteractiveElementClick(View v) {
+        if (hasInteractionInProgress) {
+            cancelInteractionInProgress();
+        }
     }
+
+    // endregion
 }

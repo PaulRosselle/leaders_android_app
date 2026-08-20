@@ -8,7 +8,17 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import com.leaders.R;
+import com.leaders.app.views.character.CharacterDisplay;
+import com.leaders.app.views.character.CharacterView;
+import com.leaders.gamelogic.entities.Board;
+import com.leaders.gamelogic.entities.Character;
+import com.leaders.gamelogic.entities.PlayableCharacter;
 import com.leaders.gamelogic.entities.Position;
+import com.leaders.gamelogic.interactions.InteractionTarget;
+import com.leaders.gamelogic.interactions.TargetCategory;
+
+import java.util.Map;
+import java.util.Objects;
 
 public final class PuzzleEditorBoardView extends BoardView {
     public PuzzleEditorBoardView(@NonNull Context context, @Nullable AttributeSet attrs) {
@@ -27,5 +37,43 @@ public final class PuzzleEditorBoardView extends BoardView {
 
     public void setOnCharacterLongClickListener(OnLongClickListener onCharacterLongClickListener) {
         super.setOnCharacterLongClickListener(onCharacterLongClickListener);
+    }
+
+
+    private void highlightCharacterAt(@NonNull Position position, boolean highlighted) {
+        CharacterDisplay characterDisplay = Objects.requireNonNull(characterDisplayMap.get(position),
+                "Character to unselected not found at position:" + position);
+        characterDisplay.setHighlighted(true, true);
+    }
+
+    public void selectCharacterAt(@NonNull Position position) {
+        highlightCharacterAt(position, true);
+    }
+
+    public void unselectCharacterAt(@NonNull Position position) {
+        highlightCharacterAt(position, false);
+    }
+
+    public void applyCharacterTargets(@NonNull Board board) {
+        for (Map.Entry<Position, CharacterDisplay> entry : characterDisplayMap.entrySet()) {
+            CharacterView characterView = entry.getValue().getCharacterView();
+            Position characterPos = entry.getKey();
+            Character character = Objects.requireNonNull(board.getCell(characterPos).getCharacter(),
+                "No character found matching character view at position:" + characterPos);
+
+            characterView.setAsTarget(new InteractionTarget(
+                    TargetCategory.PlayableCharacter,
+                    new PlayableCharacter(character, characterPos, false, false)
+            ));
+        }
+    }
+
+    public void applyCellTargets() {
+        for (Map.Entry<Position, CellView> entry : cellViewsMap.entrySet()) {
+            entry.getValue().setAsTarget(new InteractionTarget(
+                    TargetCategory.MovementDestination,
+                    entry.getKey()
+            ));
+        }
     }
 }

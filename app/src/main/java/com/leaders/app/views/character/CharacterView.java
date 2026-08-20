@@ -107,9 +107,15 @@ public final class CharacterView extends AppCompatImageView {
 
     public void setAsPlayableTarget(@NonNull InteractionTarget target) {
         this.target = target;
-        // There is no visual feedback within the characterView since playable characters
-        // must be highlighted using a CharacterHighlightView
+        // There is no visual feedback within the characterView for the moment
+        // since playable characters must be highlighted using a CharacterHighlightView
     }
+
+    public void setAsTarget(@NonNull InteractionTarget target) {
+        this.target = target;
+        // This method is made to target a characterView without visual feedacks
+    }
+
 
     @Nullable
     public InteractionTarget getTarget() {

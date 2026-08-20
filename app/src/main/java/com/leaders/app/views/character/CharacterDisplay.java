@@ -1,7 +1,5 @@
 package com.leaders.app.views.character;
 
-import static android.view.View.GONE;
-
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
@@ -83,9 +81,9 @@ public final class CharacterDisplay {
 
         characterView.clearTarget();
 
-        characterView.setVisibility(GONE);
-        shadowView.setVisibility(GONE);
-        highlightView.setVisibility(GONE);
+        characterView.setVisibility(View.GONE);
+        shadowView.setVisibility(View.GONE);
+        highlightView.setVisibility(View.GONE);
     }
 
     public void setPosition(float x, float y) {
@@ -105,5 +103,10 @@ public final class CharacterDisplay {
 
     public void setOnCharacterLongClickListener(View.OnLongClickListener onLongClickListener) {
         characterView.setOnLongClickListener(onLongClickListener);
+    }
+
+    public void setHighlighted(boolean highlighted, boolean animate) {
+        characterView.scaleForHighlight(highlighted, animate);
+        highlightView.setVisibility(highlighted ? View.VISIBLE : View.GONE);
     }
 }

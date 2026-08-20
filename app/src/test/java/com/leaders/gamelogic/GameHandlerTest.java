@@ -659,20 +659,20 @@ public class GameHandlerTest {
 
         for (InteractionTarget target : request.getLegalTargets()) {
             assertEquals(TargetCategory.PlayableCharacter, target.getCategory());
-            assertNotNull(target.getChosenCharacterPlayableState());
+            assertNotNull(target.getChosenPlayableCharacter());
         }
 
         assertTrue(request.getLegalTargets().stream()
                 .anyMatch(target -> {
-                    assertNotNull(target.getChosenCharacterPlayableState());
-                    return target.getChosenCharacterPlayableState().getCharacter().getCharacterType()
+                    assertNotNull(target.getChosenPlayableCharacter());
+                    return target.getChosenPlayableCharacter().getCharacter().getCharacterType()
                             == CharacterType.Acrobat;
                 }));
 
         assertTrue(request.getLegalTargets().stream()
                 .anyMatch(target -> {
-                    assertNotNull(target.getChosenCharacterPlayableState());
-                    return target.getChosenCharacterPlayableState().getCharacter().getCharacterType()
+                    assertNotNull(target.getChosenPlayableCharacter());
+                    return target.getChosenPlayableCharacter().getCharacter().getCharacterType()
                             == CharacterType.Archer;
                 }));
     }
