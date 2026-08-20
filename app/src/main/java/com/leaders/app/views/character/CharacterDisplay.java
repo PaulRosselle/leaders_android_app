@@ -87,8 +87,8 @@ public final class CharacterDisplay {
     }
 
     public void setPosition(float x, float y) {
-        setPosition(characterView, x, y);
         setPosition(shadowView, x, y);
+        setPosition(characterView, x, y);
         setPosition(highlightView, x, y);
     }
 
@@ -109,7 +109,6 @@ public final class CharacterDisplay {
         characterView.scaleForHighlight(highlighted, animateCharacterScaling);
         highlightView.setVisibility(highlighted ? View.VISIBLE : View.GONE);
     }
-
 
     public void startHighlightAnimation() {
         highlightView.startAnimation();

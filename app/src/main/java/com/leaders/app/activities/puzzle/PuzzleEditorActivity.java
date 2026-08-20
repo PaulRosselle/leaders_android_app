@@ -14,9 +14,14 @@ import com.leaders.app.enums.ActivityType;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.views.board.CellView;
+import com.leaders.app.views.character.CharacterActionAnimator;
+import com.leaders.app.views.character.CharacterDisplay;
+import com.leaders.gamelogic.actions.CharacterActionMotion;
+import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.PlayableCharacter;
 import com.leaders.gamelogic.entities.Position;
+import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
 import com.leaders.puzzlelogic.utilities.PuzzleEditionUtils;
@@ -42,7 +47,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
     private CharacterEditorView cevCharacterEditor;
 
     private Board board;
-    private boolean hasInteractionInProgress;
+    private boolean hasInteractionInProgress, hasAnimationInProgress;
     private List<CustomPuzzleSave> customPuzzleSaves;
     private Integer puzzleIdx;
     private PlayableCharacter selectedBoardCharacter;
@@ -81,6 +86,9 @@ public final class PuzzleEditorActivity extends BaseActivity {
     @Override
     protected void initDatas() {
         super.initDatas();
+
+        hasInteractionInProgress = false;
+        hasAnimationInProgress = false;
 
         customPuzzleSaves = JsonUtils.loadCustomPuzzles(this);
 
@@ -193,51 +201,80 @@ public final class PuzzleEditorActivity extends BaseActivity {
     }
 
     private void addNewCharacter(@NonNull Position position) {
+        hasAnimationInProgress = true;
+
         Character character = cevCharacterEditor.getSelectedNewCharacter();
         if (character == null) {
             throw new IllegalStateException("A new character must be selected to be added to the board");
         }
 
-        // TODO - replace by an animation
-        board.getCell(position).setCharacter(character);
-        bdvBoard.setBoard(board);
+        CharacterActionMotion actionMotion = new CharacterActionMotion(
+                CharacterMotionType.Add,
+                List.of(new CharacterActionTarget(character, null, position))
+        );
 
-        // TODO - delay after animation end
-        applyDefaultInteractionState();
+        CharacterActionAnimator.animate(bdvBoard, actionMotion, () -> {
+            board.getCell(position).setCharacter(character);
+            applyDefaultInteractionState();
+            hasAnimationInProgress = false;
+        });
     }
 
     private void replaceByNewCharacter(@NonNull PlayableCharacter destCharacter) {
+        hasAnimationInProgress = true;
+
         Character character = cevCharacterEditor.getSelectedNewCharacter();
         if (character == null) {
             throw new IllegalStateException("A new character must be selected to be added to the board");
         }
 
-        // TODO - replace by an animation
-        board.getCell(destCharacter.getPosition()).setCharacter(character);
-        bdvBoard.setBoard(board);
-
-        // TODO - delay after animation end
-        applyDefaultInteractionState();
+        CharacterDisplay characterDisplay = bdvBoard.getCharacterDisplay(destCharacter.getPosition());
+        characterDisplay.getCharacterView().animateSetCharacter(character, () -> {
+            board.getCell(destCharacter.getPosition()).setCharacter(character);
+            applyDefaultInteractionState();
+            hasAnimationInProgress = false;
+        });
     }
 
     private void moveCharacter(@NonNull Position position) {
-        // TODO - replace by an animation
-        board.getCell(selectedBoardCharacter.getPosition()).setCharacter(null);
-        board.getCell(position).setCharacter(selectedBoardCharacter.getCharacter());
-        bdvBoard.setBoard(board);
+        hasAnimationInProgress = true;
 
-        // TODO - delay after animation end
-        applyDefaultInteractionState();
+        CharacterActionMotion actionMotion = new CharacterActionMotion(
+                CharacterMotionType.Teleport,
+                List.of(new CharacterActionTarget(
+                        selectedBoardCharacter.getCharacter(),
+                        selectedBoardCharacter.getPosition(),
+                        position
+                ))
+        );
+
+        CharacterActionAnimator.animate(bdvBoard, actionMotion, () -> {
+            board.getCell(selectedBoardCharacter.getPosition()).setCharacter(null);
+            board.getCell(position).setCharacter(selectedBoardCharacter.getCharacter());
+            applyDefaultInteractionState();
+            hasAnimationInProgress = false;
+        });
     }
 
     private void swapCharacters(@NonNull PlayableCharacter destCharacter) {
-        // TODO - replace by an animation
-        board.getCell(selectedBoardCharacter.getPosition()).setCharacter(destCharacter.getCharacter());
-        board.getCell(destCharacter.getPosition()).setCharacter(selectedBoardCharacter.getCharacter());
-        bdvBoard.setBoard(board);
+        hasAnimationInProgress = true;
+        CharacterActionMotion actionMotion = new CharacterActionMotion(
+                CharacterMotionType.Swap,
+                List.of(new CharacterActionTarget(selectedBoardCharacter.getCharacter(),
+                                selectedBoardCharacter.getPosition(),
+                                destCharacter.getPosition()),
+                        new CharacterActionTarget(destCharacter.getCharacter(),
+                                destCharacter.getPosition(),
+                                selectedBoardCharacter.getPosition())
+                )
+        );
 
-        // TODO - delay after animation end
-        applyDefaultInteractionState();
+        CharacterActionAnimator.animate(bdvBoard, actionMotion, () -> {
+            board.getCell(selectedBoardCharacter.getPosition()).setCharacter(destCharacter.getCharacter());
+            board.getCell(destCharacter.getPosition()).setCharacter(selectedBoardCharacter.getCharacter());
+            applyDefaultInteractionState();
+            hasAnimationInProgress = false;
+        });
     }
 
     //endregion
@@ -245,6 +282,10 @@ public final class PuzzleEditorActivity extends BaseActivity {
     //region LISTENER METHODS
 
     private void onCardPortraitClick(View v) {
+        if (hasAnimationInProgress) {
+            return;
+        }
+
         if (hasInteractionInProgress) {
             cancelInteractionInProgress();
             return;
@@ -311,7 +352,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
 
     private void onBoardCellClick(View v) {
         // TODO - comment
-        if (!hasInteractionInProgress) {
+        if (!hasInteractionInProgress || hasAnimationInProgress) {
             return;
         }
 
@@ -323,7 +364,6 @@ public final class PuzzleEditorActivity extends BaseActivity {
         }
 
         // TODO - comment
-        bdvBoard.clearTargets();
         Position position = Objects.requireNonNull(target.getChosenPosition(), "Invalid cell target : position missing");
         if (selectedBoardCharacter != null) {
             moveCharacter(position);
@@ -333,6 +373,10 @@ public final class PuzzleEditorActivity extends BaseActivity {
     }
 
     private void onBoardCharacterClick(View v) {
+        if (hasAnimationInProgress) {
+            return;
+        }
+
         // TODO - comment
         if (hasInteractionInProgress) {
             InteractionTarget target = ((CharacterView) v).getTarget();
@@ -343,12 +387,11 @@ public final class PuzzleEditorActivity extends BaseActivity {
                 return;
             }
 
-            bdvBoard.clearTargets();
             PlayableCharacter playableCharacter = Objects.requireNonNull(target.getChosenPlayableCharacter(), "Invalid character target : playable character missing");
-            if (selectedBoardCharacter != null) {
-                swapCharacters(playableCharacter);
-            } else {
+            if (selectedBoardCharacter == null) {
                 replaceByNewCharacter(playableCharacter);
+            } else if (!selectedBoardCharacter.getPosition().equals(playableCharacter.getPosition())) {
+                swapCharacters(playableCharacter);
             }
         } else {
             InteractionTarget target = ((CharacterView) v).getTarget();
@@ -369,7 +412,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
     }
 
     private void onNonInteractiveElementClick(View v) {
-        if (hasInteractionInProgress) {
+        if (hasInteractionInProgress && !hasAnimationInProgress) {
             cancelInteractionInProgress();
         }
     }

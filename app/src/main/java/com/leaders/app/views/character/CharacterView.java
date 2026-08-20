@@ -25,6 +25,7 @@ import com.leaders.gamelogic.interactions.InteractionTarget;
 
 public final class CharacterView extends AppCompatImageView {
     private static final int SCALE_FOR_HIGHLIGHT_ANIMATION_DURATION = 120;
+    private static final int SET_CHARACTER_ANIMATION_DURATION = 200;
 
     @Nullable
     private InteractionTarget target;
@@ -154,8 +155,8 @@ public final class CharacterView extends AppCompatImageView {
 
     public void animateSetCharacter(@Nullable CharacterType characterType,
                                     @NonNull TeamColor teamColor,
-                                    @Nullable Runnable animationEndRunnable) {
-        final int animDuration = 200;
+                                    @Nullable Runnable onAnimationEnd) {
+        final int animDuration = SET_CHARACTER_ANIMATION_DURATION;
         Drawable[] drawables = new Drawable[2];
         drawables[0] = getDrawable();
         drawables[1] = AppCompatResources.getDrawable(getContext(), getCharacterDrawableId(characterType, teamColor));
@@ -163,8 +164,13 @@ public final class CharacterView extends AppCompatImageView {
         fadeTransition.setCrossFadeEnabled(true);
         setImageDrawable(fadeTransition);
         fadeTransition.startTransition(animDuration);
-        if (animationEndRunnable != null) {
-            new Handler(Looper.getMainLooper()).postDelayed(animationEndRunnable, animDuration);
+        if (onAnimationEnd != null) {
+            new Handler(Looper.getMainLooper()).postDelayed(onAnimationEnd, animDuration);
         }
+    }
+
+    public void animateSetCharacter(@NonNull Character character,
+                                    @Nullable Runnable onAnimationEnd) {
+        animateSetCharacter(character.getCharacterType(), character.getTeamColor(), onAnimationEnd);
     }
 }
