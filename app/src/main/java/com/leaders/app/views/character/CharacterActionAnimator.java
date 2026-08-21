@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class CharacterActionAnimator {
+public final class CharacterActionAnimator {
     private static final int DURATION_ADD = 200;
     private static final int DURATION_REMOVE = DURATION_ADD;
     private static final int DURATION_MOVE = 400;
