@@ -1,5 +1,9 @@
 package com.leaders.app.utilities;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 
 import com.leaders.gamelogic.entities.Board;
@@ -59,5 +63,11 @@ public final class PuzzleExportUtils {
 
         // Since we're sure to have added at least one character, we can remove the first cell data separator
         return builder.toString();
+    }
+
+    public static void exportToClipboard(@NonNull Context context, String exportStr) {
+        ClipData clipData = ClipData.newPlainText("PUZZLE_CODE", exportStr);
+        ((ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(clipData);
+        // TODO - add a toast ?
     }
 }
