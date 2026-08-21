@@ -93,7 +93,7 @@
     <string name="card_description_nemesis">Ne peut pas effectuer d’action durant son tour.\n\nDoit se déplacer de 2 cases après chaque action déplaçant le leader adverse. S’il n’est pas possible de la déplacer de 2 cases sans revenir à sa case d’origine, ne se déplace que d’une case.</string>
     <string name="card_description_hermit_and_cub">En les recrutant, vous prenez le contrôle du Vieil Ours et de l’Ourson. Cela ne compte que pour un seul recrutement.\n\nVous pouvez en déplacer un seul ou les deux à la suite. L’Ourson ne peut pas participer à la capture du leader adverse.</string>
     <string name="formatted_puzzle_rules">Vous contrÔlez les pions noirs,\ntrouvez comment gagner ce tour.</string>
-    <string name="save">sauvegarder</string>
+    <string name="save">Sauvegarder</string>
     <string name="search_for_solutions">chercher les solutions</string>
     <string name="leaders_board_editor" translatable="false">Leaders Board Editor</string>
     <string name="invalid_lbe_url_character">Personnage invalide dans le lien LBE : %s</string>
@@ -102,6 +102,8 @@
     <string name="remove_selected_puzzles">Supprimer les puzzles sélectionés ?</string>
     <string name="remove_selected_puzzle">Supprimer \"%s\" ?</string>
     <string name="warning_removal_cannot_be_undone">⚠ Toute suppression est définitive ⚠</string>
-    <string name="confirm">confirmer</string>
-    <string name="cancel">annuler</string>
+    <string name="confirm">Confirmer</string>
+    <string name="cancel">Annuler</string>
+    <string name="puzzle_name">Nom du puzzle</string>
+    <string name="anonymous_author">Auteur anonyme</string>
 </resources>
