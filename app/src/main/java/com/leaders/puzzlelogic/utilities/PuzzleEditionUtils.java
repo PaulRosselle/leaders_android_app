@@ -5,6 +5,7 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 
 import com.leaders.R;
+import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.actions.RecruitmentAction;
 import com.leaders.gamelogic.actions.RecruitmentActionMotion;
 import com.leaders.gamelogic.entities.Board;
@@ -82,7 +83,7 @@ public final class PuzzleEditionUtils {
     }
 
     @NonNull
-    public static GameHistory getDefaultHistory() {
+    public static GameHistory getDefaultHistory(@NonNull List<IGameAction> initialActions) {
         // The black player represents the human player (official puzzles convention)
         Player playerBlack = new Player(TeamColor.Black, "Player");
         Player playerWhite = new Player(TeamColor.White, "Puzzle");
@@ -91,19 +92,19 @@ public final class PuzzleEditionUtils {
         Character leaderBlack = Character.create(CharacterType.LeaderKing, playerBlack.getTeamColor());
         Character leaderWhite = Character.create(CharacterType.LeaderQueen, playerWhite.getTeamColor());
 
-        RecruitmentAction initialPlacements = new RecruitmentAction(Arrays.asList(
+        initialActions.add(new RecruitmentAction(Arrays.asList(
                 new RecruitmentActionMotion(RecruitmentMotionType.Add, leaderBlack,
                         BoardQuery.getLeaderStartingPosition(leaderBlack.getTeamColor())),
                 new RecruitmentActionMotion(RecruitmentMotionType.Add, leaderWhite,
                         BoardQuery.getLeaderStartingPosition(leaderWhite.getTeamColor()))
-        ));
+        )));
 
         GameConfig gameConfig =new GameConfig(
                 List.of(playerBlack, playerWhite),
                 playerBlack, // firstPlayer ; the human player
                 GameMode.Strategist,
                 Collections.emptyList(), // initialRecruitableCards ; no recruitment in puzzles
-                List.of(initialPlacements) // initialPlacements
+                initialActions
         );
 
         ArrayList<IHistoryEntry> entries = new ArrayList<>();
@@ -120,5 +121,10 @@ public final class PuzzleEditionUtils {
         entries.add(turn);
 
         return new GameHistory(gameConfig, entries);
+    }
+
+    @NonNull
+    public static GameHistory getDefaultHistory() {
+        return getDefaultHistory(new ArrayList<>());
     }
 }

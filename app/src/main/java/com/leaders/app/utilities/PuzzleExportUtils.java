@@ -16,7 +16,6 @@ import com.leaders.puzzlelogic.entities.PuzzleSave;
 import java.util.List;
 
 public final class PuzzleExportUtils {
-
     private PuzzleExportUtils(){
         throw new AssertionError("Cannot instantiate utility class");
     }
@@ -36,15 +35,15 @@ public final class PuzzleExportUtils {
         // If we have datas for both player colors we add them with the color separator
         boolean hasWhiteCharacters = !whiteCharacters.isEmpty();
         boolean hasBlackCharacters = !blackCharacters.isEmpty();
-        whiteCharacters = LbeUtils.LBE_HEADER_WHITE + whiteCharacters;
-        blackCharacters = LbeUtils.LBE_HEADER_BLACK + blackCharacters;
+        whiteCharacters = LbeUtils.HEADER_WHITE + whiteCharacters;
+        blackCharacters = LbeUtils.HEADER_BLACK + blackCharacters;
         if (hasWhiteCharacters && hasBlackCharacters) {
-            tokenDatas = whiteCharacters + LbeUtils.LBE_COLOR_DATA_SEPARATOR + blackCharacters;
+            tokenDatas = whiteCharacters + LbeUtils.COLOR_DATA_SEPARATOR + blackCharacters;
         } else if (hasWhiteCharacters || hasBlackCharacters) {
             tokenDatas = hasWhiteCharacters ? whiteCharacters : blackCharacters;
         }
 
-        return String.format(LbeUtils.LBE_DEFAULT_URL + tokenDatas);
+        return String.format(LbeUtils.DEFAULT_URL + tokenDatas);
     }
 
     private static String getCharacters(@NonNull Board board, @NonNull TeamColor teamColor) {
@@ -55,9 +54,9 @@ public final class PuzzleExportUtils {
 
         StringBuilder builder = new StringBuilder();
         for (Cell characterCell : characterCells) {
-            builder.append(LbeUtils.LBE_CELL_DATA_SEPARATOR);
+            builder.append(LbeUtils.CELL_DATA_SEPARATOR);
             builder.append(LbeUtils.getPositionExportStr(characterCell.getPosition()));
-            builder.append(LbeUtils.LBE_CHARACTER_DATA_SEPARATOR);
+            builder.append(LbeUtils.CHARACTER_DATA_SEPARATOR);
             builder.append(LbeUtils.getCharacterExportStr(characterCell.getCharacter()));
         }
 
@@ -68,6 +67,5 @@ public final class PuzzleExportUtils {
     public static void exportToClipboard(@NonNull Context context, String exportStr) {
         ClipData clipData = ClipData.newPlainText("PUZZLE_CODE", exportStr);
         ((ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(clipData);
-        // TODO - add a toast ?
     }
 }
