@@ -11,6 +11,12 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.leaders.R;
 
 public final class CharacterDisplay {
+    public enum ViewType {
+        Shadow,
+        Character,
+        Highlight
+    }
+
     @NonNull
     private final CharacterView characterView;
 
@@ -87,14 +93,24 @@ public final class CharacterDisplay {
     }
 
     public void setPosition(float x, float y) {
-        setPosition(shadowView, x, y);
-        setPosition(characterView, x, y);
-        setPosition(highlightView, x, y);
+        for (ViewType viewType : ViewType.values()) {
+            setPosition(viewType, x, y);
+        }
     }
 
-    private void setPosition(@NonNull View view, float x, float y) {
+    public void setPosition(@NonNull ViewType viewType, float x, float y) {
+        View view = getCharacterViewFromType(viewType);
         view.setX(x);
         view.setY(y);
+    }
+
+    private View getCharacterViewFromType(@NonNull ViewType viewType) {
+        switch (viewType) {
+            case Shadow: return shadowView;
+            case Character: return characterView;
+            case Highlight: return highlightView;
+            default: throw new IllegalArgumentException("No character view found for type: " + viewType);
+        }
     }
 
     public void setOnCharacterClickListener(View.OnClickListener onClickListener) {

@@ -1,5 +1,7 @@
 package com.leaders.app.views.character;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -17,8 +19,10 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class CharacterActionAnimator {
-    private static final int DURATION_FADE_IN = 400;
-    private static final int DURATION_FADE_OUT = DURATION_FADE_IN;
+    private static final int DURATION_ADD = 200;
+    private static final int DURATION_REMOVE = DURATION_ADD;
+    private static final int DURATION_MOVE = 400;
+    private static final int DURATION_TELEPORT = 800;
 
     public static void animate(@NonNull BoardView boardView,
                                @NonNull CharacterActionMotion motion,
@@ -67,19 +71,44 @@ public class CharacterActionAnimator {
             characterView.setAlpha(0f);
             characterView.setVisibility(View.VISIBLE);
 
-            animateFadeIn(characterDisplay, onTargetAnimationEnd);
+            animateFadeIn(characterDisplay, DURATION_ADD, onTargetAnimationEnd);
         }
     }
 
     private static void animateMoveCharacter(@NonNull BoardView boardView,
                                              @NonNull List<CharacterActionTarget> targets,
                                              @Nullable Runnable onAnimationEnd) {
-        // TODO
+        List<Position> originPositions = new ArrayList<>();
+        List<Position> destinationPositions = new ArrayList<>();
+
+        AtomicInteger remaining = new AtomicInteger(targets.size());
+        Runnable onTargetAnimationEnd = () -> {
+            if (remaining.decrementAndGet() == 0) {
+                boardView.moveCharacterDisplays(originPositions, destinationPositions);
+                if (onAnimationEnd != null) {
+                    onAnimationEnd.run();
+                }
+            }
+        };
+
+        for (CharacterActionTarget target : targets) {
+            Position originPos = Objects.requireNonNull(target.getOriginPos(), "Invalid teleport target : missing origin position");
+            Position destPos = Objects.requireNonNull(target.getDestPos(), "Invalid teleport target : missing destination position");
+
+            originPositions.add(originPos);
+            destinationPositions.add(destPos);
+
+            animateMove(boardView.getCharacterDisplay(originPos), boardView.getCellView(destPos), onTargetAnimationEnd);
+        }
     }
 
     private static void animateTeleportCharacter(@NonNull BoardView boardView,
                                                  @NonNull List<CharacterActionTarget> targets,
                                                  @Nullable Runnable onAnimationEnd) {
+        int respawnDelay = DURATION_TELEPORT / 6;
+        int fadeInDuration = DURATION_TELEPORT / 2 - respawnDelay;
+        int fadeOutDuration = fadeInDuration;
+
         Runnable onFadeInAnimationEnd;
         if (onAnimationEnd != null && targets.size() > 1) {
             AtomicInteger fadeInRemaining = new AtomicInteger(targets.size());
@@ -112,16 +141,18 @@ public class CharacterActionAnimator {
                 boardView.moveCharacterDisplays(originPositions, destinationPositions);
 
                 // 3. Fade in the character displays at their destinations
-                for (Position destPos : destinationPositions) {
-                    animateFadeIn(boardView.getCharacterDisplay(destPos), onFadeInAnimationEnd);
-                }
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    for (Position destPos : destinationPositions) {
+                        animateFadeIn(boardView.getCharacterDisplay(destPos), fadeInDuration, onFadeInAnimationEnd);
+                    }
+                }, respawnDelay);
             }
         };
 
         // 1. Fade out the character displays at their origin positions
         for (CharacterActionTarget target : targets) {
             Position fadeOutPos = Objects.requireNonNull(target.getOriginPos(), "Invalid teleport target : missing origin position");
-            animateFadeOut(boardView.getCharacterDisplay(fadeOutPos), onFadeOutAnimationEnd);
+            animateFadeOut(boardView.getCharacterDisplay(fadeOutPos), fadeOutDuration, onFadeOutAnimationEnd);
         }
     }
 
@@ -134,7 +165,7 @@ public class CharacterActionAnimator {
     private static void animateSwapCharacter(@NonNull BoardView boardView,
                                              @NonNull List<CharacterActionTarget> targets,
                                              @Nullable Runnable onAnimationEnd) {
-        animateTeleportCharacter(boardView, targets, onAnimationEnd);
+        animateMoveCharacter(boardView, targets, onAnimationEnd);
     }
 
     private static void animateJumpCharacter(@NonNull BoardView boardView,
@@ -146,7 +177,24 @@ public class CharacterActionAnimator {
     private static void animateRemoveCharacter(@NonNull BoardView boardView,
                                                @NonNull List<CharacterActionTarget> targets,
                                                @Nullable Runnable onAnimationEnd) {
-        // TODO
+        AtomicInteger remaining = new AtomicInteger(targets.size());
+        Runnable onTargetAnimationEnd = () -> {
+            if (remaining.decrementAndGet() == 0) {
+                for (CharacterActionTarget target : targets) {
+                    Position originPos = Objects.requireNonNull(target.getOriginPos(), "Invalid remove target : missing origin position");
+                    boardView.releaseCharacterDisplay(originPos);
+                }
+                if (onAnimationEnd != null) {
+                    onAnimationEnd.run();
+                }
+            }
+        };
+
+        for (CharacterActionTarget target : targets) {
+            Position originPos = Objects.requireNonNull(target.getOriginPos(), "Invalid remove target : missing origin position");
+            CharacterDisplay characterDisplay = boardView.getCharacterDisplay(originPos);
+            animateFadeOut(characterDisplay, DURATION_REMOVE, onTargetAnimationEnd);
+        }
     }
 
     private static void animateTransformCharacter(@NonNull BoardView boardView,
@@ -155,15 +203,15 @@ public class CharacterActionAnimator {
         // TODO
     }
 
-    private static void animateFadeIn(@NonNull CharacterDisplay characterDisplay,
+    private static void animateFadeIn(@NonNull CharacterDisplay characterDisplay, int duration,
                                       @Nullable Runnable onAnimationEnd) {
         characterDisplay.getCharacterView().animate().scaleX(1f).scaleY(1f).alpha(1f)
-                .setDuration(getAnimationDuration(DURATION_FADE_IN))
+                .setDuration(getAnimationDuration(duration))
                 .withEndAction(onAnimationEnd)
                 .start();
     }
 
-    private static void animateFadeOut(@NonNull CharacterDisplay characterDisplay,
+    private static void animateFadeOut(@NonNull CharacterDisplay characterDisplay, int duration,
                                        @Nullable Runnable onAnimationEnd) {
         CharacterView characterView = characterDisplay.getCharacterView();
         characterDisplay.stopHighlightAnimation();
@@ -171,7 +219,30 @@ public class CharacterActionAnimator {
         characterDisplay.getShadowView().setVisibility(View.GONE);
 
         characterView.animate().scaleX(0f).scaleY(0f).alpha(0f)
-                .setDuration(getAnimationDuration(DURATION_FADE_OUT))
+                .setDuration(getAnimationDuration(duration))
+                .withEndAction(onAnimationEnd)
+                .start();
+    }
+
+    private static void animateMove(@NonNull CharacterDisplay characterDisplay,
+                                    @NonNull CellView destCellView,
+                                    @Nullable Runnable onAnimationEnd) {
+        float x = destCellView.getX();
+        float y = destCellView.getY();
+
+
+        CharacterView characterView = characterDisplay.getCharacterView();
+        characterView.scaleForHighlight(false, true);
+        characterView.bringToFront();
+
+        characterDisplay.stopHighlightAnimation();
+        characterDisplay.getHighlightView().setVisibility(View.GONE);
+        characterDisplay.setPosition(CharacterDisplay.ViewType.Highlight, x, y);
+        characterDisplay.getShadowView().setVisibility(View.GONE);
+        characterDisplay.setPosition(CharacterDisplay.ViewType.Shadow, x, y);
+
+        characterView.animate().x(x).y(y)
+                .setDuration(getAnimationDuration(DURATION_MOVE))
                 .withEndAction(onAnimationEnd)
                 .start();
     }

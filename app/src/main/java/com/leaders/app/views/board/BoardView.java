@@ -180,7 +180,7 @@ public abstract class BoardView extends ConstraintLayout {
         return characterDisplay;
     }
 
-    protected final void releaseCharacterDisplay(@NonNull Position position) {
+    public final void releaseCharacterDisplay(@NonNull Position position) {
         CharacterDisplay characterDisplay = Objects.requireNonNull(characterDisplayMap.remove(position),
                 "CharacterDisplay to release not found");
 

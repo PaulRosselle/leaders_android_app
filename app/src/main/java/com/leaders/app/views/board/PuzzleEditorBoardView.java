@@ -47,7 +47,7 @@ public final class PuzzleEditorBoardView extends BoardView {
 
     public void clearCharacterSelection() {
         for (CharacterDisplay characterDisplay : characterDisplayMap.values()) {
-            characterDisplay.setHighlighted(false, false);
+            characterDisplay.setHighlighted(false, true);
             characterDisplay.stopHighlightAnimation();
         }
     }
