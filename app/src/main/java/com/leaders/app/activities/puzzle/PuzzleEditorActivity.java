@@ -165,12 +165,21 @@ public final class PuzzleEditorActivity extends BaseActivity {
         Intent intent = getIntent();
         int intentPuzzleIdx = intent.getIntExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, -1);
         puzzleIdx = intentPuzzleIdx != -1 ? intentPuzzleIdx : null;
+        boolean isImported = intent.getBooleanExtra(ExtraUtils.EXTRA_PUZZLE_IMPORTED, false);
 
         // We load the current state of the board using the puzzle save game history
         GameHistory puzzleGameHistory = puzzleIdx != null ?
                 customPuzzleSaves.get(puzzleIdx).getPuzzleGameHistory() :
                 PuzzleEditionUtils.getDefaultHistory();
         board = GameFactory.create(puzzleGameHistory).getBoard();
+
+        // An imported puzzle is only saved temporarely so it can be transmitted to the editor,
+        // we display the save dialog in case the user wants to name it and save it
+        if (isImported) {
+            customPuzzleSaves.remove(puzzleIdx.intValue());
+            JsonUtils.saveCustomPuzzles(this, customPuzzleSaves);
+            // TODO - show save dialog
+        }
 
         bdvBoard.post(() -> {
             // Once the board has been loaded in the view, we can apply the default editorState

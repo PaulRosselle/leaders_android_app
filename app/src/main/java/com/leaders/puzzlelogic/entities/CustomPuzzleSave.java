@@ -2,8 +2,10 @@ package com.leaders.puzzlelogic.entities;
 
 import androidx.annotation.NonNull;
 
+import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.puzzlelogic.enums.PuzzleCategory;
 import com.leaders.puzzlelogic.enums.PuzzleLifetime;
+import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,5 +44,15 @@ public final class CustomPuzzleSave extends PuzzleSave {
     @Override
     public PuzzleCategory getCategory() {
         return PuzzleCategory.Custom;
+    }
+
+    public static CustomPuzzleSave getDefault(@NonNull GameHistory gameHistory) {
+        GameHistorySerializer serializer = new GameHistorySerializer();
+        try {
+            return new CustomPuzzleSave("", "", PuzzleLifetime.ActionsPhase,
+                    serializer.getAsJson(gameHistory), false);
+        } catch (JSONException e) {
+            throw new RuntimeException("Invalid default puzzle :" + e);
+        }
     }
 }

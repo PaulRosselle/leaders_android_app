@@ -14,8 +14,10 @@ import com.leaders.app.utilities.ButtonUtils;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.utilities.PuzzleExportUtils;
+import com.leaders.app.utilities.PuzzleImportUtils;
 import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.puzzle.PuzzleSelectorGroupView;
+import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
 import com.leaders.puzzlelogic.entities.OfficialPuzzleSave;
 import com.leaders.puzzlelogic.entities.PuzzleSave;
@@ -214,21 +216,46 @@ public final class PuzzleSelectionActivity extends BaseActivity {
 
     public void onEditPuzzleClick(View v) {
         Intent intent = ActivityType.PuzzleEditor.getIntent(this);
-        CustomPuzzleSave selectedPuzzleSave = (CustomPuzzleSave) psgvPuzzles.getSelectedPuzzles().get(0);
-        int puzzleIdx = customPuzzleSaves.indexOf(selectedPuzzleSave);
+        int puzzleIdx = customPuzzleSaves.indexOf((CustomPuzzleSave) psgvPuzzles.getSelectedPuzzles().get(0));
         intent.putExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, puzzleIdx);
         goToActivity(intent);
     }
 
     public void onRemoveClick(View v) {
-        // TODO
+        if (puzzlesCategory == PuzzleCategory.Official) {
+            throw new IllegalStateException("Official puzzle removal is forbidden");
+        }
+        // TODO - message de confirmation
+        for (PuzzleSave puzzleSave : psgvPuzzles.getSelectedPuzzles()) {
+            customPuzzleSaves.remove((CustomPuzzleSave) puzzleSave);
+            JsonUtils.saveCustomPuzzles(this, customPuzzleSaves);
+        }
+        psgvPuzzles.setPuzzles(customPuzzleSaves);
+
+        hidePuzzleActions(null);
     }
 
     public void onImportClick(View v) {
-        // TODO
+        // TODO - import from file ?
+        GameHistory gameHistory = PuzzleImportUtils.importPuzzleFromClipboard(this);
+        if (gameHistory != null) {
+            CustomPuzzleSave importedPuzzleSave = CustomPuzzleSave.getDefault(gameHistory);
+            customPuzzleSaves.add(importedPuzzleSave);
+            JsonUtils.saveCustomPuzzles(this, customPuzzleSaves);
+
+            Intent intent = ActivityType.PuzzleEditor.getIntent(this);
+            int puzzleIdx = customPuzzleSaves.indexOf(importedPuzzleSave);
+            intent.putExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, puzzleIdx);
+            intent.putExtra(ExtraUtils.EXTRA_PUZZLE_IMPORTED, true);
+            goToActivity(intent);
+
+        } else {
+            hidePuzzleActions(null);
+        }
     }
 
     public void onExportClick(View v) {
+        // TODO - export to file ?
         StringBuilder builder = new StringBuilder();
         for (PuzzleSave puzzleSave : psgvPuzzles.getSelectedPuzzles()) {
             builder.append(puzzleSave.getName());
@@ -241,6 +268,8 @@ public final class PuzzleSelectionActivity extends BaseActivity {
         }
 
         PuzzleExportUtils.exportToClipboard(this, builder.toString().trim());
+
+        hidePuzzleActions(null);
     }
 
     public void onSelectAllClick(View v) {
