@@ -92,5 +92,7 @@
     <string name="card_description_nemesis">Cannot take an action during their action phase. Must move by 2 tiles after any action moving the opponent’s Leader. If it is not possible to move by two tiles without going back to its original position, only moves by one tile.</string>
     <string name="card_description_hermit_and_cub">"When you recruit them, take both the Hermit and the Cub. These two characters count as one during the recruitment phase. You can move either the Hermit or the Cub, or one immediately after another. The cub cannot help capture the opponent’s Leader. "</string>
     <string name="formatted_puzzle_rules">You control black characters,\nfind a way to with this turn.</string>
+    <string name="save">save</string>
+    <string name="search_for_solutions">search for solutions</string>
 
 </resources>

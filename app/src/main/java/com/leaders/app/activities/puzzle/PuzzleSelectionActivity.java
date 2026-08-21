@@ -13,6 +13,7 @@ import com.leaders.app.enums.ActivityType;
 import com.leaders.app.utilities.ButtonUtils;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.JsonUtils;
+import com.leaders.app.utilities.PuzzleExportUtils;
 import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.puzzle.PuzzleSelectorGroupView;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
@@ -228,7 +229,18 @@ public final class PuzzleSelectionActivity extends BaseActivity {
     }
 
     public void onExportClick(View v) {
-        // TODO
+        StringBuilder builder = new StringBuilder();
+        for (PuzzleSave puzzleSave : psgvPuzzles.getSelectedPuzzles()) {
+            builder.append(puzzleSave.getName());
+            if (!puzzleSave.getAuthor().isEmpty()) {
+                builder.append(String.format(getString(R.string.by_author), puzzleSave.getAuthor()));
+            }
+            builder.append("\n");
+            builder.append(PuzzleExportUtils.getLbeUrl(puzzleSave));
+            builder.append("\n\n");
+        }
+
+        PuzzleExportUtils.exportToClipboard(this, builder.toString().trim());
     }
 
     public void onSelectAllClick(View v) {

@@ -7,12 +7,15 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 
+import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.JsonUtils;
+import com.leaders.app.utilities.PuzzleExportUtils;
+import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.board.CellView;
 import com.leaders.app.views.character.CharacterActionAnimator;
 import com.leaders.app.views.character.CharacterDisplay;
@@ -52,6 +55,51 @@ public final class PuzzleEditorActivity extends BaseActivity {
         Animating
     }
 
+    private enum PuzzleCreationAction {
+        Save,
+        Play,
+        SearchForSolution,
+        ImportCode,
+        ExportCode;
+
+        private int getIconResId() {
+            switch (this) {
+                case Save: return R.drawable.icon_save;
+                case Play: return R.drawable.icon_arrow_head;
+                case SearchForSolution: return R.drawable.icon_search;
+                case ImportCode: return R.drawable.icon_import;
+                case ExportCode: return R.drawable.icon_export;
+                default: throw new IllegalStateException("No icon found for puzzle action: " + this);
+            }
+        }
+
+        private int getTextResId() {
+            switch (this) {
+                case Save: return R.string.save;
+                case Play: return R.string.play;
+                case SearchForSolution: return R.string.search_for_solutions;
+                case ImportCode: return R.string.import_puzzle;
+                case ExportCode: return R.string.export_puzzle;
+                default: throw new IllegalStateException("No text found for puzzle action: " + this);
+            }
+        }
+
+        private View.OnClickListener getOnClickListener(@NonNull PuzzleEditorActivity activity) {
+            switch (this) {
+                case Save: return activity::btnSaveClick;
+                case Play: return activity::btnPlayClick;
+                case SearchForSolution: return activity::btnSearchForSolutionsClick;
+                case ImportCode: return activity::btnImportClick;
+                case ExportCode: return activity::btnExportClick;
+                default: throw new IllegalStateException("No click listener found for puzzle action: " + this);
+            }
+        }
+    }
+
+    private View vwDialogBg;
+    private MaterialButton btnPuzzleActions;
+    private ActionsMenuView amvPuzzleActions;
+
     private CharacterNotificationView cnvCardInfo;
     private PuzzleEditorBoardView bdvBoard;
     private CharacterEditorView cevCharacterEditor;
@@ -68,11 +116,24 @@ public final class PuzzleEditorActivity extends BaseActivity {
         cnvCardInfo = findViewById(R.id.cnvCardInfo_actPuzzleEditor);
         bdvBoard = findViewById(R.id.bdvBoard_actPuzzleEditor);
         cevCharacterEditor = findViewById(R.id.cevCharacterEditor_actPuzzleEditor);
+
+        vwDialogBg = findViewById(R.id.vwDialogBg_actPuzzleEditor);
+        btnPuzzleActions = findViewById(R.id.btnPuzzleActions_actPuzzleEditor);
+        amvPuzzleActions = findViewById(R.id.amvPuzzleActions_actPuzzleEditor);
+        for (PuzzleCreationAction action : PuzzleCreationAction.values()) {
+            amvPuzzleActions.addActionButton(action.getIconResId(), action.getTextResId(),
+                    action.ordinal(), action.getOnClickListener(this));
+        }
     }
 
     @Override
     protected void initListeners() {
         super.initListeners();
+
+        // Puzzle actions listeners
+        btnPuzzleActions.setOnClickListener(v ->
+                setActionsMenuVisible(amvPuzzleActions.getVisibility() != View.VISIBLE));
+        vwDialogBg.setOnClickListener(this::vwDialogBgClick);
 
         // Non interactive element listeners
         findViewById(R.id.clyMain_actPuzzleEditor).setOnClickListener(this::onNonInteractiveElementClick);
@@ -482,4 +543,45 @@ public final class PuzzleEditorActivity extends BaseActivity {
     }
 
     // endregion
+
+
+    //region PUZZLE ACTIONS LISTENER METHODS
+
+    public void btnSaveClick(View v) {
+        // TODO
+    }
+
+    public void btnPlayClick(View v) {
+        // TODO
+    }
+
+    public void btnSearchForSolutionsClick(View v) {
+        // TODO
+    }
+
+    public void btnImportClick(View v) {
+        // TODO
+    }
+
+    public void btnExportClick(View v) {
+        // TODO - check for puzzle validity
+
+        PuzzleExportUtils.exportToClipboard(this, PuzzleExportUtils.getLbeUrl(board));
+    }
+
+    public void vwDialogBgClick(View v) {
+        setActionsMenuVisible(false);
+    }
+
+    private void setActionsMenuVisible(boolean visible) {
+        if (visible) {
+            amvPuzzleActions.setVisibility(View.VISIBLE);
+            vwDialogBg.setVisibility(View.VISIBLE);
+        } else {
+            amvPuzzleActions.setVisibility(View.GONE);
+            vwDialogBg.setVisibility(View.GONE);
+        }
+    }
+
+    //endregion
 }
