@@ -37,16 +37,17 @@ public class PuzzleSaveView extends ConstraintLayout {
         }
     }
 
-    private String getFormattedText(EditText edtText) {
-        return edtText.getText().toString().trim();
+    private String getFormattedText(CharSequence charSequence) {
+        return charSequence.toString().trim();
     }
 
     public String getPuzzleName() {
-        return getFormattedText(edtName);
+        String name = getFormattedText(edtName.getText());
+        return name.isEmpty() ? getFormattedText(edtName.getHint()) : name;
     }
 
     public String getPuzzleAuthor() {
-        return getFormattedText(edtAuthor);
+        return getFormattedText(edtAuthor.getText());
     }
 
     public void setOnBtnCancelClick(@NonNull OnClickListener onBtnCancelClick) {

@@ -136,4 +136,18 @@ public final class PuzzleEditionUtils {
         )));
         return getDefaultHistory(initialActions);
     }
+
+    @NonNull
+    public static GameHistory getDefaultHistory(@NonNull Board board) {
+        List<IGameAction> initialActions = new ArrayList<>();
+        for (Cell characterCell : BoardQuery.findCharacterCells(board, null, null)) {
+            initialActions.add(new RecruitmentAction(List.of(
+                    new RecruitmentActionMotion(RecruitmentMotionType.Add,
+                            characterCell.getCharacter(),
+                            characterCell.getPosition())
+                    ))
+            );
+        }
+        return getDefaultHistory(initialActions);
+    }
 }

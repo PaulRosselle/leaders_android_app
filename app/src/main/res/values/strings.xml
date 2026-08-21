@@ -106,4 +106,6 @@
     <string name="cancel">Annuler</string>
     <string name="puzzle_name">Nom du puzzle</string>
     <string name="anonymous_author">Auteur anonyme</string>
+    <string name="puzzle_name_is_mandatory">Veuillez saisir un nom pour votre puzzle</string>
+    <string name="puzzle_saved">Puzzle sauvegardé !</string>
 </resources>

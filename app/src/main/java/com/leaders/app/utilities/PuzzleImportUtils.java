@@ -12,6 +12,7 @@ import com.leaders.R;
 import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.actions.RecruitmentAction;
 import com.leaders.gamelogic.actions.RecruitmentActionMotion;
+import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.PlayableCharacter;
@@ -33,11 +34,11 @@ public final class PuzzleImportUtils {
     public static GameHistory getFromLbeUrl(@NonNull Context context, @NonNull String lbeUrl) {
         List<IGameAction> initialActions = new ArrayList<>();
         for (TeamColor teamColor : TeamColor.values()) {
-            for (PlayableCharacter playableCharacter : getTeamPlayableCharacters(context, lbeUrl, teamColor)) {
+            for (Cell characterCell : getTeamCharacterCells(context, lbeUrl, teamColor)) {
                 initialActions.add(new RecruitmentAction(List.of(
                         new RecruitmentActionMotion(RecruitmentMotionType.Add,
-                                playableCharacter.getCharacter(),
-                                playableCharacter.getPosition())
+                                characterCell.getCharacter(),
+                                characterCell.getPosition())
                         ))
                 );
             }
@@ -46,9 +47,9 @@ public final class PuzzleImportUtils {
         return PuzzleEditionUtils.getDefaultHistory(initialActions);
     }
 
-    private static List<PlayableCharacter> getTeamPlayableCharacters(@NonNull Context context,
-                                                                     @NonNull String lbeUrl,
-                                                                     @NonNull TeamColor teamColor) {
+    private static List<Cell> getTeamCharacterCells(@NonNull Context context,
+                                                    @NonNull String lbeUrl,
+                                                    @NonNull TeamColor teamColor) {
         // First we get the header separator associated with the player color
         String colorHeader;
         if (teamColor == TeamColor.Black) {
@@ -74,7 +75,7 @@ public final class PuzzleImportUtils {
             cellDatas = lbeUrl.substring(cellDatasStartIdx);
         }
 
-        List<PlayableCharacter> playableCharacters = new ArrayList<>();
+        List<Cell> characterCells = new ArrayList<>();
 
         // Once we have isolated the tiles datas we can extract each token and add them immediately to the board
         for (String cellData : cellDatas.split(LbeUtils.CELL_DATA_SEPARATOR)) {
@@ -85,13 +86,12 @@ public final class PuzzleImportUtils {
             Position position = LbeUtils.getPositionFromExportStr(context, characterDatas[0].toUpperCase());
             CharacterType characterType = LbeUtils.getCharacterTypeFromExportStr(context, characterDatas[1].toUpperCase());
 
-            playableCharacters.add(new PlayableCharacter(
-                    Character.create(characterType, teamColor),
-                    position, false, false
-            ));
+            Cell characterCell = new Cell(position);
+            characterCell.setCharacter(Character.create(characterType, teamColor));
+            characterCells.add(characterCell);
         }
 
-        return playableCharacters;
+        return characterCells;
     }
 
 
