@@ -94,5 +94,8 @@
     <string name="formatted_puzzle_rules">You control black characters,\nfind a way to with this turn.</string>
     <string name="save">save</string>
     <string name="search_for_solutions">search for solutions</string>
+    <string name="invalid_lbe_url_character">Invalid character in LBE url: %s</string>
+    <string name="invalid_lbe_url_position">Invalid position in LBE url: %s</string>
+    <string name="invalid_lbe_url_not_found">LBE url not found</string>
 
 </resources>

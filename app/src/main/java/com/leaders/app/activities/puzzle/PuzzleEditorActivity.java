@@ -15,6 +15,7 @@ import com.leaders.app.enums.ActivityType;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.utilities.PuzzleExportUtils;
+import com.leaders.app.utilities.PuzzleImportUtils;
 import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.board.CellView;
 import com.leaders.app.views.character.CharacterActionAnimator;
@@ -560,13 +561,24 @@ public final class PuzzleEditorActivity extends BaseActivity {
     }
 
     public void btnImportClick(View v) {
-        // TODO
+        GameHistory gameHistory = PuzzleImportUtils.importPuzzleFromClipboard(this);
+        if (gameHistory != null) {
+            board = GameFactory.create(gameHistory).getBoard();
+            bdvBoard.setBoard(board);
+            applyDefaultEditorState();
+        }
+        setActionsMenuVisible(false);
     }
 
     public void btnExportClick(View v) {
-        // TODO - check for puzzle validity
-
-        PuzzleExportUtils.exportToClipboard(this, PuzzleExportUtils.getLbeUrl(board));
+        String validityErrors = PuzzleEditionUtils.getPuzzleValidityErrors(this, board);
+        if (validityErrors.isEmpty()) {
+            PuzzleExportUtils.exportToClipboard(this, PuzzleExportUtils.getLbeUrl(board));
+            applyDefaultEditorState();
+        } else {
+            Toast.makeText(this, validityErrors, Toast.LENGTH_LONG).show();
+        }
+        setActionsMenuVisible(false);
     }
 
     public void vwDialogBgClick(View v) {

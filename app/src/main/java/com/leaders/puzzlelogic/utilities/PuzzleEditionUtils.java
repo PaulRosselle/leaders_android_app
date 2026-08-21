@@ -20,6 +20,7 @@ import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.GamePhaseType;
 import com.leaders.gamelogic.enums.RecruitmentMotionType;
 import com.leaders.gamelogic.enums.TeamColor;
+import com.leaders.gamelogic.factories.GameFactory;
 import com.leaders.gamelogic.historyentries.IHistoryEntry;
 import com.leaders.gamelogic.historyentries.segments.Turn;
 import com.leaders.gamelogic.historyentries.segments.TurnPhase;
@@ -33,6 +34,14 @@ import java.util.List;
 public final class PuzzleEditionUtils {
     private PuzzleEditionUtils(){
         throw new AssertionError("Cannot instantiate utility class");
+    }
+
+    public static String getPuzzleValidityErrors(@NonNull Context context, @NonNull GameHistory gameHistory) {
+        return getPuzzleValidityErrors(context, GameFactory.create(gameHistory).getBoard());
+    }
+
+    public static String getPuzzleValidityErrors(@NonNull Context context, @NonNull Board board) {
+        return ""; // TODO
     }
 
     public static String getCardAdditionErrors(@NonNull Context context,
@@ -88,17 +97,6 @@ public final class PuzzleEditionUtils {
         Player playerBlack = new Player(TeamColor.Black, "Player");
         Player playerWhite = new Player(TeamColor.White, "Puzzle");
 
-        // The default game history is initialized each leader at their starting position
-        Character leaderBlack = Character.create(CharacterType.LeaderKing, playerBlack.getTeamColor());
-        Character leaderWhite = Character.create(CharacterType.LeaderQueen, playerWhite.getTeamColor());
-
-        initialActions.add(new RecruitmentAction(Arrays.asList(
-                new RecruitmentActionMotion(RecruitmentMotionType.Add, leaderBlack,
-                        BoardQuery.getLeaderStartingPosition(leaderBlack.getTeamColor())),
-                new RecruitmentActionMotion(RecruitmentMotionType.Add, leaderWhite,
-                        BoardQuery.getLeaderStartingPosition(leaderWhite.getTeamColor()))
-        )));
-
         GameConfig gameConfig =new GameConfig(
                 List.of(playerBlack, playerWhite),
                 playerBlack, // firstPlayer ; the human player
@@ -125,6 +123,17 @@ public final class PuzzleEditionUtils {
 
     @NonNull
     public static GameHistory getDefaultHistory() {
-        return getDefaultHistory(new ArrayList<>());
+        // The default game history is initialized each leader at their starting position
+        Character leaderBlack = Character.create(CharacterType.LeaderKing, TeamColor.Black);
+        Character leaderWhite = Character.create(CharacterType.LeaderQueen, TeamColor.White);
+
+        List<IGameAction> initialActions = new ArrayList<>();
+        initialActions.add(new RecruitmentAction(Arrays.asList(
+                new RecruitmentActionMotion(RecruitmentMotionType.Add, leaderBlack,
+                        BoardQuery.getLeaderStartingPosition(leaderBlack.getTeamColor())),
+                new RecruitmentActionMotion(RecruitmentMotionType.Add, leaderWhite,
+                        BoardQuery.getLeaderStartingPosition(leaderWhite.getTeamColor()))
+        )));
+        return getDefaultHistory(initialActions);
     }
 }

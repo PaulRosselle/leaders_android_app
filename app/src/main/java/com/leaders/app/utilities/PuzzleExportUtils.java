@@ -61,7 +61,7 @@ public final class PuzzleExportUtils {
         }
 
         // Since we're sure to have added at least one character, we can remove the first cell data separator
-        return builder.toString();
+        return builder.toString().substring(1);
     }
 
     public static void exportToClipboard(@NonNull Context context, String exportStr) {

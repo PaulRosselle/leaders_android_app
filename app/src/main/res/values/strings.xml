@@ -96,4 +96,7 @@
     <string name="save">sauvegarder</string>
     <string name="search_for_solutions">chercher les solutions</string>
     <string name="leaders_board_editor" translatable="false">Leaders Board Editor</string>
+    <string name="invalid_lbe_url_character">Personnage invalide dans le lien LBE : %s</string>
+    <string name="invalid_lbe_url_position">Position invalide dans le lien LBE : %s</string>
+    <string name="invalid_lbe_url_not_found">Lien LBE non trouvé</string>
 </resources>

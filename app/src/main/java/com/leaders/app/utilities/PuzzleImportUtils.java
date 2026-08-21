@@ -1,7 +1,14 @@
 package com.leaders.app.utilities;
 
-import androidx.annotation.NonNull;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.leaders.R;
 import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.actions.RecruitmentAction;
 import com.leaders.gamelogic.actions.RecruitmentActionMotion;
@@ -23,10 +30,10 @@ public final class PuzzleImportUtils {
         throw new AssertionError("Cannot instantiate utility class");
     }
 
-    public GameHistory getFromLbeUrl(@NonNull String lbeUrl) {
+    public static GameHistory getFromLbeUrl(@NonNull Context context, @NonNull String lbeUrl) {
         List<IGameAction> initialActions = new ArrayList<>();
         for (TeamColor teamColor : TeamColor.values()) {
-            for (PlayableCharacter playableCharacter : getTeamPlayableCharacters(lbeUrl, teamColor)) {
+            for (PlayableCharacter playableCharacter : getTeamPlayableCharacters(context, lbeUrl, teamColor)) {
                 initialActions.add(new RecruitmentAction(List.of(
                         new RecruitmentActionMotion(RecruitmentMotionType.Add,
                                 playableCharacter.getCharacter(),
@@ -39,7 +46,9 @@ public final class PuzzleImportUtils {
         return PuzzleEditionUtils.getDefaultHistory(initialActions);
     }
 
-    private List<PlayableCharacter> getTeamPlayableCharacters(@NonNull String lbeUrl, TeamColor teamColor) {
+    private static List<PlayableCharacter> getTeamPlayableCharacters(@NonNull Context context,
+                                                                     @NonNull String lbeUrl,
+                                                                     @NonNull TeamColor teamColor) {
         // First we get the header separator associated with the player color
         String colorHeader;
         if (teamColor == TeamColor.Black) {
@@ -69,9 +78,12 @@ public final class PuzzleImportUtils {
 
         // Once we have isolated the tiles datas we can extract each token and add them immediately to the board
         for (String cellData : cellDatas.split(LbeUtils.CELL_DATA_SEPARATOR)) {
+            if (cellData.isEmpty()) {
+                continue;
+            }
             String[] characterDatas = cellData.split(LbeUtils.CHARACTER_DATA_SEPARATOR);
-            Position position = LbeUtils.getPositionFromExportStr(characterDatas[0].toUpperCase());
-            CharacterType characterType = LbeUtils.getCharacterTypeFromExportStr(characterDatas[1].toUpperCase());
+            Position position = LbeUtils.getPositionFromExportStr(context, characterDatas[0].toUpperCase());
+            CharacterType characterType = LbeUtils.getCharacterTypeFromExportStr(context, characterDatas[1].toUpperCase());
 
             playableCharacters.add(new PlayableCharacter(
                     Character.create(characterType, teamColor),
@@ -80,5 +92,34 @@ public final class PuzzleImportUtils {
         }
 
         return playableCharacters;
+    }
+
+
+    @Nullable
+    public static GameHistory importPuzzleFromClipboard(@NonNull Context context) {
+        String toastMessage;
+
+        ClipData clipData = ((ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE)).getPrimaryClip();
+        if (clipData != null && clipData.getItemCount() > 0) {
+            // Using "coerceToText" instead of "getText" guaranties that item content can be manipulated as text
+            String clipboardItemStr = clipData.getItemAt(0).coerceToText(context).toString();
+            // By default, we try to decode the item string using the app export format
+            try {
+                GameHistory gameHistory = getFromLbeUrl(context, clipboardItemStr);
+                String validityErrors = PuzzleEditionUtils.getPuzzleValidityErrors(context, gameHistory);
+                if (validityErrors.isEmpty()) {
+                    return gameHistory;
+                }
+                toastMessage = validityErrors;
+            } catch (IllegalArgumentException e) {
+                toastMessage = e.getMessage();
+            }
+        } else {
+            toastMessage = context.getString(R.string.invalid_lbe_url_not_found);
+        }
+
+        // If no valid puzzle can be found, a popup dialog is shown to inform the user of the failure
+        Toast.makeText(context, toastMessage, Toast.LENGTH_LONG).show();
+        return null;
     }
 }

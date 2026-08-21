@@ -1,8 +1,11 @@
 package com.leaders.app.utilities;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.leaders.R;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Position;
@@ -56,8 +59,8 @@ public class LbeUtils {
         return String.valueOf(getCharacterExportId(characterType));
     }
 
-    public static CharacterType getCharacterTypeFromExportStr(@NonNull String exportStr) {
-        final String errorMsg = "Invalid character in LBE url: " + exportStr;
+    public static CharacterType getCharacterTypeFromExportStr(@NonNull Context context, @NonNull String exportStr) {
+        final String errorMsg = String.format(context.getString(R.string.invalid_lbe_url_character), exportStr);
         try {
             int characterExportId = Integer.parseInt(exportStr);
             for (CharacterType characterType : CharacterType.values()) {
@@ -76,8 +79,8 @@ public class LbeUtils {
                 String.valueOf(Board.getRowCount(position.getX()) - position.getY());
     }
 
-    public static Position getPositionFromExportStr(@NonNull String exportStr) {
-        final String errorMsg = "Invalid position in LBE url: " + exportStr;
+    public static Position getPositionFromExportStr(@NonNull Context context, @NonNull String exportStr) {
+        final String errorMsg = String.format(context.getString(R.string.invalid_lbe_url_position), exportStr);
         if (exportStr.length() != 2) {
             throw new IllegalArgumentException(errorMsg);
         }
