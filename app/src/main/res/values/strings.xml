@@ -99,4 +99,9 @@
     <string name="invalid_lbe_url_character">Personnage invalide dans le lien LBE : %s</string>
     <string name="invalid_lbe_url_position">Position invalide dans le lien LBE : %s</string>
     <string name="invalid_lbe_url_not_found">Lien LBE non trouvé</string>
+    <string name="remove_selected_puzzles">Supprimer les puzzles sélectionés ?</string>
+    <string name="remove_selected_puzzle">Supprimer \"%s\" ?</string>
+    <string name="warning_removal_cannot_be_undone">⚠ Toute suppression est définitive ⚠</string>
+    <string name="confirm">confirmer</string>
+    <string name="cancel">annuler</string>
 </resources>

@@ -1,5 +1,6 @@
 package com.leaders.app.activities.puzzle;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.view.View;
 
@@ -225,12 +226,29 @@ public final class PuzzleSelectionActivity extends BaseActivity {
         if (puzzlesCategory == PuzzleCategory.Official) {
             throw new IllegalStateException("Official puzzle removal is forbidden");
         }
-        // TODO - message de confirmation
-        for (PuzzleSave puzzleSave : psgvPuzzles.getSelectedPuzzles()) {
-            customPuzzleSaves.remove((CustomPuzzleSave) puzzleSave);
-            JsonUtils.saveCustomPuzzles(this, customPuzzleSaves);
+
+        List<PuzzleSave> selectedPuzzles = psgvPuzzles.getSelectedPuzzles();
+
+        String dialogTitle;
+        if (selectedPuzzles.size() == 1) {
+            String puzzleName = selectedPuzzles.get(0).getName();
+            dialogTitle = String.format(getString(R.string.remove_selected_puzzle), puzzleName);
+        } else {
+            dialogTitle = getString(R.string.remove_selected_puzzles);
         }
-        psgvPuzzles.setPuzzles(customPuzzleSaves);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.alert_dialog_theme);
+        builder.setTitle(dialogTitle);
+        builder.setMessage(getString(R.string.warning_removal_cannot_be_undone));
+        builder.setPositiveButton(R.string.confirm, (dialog, which) -> {
+            for (PuzzleSave puzzleSave : selectedPuzzles) {
+                customPuzzleSaves.remove((CustomPuzzleSave) puzzleSave);
+                JsonUtils.saveCustomPuzzles(this, customPuzzleSaves);
+            }
+            psgvPuzzles.setPuzzles(customPuzzleSaves);
+        });
+        builder.setNegativeButton(R.string.cancel, null);
+        builder.show();
 
         hidePuzzleActions(null);
     }
