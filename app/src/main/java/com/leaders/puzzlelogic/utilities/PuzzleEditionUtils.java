@@ -77,7 +77,7 @@ public final class PuzzleEditionUtils {
         return "";
     }
 
-    private static boolean isCardRestrictedToOnePerTeam(@NonNull CharacterCard characterCard) {
+    public static boolean isCardRestrictedToOnePerTeam(@NonNull CharacterCard characterCard) {
         return characterCard == CharacterCard.Nemesis;
     }
 

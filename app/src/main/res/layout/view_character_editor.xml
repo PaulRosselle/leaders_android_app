@@ -34,10 +34,10 @@
         android:id="@+id/scvPortraits_vwCharacterEditor"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="10dp"
-        android:layout_marginBottom="12dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="6dp"
         android:clickable="false"
         android:fadeScrollbars="false"
         android:longClickable="false"
@@ -123,7 +123,7 @@
         app:strokeWidth="@dimen/default_stroke_width"
         tools:ignore="SpeakableTextPresentCheck" />
 
-    <com.leaders.app.views.board.CharacterView
+    <com.leaders.app.views.character.CharacterView
         android:id="@+id/crvSwitchColor_vwCharacterEditor"
         android:layout_width="@dimen/round_button_size"
         android:layout_height="@dimen/round_button_size"

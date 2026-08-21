@@ -2,12 +2,13 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/clyMain_actPuzzleEditor"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
-    tools:theme="@style/Theme.LeadersAndroidApp"
     tools:context=".app.activities.puzzle.PuzzleEditorActivity"
-    tools:ignore="SpUsage">
+    tools:ignore="SpUsage"
+    tools:theme="@style/Theme.LeadersAndroidApp">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/gdlRoot_actPuzzleEditor"
@@ -82,7 +83,7 @@
         tools:ignore="SpeakableTextPresentCheck" />
 
     <com.leaders.app.views.board.PuzzleEditorBoardView
-        android:id="@+id/pebvBoard_actPuzzleEditor"
+        android:id="@+id/bdvBoard_actPuzzleEditor"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -107,9 +108,9 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pebvBoard_actPuzzleEditor" />
+        app:layout_constraintTop_toBottomOf="@+id/bdvBoard_actPuzzleEditor" />
 
-    <com.leaders.app.views.CharacterNotificationView
+    <com.leaders.app.views.character.CharacterNotificationView
         android:id="@+id/cnvCardInfo_actPuzzleEditor"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

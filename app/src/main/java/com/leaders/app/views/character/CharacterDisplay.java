@@ -1,6 +1,4 @@
-package com.leaders.app.views.board;
-
-import static android.view.View.GONE;
+package com.leaders.app.views.character;
 
 import android.content.Context;
 import android.view.View;
@@ -13,6 +11,12 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.leaders.R;
 
 public final class CharacterDisplay {
+    public enum ViewType {
+        Shadow,
+        Character,
+        Highlight
+    }
+
     @NonNull
     private final CharacterView characterView;
 
@@ -83,20 +87,30 @@ public final class CharacterDisplay {
 
         characterView.clearTarget();
 
-        characterView.setVisibility(GONE);
-        shadowView.setVisibility(GONE);
-        highlightView.setVisibility(GONE);
+        characterView.setVisibility(View.GONE);
+        shadowView.setVisibility(View.GONE);
+        highlightView.setVisibility(View.GONE);
     }
 
     public void setPosition(float x, float y) {
-        setPosition(characterView, x, y);
-        setPosition(shadowView, x, y);
-        setPosition(highlightView, x, y);
+        for (ViewType viewType : ViewType.values()) {
+            setPosition(viewType, x, y);
+        }
     }
 
-    private void setPosition(@NonNull View view, float x, float y) {
+    public void setPosition(@NonNull ViewType viewType, float x, float y) {
+        View view = getCharacterViewFromType(viewType);
         view.setX(x);
         view.setY(y);
+    }
+
+    private View getCharacterViewFromType(@NonNull ViewType viewType) {
+        switch (viewType) {
+            case Shadow: return shadowView;
+            case Character: return characterView;
+            case Highlight: return highlightView;
+            default: throw new IllegalArgumentException("No character view found for type: " + viewType);
+        }
     }
 
     public void setOnCharacterClickListener(View.OnClickListener onClickListener) {
@@ -105,5 +119,18 @@ public final class CharacterDisplay {
 
     public void setOnCharacterLongClickListener(View.OnLongClickListener onLongClickListener) {
         characterView.setOnLongClickListener(onLongClickListener);
+    }
+
+    public void setHighlighted(boolean highlighted, boolean animateCharacterScaling) {
+        characterView.scaleForHighlight(highlighted, animateCharacterScaling);
+        highlightView.setVisibility(highlighted ? View.VISIBLE : View.GONE);
+    }
+
+    public void startHighlightAnimation() {
+        highlightView.startAnimation();
+    }
+
+    public void stopHighlightAnimation() {
+        highlightView.stopAnimation();
     }
 }

@@ -62,6 +62,11 @@ public final class CellView extends AppCompatImageView {
         setAsCharacterActionTarget(clvCharacter);
     }
 
+    public void setAsTarget(@NonNull InteractionTarget target) {
+        this.target = target;
+        // This method is made to target a cellView without visual feedacks
+    }
+
     private void setAsCharacterActionTarget(@NonNull CellView clvCharacter) {
         Point characterCenter = clvCharacter.getCenter();
         Point destCenter = getCenter();

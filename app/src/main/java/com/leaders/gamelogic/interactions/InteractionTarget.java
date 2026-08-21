@@ -6,9 +6,7 @@ import androidx.annotation.Nullable;
 import com.leaders.gamelogic.entities.PlayableCharacter;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.entities.SelectableCharacterCard;
-import com.leaders.gamelogic.enums.CharacterCard;
 
-import java.nio.channels.SelectableChannel;
 import java.util.Objects;
 
 public final class InteractionTarget {
@@ -60,7 +58,7 @@ public final class InteractionTarget {
     }
 
     @Nullable
-    public PlayableCharacter getChosenCharacterPlayableState() {
+    public PlayableCharacter getChosenPlayableCharacter() {
         return chosenPlayableCharacter;
     }
 

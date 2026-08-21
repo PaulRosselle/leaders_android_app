@@ -10,6 +10,9 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.leaders.R;
 import com.leaders.app.enums.BoardOrientation;
+import com.leaders.app.views.character.CharacterDisplay;
+import com.leaders.app.views.character.CharacterDisplayPool;
+import com.leaders.app.views.character.CharacterView;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Position;
@@ -29,7 +32,8 @@ public abstract class BoardView extends ConstraintLayout {
 
     @NonNull
     protected final Map<Position, CellView> cellViewsMap;
-    private final Map<Position, CharacterDisplay> characterDisplayMap;
+    @NonNull
+    protected final Map<Position, CharacterDisplay> characterDisplayMap;
 
     @NonNull
     protected BoardOrientation orientation;
@@ -154,6 +158,7 @@ public abstract class BoardView extends ConstraintLayout {
                 CharacterView characterView = characterDisplay.getCharacterView();
                 characterView.setVisibility(VISIBLE);
                 characterView.setCharacter(cell.getCharacter());
+                characterView.bringToFront();
 
                 CellView cellView = getCellView(cellPosition);
                 characterDisplay.setPosition(cellView.getX(), cellView.getY());
@@ -165,7 +170,7 @@ public abstract class BoardView extends ConstraintLayout {
     }
 
     @NonNull
-    protected final CharacterDisplay acquireCharacterDisplay(@NonNull Position position) {
+    public final CharacterDisplay acquireCharacterDisplay(@NonNull Position position) {
         CharacterDisplay characterDisplay = characterDisplayPool.acquire();
 
         characterDisplay.setOnCharacterClickListener(onCharacterClickListener);
@@ -175,7 +180,7 @@ public abstract class BoardView extends ConstraintLayout {
         return characterDisplay;
     }
 
-    protected final void releaseCharacterDisplay(@NonNull Position position) {
+    public final void releaseCharacterDisplay(@NonNull Position position) {
         CharacterDisplay characterDisplay = Objects.requireNonNull(characterDisplayMap.remove(position),
                 "CharacterDisplay to release not found");
 
@@ -185,6 +190,27 @@ public abstract class BoardView extends ConstraintLayout {
         characterDisplay.setOnCharacterLongClickListener(null);
 
         characterDisplayPool.release(characterDisplay);
+    }
+
+    public final void moveCharacterDisplay(@NonNull Position originPos, @NonNull Position destPos) {
+        CharacterDisplay characterDisplay = characterDisplayMap.remove(originPos);
+        characterDisplayMap.put(destPos, characterDisplay);
+    }
+
+    public final void moveCharacterDisplays(@NonNull List<Position> originPositions,
+                                            @NonNull List<Position> destinationPositions) {
+        if (originPositions.size() != destinationPositions.size()) {
+            throw new IllegalArgumentException("Cannot move a character display without an origin and a destination");
+        }
+
+        List<CharacterDisplay> movedDisplays = new ArrayList<>();
+        for (Position position : originPositions) {
+            movedDisplays.add(characterDisplayMap.remove(position));
+        }
+
+        for (int i = 0; i < destinationPositions.size(); i++) {
+            characterDisplayMap.put(destinationPositions.get(i), movedDisplays.get(i));
+        }
     }
 
     public final void clearTargets() {
@@ -197,8 +223,14 @@ public abstract class BoardView extends ConstraintLayout {
         }
     }
 
-    protected final CellView getCellView(@NonNull Position position) {
+    @NonNull
+    public final CellView getCellView(@NonNull Position position) {
         return Objects.requireNonNull(cellViewsMap.get(position), "No CellView found at Position:" + position);
+    }
+
+    @NonNull
+    public final CharacterDisplay getCharacterDisplay(@NonNull Position position) {
+        return Objects.requireNonNull(characterDisplayMap.get(position), "No CharacterDisplay found at Position:" + position);
     }
 
     protected void setOnCellClickListener(OnClickListener onCellClickListener) {
