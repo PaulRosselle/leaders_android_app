@@ -285,7 +285,7 @@ public final class PuzzleSelectionActivity extends BaseActivity {
             builder.append("\n\n");
         }
 
-        PuzzleExportUtils.exportToClipboard(this, builder.toString().trim());
+        PuzzleExportUtils.exportAsTextIntent(this, builder.toString().trim());
 
         hidePuzzleActions(null);
     }

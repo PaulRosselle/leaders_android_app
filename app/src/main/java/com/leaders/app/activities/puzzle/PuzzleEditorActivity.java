@@ -600,7 +600,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
     public void btnExportClick(View v) {
         String validityErrors = PuzzleEditionUtils.getPuzzleValidityErrors(this, board);
         if (validityErrors.isEmpty()) {
-            PuzzleExportUtils.exportToClipboard(this, PuzzleExportUtils.getLbeUrl(board));
+            PuzzleExportUtils.exportAsTextIntent(this, PuzzleExportUtils.getLbeUrl(board));
             applyDefaultEditorState();
         } else {
             Toast.makeText(this, validityErrors, Toast.LENGTH_LONG).show();

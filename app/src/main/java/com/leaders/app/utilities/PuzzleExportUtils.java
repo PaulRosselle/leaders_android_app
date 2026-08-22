@@ -1,8 +1,7 @@
 package com.leaders.app.utilities;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 
 import androidx.annotation.NonNull;
 
@@ -64,8 +63,10 @@ public final class PuzzleExportUtils {
         return builder.toString().substring(1);
     }
 
-    public static void exportToClipboard(@NonNull Context context, String exportStr) {
-        ClipData clipData = ClipData.newPlainText("PUZZLE_CODE", exportStr);
-        ((ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(clipData);
+    public static void exportAsTextIntent(@NonNull Context context, String exportStr) {
+        Intent sendIntent = new Intent(Intent.ACTION_SEND);
+        sendIntent.setType("text/plain");
+        sendIntent.putExtra(Intent.EXTRA_TEXT, exportStr);
+        context.startActivity(Intent.createChooser(sendIntent, "SHARE BOARD"));
     }
 }
