@@ -50,12 +50,7 @@ public final class PuzzleImportUtils {
                                                     @NonNull String lbeUrl,
                                                     @NonNull TeamColor teamColor) {
         // First we get the header separator associated with the player color
-        String colorHeader;
-        if (teamColor == TeamColor.Black) {
-            colorHeader = LbeUtils.HEADER_BLACK;
-        } else {
-            colorHeader = LbeUtils.HEADER_WHITE;
-        }
+        String colorHeader = teamColor == TeamColor.Black ? LbeUtils.HEADER_BLACK : LbeUtils.HEADER_WHITE;
 
         // If the header cannot be found within the URL, we have no data to extract
         int headerIdx = lbeUrl.indexOf(colorHeader);
