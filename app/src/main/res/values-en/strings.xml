@@ -118,5 +118,6 @@
     <string name="choose_file_name">Input your file name</string>
     <string name="error_export_file_creation">Export file creation failed</string>
     <string name="export_successful">Export successful !</string>
+    <string name="unsaved_puzzle_changes">You have unsaved changes</string>
 
 </resources>

@@ -111,6 +111,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
     private PuzzleEditorBoardView bdvBoard;
     private CharacterEditorView cevCharacterEditor;
 
+    private Board initialBoard;
     private Board board;
     private EditorState editorState;
     private List<CustomPuzzleSave> puzzleSaves;
@@ -185,9 +186,6 @@ public final class PuzzleEditorActivity extends BaseActivity {
 
         // We load the current state of the board using the puzzle save game history
         puzzleSave = puzzleIdx != -1 ? puzzleSaves.get(puzzleIdx) : null;
-        GameHistory puzzleGameHistory = puzzleSave != null ?
-                puzzleSave.getPuzzleGameHistory() : PuzzleEditionUtils.getDefaultHistory();
-        board = GameFactory.create(puzzleGameHistory).getBoard();
 
         // An imported puzzle is only saved temporarely so it can be transmitted to the editor,
         // we display the save dialog in case the user wants to name it and save it
@@ -199,9 +197,9 @@ public final class PuzzleEditorActivity extends BaseActivity {
         }
 
         bdvBoard.post(() -> {
-            // Once the board has been loaded in the view, we can apply the default editorState
-            bdvBoard.setBoard(board);
-            applyDefaultEditorState();
+            GameHistory puzzleGameHistory = puzzleSave != null ?
+                    puzzleSave.getPuzzleGameHistory() : PuzzleEditionUtils.getDefaultHistory();
+            loadPuzzleFromHistory(puzzleGameHistory);
         });
     }
 
@@ -246,7 +244,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
     protected void doOnBackPressed() {
         if (hasPuzzleBeenEdited()) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.alert_dialog_theme);
-            builder.setTitle(R.string.back);
+            builder.setTitle(R.string.unsaved_puzzle_changes);
             builder.setMessage(R.string.go_back_to_puzzle_menu);
             builder.setPositiveButton(R.string.yes, (dialog, which) -> goBackToPuzzlesMenuActivity());
             builder.setNegativeButton(R.string.no, null);
@@ -261,8 +259,14 @@ public final class PuzzleEditorActivity extends BaseActivity {
     }
 
     private boolean hasPuzzleBeenEdited() {
-        // TODO - detect when the loaded puzzle has been edited
-        return false;
+        return !PuzzleExportUtils.getLbeUrl(initialBoard).equals(PuzzleExportUtils.getLbeUrl(board));
+    }
+
+    private void loadPuzzleFromHistory(@NonNull GameHistory gameHistory) {
+        initialBoard = GameFactory.create(gameHistory).getBoard();
+        board = new Board(initialBoard);
+        bdvBoard.setBoard(board);
+        applyDefaultEditorState();
     }
 
     private void showCardDescriptionNotification(@NonNull CharacterCard characterCard) {
@@ -590,9 +594,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
     public void btnImportClick(View v) {
         GameHistory gameHistory = PuzzleImportUtils.importPuzzleFromClipboard(this);
         if (gameHistory != null) {
-            board = GameFactory.create(gameHistory).getBoard();
-            bdvBoard.setBoard(board);
-            applyDefaultEditorState();
+            loadPuzzleFromHistory(gameHistory);
         }
         setActionsMenuVisible(false);
     }

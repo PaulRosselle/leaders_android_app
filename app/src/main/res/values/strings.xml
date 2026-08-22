@@ -120,4 +120,5 @@
     <string name="choose_file_name">Saisissez un nom pour votre fichier</string>
     <string name="error_export_file_creation">Erreur rencontrée durant la création du fichier d\'export</string>
     <string name="export_successful">Export réussi !</string>
+    <string name="unsaved_puzzle_changes">Vous avez des modifications non sauvegardées</string>
 </resources>
