@@ -106,5 +106,17 @@
     <string name="anonymous_author">Anonymous author</string>
     <string name="puzzle_name_is_mandatory">Please input a name for your puzzle</string>
     <string name="puzzle_saved">Puzzle saved !</string>
+    <string name="export_option_lbe_link_in_clipboard">LBE link in clipboard</string>
+    <string name="export_option_to_file">To file</string>
+    <string name="export_puzzle_title">Puzzle export</string>
+    <string name="import_option_lbe_link_from_clipboard">LBE link from clipboard</string>
+    <string name="import_option_from_file">From file</string>
+    <string name="import_puzzle_title">Import puzzle</string>
+    <string name="import_successful">Import successful !</string>
+    <string name="error_import_file_loading">Import file loading failed</string>
+    <string name="error_export_file_writing">Export file writing failed</string>
+    <string name="choose_file_name">Input your file name</string>
+    <string name="error_export_file_creation">Export file creation failed</string>
+    <string name="export_successful">Export successful !</string>
 
 </resources>

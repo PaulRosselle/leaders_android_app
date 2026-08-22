@@ -108,4 +108,16 @@
     <string name="anonymous_author">Auteur anonyme</string>
     <string name="puzzle_name_is_mandatory">Veuillez saisir un nom pour votre puzzle</string>
     <string name="puzzle_saved">Puzzle sauvegardé !</string>
+    <string name="export_option_lbe_link_in_clipboard">Lien LBE vers le presse papier</string>
+    <string name="export_option_to_file">Vers un fichier</string>
+    <string name="export_puzzle_title">Export de puzzle</string>
+    <string name="import_option_lbe_link_from_clipboard">Depuis un lien LBE dans le presse-papier</string>
+    <string name="import_option_from_file">Depuis un fichier</string>
+    <string name="import_puzzle_title">Import de puzzle</string>
+    <string name="import_successful">Import réussi !</string>
+    <string name="error_import_file_loading">Erreur durant le chargement du fichier d\'import</string>
+    <string name="error_export_file_writing">Erreur rencontrée durant l\'écriture du fichier d\'export</string>
+    <string name="choose_file_name">Saisissez un nom pour votre fichier</string>
+    <string name="error_export_file_creation">Erreur rencontrée durant la création du fichier d\'export</string>
+    <string name="export_successful">Export réussi !</string>
 </resources>

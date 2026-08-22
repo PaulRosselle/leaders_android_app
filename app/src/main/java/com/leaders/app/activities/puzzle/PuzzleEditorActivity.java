@@ -257,7 +257,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
     }
 
     private void goBackToPuzzlesMenuActivity() {
-        goToActivity(ActivityType.Main, ActivityTransitionType.SlideLeft);
+        goToActivity(ActivityType.PuzzleSelection, ActivityTransitionType.SlideLeft);
     }
 
     private boolean hasPuzzleBeenEdited() {

@@ -73,6 +73,11 @@ public abstract class PuzzleSave {
         return lifetime;
     }
 
+    @NonNull
+    public final JSONObject getDatas() {
+        return datas;
+    }
+
     public final void updatePuzzleGameHistory(@NonNull GameHistory gameHistory) {
         try {
             datas = (new GameHistorySerializer()).getAsJson(gameHistory);
