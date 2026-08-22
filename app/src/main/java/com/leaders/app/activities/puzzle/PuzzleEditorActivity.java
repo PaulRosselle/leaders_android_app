@@ -186,6 +186,8 @@ public final class PuzzleEditorActivity extends BaseActivity {
 
         // We load the current state of the board using the puzzle save game history
         puzzleSave = puzzleIdx != -1 ? puzzleSaves.get(puzzleIdx) : null;
+        GameHistory puzzleGameHistory = puzzleSave != null ?
+                puzzleSave.getPuzzleGameHistory() : PuzzleEditionUtils.getDefaultHistory();
 
         // An imported puzzle is only saved temporarely so it can be transmitted to the editor,
         // we display the save dialog in case the user wants to name it and save it
@@ -196,11 +198,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
             openSavePuzzleDialog();
         }
 
-        bdvBoard.post(() -> {
-            GameHistory puzzleGameHistory = puzzleSave != null ?
-                    puzzleSave.getPuzzleGameHistory() : PuzzleEditionUtils.getDefaultHistory();
-            loadPuzzleFromHistory(puzzleGameHistory);
-        });
+        bdvBoard.post(() -> loadPuzzleFromHistory(puzzleGameHistory));
     }
 
     @Override
@@ -662,6 +660,8 @@ public final class PuzzleEditorActivity extends BaseActivity {
 
         JsonUtils.saveCustomPuzzles(this, puzzleSaves);
         Toast.makeText(this, R.string.puzzle_saved, Toast.LENGTH_SHORT).show();
+
+        loadPuzzleFromHistory(gameHistory);
 
         setSaveDialogVisible(false);
     }

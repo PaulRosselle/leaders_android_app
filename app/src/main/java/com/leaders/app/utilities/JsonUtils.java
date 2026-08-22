@@ -197,7 +197,7 @@ public final class JsonUtils {
             Set<Integer> solvedPuzzles = loadSolvedOfficialPuzzles(context);
 
             for (int i = 0; i < jaPuzzles.length(); i++) {
-                OfficialPuzzleSave officialPuzzle = new OfficialPuzzleSave(jaPuzzles.getJSONObject(i));
+                OfficialPuzzleSave officialPuzzle = new OfficialPuzzleSave(context, jaPuzzles.getJSONObject(i));
                 officialPuzzle.setSolved(solvedPuzzles.contains(officialPuzzle.getId()));
                 officialPuzzles.add(officialPuzzle);
             }

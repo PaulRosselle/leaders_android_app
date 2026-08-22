@@ -16,7 +16,7 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
-import com.leaders.puzzlelogic.entities.OfficialPuzzleSave;
+import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
 import com.leaders.puzzlelogic.entities.PuzzleSave;
 import com.leaders.puzzlelogic.enums.PuzzleLifetime;
 
@@ -50,7 +50,7 @@ public final class PuzzleSelectorView extends ConstraintLayout {
 
     public PuzzleSelectorView(@NonNull Context context, @Nullable AttributeSet attrs) {
         // Dummy constructor to allow instanciation in editor
-        this(context, new OfficialPuzzleSave(context, 1, PuzzleLifetime.ActionsPhase, new JSONObject(), false));
+        this(context, new CustomPuzzleSave("TEST", "Paul", PuzzleLifetime.ActionsPhase, new JSONObject(), false));
     }
 
     public PuzzleSelectorView(@NonNull Context context, @NonNull PuzzleSave puzzleSave) {
