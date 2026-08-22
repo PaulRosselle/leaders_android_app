@@ -418,11 +418,13 @@ public final class PuzzleSelectionActivity extends BaseActivity {
     }
 
     public void onSelectAllClick(View v) {
-        // TODO
+        psgvPuzzles.selectAllPuzzles();
+        hidePuzzleActions(v);
     }
 
     public void onUnselectAllClick(View v) {
-        // TODO
+        psgvPuzzles.clearPuzzleSelection();
+        hidePuzzleActions(v);
     }
 
     //endregion

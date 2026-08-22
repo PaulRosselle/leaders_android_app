@@ -55,10 +55,19 @@ public final class PuzzleSelectorGroupView extends LinearLayout {
         return selectedPuzzles;
     }
 
-    public void clearPuzzleSelection() {
+    private void setAllChecked(boolean checked) {
         for (int i = 0; i < getChildCount(); i++) {
-            ((PuzzleSelectorView) getChildAt(i)).setChecked(false);
+            ((PuzzleSelectorView) getChildAt(i)).setChecked(checked);
         }
+    }
+
+    public void selectAllPuzzles() {
+        setSingleSelection(false);
+        setAllChecked(true);
+    }
+
+    public void clearPuzzleSelection() {
+        setAllChecked(false);
         setSingleSelection(true);
     }
 
