@@ -111,6 +111,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
     private PuzzleEditorBoardView bdvBoard;
     private CharacterEditorView cevCharacterEditor;
 
+    private Board initialBoard;
     private Board board;
     private EditorState editorState;
     private List<CustomPuzzleSave> puzzleSaves;
@@ -187,7 +188,6 @@ public final class PuzzleEditorActivity extends BaseActivity {
         puzzleSave = puzzleIdx != -1 ? puzzleSaves.get(puzzleIdx) : null;
         GameHistory puzzleGameHistory = puzzleSave != null ?
                 puzzleSave.getPuzzleGameHistory() : PuzzleEditionUtils.getDefaultHistory();
-        board = GameFactory.create(puzzleGameHistory).getBoard();
 
         // An imported puzzle is only saved temporarely so it can be transmitted to the editor,
         // we display the save dialog in case the user wants to name it and save it
@@ -198,11 +198,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
             openSavePuzzleDialog();
         }
 
-        bdvBoard.post(() -> {
-            // Once the board has been loaded in the view, we can apply the default editorState
-            bdvBoard.setBoard(board);
-            applyDefaultEditorState();
-        });
+        bdvBoard.post(() -> loadPuzzleFromHistory(puzzleGameHistory));
     }
 
     @Override
@@ -246,7 +242,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
     protected void doOnBackPressed() {
         if (hasPuzzleBeenEdited()) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.alert_dialog_theme);
-            builder.setTitle(R.string.back);
+            builder.setTitle(R.string.unsaved_puzzle_changes);
             builder.setMessage(R.string.go_back_to_puzzle_menu);
             builder.setPositiveButton(R.string.yes, (dialog, which) -> goBackToPuzzlesMenuActivity());
             builder.setNegativeButton(R.string.no, null);
@@ -261,8 +257,14 @@ public final class PuzzleEditorActivity extends BaseActivity {
     }
 
     private boolean hasPuzzleBeenEdited() {
-        // TODO - detect when the loaded puzzle has been edited
-        return false;
+        return !PuzzleExportUtils.getLbeUrl(initialBoard).equals(PuzzleExportUtils.getLbeUrl(board));
+    }
+
+    private void loadPuzzleFromHistory(@NonNull GameHistory gameHistory) {
+        initialBoard = GameFactory.create(gameHistory).getBoard();
+        board = new Board(initialBoard);
+        bdvBoard.setBoard(board);
+        applyDefaultEditorState();
     }
 
     private void showCardDescriptionNotification(@NonNull CharacterCard characterCard) {
@@ -590,21 +592,26 @@ public final class PuzzleEditorActivity extends BaseActivity {
     public void btnImportClick(View v) {
         GameHistory gameHistory = PuzzleImportUtils.importPuzzleFromClipboard(this);
         if (gameHistory != null) {
-            board = GameFactory.create(gameHistory).getBoard();
-            bdvBoard.setBoard(board);
-            applyDefaultEditorState();
+            loadPuzzleFromHistory(gameHistory);
         }
+
         setActionsMenuVisible(false);
     }
 
     public void btnExportClick(View v) {
-        String validityErrors = PuzzleEditionUtils.getPuzzleValidityErrors(this, board);
+        String validityErrors = PuzzleEditionUtils.getPuzzleValidityErrors(this,
+                GameFactory.create(PuzzleEditionUtils.getDefaultHistory(board)));
+
         if (validityErrors.isEmpty()) {
             PuzzleExportUtils.exportAsTextIntent(this, PuzzleExportUtils.getLbeUrl(board));
             applyDefaultEditorState();
         } else {
-            Toast.makeText(this, validityErrors, Toast.LENGTH_LONG).show();
+            new AlertDialog.Builder(this, R.style.alert_dialog_theme)
+                    .setTitle(R.string.invalid_puzzle)
+                    .setMessage(validityErrors)
+                    .show();
         }
+
         setActionsMenuVisible(false);
     }
 
@@ -660,6 +667,8 @@ public final class PuzzleEditorActivity extends BaseActivity {
 
         JsonUtils.saveCustomPuzzles(this, puzzleSaves);
         Toast.makeText(this, R.string.puzzle_saved, Toast.LENGTH_SHORT).show();
+
+        loadPuzzleFromHistory(gameHistory);
 
         setSaveDialogVisible(false);
     }

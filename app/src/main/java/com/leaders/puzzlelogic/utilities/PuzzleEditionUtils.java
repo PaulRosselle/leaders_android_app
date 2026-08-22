@@ -11,6 +11,7 @@ import com.leaders.gamelogic.actions.RecruitmentActionMotion;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
+import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameConfig;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.Player;
@@ -25,11 +26,15 @@ import com.leaders.gamelogic.historyentries.IHistoryEntry;
 import com.leaders.gamelogic.historyentries.segments.Turn;
 import com.leaders.gamelogic.historyentries.segments.TurnPhase;
 import com.leaders.gamelogic.queries.BoardQuery;
+import com.leaders.gamelogic.queries.GameQuery;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public final class PuzzleEditionUtils {
     private PuzzleEditionUtils(){
@@ -37,11 +42,96 @@ public final class PuzzleEditionUtils {
     }
 
     public static String getPuzzleValidityErrors(@NonNull Context context, @NonNull GameHistory gameHistory) {
-        return getPuzzleValidityErrors(context, GameFactory.create(gameHistory).getBoard());
+        return getPuzzleValidityErrors(context, GameFactory.create(gameHistory));
     }
 
-    public static String getPuzzleValidityErrors(@NonNull Context context, @NonNull Board board) {
-        return ""; // TODO
+    public static String getPuzzleValidityErrors(@NonNull Context context, @NonNull Game game) {
+        // A puzzle is invalid if :
+        // 1. It is empty
+        // 2. The number of leader per team is different from 1
+        // 3. "One per team character" constraint are not respected
+        // 4. A leader is already captured or surrounded
+        // 5. Multiple hermit or cubs are present on the player's team
+
+        StringBuilder builder = new StringBuilder();
+        final String prefix = "\n• ";
+
+        List<Cell> characterCells = BoardQuery.findCharacterCells(game.getBoard(), null, null);
+        if (characterCells.isEmpty()) {
+            builder.append(prefix).append(context.getString(R.string.puzzle_error_empty_board));
+            return builder.toString().trim();
+        }
+
+        final TeamColor playerTeamColor = getPuzzlePlayerTeamColor();
+
+        List<Character> onePerTeamCharacters = new ArrayList<>();
+        List<Character> playerHermitsAndCubs = new ArrayList<>();
+        List<Character> leaders = new ArrayList<>();
+        for (Cell characterCell : characterCells) {
+            Character character = Objects.requireNonNull(characterCell.getCharacter(),
+                    "Character not found at in character cell: " + characterCell);
+            CharacterCard characterCard = character.getCharacterType().getCharacterCard();
+
+            if (characterCard.isLeader()) {
+                leaders.add(character);
+            }
+
+            if (isCardRestrictedToOnePerTeam(characterCard)) {
+                onePerTeamCharacters.add(character);
+            }
+
+            if (character.getTeamColor() == playerTeamColor && characterCard == CharacterCard.HermitAndCub) {
+                playerHermitsAndCubs.add(character);
+            }
+        }
+
+        for (TeamColor teamColor : TeamColor.values()) {
+            if (BoardQuery.findLeaderCell(game.getBoard(), teamColor) == null) {
+                builder.append(prefix).append(String.format(context.getString(R.string.puzzle_error_leader_missing), teamColor));
+                continue;
+            }
+
+            if (GameQuery.isLeaderCaptured(game, teamColor)) {
+                builder.append(prefix).append(String.format(context.getString(R.string.puzzle_error_leader_captured), teamColor));
+            }
+            if (GameQuery.isLeaderSurrounded(game, teamColor)) {
+                builder.append(prefix).append(String.format(context.getString(R.string.puzzle_error_leader_surrounded), teamColor));
+            }
+        }
+
+        if (leaders.size() > 2 ||
+                (leaders.size() == 2 && leaders.get(0).getTeamColor() == leaders.get(1).getTeamColor())) {
+            builder.append(prefix).append(context.getString(R.string.puzzle_error_one_leader_per_team));
+        }
+
+        Map<CharacterType, String> duplicatesErrors = new EnumMap<>(CharacterType.class);
+        for (Character firstCharacter : onePerTeamCharacters) {
+            for (Character secondCharacter : onePerTeamCharacters) {
+                if (firstCharacter != secondCharacter &&
+                        firstCharacter.getTeamColor() == secondCharacter.getTeamColor() &&
+                        firstCharacter.getCharacterType() == secondCharacter.getCharacterType()) {
+                    duplicatesErrors.put(firstCharacter.getCharacterType(),
+                            String.format(context.getString(R.string.puzzle_error_one_per_team_character) + firstCharacter.getCharacterType()));
+                }
+            }
+        }
+
+        for (String duplicatesError : duplicatesErrors.values()) {
+            builder.append(prefix).append(duplicatesError);
+        }
+
+        if (playerHermitsAndCubs.size() > 2 ||
+                (playerHermitsAndCubs.size() == 2 &&
+                        playerHermitsAndCubs.get(0).getCharacterType() ==
+                                playerHermitsAndCubs.get(1).getCharacterType())) {
+            builder.append(prefix).append(context.getString(R.string.puzzle_error_hermit_and_cub_limit));
+        }
+
+        return builder.toString().trim();
+    }
+
+    private static TeamColor getPuzzlePlayerTeamColor() {
+        return TeamColor.Black;
     }
 
     public static String getCardAdditionErrors(@NonNull Context context,

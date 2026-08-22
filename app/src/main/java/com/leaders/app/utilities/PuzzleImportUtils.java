@@ -7,6 +7,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 
 import com.leaders.R;
 import com.leaders.gamelogic.actions.IGameAction;
@@ -91,7 +92,8 @@ public final class PuzzleImportUtils {
 
     @Nullable
     public static GameHistory importPuzzleFromClipboard(@NonNull Context context) {
-        String toastMessage;
+        String errorMessage;
+        boolean useToast = true;
 
         ClipData clipData = ((ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE)).getPrimaryClip();
         if (clipData != null && clipData.getItemCount() > 0) {
@@ -100,20 +102,31 @@ public final class PuzzleImportUtils {
             // By default, we try to decode the item string using the app export format
             try {
                 GameHistory gameHistory = getFromLbeUrl(context, clipboardItemStr);
+
                 String validityErrors = PuzzleEditionUtils.getPuzzleValidityErrors(context, gameHistory);
                 if (validityErrors.isEmpty()) {
                     return gameHistory;
                 }
-                toastMessage = validityErrors;
+
+                useToast = false;
+                errorMessage = validityErrors;
+
             } catch (IllegalArgumentException e) {
-                toastMessage = e.getMessage();
+                errorMessage = e.getMessage();
             }
         } else {
-            toastMessage = context.getString(R.string.invalid_lbe_url_not_found);
+            errorMessage = context.getString(R.string.invalid_lbe_url_not_found);
         }
 
         // If no valid puzzle can be found, a popup dialog is shown to inform the user of the failure
-        Toast.makeText(context, toastMessage, Toast.LENGTH_LONG).show();
+        if (useToast) {
+            Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show();
+        } else {
+            new AlertDialog.Builder(context, R.style.alert_dialog_theme)
+                    .setTitle(R.string.invalid_puzzle)
+                    .setMessage(errorMessage)
+                    .show();
+        }
         return null;
     }
 }

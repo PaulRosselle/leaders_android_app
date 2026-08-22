@@ -120,4 +120,13 @@
     <string name="choose_file_name">Saisissez un nom pour votre fichier</string>
     <string name="error_export_file_creation">Erreur rencontrée durant la création du fichier d\'export</string>
     <string name="export_successful">Export réussi !</string>
+    <string name="unsaved_puzzle_changes">Vous avez des modifications non sauvegardées</string>
+    <string name="invalid_puzzle">Puzzle invalide</string>
+    <string name="puzzle_error_hermit_and_cub_limit">Il ne peut y avoir qu\'un seul viel ours ou ourson dans l\'équipe du joueur</string>
+    <string name="puzzle_error_one_per_team_character">"Personnage limité à un par équipe: %s"</string>
+    <string name="puzzle_error_one_leader_per_team">Il ne doit y avoir qu\'un leader par équipe</string>
+    <string name="puzzle_error_leader_surrounded">Leader encerclé dans l\'équipe : %s</string>
+    <string name="puzzle_error_leader_captured">Leader capturé dans l\'équipe : %s</string>
+    <string name="puzzle_error_empty_board">Plateau vide</string>
+    <string name="puzzle_error_leader_missing">Leader manquant dans l\'équipe : %s</string>
 </resources>

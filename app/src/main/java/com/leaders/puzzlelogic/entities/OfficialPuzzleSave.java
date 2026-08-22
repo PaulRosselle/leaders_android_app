@@ -6,7 +6,6 @@ import androidx.annotation.NonNull;
 
 import com.leaders.R;
 import com.leaders.puzzlelogic.enums.PuzzleCategory;
-import com.leaders.puzzlelogic.enums.PuzzleLifetime;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,16 +13,11 @@ import org.json.JSONObject;
 public final class OfficialPuzzleSave extends PuzzleSave {
     private final int id;
 
-    public OfficialPuzzleSave(@NonNull Context context, int id,
-                              @NonNull PuzzleLifetime lifetime,
-                              @NonNull JSONObject datas, boolean solved) {
-        super(String.format(context.getString(R.string.official_puzzle_name_format), id), lifetime, datas, solved);
-        this.id = id;
-    }
-
-    public OfficialPuzzleSave(JSONObject joPuzzle) throws JSONException {
+    public OfficialPuzzleSave(@NonNull Context context, @NonNull JSONObject joPuzzle) throws JSONException {
         super(joPuzzle);
         this.id = joPuzzle.getInt("id");
+        // Official puzzle names aren't stored in Json to be translatable
+        this.name = String.format(context.getString(R.string.official_puzzle_name_format), id);
     }
 
     public final int getId() {
