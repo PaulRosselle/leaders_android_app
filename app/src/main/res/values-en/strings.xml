@@ -119,5 +119,13 @@
     <string name="error_export_file_creation">Export file creation failed</string>
     <string name="export_successful">Export successful !</string>
     <string name="unsaved_puzzle_changes">You have unsaved changes</string>
+    <string name="invalid_puzzle">Invalid puzzle:</string>
+    <string name="puzzle_error_hermit_and_cub_limit">There can be only one hermit or cub in the player team</string>
+    <string name="puzzle_error_one_per_team_character">"Character limited to one per team: %s"</string>
+    <string name="puzzle_error_one_leader_per_team">There can be only one leader per team</string>
+    <string name="puzzle_error_leader_surrounded">Leader surrounded in team: %s</string>
+    <string name="puzzle_error_leader_captured">Leader captured in team: %s</string>
+    <string name="puzzle_error_empty_board">Invalid puzzle: Empty board</string>
+    <string name="puzzle_error_leader_missing">Leader missing in team: %s</string>
 
 </resources>

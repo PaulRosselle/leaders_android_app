@@ -68,6 +68,23 @@ public final class CharacterAbilityQuery {
     }
 
     /**
+     * Checks whether a character is aligned with an enemy leader on the board.
+     *
+     * <p>The character's cell is retrieved from the game board using its identifier.
+     * The alignment is then determined using {@link Position#isAligned(Position)}.</p>
+     *
+     * @param game the current game state containing the character and the board
+     * @param leaderCell the cell occupied by the enemy leader
+     * @param character the character whose alignment with the leader is checked
+     * @return {@code true} if the character and the enemy leader are aligned;
+     *         {@code false} otherwise
+     */
+    private static boolean isLeaderAligned(@NonNull Game game, @NonNull Cell leaderCell,
+                                           @NonNull Character character) {
+        return leaderCell.getPosition().isAligned(BoardQuery.getCellByCharacterId(game.getBoard(), character.getId()).getPosition());
+    }
+
+    /**
      * Computes the contribution of a character to the capture of the enemy leader.
      *
      * <p>The contribution depends on the character type and its position relative
@@ -93,9 +110,10 @@ public final class CharacterAbilityQuery {
                                              @NonNull Character character,
                                              @NonNull Cell enemyLeaderCell) {
         switch (character.getCharacterType()) {
-            // The archer only takes part in the capture from a distance of two
+            // The archer only takes part in the capture in a straight line from a distance of two
             case Archer: {
-                return getLeaderDistance(game, enemyLeaderCell, character) == 2 ? 1 : 0;
+                return isLeaderAligned(game, enemyLeaderCell, character) &&
+                        getLeaderDistance(game, enemyLeaderCell, character) == 2 ? 1 : 0;
             }
             // The assassin captures the leader by himself if he is adjacent to it
             case Assassin: {

@@ -594,17 +594,24 @@ public final class PuzzleEditorActivity extends BaseActivity {
         if (gameHistory != null) {
             loadPuzzleFromHistory(gameHistory);
         }
+
         setActionsMenuVisible(false);
     }
 
     public void btnExportClick(View v) {
-        String validityErrors = PuzzleEditionUtils.getPuzzleValidityErrors(this, board);
+        String validityErrors = PuzzleEditionUtils.getPuzzleValidityErrors(this,
+                GameFactory.create(PuzzleEditionUtils.getDefaultHistory(board)));
+
         if (validityErrors.isEmpty()) {
             PuzzleExportUtils.exportAsTextIntent(this, PuzzleExportUtils.getLbeUrl(board));
             applyDefaultEditorState();
         } else {
-            Toast.makeText(this, validityErrors, Toast.LENGTH_LONG).show();
+            new AlertDialog.Builder(this, R.style.alert_dialog_theme)
+                    .setTitle(R.string.invalid_puzzle)
+                    .setMessage(validityErrors)
+                    .show();
         }
+
         setActionsMenuVisible(false);
     }
 
