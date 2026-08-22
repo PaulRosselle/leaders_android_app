@@ -1,6 +1,7 @@
 package com.leaders.app.utilities;
 
 import android.content.Context;
+import android.net.Uri;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -9,6 +10,7 @@ import com.leaders.R;
 import com.leaders.app.entities.crash.CrashLog;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
 import com.leaders.puzzlelogic.entities.OfficialPuzzleSave;
+import com.leaders.puzzlelogic.entities.PuzzleSave;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -230,20 +232,39 @@ public final class JsonUtils {
 
     public static List<CustomPuzzleSave> loadCustomPuzzles(@NonNull Context context) {
         if (!fileExists(context, CUSTOM_PUZZLES_FILENAME)) {
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
 
         try {
-            JSONArray jaCustomPuzzles = openJsonFile(context, CUSTOM_PUZZLES_FILENAME).getJSONArray("puzzles");
-
-            List<CustomPuzzleSave> customPuzzles = new ArrayList<>();
-            for (int i = 0; i < jaCustomPuzzles.length(); i++) {
-                customPuzzles.add(new CustomPuzzleSave(jaCustomPuzzles.getJSONObject(i)));
-            }
-            return customPuzzles;
+            return getCustomPuzzlesFromJson(openJsonFile(context, CUSTOM_PUZZLES_FILENAME));
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
+    }
+
+
+    public static List<CustomPuzzleSave> loadCustomPuzzlesFromFile(@NonNull Context context,
+                                                                   @NonNull Uri uri) throws IllegalArgumentException {
+        try (InputStream inputStream = context.getContentResolver().openInputStream(uri)) {
+            if (inputStream == null) {
+                throw new IllegalArgumentException("Cannot get valid input stream from Uri");
+            }
+
+            return getCustomPuzzlesFromJson(openJsonFile(inputStream));
+        } catch (IOException | JSONException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    private static List<CustomPuzzleSave> getCustomPuzzlesFromJson(@NonNull JSONObject joCustomPuzzles) throws JSONException {
+        List<CustomPuzzleSave> customPuzzles = new ArrayList<>();
+
+        JSONArray jaCustomPuzzles = joCustomPuzzles.getJSONArray("puzzles");
+        for (int i = 0; i < jaCustomPuzzles.length(); i++) {
+            customPuzzles.add(new CustomPuzzleSave(jaCustomPuzzles.getJSONObject(i)));
+        }
+
+        return customPuzzles;
     }
 
     public static void saveOfficialPuzzles(@NonNull Context context,
@@ -270,7 +291,7 @@ public final class JsonUtils {
     }
 
     public static void saveCustomPuzzles(@NonNull Context context,
-                                          @NonNull List<CustomPuzzleSave> customPuzzles) {
+                                         @NonNull List<CustomPuzzleSave> customPuzzles) {
         try {
             JSONArray jaCustomPuzzles = new JSONArray();
             for (CustomPuzzleSave customPuzzle : customPuzzles) {
@@ -281,6 +302,37 @@ public final class JsonUtils {
             joCustomPuzzles.put("puzzles", jaCustomPuzzles);
 
             saveJsonFile(context, CUSTOM_PUZZLES_FILENAME, joCustomPuzzles);
+        } catch (JSONException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    public static void savePuzzlesToFile(@NonNull Context context,
+                                         @NonNull List<PuzzleSave> puzzleSaves,
+                                         @NonNull Uri uri) {
+        try (OutputStream outputStream = context.getContentResolver().openOutputStream(uri)) {
+            if (outputStream == null) {
+                throw new IllegalArgumentException("Cannot get valid outputStream stream from Uri");
+            }
+
+            JSONArray jaPuzzles = new JSONArray();
+            for (PuzzleSave puzzleSave : puzzleSaves) {
+                // We only save puzzle in files as custom puzzles
+                CustomPuzzleSave customPuzzleSave;
+                if (puzzleSave instanceof CustomPuzzleSave) {
+                    customPuzzleSave = (CustomPuzzleSave) puzzleSave;
+                } else {
+                    customPuzzleSave = new CustomPuzzleSave(puzzleSave.getName(), "",
+                            puzzleSave.getLifetime(), puzzleSave.getDatas(), puzzleSave.isSolved());
+                }
+                jaPuzzles.put(customPuzzleSave.getAsJsonObject());
+            }
+
+            JSONObject joCustomPuzzles = new JSONObject();
+            joCustomPuzzles.put("puzzles", jaPuzzles);
+
+            updateJsonFile(joCustomPuzzles, outputStream);
         } catch (JSONException | IOException e) {
             throw new RuntimeException(e);
         }

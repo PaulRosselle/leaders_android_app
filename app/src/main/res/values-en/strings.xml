@@ -92,7 +92,31 @@
     <string name="card_description_nemesis">Cannot take an action during their action phase. Must move by 2 tiles after any action moving the opponent’s Leader. If it is not possible to move by two tiles without going back to its original position, only moves by one tile.</string>
     <string name="card_description_hermit_and_cub">"When you recruit them, take both the Hermit and the Cub. These two characters count as one during the recruitment phase. You can move either the Hermit or the Cub, or one immediately after another. The cub cannot help capture the opponent’s Leader. "</string>
     <string name="formatted_puzzle_rules">You control black characters,\nfind a way to with this turn.</string>
-    <string name="save">save</string>
+    <string name="save">Save</string>
     <string name="search_for_solutions">search for solutions</string>
+    <string name="invalid_lbe_url_character">Invalid character in LBE url: %s</string>
+    <string name="invalid_lbe_url_position">Invalid position in LBE url: %s</string>
+    <string name="invalid_lbe_url_not_found">LBE url not found</string>
+    <string name="remove_selected_puzzles">Remove selected puzzles ?</string>
+    <string name="remove_selected_puzzle">Remove \"%s\" ?</string>
+    <string name="warning_removal_cannot_be_undone">⚠ Puzzle removal can\'t be undone ⚠</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+    <string name="puzzle_name">Puzzle name</string>
+    <string name="anonymous_author">Anonymous author</string>
+    <string name="puzzle_name_is_mandatory">Please input a name for your puzzle</string>
+    <string name="puzzle_saved">Puzzle saved !</string>
+    <string name="export_option_lbe_link_in_clipboard">LBE link in clipboard</string>
+    <string name="export_option_to_file">To file</string>
+    <string name="export_puzzle_title">Puzzle export</string>
+    <string name="import_option_lbe_link_from_clipboard">LBE link from clipboard</string>
+    <string name="import_option_from_file">From file</string>
+    <string name="import_puzzle_title">Import puzzle</string>
+    <string name="import_successful">Import successful !</string>
+    <string name="error_import_file_loading">Import file loading failed</string>
+    <string name="error_export_file_writing">Export file writing failed</string>
+    <string name="choose_file_name">Input your file name</string>
+    <string name="error_export_file_creation">Export file creation failed</string>
+    <string name="export_successful">Export successful !</string>
 
 </resources>

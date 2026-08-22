@@ -1,9 +1,17 @@
 package com.leaders.app.activities.puzzle;
 
+import androidx.appcompat.app.AlertDialog;
 import android.content.Intent;
+import android.net.Uri;
+import android.text.InputType;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.documentfile.provider.DocumentFile;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
@@ -14,8 +22,10 @@ import com.leaders.app.utilities.ButtonUtils;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.utilities.PuzzleExportUtils;
+import com.leaders.app.utilities.PuzzleImportUtils;
 import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.puzzle.PuzzleSelectorGroupView;
+import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
 import com.leaders.puzzlelogic.entities.OfficialPuzzleSave;
 import com.leaders.puzzlelogic.entities.PuzzleSave;
@@ -24,6 +34,9 @@ import com.leaders.puzzlelogic.enums.PuzzleCategory;
 import java.util.List;
 
 public final class PuzzleSelectionActivity extends BaseActivity {
+    private ActivityResultLauncher<String> importPuzzleFileSelector;
+    private ActivityResultLauncher<Uri> exportPuzzleDirectorySelector;
+
     private enum PuzzleSelectionAction {
         Add,
         Edit,
@@ -118,6 +131,22 @@ public final class PuzzleSelectionActivity extends BaseActivity {
     @Override
     protected void initDatas() {
         super.initDatas();
+
+        importPuzzleFileSelector = registerForActivityResult(
+                new ActivityResultContracts.GetContent(),
+                uri -> {
+                    if (uri != null) {
+                        importFromFile(uri);
+                    }
+                });
+
+        exportPuzzleDirectorySelector = registerForActivityResult(
+                new ActivityResultContracts.OpenDocumentTree(),
+                uri -> {
+                    if (uri != null) {
+                        exportToFile(uri);
+                    }
+                });
 
         officialPuzzleSaves = JsonUtils.loadOfficialPuzzles(this);
         customPuzzleSaves = JsonUtils.loadCustomPuzzles(this);
@@ -214,21 +243,166 @@ public final class PuzzleSelectionActivity extends BaseActivity {
 
     public void onEditPuzzleClick(View v) {
         Intent intent = ActivityType.PuzzleEditor.getIntent(this);
-        CustomPuzzleSave selectedPuzzleSave = (CustomPuzzleSave) psgvPuzzles.getSelectedPuzzles().get(0);
-        int puzzleIdx = customPuzzleSaves.indexOf(selectedPuzzleSave);
+        int puzzleIdx = customPuzzleSaves.indexOf((CustomPuzzleSave) psgvPuzzles.getSelectedPuzzles().get(0));
         intent.putExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, puzzleIdx);
         goToActivity(intent);
     }
 
     public void onRemoveClick(View v) {
-        // TODO
+        if (puzzlesCategory == PuzzleCategory.Official) {
+            throw new IllegalStateException("Official puzzle removal is forbidden");
+        }
+
+        List<PuzzleSave> selectedPuzzles = psgvPuzzles.getSelectedPuzzles();
+
+        String dialogTitle;
+        if (selectedPuzzles.size() == 1) {
+            String puzzleName = selectedPuzzles.get(0).getName();
+            dialogTitle = String.format(getString(R.string.remove_selected_puzzle), puzzleName);
+        } else {
+            dialogTitle = getString(R.string.remove_selected_puzzles);
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.alert_dialog_theme);
+        builder.setTitle(dialogTitle);
+        builder.setMessage(getString(R.string.warning_removal_cannot_be_undone));
+        builder.setPositiveButton(R.string.confirm, (dialog, which) -> {
+            for (PuzzleSave puzzleSave : selectedPuzzles) {
+                customPuzzleSaves.remove((CustomPuzzleSave) puzzleSave);
+                JsonUtils.saveCustomPuzzles(this, customPuzzleSaves);
+            }
+            psgvPuzzles.setPuzzles(customPuzzleSaves);
+        });
+        builder.setNegativeButton(R.string.cancel, null);
+        builder.show();
+
+        hidePuzzleActions(null);
     }
 
     public void onImportClick(View v) {
-        // TODO
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.alert_dialog_theme);
+        builder.setTitle(R.string.import_puzzle_title);
+
+        builder.setItems(
+                new String[]{
+                        getString(R.string.import_option_lbe_link_from_clipboard),
+                        getString(R.string.import_option_from_file)
+                },
+                (dialog, which) -> {
+                    switch (which) {
+                        case 0: importLbeLinkFromClipboard();break;
+                        case 1: selectImportFile();break;
+                    }
+                });
+        builder.show();
+
+        hidePuzzleActions(v);
+    }
+
+    private void selectImportFile() {
+        importPuzzleFileSelector.launch("application/json");
+    }
+
+    private void importFromFile(@NonNull Uri uri) {
+        try {
+            // First we try to load the puzzles from the file
+            List<CustomPuzzleSave> importedPuzzles = JsonUtils.loadCustomPuzzlesFromFile(this, uri);
+
+            if (!importedPuzzles.isEmpty()) {
+                // Then we save the new custom puzzles list
+                customPuzzleSaves.addAll(importedPuzzles);
+                JsonUtils.saveCustomPuzzles(this, customPuzzleSaves);
+
+                // Finally we display the new puzzles and inform the user that the import was successful
+                psgvPuzzles.setPuzzles(customPuzzleSaves);
+
+                Toast.makeText(this, R.string.import_successful, Toast.LENGTH_SHORT).show();
+            }
+        } catch (IllegalArgumentException e) {
+            Toast.makeText(this, R.string.error_import_file_loading, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void importLbeLinkFromClipboard() {
+        // The import method handle itself error messages
+        GameHistory gameHistory = PuzzleImportUtils.importPuzzleFromClipboard(this);
+        if (gameHistory == null) {
+            return;
+        }
+
+        CustomPuzzleSave importedPuzzleSave = CustomPuzzleSave.getDefault(gameHistory);
+        customPuzzleSaves.add(importedPuzzleSave);
+        JsonUtils.saveCustomPuzzles(this, customPuzzleSaves);
+
+        Intent intent = ActivityType.PuzzleEditor.getIntent(this);
+        int puzzleIdx = customPuzzleSaves.indexOf(importedPuzzleSave);
+        intent.putExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, puzzleIdx);
+        intent.putExtra(ExtraUtils.EXTRA_PUZZLE_IMPORTED, true);
+        goToActivity(intent);
     }
 
     public void onExportClick(View v) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.alert_dialog_theme);
+        builder.setTitle(R.string.export_puzzle_title);
+        builder.setItems(
+                new String[]{
+                        getString(R.string.export_option_lbe_link_in_clipboard),
+                        getString(R.string.export_option_to_file)
+                },
+                (dialog, which) -> {
+                    switch (which) {
+                        case 0: exportToLbeLinks();break;
+                        case 1: selectExportFile();break;
+                    }
+                });
+        builder.show();
+
+        hidePuzzleActions(v);
+    }
+
+    private void selectExportFile() {
+        exportPuzzleDirectorySelector.launch(null);
+    }
+    private void exportToFile(@NonNull Uri directoryUri) {
+        // Now that the user has chosen a directory to export the puzzles
+        // we can set up an alertDialog with an editText so the user can
+        // input the file name
+        DocumentFile fileDirectory = DocumentFile.fromTreeUri(this, directoryUri);
+
+        if (fileDirectory == null || !fileDirectory.canWrite()) {
+            Toast.makeText(this, R.string.error_export_file_writing, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.alert_dialog_theme);
+
+        builder.setTitle(R.string.choose_file_name);
+
+        final EditText edtFileName = new EditText(this);
+        edtFileName.setInputType(InputType.TYPE_TEXT_VARIATION_URI);
+        builder.setView(edtFileName);
+
+        builder.setPositiveButton(R.string.confirm, (dialog, which) -> {
+            // If the file already exists, it will be renamed with an incremented value at the end
+            String fileName = edtFileName.getText().toString();
+
+            DocumentFile file = fileDirectory.createFile("application/json", fileName);
+
+            if (file == null) {
+                Toast.makeText(this, R.string.error_export_file_creation, Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            JsonUtils.savePuzzlesToFile(this, psgvPuzzles.getSelectedPuzzles(), file.getUri());
+
+            Toast.makeText(this, R.string.export_successful, Toast.LENGTH_SHORT).show();
+        });
+
+        builder.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.cancel());
+        builder.show();
+    }
+
+    private void exportToLbeLinks() {
         StringBuilder builder = new StringBuilder();
         for (PuzzleSave puzzleSave : psgvPuzzles.getSelectedPuzzles()) {
             builder.append(puzzleSave.getName());
@@ -240,15 +414,17 @@ public final class PuzzleSelectionActivity extends BaseActivity {
             builder.append("\n\n");
         }
 
-        PuzzleExportUtils.exportToClipboard(this, builder.toString().trim());
+        PuzzleExportUtils.exportAsTextIntent(this, builder.toString().trim());
     }
 
     public void onSelectAllClick(View v) {
-        // TODO
+        psgvPuzzles.selectAllPuzzles();
+        hidePuzzleActions(v);
     }
 
     public void onUnselectAllClick(View v) {
-        // TODO
+        psgvPuzzles.clearPuzzleSelection();
+        hidePuzzleActions(v);
     }
 
     //endregion

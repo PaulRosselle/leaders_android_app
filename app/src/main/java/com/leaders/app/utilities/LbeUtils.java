@@ -1,8 +1,11 @@
 package com.leaders.app.utilities;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.leaders.R;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Position;
@@ -11,12 +14,12 @@ import com.leaders.gamelogic.enums.CharacterType;
 import java.util.NoSuchElementException;
 
 public class LbeUtils {
-    public static final String LBE_DEFAULT_URL = "https://mthbrt.github.io/Leaders-editor/#";
-    public static final String LBE_HEADER_WHITE = "white=";
-    public static final String LBE_HEADER_BLACK = "black=";
-    public static final String LBE_COLOR_DATA_SEPARATOR = "&";
-    public static final String LBE_CHARACTER_DATA_SEPARATOR = ":";
-    public static final String LBE_CELL_DATA_SEPARATOR = ",";
+    public static final String DEFAULT_URL = "https://mthbrt.github.io/Leaders-editor/#";
+    public static final String HEADER_WHITE = "white=";
+    public static final String HEADER_BLACK = "black=";
+    public static final String COLOR_DATA_SEPARATOR = "&";
+    public static final String CHARACTER_DATA_SEPARATOR = ":";
+    public static final String CELL_DATA_SEPARATOR = ",";
 
     private final static String POSITION_X_REF_STR = "ABCDEFG";
 
@@ -56,8 +59,43 @@ public class LbeUtils {
         return String.valueOf(getCharacterExportId(characterType));
     }
 
+    public static CharacterType getCharacterTypeFromExportStr(@NonNull Context context, @NonNull String exportStr) {
+        final String errorMsg = String.format(context.getString(R.string.invalid_lbe_url_character), exportStr);
+        try {
+            int characterExportId = Integer.parseInt(exportStr);
+            for (CharacterType characterType : CharacterType.values()) {
+                if (getCharacterExportId(characterType) == characterExportId) {
+                    return characterType;
+                }
+            }
+            throw new IllegalArgumentException(errorMsg);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(errorMsg);
+        }
+    }
+
     public static String getPositionExportStr(@NonNull Position position) {
         return POSITION_X_REF_STR.charAt(position.getX()) +
                 String.valueOf(Board.getRowCount(position.getX()) - position.getY());
+    }
+
+    public static Position getPositionFromExportStr(@NonNull Context context, @NonNull String exportStr) {
+        final String errorMsg = String.format(context.getString(R.string.invalid_lbe_url_position), exportStr);
+        if (exportStr.length() != 2) {
+            throw new IllegalArgumentException(errorMsg);
+        }
+
+        int x = POSITION_X_REF_STR.indexOf(exportStr.charAt(0));
+        if (x == -1) {
+            throw new IllegalArgumentException(errorMsg);
+        }
+
+        int rowCount = Board.getRowCount(x);
+        int y = rowCount - Integer.parseInt(String.valueOf(exportStr.charAt(1)));
+        if (y < 0 || y >= rowCount) {
+            throw new IllegalArgumentException(errorMsg);
+        }
+
+        return new Position(x, y);
     }
 }

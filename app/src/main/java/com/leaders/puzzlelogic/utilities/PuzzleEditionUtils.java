@@ -5,6 +5,7 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 
 import com.leaders.R;
+import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.actions.RecruitmentAction;
 import com.leaders.gamelogic.actions.RecruitmentActionMotion;
 import com.leaders.gamelogic.entities.Board;
@@ -19,6 +20,7 @@ import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.GamePhaseType;
 import com.leaders.gamelogic.enums.RecruitmentMotionType;
 import com.leaders.gamelogic.enums.TeamColor;
+import com.leaders.gamelogic.factories.GameFactory;
 import com.leaders.gamelogic.historyentries.IHistoryEntry;
 import com.leaders.gamelogic.historyentries.segments.Turn;
 import com.leaders.gamelogic.historyentries.segments.TurnPhase;
@@ -32,6 +34,14 @@ import java.util.List;
 public final class PuzzleEditionUtils {
     private PuzzleEditionUtils(){
         throw new AssertionError("Cannot instantiate utility class");
+    }
+
+    public static String getPuzzleValidityErrors(@NonNull Context context, @NonNull GameHistory gameHistory) {
+        return getPuzzleValidityErrors(context, GameFactory.create(gameHistory).getBoard());
+    }
+
+    public static String getPuzzleValidityErrors(@NonNull Context context, @NonNull Board board) {
+        return ""; // TODO
     }
 
     public static String getCardAdditionErrors(@NonNull Context context,
@@ -82,28 +92,17 @@ public final class PuzzleEditionUtils {
     }
 
     @NonNull
-    public static GameHistory getDefaultHistory() {
+    public static GameHistory getDefaultHistory(@NonNull List<IGameAction> initialActions) {
         // The black player represents the human player (official puzzles convention)
         Player playerBlack = new Player(TeamColor.Black, "Player");
         Player playerWhite = new Player(TeamColor.White, "Puzzle");
-
-        // The default game history is initialized each leader at their starting position
-        Character leaderBlack = Character.create(CharacterType.LeaderKing, playerBlack.getTeamColor());
-        Character leaderWhite = Character.create(CharacterType.LeaderQueen, playerWhite.getTeamColor());
-
-        RecruitmentAction initialPlacements = new RecruitmentAction(Arrays.asList(
-                new RecruitmentActionMotion(RecruitmentMotionType.Add, leaderBlack,
-                        BoardQuery.getLeaderStartingPosition(leaderBlack.getTeamColor())),
-                new RecruitmentActionMotion(RecruitmentMotionType.Add, leaderWhite,
-                        BoardQuery.getLeaderStartingPosition(leaderWhite.getTeamColor()))
-        ));
 
         GameConfig gameConfig =new GameConfig(
                 List.of(playerBlack, playerWhite),
                 playerBlack, // firstPlayer ; the human player
                 GameMode.Strategist,
                 Collections.emptyList(), // initialRecruitableCards ; no recruitment in puzzles
-                List.of(initialPlacements) // initialPlacements
+                initialActions
         );
 
         ArrayList<IHistoryEntry> entries = new ArrayList<>();
@@ -120,5 +119,35 @@ public final class PuzzleEditionUtils {
         entries.add(turn);
 
         return new GameHistory(gameConfig, entries);
+    }
+
+    @NonNull
+    public static GameHistory getDefaultHistory() {
+        // The default game history is initialized each leader at their starting position
+        Character leaderBlack = Character.create(CharacterType.LeaderKing, TeamColor.Black);
+        Character leaderWhite = Character.create(CharacterType.LeaderQueen, TeamColor.White);
+
+        List<IGameAction> initialActions = new ArrayList<>();
+        initialActions.add(new RecruitmentAction(Arrays.asList(
+                new RecruitmentActionMotion(RecruitmentMotionType.Add, leaderBlack,
+                        BoardQuery.getLeaderStartingPosition(leaderBlack.getTeamColor())),
+                new RecruitmentActionMotion(RecruitmentMotionType.Add, leaderWhite,
+                        BoardQuery.getLeaderStartingPosition(leaderWhite.getTeamColor()))
+        )));
+        return getDefaultHistory(initialActions);
+    }
+
+    @NonNull
+    public static GameHistory getDefaultHistory(@NonNull Board board) {
+        List<IGameAction> initialActions = new ArrayList<>();
+        for (Cell characterCell : BoardQuery.findCharacterCells(board, null, null)) {
+            initialActions.add(new RecruitmentAction(List.of(
+                    new RecruitmentActionMotion(RecruitmentMotionType.Add,
+                            characterCell.getCharacter(),
+                            characterCell.getPosition())
+                    ))
+            );
+        }
+        return getDefaultHistory(initialActions);
     }
 }

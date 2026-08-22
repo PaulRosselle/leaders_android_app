@@ -6,6 +6,10 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
@@ -15,10 +19,12 @@ import com.leaders.app.enums.ActivityType;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.utilities.PuzzleExportUtils;
+import com.leaders.app.utilities.PuzzleImportUtils;
 import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.board.CellView;
 import com.leaders.app.views.character.CharacterActionAnimator;
 import com.leaders.app.views.character.CharacterDisplay;
+import com.leaders.app.views.puzzle.PuzzleSaveView;
 import com.leaders.gamelogic.actions.CharacterActionMotion;
 import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.entities.Cell;
@@ -99,6 +105,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
     private View vwDialogBg;
     private MaterialButton btnPuzzleActions;
     private ActionsMenuView amvPuzzleActions;
+    private PuzzleSaveView psvSave;
 
     private CharacterNotificationView cnvCardInfo;
     private PuzzleEditorBoardView bdvBoard;
@@ -106,8 +113,8 @@ public final class PuzzleEditorActivity extends BaseActivity {
 
     private Board board;
     private EditorState editorState;
-    private List<CustomPuzzleSave> customPuzzleSaves;
-    private Integer puzzleIdx;
+    private List<CustomPuzzleSave> puzzleSaves;
+    private CustomPuzzleSave puzzleSave;
     private PlayableCharacter selectedBoardCharacter;
 
     protected void initViews() {
@@ -124,6 +131,13 @@ public final class PuzzleEditorActivity extends BaseActivity {
             amvPuzzleActions.addActionButton(action.getIconResId(), action.getTextResId(),
                     action.ordinal(), action.getOnClickListener(this));
         }
+        psvSave = findViewById(R.id.psvSave_actPuzzleEditor);
+        ViewCompat.setOnApplyWindowInsetsListener(psvSave, (v, insets) -> {
+                Insets imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime());
+                psvSave.setTranslationY(-imeInsets.bottom);
+                return insets;
+        });
+        ViewCompat.requestApplyInsets(psvSave);
     }
 
     @Override
@@ -134,6 +148,10 @@ public final class PuzzleEditorActivity extends BaseActivity {
         btnPuzzleActions.setOnClickListener(v ->
                 setActionsMenuVisible(amvPuzzleActions.getVisibility() != View.VISIBLE));
         vwDialogBg.setOnClickListener(this::vwDialogBgClick);
+
+        // Save dialog listeners
+        psvSave.setOnBtnSaveClick(this::onSaveConfirmClick);
+        psvSave.setOnBtnCancelClick(this::onSaveCancelClick);
 
         // Non interactive element listeners
         findViewById(R.id.clyMain_actPuzzleEditor).setOnClickListener(this::onNonInteractiveElementClick);
@@ -158,18 +176,27 @@ public final class PuzzleEditorActivity extends BaseActivity {
     protected void initDatas() {
         super.initDatas();
 
-        customPuzzleSaves = JsonUtils.loadCustomPuzzles(this);
+        puzzleSaves = JsonUtils.loadCustomPuzzles(this);
 
         // When editing an existing puzzle, its index within customPuzzleSaves is sent through the intent
         Intent intent = getIntent();
-        int intentPuzzleIdx = intent.getIntExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, -1);
-        puzzleIdx = intentPuzzleIdx != -1 ? intentPuzzleIdx : null;
+        int puzzleIdx = intent.getIntExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, -1);
+        boolean isImported = intent.getBooleanExtra(ExtraUtils.EXTRA_PUZZLE_IMPORTED, false);
 
         // We load the current state of the board using the puzzle save game history
-        GameHistory puzzleGameHistory = puzzleIdx != null ?
-                customPuzzleSaves.get(puzzleIdx).getPuzzleGameHistory() :
-                PuzzleEditionUtils.getDefaultHistory();
+        puzzleSave = puzzleIdx != -1 ? puzzleSaves.get(puzzleIdx) : null;
+        GameHistory puzzleGameHistory = puzzleSave != null ?
+                puzzleSave.getPuzzleGameHistory() : PuzzleEditionUtils.getDefaultHistory();
         board = GameFactory.create(puzzleGameHistory).getBoard();
+
+        // An imported puzzle is only saved temporarely so it can be transmitted to the editor,
+        // we display the save dialog in case the user wants to name it and save it
+        if (isImported) {
+            puzzleSaves.remove(puzzleSave);
+            JsonUtils.saveCustomPuzzles(this, puzzleSaves);
+            puzzleSave = null;
+            openSavePuzzleDialog();
+        }
 
         bdvBoard.post(() -> {
             // Once the board has been loaded in the view, we can apply the default editorState
@@ -230,7 +257,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
     }
 
     private void goBackToPuzzlesMenuActivity() {
-        goToActivity(ActivityType.Main, ActivityTransitionType.SlideLeft);
+        goToActivity(ActivityType.PuzzleSelection, ActivityTransitionType.SlideLeft);
     }
 
     private boolean hasPuzzleBeenEdited() {
@@ -548,7 +575,8 @@ public final class PuzzleEditorActivity extends BaseActivity {
     //region PUZZLE ACTIONS LISTENER METHODS
 
     public void btnSaveClick(View v) {
-        // TODO
+        amvPuzzleActions.setVisibility(View.GONE);
+        openSavePuzzleDialog();
     }
 
     public void btnPlayClick(View v) {
@@ -560,26 +588,89 @@ public final class PuzzleEditorActivity extends BaseActivity {
     }
 
     public void btnImportClick(View v) {
-        // TODO
-    }
-
-    public void btnExportClick(View v) {
-        // TODO - check for puzzle validity
-
-        PuzzleExportUtils.exportToClipboard(this, PuzzleExportUtils.getLbeUrl(board));
-    }
-
-    public void vwDialogBgClick(View v) {
+        GameHistory gameHistory = PuzzleImportUtils.importPuzzleFromClipboard(this);
+        if (gameHistory != null) {
+            board = GameFactory.create(gameHistory).getBoard();
+            bdvBoard.setBoard(board);
+            applyDefaultEditorState();
+        }
         setActionsMenuVisible(false);
     }
 
-    private void setActionsMenuVisible(boolean visible) {
-        if (visible) {
-            amvPuzzleActions.setVisibility(View.VISIBLE);
-            vwDialogBg.setVisibility(View.VISIBLE);
+    public void btnExportClick(View v) {
+        String validityErrors = PuzzleEditionUtils.getPuzzleValidityErrors(this, board);
+        if (validityErrors.isEmpty()) {
+            PuzzleExportUtils.exportAsTextIntent(this, PuzzleExportUtils.getLbeUrl(board));
+            applyDefaultEditorState();
         } else {
-            amvPuzzleActions.setVisibility(View.GONE);
+            Toast.makeText(this, validityErrors, Toast.LENGTH_LONG).show();
+        }
+        setActionsMenuVisible(false);
+    }
+
+    public void vwDialogBgClick(View v) {
+        if (amvPuzzleActions.getVisibility() == View.VISIBLE) {
+            setActionsMenuVisible(false);
+        } else if (psvSave.getVisibility() == View.VISIBLE) {
+            setSaveDialogVisible(false);
+        } else {
             vwDialogBg.setVisibility(View.GONE);
+        }
+    }
+
+    private void setActionsMenuVisible(boolean visible) {
+        amvPuzzleActions.setVisibility(visible ? View.VISIBLE : View.GONE);
+        vwDialogBg.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
+    //endregion
+
+    //region SAVE DIALOG LISTENER METHODS
+
+    private void openSavePuzzleDialog() {
+        // In case the user overwrite the default value and want them back,
+        // we apply them every time the save form is reopened
+        psvSave.setDefaultPuzzleName(puzzleSave != null ? puzzleSave.getName() : "");
+        psvSave.setDefaultPuzzleAuthor(puzzleSave != null ? puzzleSave.getAuthor() : "");
+        setSaveDialogVisible(true);
+    }
+
+    private void onSaveCancelClick(View v) {
+        setSaveDialogVisible(false);
+    }
+
+    private void onSaveConfirmClick(View v) {
+        String puzzleName = psvSave.getPuzzleName();
+        // We don't allow a puzzle to be saved without a name
+        if (puzzleName.isEmpty()) {
+            Toast.makeText(this, R.string.puzzle_name_is_mandatory, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        GameHistory gameHistory = PuzzleEditionUtils.getDefaultHistory(board);
+        if (puzzleSave == null) {
+            puzzleSave = CustomPuzzleSave.getDefault(gameHistory);
+            puzzleSaves.add(puzzleSave);
+        } else {
+            puzzleSave.updatePuzzleGameHistory(gameHistory);
+            puzzleSave.setSolved(false);
+        }
+        puzzleSave.setName(puzzleName);
+        puzzleSave.setAuthor(psvSave.getPuzzleAuthor());
+
+        JsonUtils.saveCustomPuzzles(this, puzzleSaves);
+        Toast.makeText(this, R.string.puzzle_saved, Toast.LENGTH_SHORT).show();
+
+        setSaveDialogVisible(false);
+    }
+
+    private void setSaveDialogVisible(boolean visible) {
+        psvSave.setVisibility(visible ? View.VISIBLE : View.GONE);
+        cevCharacterEditor.setVisibility(visible ? View.GONE : View.VISIBLE);
+        vwDialogBg.setVisibility(visible ? View.VISIBLE : View.GONE);
+        if (!visible) {
+            WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView())
+                    .hide(WindowInsetsCompat.Type.ime());
         }
     }
 
