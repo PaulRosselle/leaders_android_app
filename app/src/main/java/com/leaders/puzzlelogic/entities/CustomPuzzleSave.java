@@ -12,7 +12,7 @@ import org.json.JSONObject;
 
 public final class CustomPuzzleSave extends PuzzleSave {
     @NonNull
-    private final String author;
+    private String author;
 
     public CustomPuzzleSave(@NonNull String name, @NonNull String author,
                             @NonNull PuzzleLifetime lifetime,
@@ -54,5 +54,13 @@ public final class CustomPuzzleSave extends PuzzleSave {
         } catch (JSONException e) {
             throw new RuntimeException("Invalid default puzzle :" + e);
         }
+    }
+
+    public void setName(@NonNull String name) {
+        this.name = name;
+    }
+
+    public void setAuthor(@NonNull String author) {
+        this.author = author;
     }
 }

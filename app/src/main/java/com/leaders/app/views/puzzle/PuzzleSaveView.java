@@ -11,6 +11,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.leaders.R;
 
 public class PuzzleSaveView extends ConstraintLayout {
+    private String defaultName;
+
     private final EditText edtName;
     private final EditText edtAuthor;
 
@@ -20,34 +22,40 @@ public class PuzzleSaveView extends ConstraintLayout {
 
         inflate(context, R.layout.view_puzzle_save, this);
 
+        defaultName = "";
         edtName = findViewById(R.id.edtName_vwPuzzleSave);
         edtAuthor = findViewById(R.id.edtAuthor_vwPuzzleSave);
     }
 
-    public void setDefaultPuzzleName(String puzzleName) {
-        // Since the name cannot be empty, we can set the default value in the hint
-        if (puzzleName != null && !puzzleName.isEmpty()) {
-            edtName.setHint(puzzleName);
+    public void setDefaultPuzzleName(@NonNull String puzzleName) {
+        defaultName = puzzleName;
+        if (!puzzleName.isEmpty()) {
+            edtName.setHint(defaultName);
         }
     }
 
-    public void setDefaultPuzzleAuthor(String puzzleAuthor) {
-        if (puzzleAuthor != null && !puzzleAuthor.isEmpty()) {
+    public void setDefaultPuzzleAuthor(@NonNull String puzzleAuthor) {
+        if (!puzzleAuthor.isEmpty() && getFormattedText(edtAuthor).isEmpty()) {
             edtAuthor.setText(puzzleAuthor);
         }
     }
 
-    private String getFormattedText(CharSequence charSequence) {
-        return charSequence.toString().trim();
+    private String getFormattedText(EditText editText) {
+        return getFormattedText(editText.getText().toString());
+    }
+
+
+    private String getFormattedText(@NonNull String text) {
+        return text.trim();
     }
 
     public String getPuzzleName() {
-        String name = getFormattedText(edtName.getText());
-        return name.isEmpty() ? getFormattedText(edtName.getHint()) : name;
+        String name = getFormattedText(edtName);
+        return name.isEmpty() ? getFormattedText(defaultName) : name;
     }
 
     public String getPuzzleAuthor() {
-        return getFormattedText(edtAuthor.getText());
+        return getFormattedText(edtAuthor);
     }
 
     public void setOnBtnCancelClick(@NonNull OnClickListener onBtnCancelClick) {

@@ -26,7 +26,7 @@ public final class OfficialPuzzleSave extends PuzzleSave {
         this.id = joPuzzle.getInt("id");
     }
 
-    public int getId() {
+    public final int getId() {
         return id;
     }
 

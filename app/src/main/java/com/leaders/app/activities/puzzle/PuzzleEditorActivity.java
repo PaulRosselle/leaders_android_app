@@ -6,6 +6,10 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
@@ -31,7 +35,6 @@ import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
-import com.leaders.puzzlelogic.enums.PuzzleLifetime;
 import com.leaders.puzzlelogic.utilities.PuzzleEditionUtils;
 import com.leaders.app.views.character.CharacterCardPortraitView;
 import com.leaders.app.views.puzzle.CharacterEditorView;
@@ -44,8 +47,6 @@ import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.factories.GameFactory;
-
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -112,7 +113,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
 
     private Board board;
     private EditorState editorState;
-    private List<CustomPuzzleSave> customPuzzleSaves;
+    private List<CustomPuzzleSave> puzzleSaves;
     private CustomPuzzleSave puzzleSave;
     private PlayableCharacter selectedBoardCharacter;
 
@@ -131,6 +132,12 @@ public final class PuzzleEditorActivity extends BaseActivity {
                     action.ordinal(), action.getOnClickListener(this));
         }
         psvSave = findViewById(R.id.psvSave_actPuzzleEditor);
+        ViewCompat.setOnApplyWindowInsetsListener(psvSave, (v, insets) -> {
+                Insets imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime());
+                psvSave.setTranslationY(-imeInsets.bottom);
+                return insets;
+        });
+        ViewCompat.requestApplyInsets(psvSave);
     }
 
     @Override
@@ -169,7 +176,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
     protected void initDatas() {
         super.initDatas();
 
-        customPuzzleSaves = JsonUtils.loadCustomPuzzles(this);
+        puzzleSaves = JsonUtils.loadCustomPuzzles(this);
 
         // When editing an existing puzzle, its index within customPuzzleSaves is sent through the intent
         Intent intent = getIntent();
@@ -177,7 +184,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
         boolean isImported = intent.getBooleanExtra(ExtraUtils.EXTRA_PUZZLE_IMPORTED, false);
 
         // We load the current state of the board using the puzzle save game history
-        puzzleSave = puzzleIdx != -1 ? customPuzzleSaves.get(puzzleIdx) : null;
+        puzzleSave = puzzleIdx != -1 ? puzzleSaves.get(puzzleIdx) : null;
         GameHistory puzzleGameHistory = puzzleSave != null ?
                 puzzleSave.getPuzzleGameHistory() : PuzzleEditionUtils.getDefaultHistory();
         board = GameFactory.create(puzzleGameHistory).getBoard();
@@ -185,8 +192,8 @@ public final class PuzzleEditorActivity extends BaseActivity {
         // An imported puzzle is only saved temporarely so it can be transmitted to the editor,
         // we display the save dialog in case the user wants to name it and save it
         if (isImported) {
-            customPuzzleSaves.remove(puzzleSave);
-            JsonUtils.saveCustomPuzzles(this, customPuzzleSaves);
+            puzzleSaves.remove(puzzleSave);
+            JsonUtils.saveCustomPuzzles(this, puzzleSaves);
             puzzleSave = null;
             openSavePuzzleDialog();
         }
@@ -623,8 +630,8 @@ public final class PuzzleEditorActivity extends BaseActivity {
     private void openSavePuzzleDialog() {
         // In case the user overwrite the default value and want them back,
         // we apply them every time the save form is reopened
-        psvSave.setDefaultPuzzleName(puzzleSave != null ? puzzleSave.getName() : null);
-        psvSave.setDefaultPuzzleAuthor(puzzleSave != null ? puzzleSave.getAuthor() : null);
+        psvSave.setDefaultPuzzleName(puzzleSave != null ? puzzleSave.getName() : "");
+        psvSave.setDefaultPuzzleAuthor(puzzleSave != null ? puzzleSave.getAuthor() : "");
         setSaveDialogVisible(true);
     }
 
@@ -642,13 +649,16 @@ public final class PuzzleEditorActivity extends BaseActivity {
 
         GameHistory gameHistory = PuzzleEditionUtils.getDefaultHistory(board);
         if (puzzleSave == null) {
-            puzzleSave = new CustomPuzzleSave(puzzleName, psvSave.getPuzzleAuthor(),
-                    PuzzleLifetime.ActionsPhase, new JSONObject(), false);
+            puzzleSave = CustomPuzzleSave.getDefault(gameHistory);
+            puzzleSaves.add(puzzleSave);
+        } else {
+            puzzleSave.updatePuzzleGameHistory(gameHistory);
+            puzzleSave.setSolved(false);
         }
-        puzzleSave.updatePuzzleGameHistory(gameHistory);
+        puzzleSave.setName(puzzleName);
+        puzzleSave.setAuthor(psvSave.getPuzzleAuthor());
 
-
-        JsonUtils.saveCustomPuzzles(this, customPuzzleSaves);
+        JsonUtils.saveCustomPuzzles(this, puzzleSaves);
         Toast.makeText(this, R.string.puzzle_saved, Toast.LENGTH_SHORT).show();
 
         setSaveDialogVisible(false);
@@ -658,6 +668,10 @@ public final class PuzzleEditorActivity extends BaseActivity {
         psvSave.setVisibility(visible ? View.VISIBLE : View.GONE);
         cevCharacterEditor.setVisibility(visible ? View.GONE : View.VISIBLE);
         vwDialogBg.setVisibility(visible ? View.VISIBLE : View.GONE);
+        if (!visible) {
+            WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView())
+                    .hide(WindowInsetsCompat.Type.ime());
+        }
     }
 
     //endregion

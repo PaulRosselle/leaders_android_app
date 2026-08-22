@@ -14,7 +14,7 @@ import org.json.JSONObject;
 
 public abstract class PuzzleSave {
     @NonNull
-    private final String name;
+    protected String name;
     @NonNull
     private final PuzzleLifetime lifetime;
     @NonNull
@@ -57,7 +57,7 @@ public abstract class PuzzleSave {
     @NonNull
     public abstract String getAuthor();
 
-    public void setSolved(boolean solved) {
+    public final void setSolved(boolean solved) {
         this.solved = solved;
     }
 
@@ -69,11 +69,11 @@ public abstract class PuzzleSave {
     public abstract PuzzleCategory getCategory();
 
     @NonNull
-    public PuzzleLifetime getLifetime() {
+    public final PuzzleLifetime getLifetime() {
         return lifetime;
     }
 
-    public void updatePuzzleGameHistory(@NonNull GameHistory gameHistory) {
+    public final void updatePuzzleGameHistory(@NonNull GameHistory gameHistory) {
         try {
             datas = (new GameHistorySerializer()).getAsJson(gameHistory);
         } catch (JSONException e) {
@@ -81,7 +81,7 @@ public abstract class PuzzleSave {
         }
     }
 
-    public GameHistory getPuzzleGameHistory() {
+    public final GameHistory getPuzzleGameHistory() {
         try {
             return (new GameHistorySerializer()).getFromJson(datas, new SerializationContext());
         } catch (JSONException e) {
