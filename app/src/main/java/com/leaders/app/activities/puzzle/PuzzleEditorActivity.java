@@ -35,6 +35,8 @@ import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
+import com.leaders.puzzlelogic.serializers.SerializationContext;
+import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
 import com.leaders.puzzlelogic.utilities.PuzzleEditionUtils;
 import com.leaders.app.views.character.CharacterCardPortraitView;
 import com.leaders.app.views.puzzle.CharacterEditorView;
@@ -47,6 +49,9 @@ import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.factories.GameFactory;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -187,8 +192,25 @@ public final class PuzzleEditorActivity extends BaseActivity {
 
         // We load the current state of the board using the puzzle save game history
         puzzleSave = puzzleIdx != -1 ? puzzleSaves.get(puzzleIdx) : null;
-        GameHistory puzzleGameHistory = puzzleSave != null ?
-                puzzleSave.getPuzzleGameHistory() : PuzzleEditionUtils.getDefaultHistory();
+
+        GameHistory puzzleGameHistory;
+
+        // If puzzle datas were received, we use them directly
+        String puzzleDatas = getIntent().getStringExtra(ExtraUtils.EXTRA_PUZZLE_DATAS);
+        if (puzzleDatas != null && !puzzleDatas.isEmpty()) {
+            try {
+
+                JSONObject joGameHistory = new JSONObject(puzzleDatas);
+                GameHistorySerializer serializer = new GameHistorySerializer();
+                puzzleGameHistory = serializer.getFromJson(joGameHistory, new SerializationContext());
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            // Without explicit puzzle datas, we try to use the datas within the puzzle save
+            puzzleGameHistory = puzzleSave != null ?
+                    puzzleSave.getPuzzleGameHistory() : PuzzleEditionUtils.getDefaultHistory();
+        }
 
         // An imported puzzle is only saved temporarely so it can be transmitted to the editor,
         // we display the save dialog in case the user wants to name it and save it
@@ -587,7 +609,28 @@ public final class PuzzleEditorActivity extends BaseActivity {
     }
 
     public void btnSearchForSolutionsClick(View v) {
-        // TODO
+        String validityErrors = PuzzleEditionUtils.getPuzzleValidityErrors(this,
+                GameFactory.create(PuzzleEditionUtils.getDefaultHistory(board)));
+
+        if (validityErrors.isEmpty()) {
+            Intent intent = ActivityType.PuzzleSolver.getIntent(this);
+            intent.putExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, puzzleSaves.indexOf(puzzleSave));
+            GameHistorySerializer serializer = new GameHistorySerializer();
+            GameHistory gameHistory = PuzzleEditionUtils.getDefaultHistory(board);
+            try {
+                intent.putExtra(ExtraUtils.EXTRA_PUZZLE_DATAS, serializer.getAsJson(gameHistory).toString());
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+            goToActivity(intent);
+        } else {
+            new AlertDialog.Builder(this, R.style.alert_dialog_theme)
+                    .setTitle(R.string.invalid_puzzle)
+                    .setMessage(validityErrors)
+                    .show();
+        }
+
+        setActionsMenuVisible(false);
     }
 
     public void btnImportClick(View v) {
