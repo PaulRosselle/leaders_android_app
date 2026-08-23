@@ -23,6 +23,11 @@ public class LbeUtils {
 
     private final static String POSITION_X_REF_STR = "ABCDEFG";
 
+
+    private LbeUtils(){
+        throw new AssertionError("Cannot instantiate utility class");
+    }
+
     public static int getCharacterExportId(@NonNull CharacterType characterType) {
         switch (characterType) {
             case Acrobat: return 3;
@@ -53,10 +58,6 @@ public class LbeUtils {
             throw new IllegalArgumentException("Cannot export an empty character");
         }
         return String.valueOf(getCharacterExportId(character.getCharacterType()));
-    }
-
-    public static String getCharacterExportStr(@NonNull CharacterType characterType) {
-        return String.valueOf(getCharacterExportId(characterType));
     }
 
     public static CharacterType getCharacterTypeFromExportStr(@NonNull Context context, @NonNull String exportStr) {

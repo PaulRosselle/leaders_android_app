@@ -67,6 +67,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
         SearchForSolution,
         ImportCode,
         ExportCode;
+        // TODO - Add DisplayCellPositions
 
         private int getIconResId() {
             switch (this) {
