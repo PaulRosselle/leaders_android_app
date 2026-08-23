@@ -129,4 +129,8 @@
     <string name="puzzle_error_leader_captured">Leader capturé dans l\'équipe : %s</string>
     <string name="puzzle_error_empty_board">Plateau vide</string>
     <string name="puzzle_error_leader_missing">Leader manquant dans l\'équipe : %s</string>
+    <string name="searching_solution">Recherche de solution en cours…</string>
+    <string name="no_solution_found">Aucune solution trouvée</string>
+    <string name="one_solution_found">Une solution trouvée</string>
+    <string name="x_solutions_found">%d solutions trouvées</string>
 </resources>

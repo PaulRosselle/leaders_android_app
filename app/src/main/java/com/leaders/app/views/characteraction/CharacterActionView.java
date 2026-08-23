@@ -22,15 +22,15 @@ import java.util.Objects;
 
 public class CharacterActionView extends LinearLayoutCompat {
     @NonNull
-    private TextView txvIndex;
+    private final TextView txvIndex;
     @NonNull
-    private CharacterView chvSourceCharacter;
+    private final CharacterView chvSourceCharacter;
     @NonNull
-    private ImageView imvActiveAbility;
+    private final ImageView imvActiveAbility;
     @NonNull
-    private CharacterView chvTargetCharacter;
+    private final CharacterView chvTargetCharacter;
     @NonNull
-    private TextView txvDestination;
+    private final TextView txvDestination;
 
     public CharacterActionView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);

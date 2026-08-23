@@ -127,5 +127,9 @@
     <string name="puzzle_error_leader_captured">Leader captured in team: %s</string>
     <string name="puzzle_error_empty_board">Invalid puzzle: Empty board</string>
     <string name="puzzle_error_leader_missing">Leader missing in team: %s</string>
+    <string name="searching_solution">Searching solution…</string>
+    <string name="no_solution_found">No solution found</string>
+    <string name="one_solution_found">One solution found</string>
+    <string name="x_solutions_found">%d solutions found</string>
 
 </resources>
