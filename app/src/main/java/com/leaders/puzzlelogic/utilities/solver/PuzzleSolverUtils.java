@@ -47,6 +47,8 @@ public final class PuzzleSolverUtils {
      */
     public static void solve(@NonNull Game game,
                              @NonNull GameHistory history,
+                             @NonNull List<Character> characters,
+                             long permutationIndex,
                              @NonNull BlockingQueue<List<CharacterAction>> solutions) throws InterruptedException {
         IPhase phase = GameHistoryQuery.findCurrentPhase(history);
 
@@ -56,7 +58,10 @@ public final class PuzzleSolverUtils {
 
         ActionsPhase actionsPhase = (ActionsPhase) phase;
 
-        search(game, history, actionsPhase, new ArrayList<>(), new QueueSolutionCollector(solutions));
+        search(game, history, actionsPhase,
+                getPermutation(characters, permutationIndex),
+                new QueueSolutionCollector(solutions)
+        );
     }
 
     /**
@@ -394,5 +399,59 @@ public final class PuzzleSolverUtils {
 
             enumerateResolverState(resolver, next, actions);
         }
+    }
+
+    /**
+     * Returns the permutation of {@code characters} identified by {@code index}
+     * in lexicographic order.
+     *
+     * @param characters the elements to permute
+     * @param index the zero-based permutation index, in {@code [0, n!)}
+     * @return the permutation corresponding to {@code index}
+     * @throws IllegalArgumentException if {@code index} is outside the valid range
+     */
+    @NonNull
+    private static List<Character> getPermutation(@NonNull List<Character> characters,
+                                                  long index) {
+        int size = characters.size();
+
+        if (index < 0 || index >= factorial(size)) {
+            throw new IllegalArgumentException("Invalid permutation index: " + index);
+        }
+
+        List<Character> remaining = new ArrayList<>(characters);
+        List<Character> permutation = new ArrayList<>(size);
+
+        for (int position = size - 1; position >= 0; position--) {
+            long blockSize = factorial(position);
+
+            int selectedIndex = (int) (index / blockSize);
+            index %= blockSize;
+
+            permutation.add(remaining.remove(selectedIndex));
+        }
+
+        return permutation;
+    }
+
+    /**
+     * Returns the factorial of {@code value}.
+     *
+     * @param value a non-negative integer
+     * @return {@code value!}
+     * @throws IllegalArgumentException if the result exceeds {@link Long#MAX_VALUE}
+     */
+    private static long factorial(int value) {
+        long result = 1;
+
+        for (int i = 2; i <= value; i++) {
+            if (Long.MAX_VALUE / i < result) {
+                throw new IllegalArgumentException("Factorial exceeds long range: " + value);
+            }
+
+            result *= i;
+        }
+
+        return result;
     }
 }
