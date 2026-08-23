@@ -17,6 +17,7 @@ public enum TargetCategory {
      * @return the interaction result type corresponding to this target category
      * @throws IllegalArgumentException if this target category has no associated result type
      */
+    @NonNull
     public InteractionResultType getResultType() {
         switch (this) {
             case PlayableCharacter:
