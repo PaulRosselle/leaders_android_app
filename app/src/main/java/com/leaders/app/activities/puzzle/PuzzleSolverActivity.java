@@ -2,13 +2,13 @@ package com.leaders.app.activities.puzzle;
 
 import android.content.Intent;
 import android.view.View;
-import android.widget.LinearLayout;
+import android.widget.HorizontalScrollView;
 import android.widget.ProgressBar;
-import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
@@ -18,7 +18,7 @@ import com.leaders.app.enums.ActivityType;
 import com.leaders.app.utilities.ButtonUtils;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.views.board.ReadOnlyBoardView;
-import com.leaders.app.views.characteraction.CharacterActionView;
+import com.leaders.app.views.characteraction.CharacterActionTimelineView;
 import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
@@ -50,7 +50,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class PuzzleSolverActivity extends BaseActivity {
+public final class PuzzleSolverActivity extends BaseActivity {
     @NonNull
     private final List<List<CharacterAction>> solutions = new ArrayList<>();
 
@@ -58,12 +58,11 @@ public class PuzzleSolverActivity extends BaseActivity {
     private final Object solutionsLock = new Object();
 
     private ReadOnlyBoardView bdvBoard;
-    private LinearLayout llyActions;
-    private SeekBar skbSolutions;
     private ProgressBar pgbSolutionsSearch;
     private TextView txvSolutionsFound;
-    private MaterialButton btnPlayNextAction;
-    private MaterialButton btnPlayPreviousAction;
+    private MaterialButton btnPreviousSolution;
+    private MaterialButton btnNextSolution;
+    private CharacterActionTimelineView catvActions;
 
     private int puzzleIdx;
     private GameHistory puzzleGameHistory;
@@ -75,53 +74,27 @@ public class PuzzleSolverActivity extends BaseActivity {
 
     @Nullable
     private List<CharacterAction> displayedSolution;
-    private int displayedActionIndex;
 
     @Override
     protected void initViews() {
         super.initViews();
 
         bdvBoard = findViewById(R.id.bdvBoard_actPuzzleSolver);
-        btnPlayNextAction = findViewById(R.id.btnPlayNextAction_actPuzzleSolver);
-        btnPlayPreviousAction = findViewById(R.id.btnPlayPreviousAction_actPuzzleSolver);
-        llyActions = findViewById(R.id.llyActions_actPuzzleSolver);
-        skbSolutions = findViewById(R.id.skbSolutions_actPuzzleSolver);
+        btnPreviousSolution = findViewById(R.id.btnNextSolution_actPuzzleSolver);
+        btnNextSolution = findViewById(R.id.btnPreviousSolution_actPuzzleSolver);
         pgbSolutionsSearch = findViewById(R.id.pgbSolutionsLoading_actPuzzleSolver);
         txvSolutionsFound = findViewById(R.id.txvSolutionsFound_actPuzzleSolver);
+        catvActions = findViewById(R.id.catvActions_actPuzzleSolver);
     }
 
     @Override
     protected void initListeners() {
         super.initListeners();
 
-        skbSolutions.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(@NonNull SeekBar seekBar, int progress, boolean fromUser) {
-                if (!fromUser) {
-                    return;
-                }
+        catvActions.setOnMarkerSelectedListener(this::onActionTimelineMarkerSelect);
 
-                List<CharacterAction> solutionToDisplay;
-                synchronized (solutionsLock) {
-                    solutionToDisplay = new ArrayList<>(solutions.get(progress));
-                }
-
-                setDisplayedSolution(solutionToDisplay, false);
-            }
-
-            @Override
-            public void onStartTrackingTouch(@NonNull SeekBar seekBar) {
-                // Nothing to do.
-            }
-
-            @Override
-            public void onStopTrackingTouch(@NonNull SeekBar seekBar) {
-                // Nothing to do.
-            }
-        });
-
-        btnPlayPreviousAction.setOnClickListener(v -> playPreviousAction());
-        btnPlayNextAction.setOnClickListener(v -> playNextAction());
+        btnNextSolution.setOnClickListener(this::btnChangeDisplayedSolutionClick);
+        btnPreviousSolution.setOnClickListener(this::btnChangeDisplayedSolutionClick);
     }
 
     @Override
@@ -129,7 +102,6 @@ public class PuzzleSolverActivity extends BaseActivity {
         super.initDatas();
 
         displayedSolution = null;
-        displayedActionIndex = -1;
 
         puzzleIdx = getIntent().getIntExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, -1);
 
@@ -165,7 +137,7 @@ public class PuzzleSolverActivity extends BaseActivity {
         return R.id.gdlRoot_actPuzzleSolver;
     }
 
-    @Nullable
+    @NonNull
     @Override
     protected Integer getBtnBackResId() {
         return R.id.btnBack_actPuzzleSolver;
@@ -374,7 +346,7 @@ public class PuzzleSolverActivity extends BaseActivity {
         runOnUiThread(() -> {
             updateSolutions();
             if (finalSolutionToDisplay != null) {
-                setDisplayedSolution(finalSolutionToDisplay, true);
+                setDisplayedSolution(finalSolutionToDisplay);
             }
         });
     }
@@ -392,118 +364,146 @@ public class PuzzleSolverActivity extends BaseActivity {
         // If the search ended without finding a solution, we update the search display
         if (hasNoSolution) {
             txvSolutionsFound.setText(R.string.no_solution_found);
-            skbSolutions.setVisibility(View.GONE);
-            updatePlayButtons();
+            updateSolutionButtons();
         }
 
         pgbSolutionsSearch.setVisibility(View.GONE);
     }
 
     private void updateSolutions() {
+        updateSolutionTextView();
+        updateSolutionButtons();
+    }
+
+    private void setDisplayedSolution(@NonNull List<CharacterAction> solutionToDisplay) {
+        displayedSolution = solutionToDisplay;
+
+        catvActions.setActions(displayedSolution);
+
+        showBoardState(0);
+
+        catvActions.post(this::updateActionsScrollView);
+        updateSolutionTextView();
+        updateSolutionButtons();
+    }
+
+    private void btnChangeDisplayedSolutionClick(View v) {
+        int incValue = v == btnNextSolution ? 1 : -1;
+
+        List<CharacterAction> previousSolution;
+        synchronized (solutionsLock) {
+            previousSolution = solutions.get(solutions.indexOf(displayedSolution) + incValue);
+        }
+
+        setDisplayedSolution(previousSolution);
+    }
+
+    private void updateSolutionTextView() {
+        int solutionIndex;
         int solutionCount;
 
         synchronized (solutionsLock) {
+            solutionIndex = solutions.indexOf(displayedSolution) + 1;
             solutionCount = solutions.size();
+        }
+
+        if (solutionCount == 0) {
+            throw new IllegalStateException("Solution textView updated without solution");
         }
 
         if (solutionCount == 1) {
             txvSolutionsFound.setText(R.string.one_solution_found);
-            skbSolutions.setVisibility(View.GONE);
         } else {
-            txvSolutionsFound.setText(getString(R.string.x_solutions_found, solutionCount));
-            skbSolutions.setMax(solutionCount - 1);
-            skbSolutions.setVisibility(View.VISIBLE);
-        }
-
-        updatePlayButtons();
-    }
-
-    private void setDisplayedSolution(@NonNull List<CharacterAction> solutionToDisplay,
-                                      boolean updateSeekbarProgress) {
-        displayedSolution = solutionToDisplay;
-        displayedActionIndex = -1;
-
-        llyActions.removeAllViews();
-
-        for (int i = 0; i < displayedSolution.size(); i++) {
-            CharacterActionView actionView = new CharacterActionView(this, i, displayedSolution.get(i));
-
-            LinearLayout.LayoutParams layoutParams =
-                    new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT
-                    );
-            int verticalMargin = (int) (2 * getResources().getDisplayMetrics().density);
-            layoutParams.topMargin = verticalMargin;
-            layoutParams.bottomMargin = verticalMargin;
-
-            llyActions.addView(actionView, layoutParams);
-        }
-
-        showBoardStateAtAction(-1);
-        updatePlayButtons();
-
-        if (updateSeekbarProgress) {
-            int solutionIndex;
-            synchronized (solutionsLock) {
-                solutionIndex = solutions.indexOf(displayedSolution);
-            }
-            skbSolutions.setProgress(solutionIndex);
+            txvSolutionsFound.setText(getString(R.string.solution_x_out_of_n, solutionIndex, solutionCount));
         }
     }
 
-    private void playNextAction() {
-        if (displayedSolution == null || displayedActionIndex >= displayedSolution.size() - 1) {
-            return;
+    private void updateSolutionButtons() {
+        int solutionIndex;
+        int solutionsCount;
+        synchronized (solutionsLock) {
+            solutionIndex = solutions.indexOf(displayedSolution);
+            solutionsCount = solutions.size();
         }
 
-        displayedActionIndex++;
-        showBoardStateAtAction(displayedActionIndex);
-        updatePlayButtons();
-    }
+        boolean hasSolutions = solutionsCount > 1;
+        btnNextSolution.setVisibility(hasSolutions ? View.VISIBLE : View.INVISIBLE);
+        btnPreviousSolution.setVisibility(hasSolutions ? View.VISIBLE : View.INVISIBLE);
 
-    private void playPreviousAction() {
-        if (displayedActionIndex < 0) {
-            return;
+        if (hasSolutions) {
+            ButtonUtils.setButtonEnabled(btnNextSolution, solutionIndex < solutionsCount - 2);
+            ButtonUtils.setButtonEnabled(btnPreviousSolution, solutionIndex > 0);
         }
-
-        displayedActionIndex--;
-        showBoardStateAtAction(displayedActionIndex);
-        updatePlayButtons();
     }
 
-    /**
-     * Rebuilds the displayed board from the original puzzle and applies the
-     * selected prefix of the solution through the same action handlers used by
-     * the game logic.
-     */
-    private void showBoardStateAtAction(int actionIndex) {
+    private void shutdownSearch() {
+        solverExecutor.shutdownNow();
+        solutionConsumerThread.interrupt();
+    }
+
+
+    // TODO - generate javadoc
+    private void showBoardState(int timelineMarkerIndex) {
         if (displayedSolution == null) {
-            return;
+            throw new IllegalStateException("No solution found matching actions timeline");
         }
+
+        // TODO - add back
+        /*if (timelineMarkerIndex < 0 || timelineMarkerIndex > displayedSolution.size()) {
+            throw new IllegalArgumentException("Invalid timeline marker index: " + timelineMarkerIndex);
+        }*/
 
         Game displayGame = GameFactory.create(puzzleGameHistory);
 
-        int lastAction = Math.min(actionIndex, displayedSolution.size() - 1);
-        for (int i = 0; i <= lastAction; i++) {
+        // TODO - remove la limite
+        for (int i = 0; i < Math.min(timelineMarkerIndex, displayedSolution.size()); i++) {
             CharacterAction action = displayedSolution.get(i);
-            GameActionHandler handler =
-                    GameActionHandlerFactory.create(displayGame, action);
+            GameActionHandler handler = GameActionHandlerFactory.create(displayGame, action);
             handler.doAction();
         }
 
         bdvBoard.setBoard(displayGame.getBoard());
     }
 
-    private void updatePlayButtons() {
-        ButtonUtils.setButtonEnabled(btnPlayPreviousAction,
-                displayedSolution != null && displayedActionIndex >= 0);
-        ButtonUtils.setButtonEnabled(btnPlayNextAction,
-                displayedSolution != null && displayedActionIndex < displayedSolution.size() - 1);
+    private void onActionTimelineMarkerSelect(int markerIndex) {
+        showBoardState(markerIndex);
     }
 
-    private void shutdownSearch() {
-        solverExecutor.shutdownNow();
-        solutionConsumerThread.interrupt();
+    private void updateActionsScrollView() {
+        HorizontalScrollView scvActions = findViewById(R.id.scvActions_actPuzzleSolver);
+        ConstraintLayout.LayoutParams params =
+                (ConstraintLayout.LayoutParams) scvActions.getLayoutParams();
+
+        int availableWidth = scvActions.getMeasuredWidth();
+
+        if (availableWidth <= 0) {
+            scvActions.post(this::updateActionsScrollView);
+            return;
+        }
+
+        int timelineWidth = catvActions.getMeasuredWidth();
+
+        if (timelineWidth <= availableWidth) {
+            // The whole timeline fits on screen.
+            // Let the ScrollView have its natural width and center it.
+            params.width = ConstraintLayout.LayoutParams.WRAP_CONTENT;
+
+            params.startToStart = R.id.imvSolutionsBg_actPuzzleSolver;
+            params.endToEnd = R.id.imvSolutionsBg_actPuzzleSolver;
+
+            params.horizontalBias = 0.5f;
+
+        } else {
+            // The timeline is wider than the screen.
+            // Make the ScrollView fill the available width so it can scroll.
+            params.width = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT;
+
+            params.startToStart = R.id.imvSolutionsBg_actPuzzleSolver;
+            params.endToEnd = R.id.imvSolutionsBg_actPuzzleSolver;
+
+            params.horizontalBias = 0.5f;
+        }
+
+        scvActions.setLayoutParams(params);
     }
 }

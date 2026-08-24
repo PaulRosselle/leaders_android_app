@@ -130,6 +130,6 @@
     <string name="searching_solution">Searching solution…</string>
     <string name="no_solution_found">No solution found</string>
     <string name="one_solution_found">One solution found</string>
-    <string name="x_solutions_found">%d solutions found</string>
+    <string name="solution_x_out_of_n">Solution %d/%d</string>
 
 </resources>

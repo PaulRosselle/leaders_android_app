@@ -18,11 +18,11 @@ import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterMotionType;
 
+import org.w3c.dom.Attr;
+
 import java.util.Objects;
 
 public class CharacterActionView extends LinearLayoutCompat {
-    @NonNull
-    private final TextView txvIndex;
     @NonNull
     private final CharacterView chvSourceCharacter;
     @NonNull
@@ -37,18 +37,16 @@ public class CharacterActionView extends LinearLayoutCompat {
 
         inflate(context, R.layout.view_character_action, this);
 
-        txvIndex = findViewById(R.id.txvIndex_vwCharacterAction);
         chvSourceCharacter = findViewById(R.id.chvSourceCharacter_vwCharacterAction);
         imvActiveAbility = findViewById(R.id.imvActiveAbility_vwCharacterAction);
         chvTargetCharacter = findViewById(R.id.chvTargetCharacter_vwCharacterAction);
         txvDestination = findViewById(R.id.txvDestination_vwCharacterAction);
     }
 
-    public CharacterActionView(@NonNull Context context, int index,
+    public CharacterActionView(@NonNull Context context,
                                @NonNull CharacterAction characterAction) {
-        this(context, null);
+        this(context, (AttributeSet) null);
 
-        txvIndex.setText(String.format("%s -", index + 1));
 
         chvSourceCharacter.setCharacter(characterAction.getSrcCharacter());
 

@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
+    android:layout_height="@dimen/character_action_height"
+    android:orientation="vertical"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintHorizontal_bias="0.0"
@@ -13,46 +12,28 @@
     app:layout_constraintTop_toTopOf="parent"
     app:layout_constraintVertical_bias="0.0">
 
-    <TextView
-        android:id="@+id/txvIndex_vwCharacterAction"
-        android:layout_width="@dimen/character_action_element_size"
-        android:layout_height="@dimen/character_action_element_size"
-        android:layout_weight="1"
-        android:autoSizeMaxTextSize="48dp"
-        android:autoSizeMinTextSize="12dp"
-        android:autoSizePresetSizes="32dp"
-        android:autoSizeStepGranularity="4dp"
-        android:autoSizeTextType="uniform"
-        android:fontFamily="@font/bobby_jones_regular"
-        android:gravity="center"
-        android:textAlignment="gravity"
-        android:textAllCaps="true"
-        android:textColor="@color/app_golden"
-        tools:text="1 -" />
-
     <com.leaders.app.views.character.CharacterView
         android:id="@+id/chvSourceCharacter_vwCharacterAction"
-        android:layout_width="@dimen/character_action_element_size"
-        android:layout_height="@dimen/character_action_element_size"/>
+        android:layout_width="@dimen/character_action_width"
+        android:layout_height="@dimen/character_action_width" />
 
     <ImageView
         android:id="@+id/imvActiveAbility_vwCharacterAction"
-        android:layout_width="@dimen/character_action_element_size"
-        android:layout_height="@dimen/character_action_element_size"
+        android:layout_width="@dimen/character_action_width"
+        android:layout_height="@dimen/character_action_width"
         android:importantForAccessibility="no"
         android:padding="4dp"
         app:srcCompat="@drawable/icon_ability_active" />
 
     <com.leaders.app.views.character.CharacterView
         android:id="@+id/chvTargetCharacter_vwCharacterAction"
-        android:layout_width="@dimen/character_action_element_size"
-        android:layout_height="@dimen/character_action_element_size"/>
+        android:layout_width="@dimen/character_action_width"
+        android:layout_height="@dimen/character_action_width" />
 
     <TextView
         android:id="@+id/txvDestination_vwCharacterAction"
-        android:layout_width="@dimen/character_action_element_size"
-        android:layout_height="@dimen/character_action_element_size"
-        android:layout_weight="1"
+        android:layout_width="@dimen/character_action_width"
+        android:layout_height="@dimen/character_action_width"
         android:autoSizeMaxTextSize="48dp"
         android:autoSizeMinTextSize="12dp"
         android:autoSizePresetSizes="32dp"
