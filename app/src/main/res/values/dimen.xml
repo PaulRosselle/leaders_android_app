@@ -8,11 +8,13 @@
     <dimen name="round_button_icon_size">36dp</dimen>
 
     <dimen name="character_action_offset_margin">23dp</dimen>
-    <dimen name="character_action_inner_margin">4dp</dimen>
-    <dimen name="character_action_marker_size">21dp</dimen>
+    <dimen name="character_action_inner_margin">2dp</dimen>
+    <dimen name="character_action_marker_size">22dp</dimen>
+    <dimen name="character_action_marker_empty_size">12dp</dimen>
     <dimen name="character_action_marker_border_size">2dp</dimen>
     <dimen name="character_action_width">42dp</dimen>
-    <dimen name="character_action_height">168dp</dimen>
+    <dimen name="character_action_element_size">38dp</dimen>
+    <dimen name="character_action_height">156dp</dimen>
 
     <dimen name="solver_progress_bar_size">30dp</dimen>
 

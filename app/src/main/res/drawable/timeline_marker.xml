@@ -3,4 +3,5 @@
     <solid android:color="@color/app_golden"/>
     <size android:height="@dimen/character_action_marker_size"
         android:width="@dimen/character_action_marker_size"/>
+    <stroke android:color="@color/transparent_golden" android:width="3dp"/>
 </shape>

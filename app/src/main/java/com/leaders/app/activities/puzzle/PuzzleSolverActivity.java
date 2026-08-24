@@ -51,6 +51,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 public final class PuzzleSolverActivity extends BaseActivity {
+    // TODO - Add DisplayCellPositions
     @NonNull
     private final List<List<CharacterAction>> solutions = new ArrayList<>();
 
@@ -63,6 +64,7 @@ public final class PuzzleSolverActivity extends BaseActivity {
     private MaterialButton btnPreviousSolution;
     private MaterialButton btnNextSolution;
     private CharacterActionTimelineView catvActions;
+    private HorizontalScrollView scvActions;
 
     private int puzzleIdx;
     private GameHistory puzzleGameHistory;
@@ -80,11 +82,12 @@ public final class PuzzleSolverActivity extends BaseActivity {
         super.initViews();
 
         bdvBoard = findViewById(R.id.bdvBoard_actPuzzleSolver);
-        btnPreviousSolution = findViewById(R.id.btnNextSolution_actPuzzleSolver);
-        btnNextSolution = findViewById(R.id.btnPreviousSolution_actPuzzleSolver);
+        btnPreviousSolution = findViewById(R.id.btnPreviousSolution_actPuzzleSolver);
+        btnNextSolution = findViewById(R.id.btnNextSolution_actPuzzleSolver);
         pgbSolutionsSearch = findViewById(R.id.pgbSolutionsLoading_actPuzzleSolver);
         txvSolutionsFound = findViewById(R.id.txvSolutionsFound_actPuzzleSolver);
         catvActions = findViewById(R.id.catvActions_actPuzzleSolver);
+        scvActions = findViewById(R.id.scvActions_actPuzzleSolver);
     }
 
     @Override
@@ -431,7 +434,7 @@ public final class PuzzleSolverActivity extends BaseActivity {
         btnPreviousSolution.setVisibility(hasSolutions ? View.VISIBLE : View.INVISIBLE);
 
         if (hasSolutions) {
-            ButtonUtils.setButtonEnabled(btnNextSolution, solutionIndex < solutionsCount - 2);
+            ButtonUtils.setButtonEnabled(btnNextSolution, solutionIndex < solutionsCount - 1);
             ButtonUtils.setButtonEnabled(btnPreviousSolution, solutionIndex > 0);
         }
     }
@@ -442,21 +445,28 @@ public final class PuzzleSolverActivity extends BaseActivity {
     }
 
 
-    // TODO - generate javadoc
+    /**
+     * Displays the board state resulting from applying the displayed solution up
+     * to the specified timeline marker.
+     *
+     * @param timelineMarkerIndex the number of actions to apply, in
+     *                            {@code [0, displayedSolution.size()]}
+     * @throws IllegalStateException if no solution is available to display
+     * @throws IllegalArgumentException if {@code timelineMarkerIndex} is outside
+     *                                  the valid range
+     */
     private void showBoardState(int timelineMarkerIndex) {
         if (displayedSolution == null) {
             throw new IllegalStateException("No solution found matching actions timeline");
         }
 
-        // TODO - add back
-        /*if (timelineMarkerIndex < 0 || timelineMarkerIndex > displayedSolution.size()) {
+        if (timelineMarkerIndex < 0 || timelineMarkerIndex > displayedSolution.size()) {
             throw new IllegalArgumentException("Invalid timeline marker index: " + timelineMarkerIndex);
-        }*/
+        }
 
         Game displayGame = GameFactory.create(puzzleGameHistory);
 
-        // TODO - remove la limite
-        for (int i = 0; i < Math.min(timelineMarkerIndex, displayedSolution.size()); i++) {
+        for (int i = 0; i < timelineMarkerIndex; i++) {
             CharacterAction action = displayedSolution.get(i);
             GameActionHandler handler = GameActionHandlerFactory.create(displayGame, action);
             handler.doAction();
@@ -470,12 +480,9 @@ public final class PuzzleSolverActivity extends BaseActivity {
     }
 
     private void updateActionsScrollView() {
-        HorizontalScrollView scvActions = findViewById(R.id.scvActions_actPuzzleSolver);
-        ConstraintLayout.LayoutParams params =
-                (ConstraintLayout.LayoutParams) scvActions.getLayoutParams();
+        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) scvActions.getLayoutParams();
 
         int availableWidth = scvActions.getMeasuredWidth();
-
         if (availableWidth <= 0) {
             scvActions.post(this::updateActionsScrollView);
             return;
@@ -488,20 +495,11 @@ public final class PuzzleSolverActivity extends BaseActivity {
             // Let the ScrollView have its natural width and center it.
             params.width = ConstraintLayout.LayoutParams.WRAP_CONTENT;
 
-            params.startToStart = R.id.imvSolutionsBg_actPuzzleSolver;
-            params.endToEnd = R.id.imvSolutionsBg_actPuzzleSolver;
-
-            params.horizontalBias = 0.5f;
-
         } else {
             // The timeline is wider than the screen.
             // Make the ScrollView fill the available width so it can scroll.
             params.width = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT;
 
-            params.startToStart = R.id.imvSolutionsBg_actPuzzleSolver;
-            params.endToEnd = R.id.imvSolutionsBg_actPuzzleSolver;
-
-            params.horizontalBias = 0.5f;
         }
 
         scvActions.setLayoutParams(params);

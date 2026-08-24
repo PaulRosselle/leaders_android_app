@@ -11,11 +11,11 @@ import android.widget.LinearLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 
 import com.leaders.R;
 import com.leaders.gamelogic.actions.CharacterAction;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class CharacterActionTimelineView extends ConstraintLayout {
@@ -58,16 +58,14 @@ public class CharacterActionTimelineView extends ConstraintLayout {
         int actionWidth = getResources().getDimensionPixelSize(R.dimen.character_action_width);
         int actionHeight = getResources().getDimensionPixelSize(R.dimen.character_action_height);
 
-        List<CharacterAction> test = new ArrayList<>(actions);
-        test.addAll(actions);
-        for (CharacterAction action : test) {
+        for (CharacterAction action : actions) {
             llyMarkers.addView(getMarkerView(), getMarkerLayoutParams(actionWidth, actionMargin));
             llyActions.addView(getActionView(action), getActionLayoutParams(actionWidth, actionHeight, actionMargin));
         }
         // Each action is bounded by a marker before and after it, so there is always one more marker than action
         llyMarkers.addView(getMarkerView(), getMarkerLayoutParams(actionWidth, actionMargin));
 
-        selectMarkersUntil(0);
+        selectMarker(0);
     }
 
     private ImageView getMarkerView() {
@@ -77,8 +75,9 @@ public class CharacterActionTimelineView extends ConstraintLayout {
     }
 
     private CharacterActionView getActionView(@NonNull CharacterAction action) {
-        return new CharacterActionView(getContext(), action);
-        // TODO on character long click ?
+        CharacterActionView cavAction = new CharacterActionView(getContext(), action);
+        cavAction.setOnClickListener(this::onActionClick);
+        return cavAction;
     }
 
     private LinearLayout.LayoutParams getMarkerLayoutParams(int size, int margin) {
@@ -99,11 +98,16 @@ public class CharacterActionTimelineView extends ConstraintLayout {
         return layoutParams;
     }
 
-    private void selectMarkersUntil(int lastMarkerIndex) {
+    private void selectMarker(int lastMarkerIndex) {
         for (int i = 0; i < llyMarkers.getChildCount(); i++) {
-            ImageView imvMarker = (ImageView) llyMarkers.getChildAt(i);
-            imvMarker.setImageResource(i <= lastMarkerIndex ?
+            ((ImageView) llyMarkers.getChildAt(i)).setImageResource(i == lastMarkerIndex ?
                     R.drawable.timeline_marker : R.drawable.timeline_marker_empty);
+        }
+
+        for (int i = 0; i < llyActions.getChildCount(); i++) {
+            CharacterActionView cavAction = (CharacterActionView) llyActions.getChildAt(i);
+            cavAction.setForeground(i < lastMarkerIndex ?
+                    ContextCompat.getDrawable(getContext(), R.drawable.round_rect_stroke_golden) : null);
         }
     }
 
@@ -151,7 +155,7 @@ public class CharacterActionTimelineView extends ConstraintLayout {
 
         lastDraggedMarker = markerIndex;
 
-        selectMarkersUntil(markerIndex);
+        selectMarker(markerIndex);
 
         if (onMarkerSelectedListener != null) {
             onMarkerSelectedListener.onMarkerSelected(markerIndex);
@@ -175,5 +179,14 @@ public class CharacterActionTimelineView extends ConstraintLayout {
         }
 
         return closestIndex;
+    }
+
+    private void onActionClick(View v) {
+        int markerIndex = llyActions.indexOfChild(v) + 1;
+        selectMarker(markerIndex);
+
+        if (onMarkerSelectedListener != null) {
+            onMarkerSelectedListener.onMarkerSelected(markerIndex);
+        }
     }
 }

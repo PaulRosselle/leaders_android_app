@@ -144,7 +144,7 @@ public final class PuzzleSelectorView extends ConstraintLayout {
         int authorColorId = R.color.font;
         if (isChecked) {
             strokeWidth *= 2;
-            bgColorId = R.color.black;
+            bgColorId = R.color.ultra_dark_background;
             strokeColorId = R.color.white;
             nameColorId = R.color.white;
             authorColorId = R.color.white;
