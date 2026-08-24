@@ -62,10 +62,6 @@ public final class BruiserActionResolver extends CharacterActionResolver {
         }
 
         if (isBruiserTargetResult(firstResult)) {
-            return buildPushDestinationInteraction(builder, firstResult);
-        }
-
-        if (isBruiserTargetResult(firstResult)) {
             if (builder.getResults().size() > 1) {
                 if (!isBruiserPushDestinationResult(builder.getResults().get(1))) {
                     throw new IllegalArgumentException("Invalid result type for a Bruiser ability activation");

@@ -172,15 +172,19 @@ public final class PuzzleSolverUtils {
     }
 
     /**
-     * Explores all possible actions of a mandatory opponent character and retains
-     * only the continuations valid for every possible action.
+     * Explores all possible actions of a mandatory opponent character.
+     *
+     * <p>Every possible action of the opponent must leave at least one winning
+     * continuation for the current player. If one opponent action does not allow
+     * any solution, the whole branch is invalidated. Otherwise, all solutions
+     * found across the opponent actions are collected.</p>
      *
      * @param game the game being explored
      * @param history the game history used to evaluate possible continuations
      * @param actionsPhase the current actions phase
      * @param remainingCharacters the characters remaining to be explored
      * @param playableCharacter the opponent character whose actions are being explored
-     * @param collector the collector receiving continuations valid for every action
+     * @param collector the collector receiving the valid solutions
      * @throws InterruptedException if the exploration is interrupted
      */
     private static void exploreOpponentCharacterActions(@NonNull Game game,
@@ -191,7 +195,7 @@ public final class PuzzleSolverUtils {
                                                         @NonNull ISolutionCollector collector) throws InterruptedException {
         List<CharacterAction> actions = enumerateActions(game, history, playableCharacter.getCharacter());
 
-        List<List<CharacterAction>> commonSolutions = null;
+        List<List<CharacterAction>> solutions = new ArrayList<>();
 
         for (CharacterAction action : actions) {
             GameActionHandler handler = GameActionHandlerFactory.create(game, action);
@@ -204,26 +208,22 @@ public final class PuzzleSolverUtils {
 
                 search(game, history, actionsPhase, remainingCharacters, branchCollector);
 
-                if (commonSolutions == null) {
-                    commonSolutions = branchCollector.getSolutions();
-                } else {
-                    commonSolutions = intersectSolutions(commonSolutions, branchCollector.getSolutions());
-                }
-
-                // No continuation is valid for every possible opponent action.
-                if (commonSolutions.isEmpty()) {
+                // If this opponent action prevents every possible solution, the AND node is invalid
+                if (branchCollector.getSolutions().isEmpty()) {
                     return;
                 }
+
+                // This opponent action allows at least one solution
+                solutions.addAll(branchCollector.getSolutions());
+
             } finally {
                 actionsPhase.getActions().remove(actionsPhase.getActions().size() - 1);
                 handler.undoAction();
             }
         }
 
-        if (commonSolutions != null) {
-            for (List<CharacterAction> solution : commonSolutions) {
-                collector.add(solution);
-            }
+        for (List<CharacterAction> solution : solutions) {
+            collector.add(solution);
         }
     }
 
