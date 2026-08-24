@@ -20,7 +20,6 @@ import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.views.board.ReadOnlyBoardView;
 import com.leaders.app.views.characteraction.CharacterActionView;
 import com.leaders.gamelogic.actions.CharacterAction;
-import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
@@ -36,6 +35,7 @@ import com.leaders.gamelogic.queries.GameHistoryQuery;
 import com.leaders.puzzlelogic.serializers.SerializationContext;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
 import com.leaders.puzzlelogic.utilities.solver.PuzzleSolverUtils;
+import com.leaders.puzzlelogic.utilities.solver.SolutionComparatorUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -73,8 +73,9 @@ public class PuzzleSolverActivity extends BaseActivity {
     private CountDownLatch solverWorkersLatch;
     private BlockingQueue<List<CharacterAction>> solutionQueue;
 
-    private int currentSolutionIdx;
-    private int currentActionIdx;
+    @Nullable
+    private List<CharacterAction> displayedSolution;
+    private int displayedActionIndex;
 
     @Override
     protected void initViews() {
@@ -96,9 +97,16 @@ public class PuzzleSolverActivity extends BaseActivity {
         skbSolutions.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(@NonNull SeekBar seekBar, int progress, boolean fromUser) {
-                if (fromUser) {
-                    displaySolution(progress);
+                if (!fromUser) {
+                    return;
                 }
+
+                List<CharacterAction> solutionToDisplay;
+                synchronized (solutionsLock) {
+                    solutionToDisplay = new ArrayList<>(solutions.get(progress));
+                }
+
+                setDisplayedSolution(solutionToDisplay, false);
             }
 
             @Override
@@ -120,8 +128,8 @@ public class PuzzleSolverActivity extends BaseActivity {
     protected void initDatas() {
         super.initDatas();
 
-        currentSolutionIdx = -1;
-        currentActionIdx = -1;
+        displayedSolution = null;
+        displayedActionIndex = -1;
 
         puzzleIdx = getIntent().getIntExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, -1);
 
@@ -311,8 +319,7 @@ public class PuzzleSolverActivity extends BaseActivity {
     private void consumeSolutions() {
         try {
             while (solverWorkersLatch.getCount() > 0 || !solutionQueue.isEmpty()) {
-                List<CharacterAction> solution =
-                        solutionQueue.poll(100, TimeUnit.MILLISECONDS);
+                List<CharacterAction> solution = solutionQueue.poll(100, TimeUnit.MILLISECONDS);
 
                 if (solution != null) {
                     addSolution(solution);
@@ -326,84 +333,50 @@ public class PuzzleSolverActivity extends BaseActivity {
         }
     }
 
-    private void addSolution(@NonNull List<CharacterAction> solution) {
+    private void addSolution(@NonNull List<CharacterAction> newSolution) {
+        List<CharacterAction> solutionToDisplay = null;
+
         synchronized (solutionsLock) {
-            if (containsEquivalentSolution(solution)) {
-                return;
-            }
-            // TODO - take into account the case where the currentSolution
-            // is a better version of an existing one
+            List<List<CharacterAction>> solutionsToRemove = new ArrayList<>();
 
-            solutions.add(new ArrayList<>(solution));
-        }
+            for (List<CharacterAction> existingSolution : solutions) {
+                SolutionComparatorUtils.SolutionCompareValue comparison =
+                        SolutionComparatorUtils.compareSolutions(
+                                newSolution,
+                                existingSolution
+                        );
 
-        runOnUiThread(this::updateSolutions);
-    }
-
-    private boolean containsEquivalentSolution(@NonNull List<CharacterAction> candidate) {
-        for (List<CharacterAction> existing : solutions) {
-            if (areSolutionsStructurallyEqual(existing, candidate)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean areSolutionsStructurallyEqual(@NonNull List<CharacterAction> first,
-                                                  @NonNull List<CharacterAction> second) {
-        if (first.size() != second.size()) {
-            return false;
-        }
-
-        for (int i = 0; i < first.size(); i++) {
-            if (!areActionsStructurallyEqual(first.get(i), second.get(i))) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private boolean areActionsStructurallyEqual(@NonNull CharacterAction first,
-                                                @NonNull CharacterAction second) {
-        if (!first.getSrcCharacter().getId().equals(second.getSrcCharacter().getId())) {
-            return false;
-        }
-
-        if (first.getMotions().size() != second.getMotions().size()) {
-            return false;
-        }
-
-        for (int i = 0; i < first.getMotions().size(); i++) {
-            if (first.getMotions().get(i).getMotionType()
-                    != second.getMotions().get(i).getMotionType()) {
-                return false;
-            }
-
-            if (first.getMotions().get(i).getTargets().size()
-                    != second.getMotions().get(i).getTargets().size()) {
-                return false;
-            }
-
-            for (int j = 0; j < first.getMotions().get(i).getTargets().size(); j++) {
-                CharacterActionTarget firstTarget = first.getMotions().get(i).getTargets().get(j);
-                CharacterActionTarget secondTarget = second.getMotions().get(i).getTargets().get(j);
-
-                if (!firstTarget.getCharacter().getId().equals(secondTarget.getCharacter().getId())) {
-                    return false;
+                // If an identical or better solution already exist, we don't add this one
+                if (comparison == SolutionComparatorUtils.SolutionCompareValue.StructurallyEqual ||
+                        comparison == SolutionComparatorUtils.SolutionCompareValue.SecondIsBetter) {
+                    return;
                 }
 
-                if (!java.util.Objects.equals(firstTarget.getOriginPos(), secondTarget.getOriginPos())) {
-                    return false;
-                }
-
-                if (!java.util.Objects.equals(firstTarget.getDestPos(), secondTarget.getDestPos())) {
-                    return false;
+                // If worst version of the new solution exist, we will remove them when adding it
+                if (comparison == SolutionComparatorUtils.SolutionCompareValue.FirstIsBetter) {
+                    solutionsToRemove.add(existingSolution);
                 }
             }
+
+            // We display the new solution in two scenarios :
+            // 1. The new solution is the first one
+            // 2. The displayed solution will be replaced by the new one
+            if (solutions.isEmpty() ||
+                    (displayedSolution != null && solutionsToRemove.contains(displayedSolution))) {
+                solutionToDisplay = newSolution;
+            }
+
+            solutions.removeAll(solutionsToRemove);
+            solutions.add(newSolution);
         }
 
-        return true;
+        List<CharacterAction> finalSolutionToDisplay = solutionToDisplay;
+        runOnUiThread(() -> {
+            updateSolutions();
+            if (finalSolutionToDisplay != null) {
+                setDisplayedSolution(finalSolutionToDisplay, true);
+            }
+        });
     }
 
     private void finishSolutionSearch() {
@@ -436,7 +409,6 @@ public class PuzzleSolverActivity extends BaseActivity {
         if (solutionCount == 1) {
             txvSolutionsFound.setText(R.string.one_solution_found);
             skbSolutions.setVisibility(View.GONE);
-            displaySolution(0);
         } else {
             txvSolutionsFound.setText(getString(R.string.x_solutions_found, solutionCount));
             skbSolutions.setMax(solutionCount - 1);
@@ -446,38 +418,15 @@ public class PuzzleSolverActivity extends BaseActivity {
         updatePlayButtons();
     }
 
-    /**
-     * Displays one solution and resets the action playback position.
-     *
-     * <p>Action animation is deliberately not coupled to this method. The new
-     * CharacterActionAnimator still has unimplemented motion types, so the
-     * activity reconstructs the board state through the authoritative game
-     * action handlers instead of risking an animation that leaves the UI in an
-     * inconsistent state.</p>
-     */
-    private void displaySolution(int solutionIndex) {
-        int solutionCount;
-
-        synchronized (solutionsLock) {
-            solutionCount = solutions.size();
-        }
-
-        if (solutionIndex < 0 || solutionIndex >= solutionCount) {
-            return;
-        }
-
-        currentSolutionIdx = solutionIndex;
-        currentActionIdx = -1;
-
-        List<CharacterAction> solution;
-        synchronized (solutionsLock) {
-            solution = new ArrayList<>(solutions.get(solutionIndex));
-        }
+    private void setDisplayedSolution(@NonNull List<CharacterAction> solutionToDisplay,
+                                      boolean updateSeekbarProgress) {
+        displayedSolution = solutionToDisplay;
+        displayedActionIndex = -1;
 
         llyActions.removeAllViews();
 
-        for (int i = 0; i < solution.size(); i++) {
-            CharacterActionView actionView = new CharacterActionView(this, i, solution.get(i));
+        for (int i = 0; i < displayedSolution.size(); i++) {
+            CharacterActionView actionView = new CharacterActionView(this, i, displayedSolution.get(i));
 
             LinearLayout.LayoutParams layoutParams =
                     new LinearLayout.LayoutParams(
@@ -492,28 +441,34 @@ public class PuzzleSolverActivity extends BaseActivity {
         }
 
         showBoardStateAtAction(-1);
-        skbSolutions.setProgress(solutionIndex);
         updatePlayButtons();
+
+        if (updateSeekbarProgress) {
+            int solutionIndex;
+            synchronized (solutionsLock) {
+                solutionIndex = solutions.indexOf(displayedSolution);
+            }
+            skbSolutions.setProgress(solutionIndex);
+        }
     }
 
     private void playNextAction() {
-        List<CharacterAction> solution = getCurrentSolution();
-        if (solution == null || currentActionIdx >= solution.size() - 1) {
+        if (displayedSolution == null || displayedActionIndex >= displayedSolution.size() - 1) {
             return;
         }
 
-        currentActionIdx++;
-        showBoardStateAtAction(currentActionIdx);
+        displayedActionIndex++;
+        showBoardStateAtAction(displayedActionIndex);
         updatePlayButtons();
     }
 
     private void playPreviousAction() {
-        if (currentActionIdx < 0) {
+        if (displayedActionIndex < 0) {
             return;
         }
 
-        currentActionIdx--;
-        showBoardStateAtAction(currentActionIdx);
+        displayedActionIndex--;
+        showBoardStateAtAction(displayedActionIndex);
         updatePlayButtons();
     }
 
@@ -523,16 +478,15 @@ public class PuzzleSolverActivity extends BaseActivity {
      * the game logic.
      */
     private void showBoardStateAtAction(int actionIndex) {
-        List<CharacterAction> solution = getCurrentSolution();
-        if (solution == null) {
+        if (displayedSolution == null) {
             return;
         }
 
         Game displayGame = GameFactory.create(puzzleGameHistory);
 
-        int lastAction = Math.min(actionIndex, solution.size() - 1);
+        int lastAction = Math.min(actionIndex, displayedSolution.size() - 1);
         for (int i = 0; i <= lastAction; i++) {
-            CharacterAction action = solution.get(i);
+            CharacterAction action = displayedSolution.get(i);
             GameActionHandler handler =
                     GameActionHandlerFactory.create(displayGame, action);
             handler.doAction();
@@ -541,24 +495,11 @@ public class PuzzleSolverActivity extends BaseActivity {
         bdvBoard.setBoard(displayGame.getBoard());
     }
 
-    @Nullable
-    private List<CharacterAction> getCurrentSolution() {
-        synchronized (solutionsLock) {
-            if (currentSolutionIdx < 0 || currentSolutionIdx >= solutions.size()) {
-                return null;
-            }
-
-            return new ArrayList<>(solutions.get(currentSolutionIdx));
-        }
-    }
-
     private void updatePlayButtons() {
-        List<CharacterAction> solution = getCurrentSolution();
-
         ButtonUtils.setButtonEnabled(btnPlayPreviousAction,
-                solution != null && currentActionIdx >= 0);
+                displayedSolution != null && displayedActionIndex >= 0);
         ButtonUtils.setButtonEnabled(btnPlayNextAction,
-                solution != null && currentActionIdx < solution.size() - 1);
+                displayedSolution != null && displayedActionIndex < displayedSolution.size() - 1);
     }
 
     private void shutdownSearch() {
