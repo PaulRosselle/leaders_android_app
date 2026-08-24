@@ -46,54 +46,94 @@ public class CharacterActionView extends LinearLayoutCompat {
 
     public CharacterActionView(@NonNull Context context, int index,
                                @NonNull CharacterAction characterAction) {
-        this(context, (AttributeSet) null);
+        this(context, null);
 
         txvIndex.setText(String.format("%s -", index + 1));
 
         chvSourceCharacter.setCharacter(characterAction.getSrcCharacter());
 
-        Position destPos = null;
-        if (isNormalMovement(characterAction)) {
+        CharacterActionTarget normalMovementTarget = getNormalMovementTarget(characterAction);
+        if (normalMovementTarget != null) {
             imvActiveAbility.setVisibility(GONE);
             chvTargetCharacter.setVisibility(GONE);
-            destPos = Objects.requireNonNull(
-                    characterAction.getMotions().get(0).getTargets().get(0).getDestPos(),
+            Position destPos = Objects.requireNonNull(
+                    normalMovementTarget.getDestPos(),
                     "Invalid normal movement target : Destination missing"
             );
-        } else {
-            imvActiveAbility.setVisibility(VISIBLE);
-            boolean hasTarget = false;
-            for (CharacterActionMotion motion : characterAction.getMotions()) {
-                for (CharacterActionTarget target : motion.getTargets()) {
-                    if (target.getCharacter() != characterAction.getSrcCharacter()) {
-                        hasTarget = true;
-                        chvTargetCharacter.setCharacter(target.getCharacter());
-                        if (motionHasDestination(motion)) {
-                            destPos = target.getDestPos();
-                        }
-                        break;
-                    }
-                }
-            }
-            chvTargetCharacter.setVisibility(hasTarget ? VISIBLE : GONE);
+            txvDestination.setText(LbeUtils.getPositionExportStr(destPos));
+            return;
         }
 
-        if (destPos != null) {
-            txvDestination.setText(LbeUtils.getPositionExportStr(destPos));
+        CharacterActionTarget otherCharacterAbilityTarget = getOtherCharacterAbilityTarget(characterAction);
+        if (otherCharacterAbilityTarget != null) {
+            imvActiveAbility.setVisibility(VISIBLE);
+            chvTargetCharacter.setVisibility(VISIBLE);
+            chvTargetCharacter.setCharacter(otherCharacterAbilityTarget.getCharacter());
+            if (motionHasDestination(characterAction)) {
+                setDestinationText(otherCharacterAbilityTarget);
+            }
+            return;
+        }
+
+        CharacterActionTarget sourceCharacterAbilityTarget = getSourceCharacterAbilityTarget(characterAction);
+        if (sourceCharacterAbilityTarget != null) {
+            imvActiveAbility.setVisibility(VISIBLE);
+            chvTargetCharacter.setVisibility(GONE);
+            if (motionHasDestination(characterAction)) {
+                setDestinationText(sourceCharacterAbilityTarget);
+            }
         }
     }
 
-    private boolean motionHasDestination(@NonNull CharacterActionMotion motion) {
-        CharacterMotionType motionType = motion.getMotionType();
+    private void setDestinationText(@NonNull CharacterActionTarget target) {
+        Position destPos = Objects.requireNonNull(
+                target.getDestPos(),
+                "Invalid target : Destination missing"
+        );
+        txvDestination.setText(LbeUtils.getPositionExportStr(destPos));
+    }
+
+    private boolean motionHasDestination(@NonNull CharacterAction characterAction) {
+        CharacterMotionType motionType = characterAction.getMotions().get(0).getMotionType();
         return motionType != CharacterMotionType.Remove &&
                 motionType != CharacterMotionType.Transform &&
                 motionType != CharacterMotionType.Swap;
     }
 
-    private boolean isNormalMovement(@NonNull CharacterAction characterAction) {
-        return characterAction.getMotions().size() == 1 &&
-                characterAction.getMotions().get(0).getMotionType() == CharacterMotionType.Move &&
-                characterAction.getMotions().get(0).getTargets().size() == 1 &&
-                characterAction.getMotions().get(0).getTargets().get(0).getCharacter() == characterAction.getSrcCharacter();
+    @Nullable
+    private CharacterActionTarget getNormalMovementTarget(@NonNull CharacterAction characterAction) {
+        if (characterAction.getMotions().size() == 1) {
+            CharacterActionMotion motion = characterAction.getMotions().get(0);
+            if (motion.getMotionType() == CharacterMotionType.Move &&
+                motion.getTargets().size() == 1) {
+                CharacterActionTarget target = motion.getTargets().get(0);
+                if (target.getCharacter().getId().equals(characterAction.getSrcCharacter().getId())) {
+                    return target;
+                }
+            }
+        }
+        return null;
     }
+
+    private CharacterActionTarget getSourceCharacterAbilityTarget(@NonNull CharacterAction characterAction) {
+        return getCharacterAbilityTarget(characterAction, true);
+    }
+
+    private CharacterActionTarget getOtherCharacterAbilityTarget(@NonNull CharacterAction characterAction) {
+        return getCharacterAbilityTarget(characterAction, false);
+    }
+
+
+    private CharacterActionTarget getCharacterAbilityTarget(@NonNull CharacterAction characterAction,
+                                                            boolean mustBeSourceCharacter) {
+        for (CharacterActionMotion motion : characterAction.getMotions()) {
+            for (CharacterActionTarget target : motion.getTargets()) {
+                if (target.getCharacter().getId().equals(characterAction.getSrcCharacter().getId()) == mustBeSourceCharacter) {
+                    return target;
+                }
+            }
+        }
+        return null;
+    }
+
 }

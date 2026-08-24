@@ -170,7 +170,7 @@ public class BrewmasterActionResolverTest {
         assertEquals(InteractionType.PositionExpected, request.getRequestType());
         assertTrue(request.getLegalResults().contains(InteractionResultType.PositionChosen));
         assertTrue(request.getLegalResults().contains(InteractionResultType.CancelAction));
-        assertTrue(containsTarget(request, TargetCategory.ActiveAbilityTargetPosition, destination));
+        assertTrue(containsTarget(request, TargetCategory.ActiveAbilityDestination, destination));
     }
 
     @Test

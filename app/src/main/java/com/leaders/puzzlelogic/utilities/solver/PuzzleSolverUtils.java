@@ -32,6 +32,8 @@ import java.util.concurrent.BlockingQueue;
  * Utility class used to find winning action sequences during an ActionsPhase.
  */
 public final class PuzzleSolverUtils {
+    private static final int MAX_RESOLVER_INTERACTION_DEPTH = 2;
+
     private PuzzleSolverUtils(){
         throw new AssertionError("Cannot instantiate utility class");
     }
@@ -355,7 +357,7 @@ public final class PuzzleSolverUtils {
 
         List<CharacterAction> actions = new ArrayList<>();
 
-        enumerateResolverState(resolver, builder, actions);
+        enumerateResolverState(resolver, builder, actions, 0);
 
         return actions;
     }
@@ -371,7 +373,15 @@ public final class PuzzleSolverUtils {
      */
     private static void enumerateResolverState(@NonNull CharacterActionResolver resolver,
                                                @NonNull CharacterActionBuilder builder,
-                                               @NonNull List<CharacterAction> actions) {
+                                               @NonNull List<CharacterAction> actions,
+                                               int depth) {
+        if (depth > MAX_RESOLVER_INTERACTION_DEPTH) {
+            throw new IllegalStateException(
+                    "Resolver interaction flow did not terminate: "
+                            + resolver.getClass().getSimpleName()
+            );
+        }
+
         InteractionRequest request = resolver.getNextInteraction(builder);
 
         if (request == null) {
@@ -397,8 +407,20 @@ public final class PuzzleSolverUtils {
                 next.addFeedback(feedback);
             }
 
-            enumerateResolverState(resolver, next, actions);
+            enumerateResolverState(resolver, next, actions, depth + 1);
         }
+    }
+
+    /**
+     * Returns the total number of permutations of {@code characters}.
+     *
+     * @param characters the elements to permute
+     * @return the number of permutations, {@code characters.size()!}
+     * @throws IllegalArgumentException if the number of permutations exceeds
+     *                                  {@link Long#MAX_VALUE}
+     */
+    public static long getPermutationCount(@NonNull List<Character> characters) {
+        return factorial(characters.size());
     }
 
     /**

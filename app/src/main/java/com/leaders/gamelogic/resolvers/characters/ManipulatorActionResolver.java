@@ -61,7 +61,14 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
         }
 
         if (isManipulatorTargetResult(firstResult)) {
-            return buildTargetDestinationInteraction(builder, firstResult);
+            if (builder.getResults().size() > 1) {
+                if (!isManipulatorTargetDestinationResult(builder.getResults().get(1))) {
+                    throw new IllegalArgumentException("Invalid result type for a Manipulator ability activation");
+                }
+                return null;
+            } else {
+                return buildTargetDestinationInteraction(builder, firstResult);
+            }
         }
 
         throw new IllegalArgumentException("Invalid Manipulator action builder");
@@ -95,7 +102,7 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
         InteractionResult destinationResult = builder.getResults().get(1);
 
         if (!isManipulatorTargetResult(firstResult) ||
-                !isManipulatorDestinationResult(destinationResult)) {
+                !isManipulatorTargetDestinationResult(destinationResult)) {
             throw new IllegalArgumentException("Invalid result types for a Manipulator ability activation");
         }
 
@@ -264,7 +271,7 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
                 result.getChosenTarget().getCategory() == TargetCategory.ActiveAbilityTargetPosition;
     }
 
-    private boolean isManipulatorDestinationResult(@NonNull InteractionResult result) {
+    private boolean isManipulatorTargetDestinationResult(@NonNull InteractionResult result) {
         return result.getResultType() == InteractionResultType.PositionChosen &&
                 result.getChosenTarget() != null &&
                 result.getChosenTarget().getCategory() == TargetCategory.ActiveAbilityDestination;

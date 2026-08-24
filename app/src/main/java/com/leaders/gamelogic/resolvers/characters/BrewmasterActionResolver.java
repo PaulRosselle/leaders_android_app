@@ -60,7 +60,14 @@ public final class BrewmasterActionResolver extends CharacterActionResolver {
         // Otherwise it should be an ability activation, in which case the next (and last)
         // interaction is to select a target destination
         if (isBrewmasterTargetResult(firstResult)) {
-            return buildTargetDestinationInteraction(builder, firstResult);
+            if (builder.getResults().size() > 1) {
+                if (!isBrewmasterTargetDestinationResult(builder.getResults().get(1))) {
+                    throw new IllegalArgumentException("Invalid result type for a Brewmaster ability activation");
+                }
+                return null;
+            } else {
+                return buildTargetDestinationInteraction(builder, firstResult);
+            }
         }
 
         throw new IllegalArgumentException("Invalid Brewmaster action builder");
@@ -95,7 +102,7 @@ public final class BrewmasterActionResolver extends CharacterActionResolver {
 
         if (!isBrewmasterTargetResult(firstResult) ||
                 !isBrewmasterTargetDestinationResult(targetDestResult)) {
-            throw new IllegalArgumentException("Invalid result types for a Brewmaster ability activation");
+            throw new IllegalArgumentException("Invalid result type for a Brewmaster ability activation");
         }
 
         Position targetOrigin = Objects.requireNonNull(
@@ -161,7 +168,7 @@ public final class BrewmasterActionResolver extends CharacterActionResolver {
 
         List<InteractionTarget> legalTargets = new ArrayList<>();
         for (Position destination : getValidTargetDestinations(builder, targetPos, false)) {
-            legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityTargetPosition, destination));
+            legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityDestination, destination));
         }
 
         Character targetedAlly = Objects.requireNonNull(game.getBoard().getCell(targetPos).getCharacter(),

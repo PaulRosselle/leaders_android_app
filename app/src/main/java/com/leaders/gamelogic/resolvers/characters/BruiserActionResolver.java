@@ -53,6 +53,10 @@ public final class BruiserActionResolver extends CharacterActionResolver {
 
         InteractionResult firstResult = builder.getResults().get(0);
 
+        if (firstResult.getResultType() == InteractionResultType.CancelAction) {
+            return null;
+        }
+
         if (isNormalMovementResult(firstResult)) {
             return super.getNextInteraction(builder);
         }
@@ -61,7 +65,18 @@ public final class BruiserActionResolver extends CharacterActionResolver {
             return buildPushDestinationInteraction(builder, firstResult);
         }
 
-        return null;
+        if (isBruiserTargetResult(firstResult)) {
+            if (builder.getResults().size() > 1) {
+                if (!isBruiserPushDestinationResult(builder.getResults().get(1))) {
+                    throw new IllegalArgumentException("Invalid result type for a Bruiser ability activation");
+                }
+                return null;
+            } else {
+                return buildPushDestinationInteraction(builder, firstResult);
+            }
+        }
+
+        throw new IllegalArgumentException("Invalid Bruiser action builder");
     }
 
     @Override
@@ -92,7 +107,7 @@ public final class BruiserActionResolver extends CharacterActionResolver {
         InteractionResult destinationResult = builder.getResults().get(1);
 
         if (!isBruiserTargetResult(firstResult) ||
-                !isBruiserDestinationResult(destinationResult)) {
+                !isBruiserPushDestinationResult(destinationResult)) {
             throw new IllegalArgumentException("Invalid result types for a Bruiser ability activation");
         }
 
@@ -288,7 +303,7 @@ public final class BruiserActionResolver extends CharacterActionResolver {
                 result.getChosenTarget().getCategory() == TargetCategory.ActiveAbilityTargetPosition;
     }
 
-    private boolean isBruiserDestinationResult(@NonNull InteractionResult result) {
+    private boolean isBruiserPushDestinationResult(@NonNull InteractionResult result) {
         return result.getResultType() == InteractionResultType.PositionChosen &&
                 result.getChosenTarget() != null &&
                 result.getChosenTarget().getCategory() == TargetCategory.ActiveAbilityDestination;
