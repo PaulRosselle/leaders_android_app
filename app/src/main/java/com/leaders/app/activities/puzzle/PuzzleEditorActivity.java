@@ -359,8 +359,12 @@ public final class PuzzleEditorActivity extends BaseActivity {
             throw new IllegalStateException("A new character must be selected to be added to the board");
         }
 
-        CharacterDisplay characterDisplay = bdvBoard.getCharacterDisplay(destCharacter.getPosition());
-        characterDisplay.getCharacterView().animateSetCharacter(character, () -> {
+        CharacterActionMotion motion = new CharacterActionMotion(CharacterMotionType.Transform, List.of(
+                new CharacterActionTarget(destCharacter.getCharacter(), destCharacter.getPosition(), null),
+                new CharacterActionTarget(character, null, destCharacter.getPosition())
+        ));
+
+        CharacterActionAnimator.animate(bdvBoard, motion, () -> {
             board.getCell(destCharacter.getPosition()).setCharacter(character);
             applyDefaultEditorState();
         });
@@ -625,7 +629,6 @@ public final class PuzzleEditorActivity extends BaseActivity {
     }
 
     private void btnSearchForSolutionsClick(View v) {
-        // TODO - add 10 character limitation
         List<Cell> playerCharacterCells = BoardQuery.findCharacterCells(board,
                 PuzzleEditionUtils.getPuzzlePlayerTeamColor(), null);
         if (playerCharacterCells.size() >= PuzzleSolverUtils.MAX_PLAYER_CHARACTER_COUNT) {

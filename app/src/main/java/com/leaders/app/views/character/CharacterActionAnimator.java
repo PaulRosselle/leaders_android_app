@@ -34,6 +34,7 @@ public final class CharacterActionAnimator {
     private static final int DURATION_TELEPORT = 800;
     private static final int DURATION_PUSH = 400;
     private static final int DURATION_JUMP = 400;
+    private static final int DURATION_TRANSFORM = 800;
 
     public static void animate(@NonNull BoardView boardView,
                                @NonNull CharacterActionMotion motion,
@@ -358,8 +359,9 @@ public final class CharacterActionAnimator {
             xAnimator.setDuration(duration);
             yAnimator.setDuration(duration);
 
-            xAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-            yAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+            AccelerateDecelerateInterpolator interpolator = new AccelerateDecelerateInterpolator();
+            xAnimator.setInterpolator(interpolator);
+            yAnimator.setInterpolator(interpolator);
 
             AnimatorSet animatorSet = new AnimatorSet();
             animatorSet.playTogether(xAnimator, yAnimator, scaleAnimator);
@@ -404,8 +406,119 @@ public final class CharacterActionAnimator {
     private static void animateTransformCharacter(@NonNull BoardView boardView,
                                                   @NonNull List<CharacterActionTarget> targets,
                                                   @Nullable Runnable onAnimationEnd) {
-        // TODO
+        if (targets.size() != 2) {
+            throw new IllegalArgumentException("Invalid transform motion : expected exactly 2 targets");
+        }
+
+        CharacterActionTarget sourceTarget = targets.get(0);
+        CharacterActionTarget destinationTarget = targets.get(1);
+
+        Position sourcePos = Objects.requireNonNull(sourceTarget.getOriginPos(),
+                "Invalid transform target : missing source origin position");
+        Position destPos = Objects.requireNonNull(destinationTarget.getDestPos(),
+                "Invalid transform target : missing destination position");
+
+        CharacterDisplay sourceCharacter = boardView.getCharacterDisplay(sourcePos);
+        CharacterView characterView = sourceCharacter.getCharacterView();
+
+        CellView destCell = boardView.getCellView(destPos);
+
+        // The source CharacterDisplay remains at its position throughou the entire animation.
+        setupForMovement(sourceCharacter, destCell.getX(), destCell.getY());
+
+        // Temporarily use the same CharacterDisplay for the transformation.
+        // The new character will be injected in the middle of the animation.
+
+        int duration = getAnimationDuration(DURATION_TRANSFORM);
+
+        int transformOutDuration = duration / 2;
+        int transformInDuration = duration - transformOutDuration;
+
+        // TRANSFORM OUT ANIMATION
+        ObjectAnimator outScaleX = ObjectAnimator.ofFloat(characterView, View.SCALE_X, 1f, 1.15f, 1.30f, 0.75f);
+        ObjectAnimator outScaleY = ObjectAnimator.ofFloat(characterView, View.SCALE_Y, 1f, 1.15f, 1.30f, 0.75f);
+        ObjectAnimator outRotation = ObjectAnimator.ofFloat(characterView, View.ROTATION, 0f, -8f, 12f, 0f);
+        ObjectAnimator outAlpha = ObjectAnimator.ofFloat(characterView, View.ALPHA, 1f, 1f, 0.6f, 0f);
+
+        outScaleX.setDuration(transformOutDuration);
+        outScaleY.setDuration(transformOutDuration);
+        outRotation.setDuration(transformOutDuration);
+        outAlpha.setDuration(transformOutDuration);
+
+        AccelerateDecelerateInterpolator outInterpolator = new AccelerateDecelerateInterpolator();
+
+        outScaleX.setInterpolator(outInterpolator);
+        outScaleY.setInterpolator(outInterpolator);
+        outRotation.setInterpolator(outInterpolator);
+        outAlpha.setInterpolator(outInterpolator);
+
+        AnimatorSet transformOut = new AnimatorSet();
+        transformOut.playTogether(outScaleX, outScaleY, outRotation, outAlpha);
+
+        // The character change must happen between the two animation phases.
+        transformOut.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                // Reset to a clean state for the appearance phase.
+                characterView.setCharacter(destinationTarget.getCharacter());
+
+                characterView.setScaleX(0.75f);
+                characterView.setScaleY(0.75f);
+                characterView.setRotation(0f);
+                characterView.setAlpha(0f);
+            }
+        });
+
+        // TRANSFORM IN ANIMATION
+        ObjectAnimator inScaleX = ObjectAnimator.ofFloat(characterView, View.SCALE_X, 0.75f, 1.15f, 0.95f, 1f);
+        ObjectAnimator inScaleY = ObjectAnimator.ofFloat(characterView, View.SCALE_Y, 0.75f, 1.15f, 0.95f, 1f);
+        ObjectAnimator inRotation = ObjectAnimator.ofFloat(characterView, View.ROTATION, 0f, -8f, 4f, 0f);
+        ObjectAnimator inAlpha = ObjectAnimator.ofFloat(characterView, View.ALPHA, 0f, 1f);
+
+        inScaleX.setDuration(transformInDuration);
+        inScaleY.setDuration(transformInDuration);
+        inRotation.setDuration(transformInDuration);
+        inAlpha.setDuration(transformInDuration);
+
+        DecelerateInterpolator inInterpolator = new DecelerateInterpolator(1.5f);
+
+        inScaleX.setInterpolator(inInterpolator);
+        inScaleY.setInterpolator(inInterpolator);
+        inRotation.setInterpolator(inInterpolator);
+        inAlpha.setInterpolator(inInterpolator);
+
+        AnimatorSet transformIn = new AnimatorSet();
+        transformIn.playTogether(inScaleX, inScaleY, inRotation, inAlpha);
+
+        AnimatorSet transformSequence = new AnimatorSet();
+        transformSequence.playSequentially(transformOut, transformIn);
+
+        transformSequence.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                // The transformed character is now fully displayed.
+                characterView.setScaleX(1f);
+                characterView.setScaleY(1f);
+                characterView.setRotation(0f);
+                characterView.setAlpha(1f);
+
+                // The CharacterDisplay remains associated with the position,
+                // but its CharacterView now represents the transformed character.
+                List<Position> originPositions = List.of(sourcePos);
+
+                List<Position> destinationPositions = List.of(destPos);
+
+                boardView.moveCharacterDisplays(originPositions, destinationPositions);
+
+                if (onAnimationEnd != null) {
+                    onAnimationEnd.run();
+                }
+            }
+        });
+
+        transformSequence.start();
     }
+
 
     private static void animateFadeIn(@NonNull CharacterDisplay characterDisplay, int duration,
                                       @Nullable Runnable onAnimationEnd) {
