@@ -339,4 +339,22 @@ public class BrewmasterActionResolverTest {
         assertNotNull(request);
         assertFalse(containsTarget(request, TargetCategory.ActiveAbilityTargetPosition, occupiedDestination));
     }
+
+    @Test
+    public void getNextInteraction_shouldNotExposeAbilityWhenMuted() {
+        Character ally = Character.create(CharacterType.Hermit, TeamColor.Black);
+        game.getBoard().getCell(new Position(3, 4)).setCharacter(ally);
+
+        Character jailer = Character.create(CharacterType.Jailer, TeamColor.White);
+        game.getBoard().getCell(new Position(2, 3)).setCharacter(jailer);
+
+        InteractionRequest request = resolver.getNextInteraction(createBuilder());
+
+        assertNotNull(request);
+        assertFalse(containsTarget(
+                request,
+                TargetCategory.ActiveAbilityTargetPosition,
+                new Position(3, 4)
+        ));
+    }
 }

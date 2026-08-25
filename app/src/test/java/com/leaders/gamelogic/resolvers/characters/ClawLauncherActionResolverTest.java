@@ -1,6 +1,7 @@
 package com.leaders.gamelogic.resolvers.characters;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -39,6 +40,7 @@ import java.util.List;
 
 public class ClawLauncherActionResolverTest {
 
+    private Game game;
     private Character character;
     private Character target;
     private ClawLauncherActionResolver resolver;
@@ -82,7 +84,7 @@ public class ClawLauncherActionResolverTest {
 
     @Before
     public void setUp() {
-        Game game = createTestGame();
+        game = createTestGame();
         GameHistory gameHistory = createTestGameHistory();
 
         Character leader = Character.create(CharacterType.LeaderKing, TeamColor.Black);
@@ -320,5 +322,34 @@ public class ClawLauncherActionResolverTest {
         ));
 
         assertNull(resolver.getNextFeedback(builder));
+    }
+
+    @Test
+    public void getNextInteraction_shouldRespectPassiveAbilities() {
+        Character jailer = Character.create(CharacterType.Jailer, TeamColor.White);
+        game.getBoard().getCell(new Position(2, 3)).setCharacter(jailer);
+
+        Character protector = Character.create(CharacterType.Protector, TeamColor.White);
+        game.getBoard().getCell(new Position(2, 0)).setCharacter(protector);
+
+        InteractionRequest request = resolver.getNextInteraction(createBuilder());
+
+        assertNotNull(request);
+
+        boolean hasAbilityDestination = false;
+        boolean hasProtectedTarget = false;
+        for (InteractionTarget target : request.getLegalTargets()) {
+            if (target.getCategory() == TargetCategory.ActiveAbilityDestination &&
+                    new Position(3, 1).equals(target.getChosenPosition())) {
+                hasAbilityDestination = true;
+            }
+            if (target.getCategory() == TargetCategory.ActiveAbilityTargetPosition &&
+                    new Position(3, 0).equals(target.getChosenPosition())) {
+                hasProtectedTarget = true;
+            }
+        }
+
+        assertFalse(hasAbilityDestination);
+        assertFalse(hasProtectedTarget);
     }
 }

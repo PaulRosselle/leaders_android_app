@@ -260,4 +260,24 @@ public class RiderActionResolverTest {
 
         return false;
     }
+
+    @Test
+    public void getNextInteraction_shouldNotExposeAbilityWhenMuted() {
+        Character jailer = Character.create(CharacterType.Jailer, TeamColor.White);
+        game.getBoard().getCell(new Position(2, 3)).setCharacter(jailer);
+
+        InteractionRequest request = resolver.getNextInteraction(createBuilder());
+
+        assertNotNull(request);
+        assertTrue(containsTarget(
+                request,
+                TargetCategory.MovementDestination,
+                NORMAL_DESTINATION
+        ));
+        assertFalse(containsTarget(
+                request,
+                TargetCategory.ActiveAbilityDestination,
+                DASH_DESTINATION
+        ));
+    }
 }
