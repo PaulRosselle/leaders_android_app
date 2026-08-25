@@ -177,6 +177,8 @@ public class AcrobatActionResolverTest {
         CharacterActionBuilder builder = createBuilder();
         builder.addResult(createResult(TargetCategory.ActiveAbilityDestination, destination));
 
+        placeCharacter(new Position(3, 2));
+
         InteractionFeedback feedback = resolver.getNextFeedback(builder);
 
         assertNotNull(feedback);
@@ -198,6 +200,8 @@ public class AcrobatActionResolverTest {
         CharacterActionBuilder builder = createBuilder();
 
         builder.addResult(createResult(TargetCategory.ActiveAbilityDestination, new Position(3, 1)));
+
+        placeCharacter(new Position(3, 2));
 
         InteractionFeedback feedback = resolver.getNextFeedback(builder);
 
@@ -221,6 +225,8 @@ public class AcrobatActionResolverTest {
 
         CharacterActionBuilder builder = createBuilder();
         builder.addResult(createResult(TargetCategory.ActiveAbilityDestination, destination));
+
+        placeCharacter(new Position(3, 2));
 
         InteractionFeedback feedback = resolver.getNextFeedback(builder);
 
@@ -278,17 +284,13 @@ public class AcrobatActionResolverTest {
 
     @Test
     public void getNextInteraction_shouldNotExposeDuplicateAcrobatDestinations() {
-        // Arrange a board configuration where two different jump paths
-        // lead to the same final destination.
-        Position firstJumpDestination = new Position(3, 1);
-
         Position secondJumpDestination = new Position(1, 1);
         placeCharacter(new Position(3, 2));
-        placeCharacter(new Position(4, 2));
+        placeCharacter(new Position(2, 3));
 
         // Additional characters allowing the Acrobat to jump again to (1, 1).
         placeCharacter(new Position(2, 1));
-        placeCharacter(new Position(4, 1));
+        placeCharacter(new Position(1, 2));
 
         InteractionRequest request = resolver.getNextInteraction(createBuilder());
 
@@ -298,7 +300,7 @@ public class AcrobatActionResolverTest {
         int secondJumpDestinationCount = 0;
         for (InteractionTarget target : request.getLegalTargets()) {
             if (target.getCategory() == TargetCategory.ActiveAbilityDestination &&
-                    firstJumpDestination.equals(target.getChosenPosition())) {
+                    secondJumpDestination.equals(target.getChosenPosition())) {
                 secondJumpDestinationCount++;
             }
         }

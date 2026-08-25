@@ -130,7 +130,7 @@ public final class WandererActionResolver extends CharacterActionResolver {
 
                 destinationBuilder.addFeedback(InteractionFeedback.createForCharacterAction(
                         List.of(new CharacterActionMotion(
-                                CharacterMotionType.Move,
+                                CharacterMotionType.Fly,
                                 List.of(new CharacterActionTarget(
                                         character, characterPos, destPos))
                         ))
@@ -167,7 +167,7 @@ public final class WandererActionResolver extends CharacterActionResolver {
         );
 
         return InteractionFeedback.createForCharacterAction(List.of(new CharacterActionMotion(
-                CharacterMotionType.Move,
+                CharacterMotionType.Fly,
                 List.of(new CharacterActionTarget(character, characterPos, destination))
         )));
     }

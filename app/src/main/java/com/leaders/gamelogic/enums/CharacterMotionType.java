@@ -6,6 +6,7 @@ public enum CharacterMotionType {
     Push,
     Swap,
     Jump,
+    Fly,
     Add,
     Remove,
     Transform

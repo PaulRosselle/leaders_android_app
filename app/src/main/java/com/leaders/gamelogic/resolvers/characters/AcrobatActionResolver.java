@@ -28,6 +28,7 @@ import com.leaders.gamelogic.resolvers.CharacterActionResolver;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 public final class AcrobatActionResolver extends CharacterActionResolver {
@@ -173,12 +174,51 @@ public final class AcrobatActionResolver extends CharacterActionResolver {
             throw new IllegalArgumentException("Expected an ActiveAbilityDestination for an Acrobat jump");
         }
 
-        return InteractionFeedback.createForCharacterAction(
-                List.of(new CharacterActionMotion(CharacterMotionType.Jump,
-                        List.of(new CharacterActionTarget(character, characterPos,
-                                result.getChosenTarget().getChosenPosition())
-                        )
-                ))
-        );
+        Position destPos = Objects.requireNonNull(result.getChosenTarget().getChosenPosition(),
+                "Invalid jump target : destination position missing");
+
+        List<CharacterActionMotion> jumpMotions = new ArrayList<>();
+
+        Position intermediatePos = getIntermediateJump(destPos);
+        if (intermediatePos != null) {
+            jumpMotions.add(new CharacterActionMotion(CharacterMotionType.Jump,
+                    List.of(new CharacterActionTarget(character, characterPos, intermediatePos))));
+            jumpMotions.add(new CharacterActionMotion(CharacterMotionType.Jump,
+                    List.of(new CharacterActionTarget(character, intermediatePos, destPos))));
+        } else {
+            jumpMotions.add(new CharacterActionMotion(CharacterMotionType.Jump,
+                    List.of(new CharacterActionTarget(character, characterPos, destPos))));
+        }
+
+        return InteractionFeedback.createForCharacterAction(jumpMotions);
     }
+
+    @Nullable
+    private Position getIntermediateJump(@NonNull Position destPos) {
+        for (Direction firstDirection : Direction.values()) {
+            Cell jumpDestination = findJumpDestination(characterPos, firstDirection);
+            if (jumpDestination == null) {
+                continue;
+            }
+
+            Position firstJumpPos = jumpDestination.getPosition();
+            // Destination is accessible in one jump -> no intermediate needed
+            if (firstJumpPos.equals(destPos)) {
+                return null;
+            }
+
+            for (Direction secondDirection : Direction.values()) {
+                if (secondDirection != firstDirection.getOpposite()) {
+                    Cell secondJumpDestination = findJumpDestination(firstJumpPos, secondDirection);
+                    if (secondJumpDestination != null && secondJumpDestination.getPosition().equals(destPos)) {
+                        return firstJumpPos;
+                    }
+                }
+            }
+        }
+
+        throw new IllegalArgumentException("Unreachable Acrobat jump destination: " + destPos);
+    }
+
+
 }

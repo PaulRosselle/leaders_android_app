@@ -11,6 +11,7 @@ import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterMotionType;
+import com.leaders.gamelogic.enums.Direction;
 import com.leaders.gamelogic.interactions.CharacterActionBuilder;
 import com.leaders.gamelogic.interactions.InteractionContext;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
@@ -155,10 +156,53 @@ public final class RoyalGuardActionResolver extends CharacterActionResolver {
                 "Royal Guard destination interaction result invalid: no destination position"
         );
 
-        return InteractionFeedback.createForCharacterAction(List.of(new CharacterActionMotion(
-                CharacterMotionType.Move,
-                List.of(new CharacterActionTarget(character, characterPos, destPos))
-        )));
+
+        List<CharacterActionMotion> abilityMotions = new ArrayList<>();
+
+        Position intermediatePos = getIntermediatePosition(destPos);
+        if (intermediatePos != null) {
+            abilityMotions.add(new CharacterActionMotion(CharacterMotionType.Teleport,
+                    List.of(new CharacterActionTarget(character, characterPos, intermediatePos))));
+            abilityMotions.add(new CharacterActionMotion(CharacterMotionType.Move,
+                    List.of(new CharacterActionTarget(character, intermediatePos, destPos))));
+        } else {
+            abilityMotions.add(new CharacterActionMotion(CharacterMotionType.Teleport,
+                    List.of(new CharacterActionTarget(character, characterPos, destPos))));
+        }
+
+        return InteractionFeedback.createForCharacterAction(abilityMotions);
+    }
+
+    @Nullable
+    private Position getIntermediatePosition(@NonNull Position destPos) {
+        Cell leaderCell = BoardQuery.findLeaderCell(game.getBoard(), character.getTeamColor());
+        if (leaderCell == null) {
+            throw new IllegalStateException("Cannot find a royal guard teleportation destination without an ally leader");
+        }
+
+        List<Position> intermediatePositions = new ArrayList<>();
+        for (Direction direction : Direction.values()) {
+            Position teleportPos = leaderCell.getPosition().adjacent(direction);
+            if (teleportPos == null) {
+                continue;
+            }
+
+            // Destination is accessible with the initial teleportation -> no intermediate needed
+            if (teleportPos.equals(destPos)) {
+                return null;
+            }
+
+            if (teleportPos.distanceTo(destPos) == 1) {
+                intermediatePositions.add(teleportPos);
+            }
+        }
+
+        // If we get here, it means the destPos is not adjacent to the leader
+        if (!intermediatePositions.isEmpty()) {
+            return intermediatePositions.get(0);
+        }
+
+        throw new IllegalArgumentException("Unreachable Royal Guard destination: " + destPos);
     }
 
     private boolean isRoyalGuardDestinationResult(@NonNull InteractionResult result) {

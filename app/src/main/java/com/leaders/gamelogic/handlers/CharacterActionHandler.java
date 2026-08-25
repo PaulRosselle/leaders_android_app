@@ -47,14 +47,20 @@ public final class CharacterActionHandler extends GameActionHandler {
     public void undoAction() {
         Board board = game.getBoard();
 
-        for (CharacterActionMotion motion : characterAction.getMotions()) {
-            // Characters are removed from their destination before being restored to their original position.
-            // This mirrors the action application order and prevents incorrect removals during swaps.
+        // Motions must be undone in reverse order.
+        // doAction() applies them sequentially, so undoing them in the
+        // same order can leave intermediate positions occupied.
+        for (int i = characterAction.getMotions().size() - 1; i >= 0; i--) {
+            CharacterActionMotion motion = characterAction.getMotions().get(i);
+
+            // Characters are removed from their destinations before being
+            // restored to their original positions.
             for (CharacterActionTarget target : motion.getTargets()) {
                 if (target.getDestPos() != null) {
                     board.getCell(target.getDestPos()).setCharacter(null);
                 }
             }
+
             for (CharacterActionTarget target : motion.getTargets()) {
                 if (target.getOriginPos() != null) {
                     board.getCell(target.getOriginPos()).setCharacter(target.getCharacter());
