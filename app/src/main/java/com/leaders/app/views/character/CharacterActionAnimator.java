@@ -6,6 +6,7 @@ import android.animation.AnimatorSet;
 import android.animation.Keyframe;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
+import android.animation.TypeEvaluator;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
@@ -34,6 +35,7 @@ public final class CharacterActionAnimator {
     private static final int DURATION_TELEPORT = 800;
     private static final int DURATION_PUSH = 400;
     private static final int DURATION_JUMP = 400;
+    private static final int DURATION_FLY = 600;
     private static final int DURATION_TRANSFORM = 800;
 
     public static void animate(@NonNull BoardView boardView,
@@ -51,6 +53,7 @@ public final class CharacterActionAnimator {
             case Push: animatePushCharacter(boardView, targets, onAnimationEnd); break;
             case Swap: animateSwapCharacter(boardView, targets, onAnimationEnd); break;
             case Jump: animateJumpCharacter(boardView, targets, onAnimationEnd); break;
+            case Fly: animateFlyCharacter(boardView, targets, onAnimationEnd); break;
             case Remove: animateRemoveCharacter(boardView, targets, onAnimationEnd); break;
             case Transform: animateTransformCharacter(boardView, targets, onAnimationEnd); break;
             default: throw new IllegalArgumentException("Character motion animation not handled: " + motion.getMotionType());
@@ -518,6 +521,110 @@ public final class CharacterActionAnimator {
 
         transformSequence.start();
     }
+
+    private static void animateFlyCharacter(@NonNull BoardView boardView,
+                                            @NonNull List<CharacterActionTarget> targets,
+                                            @Nullable Runnable onAnimationEnd) {
+        List<Position> originPositions = new ArrayList<>();
+        List<Position> destinationPositions = new ArrayList<>();
+
+        AtomicInteger remaining = new AtomicInteger(targets.size());
+
+        Runnable onTargetAnimationEnd = () -> {
+            if (remaining.decrementAndGet() == 0) {
+                boardView.moveCharacterDisplays(originPositions, destinationPositions);
+                if (onAnimationEnd != null) {
+                    onAnimationEnd.run();
+                }
+            }
+        };
+
+        for (CharacterActionTarget target : targets) {
+            Position originPos = Objects.requireNonNull(target.getOriginPos(), "Invalid fly target : missing origin position");
+            Position destPos = Objects.requireNonNull(target.getDestPos(), "Invalid fly target : missing destination position");
+
+            originPositions.add(originPos);
+            destinationPositions.add(destPos);
+
+            CharacterDisplay characterDisplay = boardView.getCharacterDisplay(originPos);
+
+            CellView originCell = boardView.getCellView(originPos);
+            CellView destCell = boardView.getCellView(destPos);
+
+            float originX = originCell.getX();
+            float originY = originCell.getY();
+
+            float destX = destCell.getX();
+            float destY = destCell.getY();
+
+            setupForMovement(characterDisplay, destX, destY);
+
+            CharacterView characterView = characterDisplay.getCharacterView();
+
+            // Linear movement for X axis
+            ObjectAnimator xAnimator = ObjectAnimator.ofFloat(characterView, View.X, originX, destX);
+
+            float arcHeight = 50f;
+
+            TypeEvaluator<Float> arcEvaluator = (fraction, startValue, endValue) -> {
+                float linearY = startValue + (endValue - startValue) * fraction;
+                float arc = 4f * fraction * (1f - fraction);
+                return linearY - arcHeight * arc;
+            };
+
+            ObjectAnimator yAnimator = ObjectAnimator.ofObject(characterView, View.Y, arcEvaluator, originY, destY);
+
+            // SCALING ANIMATION
+            Keyframe scaleStart = Keyframe.ofFloat(0f, 1f);
+            Keyframe scalePeak = Keyframe.ofFloat(0.45f, 1.15f);
+            Keyframe scaleEnd = Keyframe.ofFloat(1f, 1f);
+
+            PropertyValuesHolder scaleXValues = PropertyValuesHolder.ofKeyframe(View.SCALE_X, scaleStart, scalePeak, scaleEnd);
+            PropertyValuesHolder scaleYValues = PropertyValuesHolder.ofKeyframe(View.SCALE_Y, scaleStart, scalePeak, scaleEnd);
+
+            ObjectAnimator scaleAnimator = ObjectAnimator.ofPropertyValuesHolder(characterView, scaleXValues, scaleYValues);
+
+            // ROTATION ANIMATION
+            float rotationDirection = destX >= originX ? 1f : -1f;
+
+            ObjectAnimator rotationAnimator = ObjectAnimator.ofFloat(characterView, View.ROTATION, 0f, 5f * rotationDirection, 0f);
+
+            int duration = getAnimationDuration(DURATION_FLY);
+
+            xAnimator.setDuration(duration);
+            yAnimator.setDuration(duration);
+            scaleAnimator.setDuration(duration);
+            rotationAnimator.setDuration(duration);
+
+            AccelerateDecelerateInterpolator interpolator = new AccelerateDecelerateInterpolator();
+
+            xAnimator.setInterpolator(interpolator);
+            yAnimator.setInterpolator(interpolator);
+            scaleAnimator.setInterpolator(interpolator);
+            rotationAnimator.setInterpolator(interpolator);
+
+            AnimatorSet animatorSet = new AnimatorSet();
+
+            animatorSet.playTogether(xAnimator, yAnimator, scaleAnimator, rotationAnimator);
+
+            animatorSet.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    characterDisplay.setPosition(destX, destY);
+
+                    characterView.setRotation(0f);
+                    characterView.setScaleX(1f);
+                    characterView.setScaleY(1f);
+
+                    onTargetAnimationEnd.run();
+                }
+            });
+
+            animatorSet.start();
+        }
+    }
+
+
 
 
     private static void animateFadeIn(@NonNull CharacterDisplay characterDisplay, int duration,
