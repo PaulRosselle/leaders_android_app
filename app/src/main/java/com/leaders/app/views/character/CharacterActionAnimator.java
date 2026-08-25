@@ -19,6 +19,7 @@ import androidx.annotation.Nullable;
 
 import com.leaders.app.views.board.BoardView;
 import com.leaders.app.views.board.CellView;
+import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.actions.CharacterActionMotion;
 import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.entities.Position;
@@ -37,6 +38,21 @@ public final class CharacterActionAnimator {
     private static final int DURATION_JUMP = 400;
     private static final int DURATION_FLY = 600;
     private static final int DURATION_TRANSFORM = 800;
+
+    public static void animate(@NonNull BoardView boardView,
+                               @NonNull CharacterAction action,
+                               @Nullable Runnable onAnimationEnd) {
+        List<CharacterActionMotion> motions = action.getMotions();
+        
+        if (motions.isEmpty()) {
+            if (onAnimationEnd != null) {
+                onAnimationEnd.run();
+            }
+            return;
+        }
+
+        animateMotionSequence(boardView, motions, 0, onAnimationEnd);
+    }
 
     public static void animate(@NonNull BoardView boardView,
                                @NonNull CharacterActionMotion motion,
@@ -58,6 +74,22 @@ public final class CharacterActionAnimator {
             case Transform: animateTransformCharacter(boardView, targets, onAnimationEnd); break;
             default: throw new IllegalArgumentException("Character motion animation not handled: " + motion.getMotionType());
         }
+    }
+
+    private static void animateMotionSequence(@NonNull BoardView boardView,
+                                              @NonNull List<CharacterActionMotion> motions,
+                                              int index, @Nullable Runnable onAnimationEnd) {
+        if (index >= motions.size()) {
+            if (onAnimationEnd != null) {
+                onAnimationEnd.run();
+            } return;
+        }
+
+        CharacterActionMotion motion = motions.get(index);
+
+        animate(boardView, motion, () ->
+                animateMotionSequence(boardView, motions, index + 1, onAnimationEnd)
+        );
     }
 
     private static void animateAddCharacter(@NonNull BoardView boardView,
