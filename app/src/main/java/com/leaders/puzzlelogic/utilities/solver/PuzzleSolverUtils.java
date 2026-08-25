@@ -32,6 +32,7 @@ import java.util.concurrent.BlockingQueue;
  * Utility class used to find winning action sequences during an ActionsPhase.
  */
 public final class PuzzleSolverUtils {
+    public static final int MAX_PLAYER_CHARACTER_COUNT = 10;
     private static final int MAX_RESOLVER_INTERACTION_DEPTH = 2;
 
     private PuzzleSolverUtils(){

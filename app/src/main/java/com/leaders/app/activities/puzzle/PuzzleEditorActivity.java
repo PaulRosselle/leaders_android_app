@@ -49,6 +49,7 @@ import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.factories.GameFactory;
+import com.leaders.puzzlelogic.utilities.solver.PuzzleSolverUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -334,7 +335,19 @@ public final class PuzzleEditorActivity extends BaseActivity {
 
         CharacterActionAnimator.animate(bdvBoard, actionMotion, () -> {
             board.getCell(position).setCharacter(character);
-            applyDefaultEditorState();
+
+            // If there are still characters to add, we continue in AddingCharacter mode
+            cevCharacterEditor.removeNewCharactersMatching(
+                    character.getTeamColor().getOpposite(),
+                    character.getCharacterType()
+            );
+            if (cevCharacterEditor.hasCharactersToAdd()) {
+                bdvBoard.applyCellTargets();
+                bdvBoard.applyCharacterTargets(board);
+                editorState = EditorState.AddingCharacter;
+            } else {
+                applyDefaultEditorState();
+            }
         });
     }
 
@@ -612,6 +625,25 @@ public final class PuzzleEditorActivity extends BaseActivity {
     }
 
     private void btnSearchForSolutionsClick(View v) {
+        // TODO - add 10 character limitation
+        List<Cell> playerCharacterCells = BoardQuery.findCharacterCells(board,
+                PuzzleEditionUtils.getPuzzlePlayerTeamColor(), null);
+        if (playerCharacterCells.size() >= PuzzleSolverUtils.MAX_PLAYER_CHARACTER_COUNT) {
+            new AlertDialog.Builder(this, R.style.alert_dialog_theme)
+                    .setTitle(R.string.solution_search_not_recommended)
+                    .setMessage(String.format(getString(R.string.search_with_x_characters_can_take_a_long_time),
+                            PuzzleSolverUtils.MAX_PLAYER_CHARACTER_COUNT))
+                    .setPositiveButton(R.string.proceed, (dialog, which) -> searchForSolution())
+                    .setNegativeButton(R.string.cancel, null)
+                    .show();
+        } else {
+            searchForSolution();
+        }
+
+        setActionsMenuVisible(false);
+    }
+
+    private void searchForSolution() {
         String validityErrors = PuzzleEditionUtils.getPuzzleValidityErrors(this,
                 GameFactory.create(PuzzleEditionUtils.getDefaultHistory(board)));
 
@@ -630,10 +662,9 @@ public final class PuzzleEditorActivity extends BaseActivity {
             new AlertDialog.Builder(this, R.style.alert_dialog_theme)
                     .setTitle(R.string.invalid_puzzle)
                     .setMessage(validityErrors)
+                    .setPositiveButton(R.string.ok, null)
                     .show();
         }
-
-        setActionsMenuVisible(false);
     }
 
     private void btnImportClick(View v) {
@@ -656,6 +687,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
             new AlertDialog.Builder(this, R.style.alert_dialog_theme)
                     .setTitle(R.string.invalid_puzzle)
                     .setMessage(validityErrors)
+                    .setPositiveButton(R.string.ok, null)
                     .show();
         }
 

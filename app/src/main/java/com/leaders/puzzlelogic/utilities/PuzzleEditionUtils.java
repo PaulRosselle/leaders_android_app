@@ -130,7 +130,7 @@ public final class PuzzleEditionUtils {
         return builder.toString().trim();
     }
 
-    private static TeamColor getPuzzlePlayerTeamColor() {
+    public static TeamColor getPuzzlePlayerTeamColor() {
         return TeamColor.Black;
     }
 

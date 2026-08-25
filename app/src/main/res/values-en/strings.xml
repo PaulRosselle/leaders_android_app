@@ -132,5 +132,9 @@
     <string name="one_solution_found">One solution found</string>
     <string name="solution_x_out_of_n">Solution %d/%d</string>
     <string name="board_coordinates">Board coordinates</string>
+    <string name="solution_search_not_recommended">Solution search not recommended</string>
+    <string name="search_with_x_characters_can_take_a_long_time">With %d or more characters in the player\'s team, finding a solution may take several hours, or even days.</string>
+    <string name="ok">OK</string>
+    <string name="proceed">Proceed</string>
 
 </resources>
