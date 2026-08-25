@@ -131,5 +131,6 @@
     <string name="no_solution_found">No solution found</string>
     <string name="one_solution_found">One solution found</string>
     <string name="solution_x_out_of_n">Solution %d/%d</string>
+    <string name="board_coordinates">Board coordinates</string>
 
 </resources>

@@ -17,6 +17,7 @@ import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.utilities.ButtonUtils;
 import com.leaders.app.utilities.ExtraUtils;
+import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.board.ReadOnlyBoardView;
 import com.leaders.app.views.characteraction.CharacterActionTimelineView;
 import com.leaders.gamelogic.actions.CharacterAction;
@@ -51,7 +52,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 public final class PuzzleSolverActivity extends BaseActivity {
-    // TODO - Add DisplayCellPositions
     @NonNull
     private final List<List<CharacterAction>> solutions = new ArrayList<>();
 
@@ -65,6 +65,9 @@ public final class PuzzleSolverActivity extends BaseActivity {
     private MaterialButton btnNextSolution;
     private CharacterActionTimelineView catvActions;
     private HorizontalScrollView scvActions;
+    private MaterialButton btnPuzzleActions;
+    private ActionsMenuView amvPuzzleActions;
+    private View vwDialogBg;
 
     private int puzzleIdx;
     private GameHistory puzzleGameHistory;
@@ -88,11 +91,22 @@ public final class PuzzleSolverActivity extends BaseActivity {
         txvSolutionsFound = findViewById(R.id.txvSolutionsFound_actPuzzleSolver);
         catvActions = findViewById(R.id.catvActions_actPuzzleSolver);
         scvActions = findViewById(R.id.scvActions_actPuzzleSolver);
+        btnPuzzleActions = findViewById(R.id.btnPuzzleActions_actPuzzleSolver);
+        amvPuzzleActions = findViewById(R.id.amvPuzzleActions_actPuzzleSolver);
+        vwDialogBg = findViewById(R.id.vwDialogBg_actPuzzleSolver);
+
+        amvPuzzleActions.addActionButton(R.drawable.icon_position, R.string.board_coordinates, 0, this::btnDisplayCellPosition);
     }
 
     @Override
     protected void initListeners() {
         super.initListeners();
+
+
+        // Puzzle actions listeners
+        btnPuzzleActions.setOnClickListener(v ->
+                setActionsMenuVisible(amvPuzzleActions.getVisibility() != View.VISIBLE));
+        vwDialogBg.setOnClickListener(this::vwDialogBgClick);
 
         catvActions.setOnMarkerSelectedListener(this::onActionTimelineMarkerSelect);
 
@@ -390,6 +404,12 @@ public final class PuzzleSolverActivity extends BaseActivity {
         updateSolutionButtons();
     }
 
+
+    private void setActionsMenuVisible(boolean visible) {
+        amvPuzzleActions.setVisibility(visible ? View.VISIBLE : View.GONE);
+        vwDialogBg.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
     private void btnChangeDisplayedSolutionClick(View v) {
         int incValue = v == btnNextSolution ? 1 : -1;
 
@@ -399,6 +419,16 @@ public final class PuzzleSolverActivity extends BaseActivity {
         }
 
         setDisplayedSolution(previousSolution);
+    }
+
+    private void btnDisplayCellPosition(View v) {
+        bdvBoard.setCellPositionVisible(!bdvBoard.isCellPositionVisible());
+
+        setActionsMenuVisible(false);
+    }
+
+    private void vwDialogBgClick(View v) {
+        setActionsMenuVisible(false);
     }
 
     private void updateSolutionTextView() {

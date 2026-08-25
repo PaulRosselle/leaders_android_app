@@ -10,8 +10,11 @@ import androidx.core.content.ContextCompat;
 import com.leaders.R;
 
 public final class ReadOnlyBoardView extends BoardView {
+    private boolean isCellPositionVisible;
+
     public ReadOnlyBoardView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        setCellPositionVisible(true);
     }
 
     public void setOnCharacterLongClickListener(OnLongClickListener onCharacterLongClickListener) {
@@ -20,10 +23,15 @@ public final class ReadOnlyBoardView extends BoardView {
     }
 
     public void setCellPositionVisible(boolean visible) {
+        isCellPositionVisible = visible;
         if (visible) {
             imvBoard.setForeground(ContextCompat.getDrawable(getContext(), R.drawable.cell_positions));
         } else {
             imvBoard.setForeground(null);
         }
+    }
+
+    public boolean isCellPositionVisible() {
+        return isCellPositionVisible;
     }
 }

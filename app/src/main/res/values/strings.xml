@@ -133,4 +133,5 @@
     <string name="no_solution_found">Aucune solution trouvée</string>
     <string name="one_solution_found">Une solution trouvée</string>
     <string name="solution_x_out_of_n">Solution %d/%d</string>
+    <string name="board_coordinates">Coordonnées du plateau</string>
 </resources>

@@ -71,8 +71,8 @@ public final class PuzzleEditorActivity extends BaseActivity {
         Play,
         SearchForSolution,
         ImportCode,
-        ExportCode;
-        // TODO - Add DisplayCellPositions
+        ExportCode,
+        DisplayCellPositions;
 
         private int getIconResId() {
             switch (this) {
@@ -81,6 +81,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
                 case SearchForSolution: return R.drawable.icon_search;
                 case ImportCode: return R.drawable.icon_import;
                 case ExportCode: return R.drawable.icon_export;
+                case DisplayCellPositions: return R.drawable.icon_position;
                 default: throw new IllegalStateException("No icon found for puzzle action: " + this);
             }
         }
@@ -92,6 +93,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
                 case SearchForSolution: return R.string.search_for_solutions;
                 case ImportCode: return R.string.import_puzzle;
                 case ExportCode: return R.string.export_puzzle;
+                case DisplayCellPositions: return R.string.board_coordinates;
                 default: throw new IllegalStateException("No text found for puzzle action: " + this);
             }
         }
@@ -103,6 +105,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
                 case SearchForSolution: return activity::btnSearchForSolutionsClick;
                 case ImportCode: return activity::btnImportClick;
                 case ExportCode: return activity::btnExportClick;
+                case DisplayCellPositions: return activity::btnDisplayCellPosition;
                 default: throw new IllegalStateException("No click listener found for puzzle action: " + this);
             }
         }
@@ -599,16 +602,16 @@ public final class PuzzleEditorActivity extends BaseActivity {
 
     //region PUZZLE ACTIONS LISTENER METHODS
 
-    public void btnSaveClick(View v) {
+    private void btnSaveClick(View v) {
         amvPuzzleActions.setVisibility(View.GONE);
         openSavePuzzleDialog();
     }
 
-    public void btnPlayClick(View v) {
+    private void btnPlayClick(View v) {
         // TODO
     }
 
-    public void btnSearchForSolutionsClick(View v) {
+    private void btnSearchForSolutionsClick(View v) {
         String validityErrors = PuzzleEditionUtils.getPuzzleValidityErrors(this,
                 GameFactory.create(PuzzleEditionUtils.getDefaultHistory(board)));
 
@@ -633,7 +636,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
         setActionsMenuVisible(false);
     }
 
-    public void btnImportClick(View v) {
+    private void btnImportClick(View v) {
         GameHistory gameHistory = PuzzleImportUtils.importPuzzleFromClipboard(this);
         if (gameHistory != null) {
             loadPuzzleFromHistory(gameHistory);
@@ -642,7 +645,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
         setActionsMenuVisible(false);
     }
 
-    public void btnExportClick(View v) {
+    private void btnExportClick(View v) {
         String validityErrors = PuzzleEditionUtils.getPuzzleValidityErrors(this,
                 GameFactory.create(PuzzleEditionUtils.getDefaultHistory(board)));
 
@@ -659,7 +662,13 @@ public final class PuzzleEditorActivity extends BaseActivity {
         setActionsMenuVisible(false);
     }
 
-    public void vwDialogBgClick(View v) {
+    private void btnDisplayCellPosition(View v) {
+        bdvBoard.setCellPositionVisible(!bdvBoard.isCellPositionVisible());
+
+        setActionsMenuVisible(false);
+    }
+
+    private void vwDialogBgClick(View v) {
         if (amvPuzzleActions.getVisibility() == View.VISIBLE) {
             setActionsMenuVisible(false);
         } else if (psvSave.getVisibility() == View.VISIBLE) {
