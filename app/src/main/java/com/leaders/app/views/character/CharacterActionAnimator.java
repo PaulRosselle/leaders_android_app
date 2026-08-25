@@ -43,7 +43,7 @@ public final class CharacterActionAnimator {
                                @NonNull CharacterAction action,
                                @Nullable Runnable onAnimationEnd) {
         List<CharacterActionMotion> motions = action.getMotions();
-        
+
         if (motions.isEmpty()) {
             if (onAnimationEnd != null) {
                 onAnimationEnd.run();

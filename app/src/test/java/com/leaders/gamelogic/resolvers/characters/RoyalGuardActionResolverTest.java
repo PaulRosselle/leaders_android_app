@@ -162,7 +162,8 @@ public class RoyalGuardActionResolverTest {
 
     @Test
     public void getNextFeedback_shouldBuildRoyalGuardMovement() {
-        Position destination = new Position(1, 1);
+        Position teleportPos = new Position(1, 0);
+        Position destination = new Position(2, 1);
         CharacterActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(
                 TargetCategory.ActiveAbilityDestination,
@@ -175,14 +176,22 @@ public class RoyalGuardActionResolverTest {
 
         List<CharacterActionMotion> motions = feedback.getCharacterActionMotions();
 
-        assertEquals(1, motions.size());
-        CharacterActionMotion motion = motions.get(0);
+        assertEquals(2, motions.size());
+        CharacterActionMotion teleportMotion = motions.get(0);
 
-        assertEquals(CharacterMotionType.Move, motion.getMotionType());
-        assertEquals(1, motion.getTargets().size());
-        assertEquals(character, motion.getTargets().get(0).getCharacter());
-        assertEquals(new Position(3, 3), motion.getTargets().get(0).getOriginPos());
-        assertEquals(destination, motion.getTargets().get(0).getDestPos());
+        assertEquals(CharacterMotionType.Teleport, teleportMotion.getMotionType());
+        assertEquals(1, teleportMotion.getTargets().size());
+        assertEquals(character, teleportMotion.getTargets().get(0).getCharacter());
+        assertEquals(new Position(3, 3), teleportMotion.getTargets().get(0).getOriginPos());
+        assertEquals(teleportPos, teleportMotion.getTargets().get(0).getDestPos());
+
+
+        CharacterActionMotion moveMotion = motions.get(1);
+        assertEquals(CharacterMotionType.Move, moveMotion.getMotionType());
+        assertEquals(1, moveMotion.getTargets().size());
+        assertEquals(character, moveMotion.getTargets().get(0).getCharacter());
+        assertEquals(teleportPos, moveMotion.getTargets().get(0).getOriginPos());
+        assertEquals(destination, moveMotion.getTargets().get(0).getDestPos());
     }
 
     @Test
@@ -216,7 +225,7 @@ public class RoyalGuardActionResolverTest {
 
     @Test
     public void buildAction_shouldBuildActionForRoyalGuardAbility() {
-        Position destination = new Position(1, 1);
+        Position destination = new Position(0, 1);
         CharacterActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(
                 TargetCategory.ActiveAbilityDestination,
@@ -235,7 +244,7 @@ public class RoyalGuardActionResolverTest {
 
         CharacterActionMotion motion = action.getMotions().get(0);
 
-        assertEquals(CharacterMotionType.Move, motion.getMotionType());
+        assertEquals(CharacterMotionType.Teleport, motion.getMotionType());
         assertEquals(character, motion.getTargets().get(0).getCharacter());
         assertEquals(new Position(3, 3), motion.getTargets().get(0).getOriginPos());
         assertEquals(destination, motion.getTargets().get(0).getDestPos());

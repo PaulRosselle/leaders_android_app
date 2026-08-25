@@ -30,15 +30,23 @@ public final class RecruitmentActionHandler extends GameActionHandler {
 
     @Override
     public void undoAction() {
-        for (RecruitmentActionMotion motion : recruitmentAction.getMotions()) {
+        for (int i = recruitmentAction.getMotions().size() - 1; i >= 0; i--) {
+            RecruitmentActionMotion motion = recruitmentAction.getMotions().get(i);
+
             game.getRecruitedCharacters().remove(motion.getCharacter());
-            // We only add back a card once into the recruitable cards pool since it shouldn't host any duplicate
+
+            // Restore the recruited character's card only once, since the
+            // recruitable cards pool should not contain duplicates.
             CharacterCard card = motion.getCharacter().getCharacterType().getCharacterCard();
-            if (!game.getRecruitableCards().contains(card))
-            {
+
+            if (!game.getRecruitableCards().contains(card)) {
                 game.getRecruitableCards().add(card);
             }
+
+            // Remove the character from the board.
             game.getBoard().getCell(motion.getPosition()).setCharacter(null);
         }
     }
+
+
 }

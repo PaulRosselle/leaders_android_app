@@ -166,7 +166,7 @@ public class WandererActionResolverTest {
         assertEquals(1, motions.size());
         CharacterActionMotion motion = motions.get(0);
 
-        assertEquals(CharacterMotionType.Move, motion.getMotionType());
+        assertEquals(CharacterMotionType.Fly, motion.getMotionType());
         assertEquals(1, motion.getTargets().size());
         assertEquals(wanderer, motion.getTargets().get(0).getCharacter());
         assertEquals(WANDERER_POSITION, motion.getTargets().get(0).getOriginPos());
@@ -230,7 +230,7 @@ public class WandererActionResolverTest {
 
         CharacterActionMotion motion = action.getMotions().get(0);
 
-        assertEquals(CharacterMotionType.Move, motion.getMotionType());
+        assertEquals(CharacterMotionType.Fly, motion.getMotionType());
         assertEquals(1, motion.getTargets().size());
         assertEquals(wanderer, motion.getTargets().get(0).getCharacter());
         assertEquals(WANDERER_POSITION, motion.getTargets().get(0).getOriginPos());
