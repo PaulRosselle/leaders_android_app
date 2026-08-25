@@ -3,10 +3,13 @@ package com.leaders.app.views.character;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
+import android.animation.Keyframe;
 import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AnticipateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 
@@ -24,14 +27,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import kotlin.NotImplementedError;
-
 public final class CharacterActionAnimator {
     private static final int DURATION_ADD = 200;
-    private static final int DURATION_REMOVE = DURATION_ADD;
+    private static final int DURATION_REMOVE = 200;
     private static final int DURATION_MOVE = 400;
     private static final int DURATION_TELEPORT = 800;
     private static final int DURATION_PUSH = 400;
+    private static final int DURATION_JUMP = 400;
 
     public static void animate(@NonNull BoardView boardView,
                                @NonNull CharacterActionMotion motion,
@@ -304,7 +306,76 @@ public final class CharacterActionAnimator {
     private static void animateJumpCharacter(@NonNull BoardView boardView,
                                              @NonNull List<CharacterActionTarget> targets,
                                              @Nullable Runnable onAnimationEnd) {
-        // TODO
+        List<Position> originPositions = new ArrayList<>();
+        List<Position> destinationPositions = new ArrayList<>();
+
+        AtomicInteger remaining = new AtomicInteger(targets.size());
+        Runnable onTargetAnimationEnd = () -> {
+            if (remaining.decrementAndGet() == 0) {
+                boardView.moveCharacterDisplays(originPositions, destinationPositions);
+
+                if (onAnimationEnd != null) {
+                    onAnimationEnd.run();
+                }
+            }
+        };
+
+        for (CharacterActionTarget target : targets) {
+            Position originPos = Objects.requireNonNull(target.getOriginPos(),
+                    "Invalid jump target : missing origin position");
+            Position destPos = Objects.requireNonNull(target.getDestPos(),
+                    "Invalid jump target : missing destination position");
+
+            originPositions.add(originPos);
+            destinationPositions.add(destPos);
+
+            CharacterDisplay characterDisplay = boardView.getCharacterDisplay(originPos);
+            CellView destCellView = boardView.getCellView(destPos);
+
+            float destX = destCellView.getX();
+            float destY = destCellView.getY();
+
+            setupForMovement(characterDisplay, destX, destY);
+
+            CharacterView characterView = characterDisplay.getCharacterView();
+
+            ObjectAnimator xAnimator = ObjectAnimator.ofFloat(characterView, View.X, destX);
+            ObjectAnimator yAnimator = ObjectAnimator.ofFloat(characterView, View.Y, destY);
+
+            Keyframe scaleStart = Keyframe.ofFloat(0f, 1f);
+            Keyframe scalePeak = Keyframe.ofFloat(0.45f, 1.25f);
+            Keyframe scaleEnd = Keyframe.ofFloat(1f, 1f);
+
+            PropertyValuesHolder scaleX = PropertyValuesHolder.ofKeyframe(View.SCALE_X, scaleStart, scalePeak, scaleEnd);
+
+            PropertyValuesHolder scaleY = PropertyValuesHolder.ofKeyframe(View.SCALE_Y, scaleStart, scalePeak, scaleEnd);
+
+            ObjectAnimator scaleAnimator = ObjectAnimator.ofPropertyValuesHolder(characterView, scaleX, scaleY);
+
+
+            int duration = getAnimationDuration(DURATION_JUMP);
+
+            xAnimator.setDuration(duration);
+            yAnimator.setDuration(duration);
+
+            xAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+            yAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+
+            AnimatorSet animatorSet = new AnimatorSet();
+            animatorSet.playTogether(xAnimator, yAnimator, scaleAnimator);
+
+            animatorSet.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    // Realign the whole display at the destination position
+                    characterDisplay.setPosition(destX, destY);
+
+                    onTargetAnimationEnd.run();
+                }
+            });
+
+            animatorSet.start();
+        }
     }
 
     private static void animateRemoveCharacter(@NonNull BoardView boardView,
@@ -333,7 +404,7 @@ public final class CharacterActionAnimator {
     private static void animateTransformCharacter(@NonNull BoardView boardView,
                                                   @NonNull List<CharacterActionTarget> targets,
                                                   @Nullable Runnable onAnimationEnd) {
-        throw new NotImplementedError("Transform character animation not implemented");
+        // TODO
     }
 
     private static void animateFadeIn(@NonNull CharacterDisplay characterDisplay, int duration,
@@ -367,15 +438,12 @@ public final class CharacterActionAnimator {
 
         characterDisplay.getCharacterView().animate().x(x).y(y)
                 .setDuration(getAnimationDuration(DURATION_MOVE))
-                .withEndAction(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Realign the whole display at the destination position
-                        characterDisplay.setPosition(x, y);
+                .withEndAction(() -> {
+                    // Realign the whole display at the destination position
+                    characterDisplay.setPosition(x, y);
 
-                        if (onAnimationEnd != null) {
-                            onAnimationEnd.run();
-                        }
+                    if (onAnimationEnd != null) {
+                        onAnimationEnd.run();
                     }
                 })
                 .start();
