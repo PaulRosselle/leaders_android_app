@@ -22,6 +22,7 @@ import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.interactions.InteractionType;
 import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
+import com.leaders.gamelogic.queries.CharacterAbilityQuery;
 import com.leaders.gamelogic.resolvers.CharacterActionResolver;
 
 import java.util.ArrayList;
@@ -58,8 +59,10 @@ public final class RiderActionResolver extends CharacterActionResolver {
             legalTargets.add(new InteractionTarget(TargetCategory.MovementDestination, destination));
         }
 
-        for (Position destination : getRiderDashDestinations(builder)) {
-            legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityDestination, destination));
+        if (CharacterAbilityQuery.canUseActiveAbility(game, character)) {
+            for (Position destination : getRiderDashDestinations(builder)) {
+                legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityDestination, destination));
+            }
         }
 
         return new InteractionRequest(

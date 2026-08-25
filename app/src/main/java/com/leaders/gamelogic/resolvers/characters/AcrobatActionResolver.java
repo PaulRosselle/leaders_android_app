@@ -22,6 +22,7 @@ import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.interactions.InteractionType;
 import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
+import com.leaders.gamelogic.queries.CharacterAbilityQuery;
 import com.leaders.gamelogic.resolvers.CharacterActionResolver;
 
 import java.util.ArrayList;
@@ -64,8 +65,10 @@ public final class AcrobatActionResolver extends CharacterActionResolver {
         for (Position movementDest : getNormalMovementValidDestinations(builder)) {
             legalTargets.add(new InteractionTarget(TargetCategory.MovementDestination, movementDest));
         }
-        for (Position abilityDestination : getAcrobatJumpDestinations(builder)) {
-            legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityDestination, abilityDestination));
+        if (CharacterAbilityQuery.canUseActiveAbility(game, character)) {
+            for (Position abilityDestination : getAcrobatJumpDestinations(builder)) {
+                legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityDestination, abilityDestination));
+            }
         }
 
         return new InteractionRequest(InteractionType.PositionExpected,

@@ -22,6 +22,7 @@ import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.interactions.InteractionType;
 import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
+import com.leaders.gamelogic.queries.CharacterAbilityQuery;
 import com.leaders.gamelogic.resolvers.CharacterActionResolver;
 
 import java.util.ArrayList;
@@ -140,9 +141,11 @@ public final class BruiserActionResolver extends CharacterActionResolver {
             legalTargets.add(new InteractionTarget(TargetCategory.MovementDestination, destination));
         }
 
-        for (Position enemyPosition : getAdjacentEnemyPositions()) {
-            if (!getValidPushDestinations(builder, enemyPosition, true).isEmpty()) {
-                legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityTargetPosition, enemyPosition));
+        if (CharacterAbilityQuery.canUseActiveAbility(game, character)) {
+            for (Position enemyPosition : getAdjacentEnemyPositions()) {
+                if (!getValidPushDestinations(builder, enemyPosition, true).isEmpty()) {
+                    legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityTargetPosition, enemyPosition));
+                }
             }
         }
 
@@ -196,7 +199,8 @@ public final class BruiserActionResolver extends CharacterActionResolver {
             Cell adjacentCell = BoardQuery.findAdjacentCell(game.getBoard(), characterPos, direction);
             if (adjacentCell != null) {
                 Character target = adjacentCell.getCharacter();
-                if (target != null && target.getTeamColor() != character.getTeamColor()) {
+                if (target != null && target.getTeamColor() != character.getTeamColor() &&
+                    CharacterAbilityQuery.canBeMovedByEnemyAbilities(game, target)) {
                     enemies.add(adjacentCell.getPosition());
                 }
             }

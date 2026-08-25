@@ -22,6 +22,7 @@ import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.interactions.InteractionType;
 import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
+import com.leaders.gamelogic.queries.CharacterAbilityQuery;
 import com.leaders.gamelogic.resolvers.CharacterActionResolver;
 
 import java.util.ArrayList;
@@ -136,9 +137,11 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
             legalTargets.add(new InteractionTarget(TargetCategory.MovementDestination, destination));
         }
 
-        for (Position enemyPosition : getManipulatorTargetPositions()) {
-            if (!getValidTargetDestinations(builder, enemyPosition, true).isEmpty()) {
-                legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityTargetPosition, enemyPosition));
+        if (CharacterAbilityQuery.canUseActiveAbility(game, character)) {
+            for (Position enemyPosition : getManipulatorTargetPositions()) {
+                if (!getValidTargetDestinations(builder, enemyPosition, true).isEmpty()) {
+                    legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityTargetPosition, enemyPosition));
+                }
             }
         }
 
@@ -196,7 +199,8 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
             if (adjacentCell != null && adjacentCell.getCharacter() == null) {
                 Cell targetCell = BoardQuery.findVisibleCharacterCell(game.getBoard(), characterPos,
                         direction, character.getTeamColor().getOpposite(), null);
-                if (targetCell != null) {
+                if (targetCell != null &&
+                        CharacterAbilityQuery.canBeMovedByEnemyAbilities(game, targetCell.getCharacter())) {
                     targets.add(targetCell.getPosition());
                 }
             }
