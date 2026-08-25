@@ -290,4 +290,22 @@ public class IllusionistActionResolverTest {
 
         return false;
     }
+
+    @Test
+    public void etNextInteraction_shouldRespectPassiveAbilities() {
+        Character jailer = Character.create(CharacterType.Jailer, TeamColor.White);
+        game.getBoard().getCell(new Position(2, 3)).setCharacter(jailer);
+
+        Character protector = Character.create(CharacterType.Protector, TeamColor.White);
+        game.getBoard().getCell(new Position(3, 6)).setCharacter(protector);
+
+        InteractionRequest request = resolver.getNextInteraction(createBuilder());
+
+        assertNotNull(request);
+        assertFalse(containsTarget(
+                request,
+                TargetCategory.ActiveAbilityTargetPosition,
+                TARGET_POSITION
+        ));
+    }
 }

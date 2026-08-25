@@ -40,6 +40,8 @@ import java.util.List;
 
 public class WandererActionResolverTest {
 
+    private Game game;
+
     private static final Position WANDERER_POSITION = new Position(3, 3);
     private static final Position NORMAL_DESTINATION = new Position(3, 2);
     private static final Position ABILITY_DESTINATION = new Position(1, 1);
@@ -74,7 +76,7 @@ public class WandererActionResolverTest {
 
     @Before
     public void setUp() {
-        Game game = createTestGame();
+        game = createTestGame();
 
         Character leader = Character.create(CharacterType.LeaderKing, TeamColor.Black);
         game.getBoard().getCell(new Position(0, 0)).setCharacter(leader);
@@ -256,5 +258,25 @@ public class WandererActionResolverTest {
         }
 
         return false;
+    }
+
+    @Test
+    public void getNextInteraction_shouldNotExposeAbilityWhenMuted() {
+        Character jailer = Character.create(CharacterType.Jailer, TeamColor.White);
+        game.getBoard().getCell(new Position(2, 3)).setCharacter(jailer);
+
+        InteractionRequest request = resolver.getNextInteraction(createBuilder());
+
+        assertNotNull(request);
+        assertTrue(containsTarget(
+                request,
+                TargetCategory.MovementDestination,
+                NORMAL_DESTINATION
+        ));
+        assertFalse(containsTarget(
+                request,
+                TargetCategory.ActiveAbilityDestination,
+                ABILITY_DESTINATION
+        ));
     }
 }

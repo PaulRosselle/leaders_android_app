@@ -22,6 +22,7 @@ import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.interactions.InteractionType;
 import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
+import com.leaders.gamelogic.queries.CharacterAbilityQuery;
 import com.leaders.gamelogic.resolvers.CharacterActionResolver;
 
 import java.util.ArrayList;
@@ -61,15 +62,23 @@ public final class ClawLauncherActionResolver extends CharacterActionResolver {
             legalTargets.add(new InteractionTarget(TargetCategory.MovementDestination, destination));
         }
 
-        for (Position targetPos : getClawLauncherValidTargetPositions(builder)) {
-            // The claw launcher can pull itself to any valid target
-            Position clawLauncherDestPos = getAbilityPullDestination(targetPos, characterPos);
-            if (!movementDestinations.contains(clawLauncherDestPos) &&
-                    isValidPull(builder, TargetCategory.ActiveAbilityDestination, clawLauncherDestPos)) {
-                legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityDestination, clawLauncherDestPos));
-            }
 
-            legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityTargetPosition, targetPos));
+        if (CharacterAbilityQuery.canUseActiveAbility(game, character)) {
+            for (Position targetPos : getClawLauncherValidTargetPositions(builder)) {
+                // The claw launcher can pull itself to any valid target
+                Position clawLauncherDestPos = getAbilityPullDestination(targetPos, characterPos);
+                if (!movementDestinations.contains(clawLauncherDestPos) &&
+                        isValidPull(builder, TargetCategory.ActiveAbilityDestination, clawLauncherDestPos)) {
+                    legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityDestination, clawLauncherDestPos));
+                }
+
+                // The target can be pulled next to the claw launcher
+                Character target = game.getBoard().getCell(targetPos).getCharacter();
+                if (CharacterAbilityQuery.canBeMovedByEnemyAbilities(game, target) &&
+                        isValidPull(builder, TargetCategory.ActiveAbilityTargetPosition, targetPos)) {
+                    legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityTargetPosition, targetPos));
+                }
+            }
         }
 
         return new InteractionRequest(
@@ -122,10 +131,7 @@ public final class ClawLauncherActionResolver extends CharacterActionResolver {
                     direction, null, null);
 
             if (targetCell != null) {
-                Position targetPos = targetCell.getPosition();
-                if (isValidPull(builder, TargetCategory.ActiveAbilityTargetPosition, targetPos)) {
-                    targets.add(targetPos);
-                }
+                targets.add(targetCell.getPosition());
             }
         }
 

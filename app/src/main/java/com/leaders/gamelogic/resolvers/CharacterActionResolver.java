@@ -228,10 +228,6 @@ public class CharacterActionResolver {
      */
     @NonNull
     public CharacterAction buildAction(@NonNull CharacterActionBuilder builder) {
-        if (builder.getFeedbacks().size() > 1) {
-            throw new IllegalArgumentException("The default resolver use the builder's CharacterActionMotions to create a CharacterAction");
-        }
-
         List<CharacterActionMotion> characterActionMotions = new ArrayList<>();
         for (InteractionFeedback feedback : builder.getFeedbacks()) {
             characterActionMotions.addAll(feedback.getCharacterActionMotions());

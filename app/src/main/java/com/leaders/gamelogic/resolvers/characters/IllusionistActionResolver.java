@@ -22,6 +22,7 @@ import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.interactions.InteractionType;
 import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
+import com.leaders.gamelogic.queries.CharacterAbilityQuery;
 import com.leaders.gamelogic.resolvers.CharacterActionResolver;
 
 import java.util.ArrayList;
@@ -62,9 +63,11 @@ public final class IllusionistActionResolver extends CharacterActionResolver {
             legalTargets.add(new InteractionTarget(TargetCategory.MovementDestination, destination));
         }
 
-        for (Position targetPosition : getIllusionistTargetPositions(builder)) {
-            legalTargets.add(new InteractionTarget(
-                    TargetCategory.ActiveAbilityTargetPosition, targetPosition));
+        if (CharacterAbilityQuery.canUseActiveAbility(game, character)) {
+            for (Position targetPosition : getIllusionistTargetPositions(builder)) {
+                legalTargets.add(new InteractionTarget(
+                        TargetCategory.ActiveAbilityTargetPosition, targetPosition));
+            }
         }
 
         return new InteractionRequest(
@@ -119,7 +122,8 @@ public final class IllusionistActionResolver extends CharacterActionResolver {
             if (adjacentCell != null && adjacentCell.getCharacter() == null) {
                 Cell targetCell = BoardQuery.findVisibleCharacterCell(game.getBoard(), characterPos,
                         direction, null, null);
-                if (targetCell != null) {
+                if (targetCell != null &&
+                        CharacterAbilityQuery.canBeMovedByEnemyAbilities(game, targetCell.getCharacter())) {
                     Position targetPos = targetCell.getPosition();
 
                     InteractionResult swapResult = new InteractionResult(

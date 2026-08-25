@@ -341,4 +341,20 @@ public class AcrobatActionResolverTest {
         assertNotNull(request);
         assertFalse(containsTarget(request, TargetCategory.ActiveAbilityDestination, forbiddenDestination));
     }
+
+    @Test
+    public void getNextInteraction_shouldNotExposeAbilityWhenMuted() {
+        Character jailer = Character.create(CharacterType.Jailer, TeamColor.White);
+        game.getBoard().getCell(new Position(2, 3)).setCharacter(jailer);
+
+        InteractionRequest request = resolver.getNextInteraction(createBuilder());
+
+        assertNotNull(request);
+        assertTrue(containsTarget(request, TargetCategory.MovementDestination, new Position(2, 2)));
+        assertFalse(containsTarget(
+                request,
+                TargetCategory.ActiveAbilityDestination,
+                new Position(3, 1)
+        ));
+    }
 }

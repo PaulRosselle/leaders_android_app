@@ -179,20 +179,18 @@ public final class CharacterEditorView extends ConstraintLayout {
         }
     }
 
-    public void removeNewCharactersMatching(@Nullable TeamColor teamColor,
-                                            @Nullable CharacterType characterType) {
+    public void removeNewCharactersMatching(@NonNull TeamColor teamColor,
+                                            @NonNull CharacterType characterType) {
         for (int i = newCharacterViews.size() - 1; i >= 0; i--) {
             CharacterView characterView = newCharacterViews.get(i);
             Character character = getCharacterFromView(characterView);
 
-            if ((teamColor == null || character.getTeamColor() == teamColor) &&
-                    (characterType == null || character.getCharacterType() == characterType)) {
+            if (character.getTeamColor() == teamColor || character.getCharacterType() == characterType) {
                 newCharacterViews.remove(i);
                 removeView(characterView);
             }
         }
 
-        // TODO - comment
         if (!newCharacterViews.isEmpty()) {
             selectFirstNewCharacter();
         }
@@ -227,8 +225,8 @@ public final class CharacterEditorView extends ConstraintLayout {
         newCharacterHighlight.startAnimation();
     }
 
-    public int getNewCharactersCount() {
-        return newCharacterViews.size();
+    public boolean hasCharactersToAdd() {
+        return !newCharacterViews.isEmpty();
     }
 
     private LayoutParams getCharacterLayoutParam(int characterSize) {

@@ -32,6 +32,9 @@ import java.util.concurrent.BlockingQueue;
  * Utility class used to find winning action sequences during an ActionsPhase.
  */
 public final class PuzzleSolverUtils {
+    public static final int MAX_PLAYER_CHARACTER_COUNT = 10;
+    private static final int MAX_RESOLVER_INTERACTION_DEPTH = 2;
+
     private PuzzleSolverUtils(){
         throw new AssertionError("Cannot instantiate utility class");
     }
@@ -170,15 +173,19 @@ public final class PuzzleSolverUtils {
     }
 
     /**
-     * Explores all possible actions of a mandatory opponent character and retains
-     * only the continuations valid for every possible action.
+     * Explores all possible actions of a mandatory opponent character.
+     *
+     * <p>Every possible action of the opponent must leave at least one winning
+     * continuation for the current player. If one opponent action does not allow
+     * any solution, the whole branch is invalidated. Otherwise, all solutions
+     * found across the opponent actions are collected.</p>
      *
      * @param game the game being explored
      * @param history the game history used to evaluate possible continuations
      * @param actionsPhase the current actions phase
      * @param remainingCharacters the characters remaining to be explored
      * @param playableCharacter the opponent character whose actions are being explored
-     * @param collector the collector receiving continuations valid for every action
+     * @param collector the collector receiving the valid solutions
      * @throws InterruptedException if the exploration is interrupted
      */
     private static void exploreOpponentCharacterActions(@NonNull Game game,
@@ -189,7 +196,7 @@ public final class PuzzleSolverUtils {
                                                         @NonNull ISolutionCollector collector) throws InterruptedException {
         List<CharacterAction> actions = enumerateActions(game, history, playableCharacter.getCharacter());
 
-        List<List<CharacterAction>> commonSolutions = null;
+        List<List<CharacterAction>> solutions = new ArrayList<>();
 
         for (CharacterAction action : actions) {
             GameActionHandler handler = GameActionHandlerFactory.create(game, action);
@@ -202,26 +209,22 @@ public final class PuzzleSolverUtils {
 
                 search(game, history, actionsPhase, remainingCharacters, branchCollector);
 
-                if (commonSolutions == null) {
-                    commonSolutions = branchCollector.getSolutions();
-                } else {
-                    commonSolutions = intersectSolutions(commonSolutions, branchCollector.getSolutions());
-                }
-
-                // No continuation is valid for every possible opponent action.
-                if (commonSolutions.isEmpty()) {
+                // If this opponent action prevents every possible solution, the AND node is invalid
+                if (branchCollector.getSolutions().isEmpty()) {
                     return;
                 }
+
+                // This opponent action allows at least one solution
+                solutions.addAll(branchCollector.getSolutions());
+
             } finally {
                 actionsPhase.getActions().remove(actionsPhase.getActions().size() - 1);
                 handler.undoAction();
             }
         }
 
-        if (commonSolutions != null) {
-            for (List<CharacterAction> solution : commonSolutions) {
-                collector.add(solution);
-            }
+        for (List<CharacterAction> solution : solutions) {
+            collector.add(solution);
         }
     }
 
@@ -355,7 +358,7 @@ public final class PuzzleSolverUtils {
 
         List<CharacterAction> actions = new ArrayList<>();
 
-        enumerateResolverState(resolver, builder, actions);
+        enumerateResolverState(resolver, builder, actions, 0);
 
         return actions;
     }
@@ -371,7 +374,15 @@ public final class PuzzleSolverUtils {
      */
     private static void enumerateResolverState(@NonNull CharacterActionResolver resolver,
                                                @NonNull CharacterActionBuilder builder,
-                                               @NonNull List<CharacterAction> actions) {
+                                               @NonNull List<CharacterAction> actions,
+                                               int depth) {
+        if (depth > MAX_RESOLVER_INTERACTION_DEPTH) {
+            throw new IllegalStateException(
+                    "Resolver interaction flow did not terminate: "
+                            + resolver.getClass().getSimpleName()
+            );
+        }
+
         InteractionRequest request = resolver.getNextInteraction(builder);
 
         if (request == null) {
@@ -397,8 +408,20 @@ public final class PuzzleSolverUtils {
                 next.addFeedback(feedback);
             }
 
-            enumerateResolverState(resolver, next, actions);
+            enumerateResolverState(resolver, next, actions, depth + 1);
         }
+    }
+
+    /**
+     * Returns the total number of permutations of {@code characters}.
+     *
+     * @param characters the elements to permute
+     * @return the number of permutations, {@code characters.size()!}
+     * @throws IllegalArgumentException if the number of permutations exceeds
+     *                                  {@link Long#MAX_VALUE}
+     */
+    public static long getPermutationCount(@NonNull List<Character> characters) {
+        return factorial(characters.size());
     }
 
     /**

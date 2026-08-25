@@ -22,6 +22,7 @@ import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.interactions.InteractionType;
 import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
+import com.leaders.gamelogic.queries.CharacterAbilityQuery;
 import com.leaders.gamelogic.resolvers.CharacterActionResolver;
 
 import java.util.ArrayList;
@@ -53,15 +54,26 @@ public final class BruiserActionResolver extends CharacterActionResolver {
 
         InteractionResult firstResult = builder.getResults().get(0);
 
+        if (firstResult.getResultType() == InteractionResultType.CancelAction) {
+            return null;
+        }
+
         if (isNormalMovementResult(firstResult)) {
             return super.getNextInteraction(builder);
         }
 
         if (isBruiserTargetResult(firstResult)) {
-            return buildPushDestinationInteraction(builder, firstResult);
+            if (builder.getResults().size() > 1) {
+                if (!isBruiserPushDestinationResult(builder.getResults().get(1))) {
+                    throw new IllegalArgumentException("Invalid result type for a Bruiser ability activation");
+                }
+                return null;
+            } else {
+                return buildPushDestinationInteraction(builder, firstResult);
+            }
         }
 
-        return null;
+        throw new IllegalArgumentException("Invalid Bruiser action builder");
     }
 
     @Override
@@ -92,7 +104,7 @@ public final class BruiserActionResolver extends CharacterActionResolver {
         InteractionResult destinationResult = builder.getResults().get(1);
 
         if (!isBruiserTargetResult(firstResult) ||
-                !isBruiserDestinationResult(destinationResult)) {
+                !isBruiserPushDestinationResult(destinationResult)) {
             throw new IllegalArgumentException("Invalid result types for a Bruiser ability activation");
         }
 
@@ -129,9 +141,11 @@ public final class BruiserActionResolver extends CharacterActionResolver {
             legalTargets.add(new InteractionTarget(TargetCategory.MovementDestination, destination));
         }
 
-        for (Position enemyPosition : getAdjacentEnemyPositions()) {
-            if (!getValidPushDestinations(builder, enemyPosition, true).isEmpty()) {
-                legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityTargetPosition, enemyPosition));
+        if (CharacterAbilityQuery.canUseActiveAbility(game, character)) {
+            for (Position enemyPosition : getAdjacentEnemyPositions()) {
+                if (!getValidPushDestinations(builder, enemyPosition, true).isEmpty()) {
+                    legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityTargetPosition, enemyPosition));
+                }
             }
         }
 
@@ -185,7 +199,8 @@ public final class BruiserActionResolver extends CharacterActionResolver {
             Cell adjacentCell = BoardQuery.findAdjacentCell(game.getBoard(), characterPos, direction);
             if (adjacentCell != null) {
                 Character target = adjacentCell.getCharacter();
-                if (target != null && target.getTeamColor() != character.getTeamColor()) {
+                if (target != null && target.getTeamColor() != character.getTeamColor() &&
+                    CharacterAbilityQuery.canBeMovedByEnemyAbilities(game, target)) {
                     enemies.add(adjacentCell.getPosition());
                 }
             }
@@ -288,7 +303,7 @@ public final class BruiserActionResolver extends CharacterActionResolver {
                 result.getChosenTarget().getCategory() == TargetCategory.ActiveAbilityTargetPosition;
     }
 
-    private boolean isBruiserDestinationResult(@NonNull InteractionResult result) {
+    private boolean isBruiserPushDestinationResult(@NonNull InteractionResult result) {
         return result.getResultType() == InteractionResultType.PositionChosen &&
                 result.getChosenTarget() != null &&
                 result.getChosenTarget().getCategory() == TargetCategory.ActiveAbilityDestination;

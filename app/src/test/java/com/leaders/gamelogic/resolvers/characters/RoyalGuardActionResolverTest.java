@@ -1,6 +1,7 @@
 package com.leaders.gamelogic.resolvers.characters;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -39,6 +40,7 @@ import java.util.List;
 
 public class RoyalGuardActionResolverTest {
 
+    private Game game;
     private Character character;
     private RoyalGuardActionResolver resolver;
 
@@ -82,7 +84,7 @@ public class RoyalGuardActionResolverTest {
 
     @Before
     public void setUp() {
-        Game game = createTestGame();
+        game = createTestGame();
         GameHistory gameHistory = createTestGameHistory();
 
         Character leader = Character.create(CharacterType.LeaderKing, TeamColor.Black);
@@ -259,5 +261,26 @@ public class RoyalGuardActionResolverTest {
         assertEquals(1, action.getMotions().size());
         assertEquals(CharacterMotionType.Move,
                 action.getMotions().get(0).getMotionType());
+    }
+
+    @Test
+    public void getNextInteraction_shouldNotExposeAbilityWhenMuted() {
+        Character jailer = Character.create(CharacterType.Jailer, TeamColor.White);
+        game.getBoard().getCell(new Position(2, 3)).setCharacter(jailer);
+
+        InteractionRequest request = resolver.getNextInteraction(createBuilder());
+
+        assertNotNull(request);
+
+        boolean hasAbilityDestination = false;
+        for (InteractionTarget target : request.getLegalTargets()) {
+            if (target.getCategory() == TargetCategory.ActiveAbilityDestination &&
+                    new Position(1, 1).equals(target.getChosenPosition())) {
+                hasAbilityDestination = true;
+                break;
+            }
+        }
+
+        assertFalse(hasAbilityDestination);
     }
 }

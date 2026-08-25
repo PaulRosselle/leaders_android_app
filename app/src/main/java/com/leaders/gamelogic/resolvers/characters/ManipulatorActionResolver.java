@@ -22,6 +22,7 @@ import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.interactions.InteractionType;
 import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
+import com.leaders.gamelogic.queries.CharacterAbilityQuery;
 import com.leaders.gamelogic.resolvers.CharacterActionResolver;
 
 import java.util.ArrayList;
@@ -61,7 +62,14 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
         }
 
         if (isManipulatorTargetResult(firstResult)) {
-            return buildTargetDestinationInteraction(builder, firstResult);
+            if (builder.getResults().size() > 1) {
+                if (!isManipulatorTargetDestinationResult(builder.getResults().get(1))) {
+                    throw new IllegalArgumentException("Invalid result type for a Manipulator ability activation");
+                }
+                return null;
+            } else {
+                return buildTargetDestinationInteraction(builder, firstResult);
+            }
         }
 
         throw new IllegalArgumentException("Invalid Manipulator action builder");
@@ -95,7 +103,7 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
         InteractionResult destinationResult = builder.getResults().get(1);
 
         if (!isManipulatorTargetResult(firstResult) ||
-                !isManipulatorDestinationResult(destinationResult)) {
+                !isManipulatorTargetDestinationResult(destinationResult)) {
             throw new IllegalArgumentException("Invalid result types for a Manipulator ability activation");
         }
 
@@ -129,9 +137,11 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
             legalTargets.add(new InteractionTarget(TargetCategory.MovementDestination, destination));
         }
 
-        for (Position enemyPosition : getManipulatorTargetPositions()) {
-            if (!getValidTargetDestinations(builder, enemyPosition, true).isEmpty()) {
-                legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityTargetPosition, enemyPosition));
+        if (CharacterAbilityQuery.canUseActiveAbility(game, character)) {
+            for (Position enemyPosition : getManipulatorTargetPositions()) {
+                if (!getValidTargetDestinations(builder, enemyPosition, true).isEmpty()) {
+                    legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityTargetPosition, enemyPosition));
+                }
             }
         }
 
@@ -189,7 +199,8 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
             if (adjacentCell != null && adjacentCell.getCharacter() == null) {
                 Cell targetCell = BoardQuery.findVisibleCharacterCell(game.getBoard(), characterPos,
                         direction, character.getTeamColor().getOpposite(), null);
-                if (targetCell != null) {
+                if (targetCell != null &&
+                        CharacterAbilityQuery.canBeMovedByEnemyAbilities(game, targetCell.getCharacter())) {
                     targets.add(targetCell.getPosition());
                 }
             }
@@ -264,7 +275,7 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
                 result.getChosenTarget().getCategory() == TargetCategory.ActiveAbilityTargetPosition;
     }
 
-    private boolean isManipulatorDestinationResult(@NonNull InteractionResult result) {
+    private boolean isManipulatorTargetDestinationResult(@NonNull InteractionResult result) {
         return result.getResultType() == InteractionResultType.PositionChosen &&
                 result.getChosenTarget() != null &&
                 result.getChosenTarget().getCategory() == TargetCategory.ActiveAbilityDestination;

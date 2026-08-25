@@ -35,6 +35,8 @@ import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
+import com.leaders.puzzlelogic.serializers.SerializationContext;
+import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
 import com.leaders.puzzlelogic.utilities.PuzzleEditionUtils;
 import com.leaders.app.views.character.CharacterCardPortraitView;
 import com.leaders.app.views.puzzle.CharacterEditorView;
@@ -47,6 +49,10 @@ import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.factories.GameFactory;
+import com.leaders.puzzlelogic.utilities.solver.PuzzleSolverUtils;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +72,8 @@ public final class PuzzleEditorActivity extends BaseActivity {
         Play,
         SearchForSolution,
         ImportCode,
-        ExportCode;
+        ExportCode,
+        DisplayCellPositions;
 
         private int getIconResId() {
             switch (this) {
@@ -75,6 +82,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
                 case SearchForSolution: return R.drawable.icon_search;
                 case ImportCode: return R.drawable.icon_import;
                 case ExportCode: return R.drawable.icon_export;
+                case DisplayCellPositions: return R.drawable.icon_position;
                 default: throw new IllegalStateException("No icon found for puzzle action: " + this);
             }
         }
@@ -86,6 +94,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
                 case SearchForSolution: return R.string.search_for_solutions;
                 case ImportCode: return R.string.import_puzzle;
                 case ExportCode: return R.string.export_puzzle;
+                case DisplayCellPositions: return R.string.board_coordinates;
                 default: throw new IllegalStateException("No text found for puzzle action: " + this);
             }
         }
@@ -97,6 +106,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
                 case SearchForSolution: return activity::btnSearchForSolutionsClick;
                 case ImportCode: return activity::btnImportClick;
                 case ExportCode: return activity::btnExportClick;
+                case DisplayCellPositions: return activity::btnDisplayCellPosition;
                 default: throw new IllegalStateException("No click listener found for puzzle action: " + this);
             }
         }
@@ -186,8 +196,25 @@ public final class PuzzleEditorActivity extends BaseActivity {
 
         // We load the current state of the board using the puzzle save game history
         puzzleSave = puzzleIdx != -1 ? puzzleSaves.get(puzzleIdx) : null;
-        GameHistory puzzleGameHistory = puzzleSave != null ?
-                puzzleSave.getPuzzleGameHistory() : PuzzleEditionUtils.getDefaultHistory();
+
+        GameHistory puzzleGameHistory;
+
+        // If puzzle datas were received, we use them directly
+        String puzzleDatas = getIntent().getStringExtra(ExtraUtils.EXTRA_PUZZLE_DATAS);
+        if (puzzleDatas != null && !puzzleDatas.isEmpty()) {
+            try {
+
+                JSONObject joGameHistory = new JSONObject(puzzleDatas);
+                GameHistorySerializer serializer = new GameHistorySerializer();
+                puzzleGameHistory = serializer.getFromJson(joGameHistory, new SerializationContext());
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            // Without explicit puzzle datas, we try to use the datas within the puzzle save
+            puzzleGameHistory = puzzleSave != null ?
+                    puzzleSave.getPuzzleGameHistory() : PuzzleEditionUtils.getDefaultHistory();
+        }
 
         // An imported puzzle is only saved temporarely so it can be transmitted to the editor,
         // we display the save dialog in case the user wants to name it and save it
@@ -308,7 +335,19 @@ public final class PuzzleEditorActivity extends BaseActivity {
 
         CharacterActionAnimator.animate(bdvBoard, actionMotion, () -> {
             board.getCell(position).setCharacter(character);
-            applyDefaultEditorState();
+
+            // If there are still characters to add, we continue in AddingCharacter mode
+            cevCharacterEditor.removeNewCharactersMatching(
+                    character.getTeamColor().getOpposite(),
+                    character.getCharacterType()
+            );
+            if (cevCharacterEditor.hasCharactersToAdd()) {
+                bdvBoard.applyCellTargets();
+                bdvBoard.applyCharacterTargets(board);
+                editorState = EditorState.AddingCharacter;
+            } else {
+                applyDefaultEditorState();
+            }
         });
     }
 
@@ -576,20 +615,59 @@ public final class PuzzleEditorActivity extends BaseActivity {
 
     //region PUZZLE ACTIONS LISTENER METHODS
 
-    public void btnSaveClick(View v) {
+    private void btnSaveClick(View v) {
         amvPuzzleActions.setVisibility(View.GONE);
         openSavePuzzleDialog();
     }
 
-    public void btnPlayClick(View v) {
+    private void btnPlayClick(View v) {
         // TODO
     }
 
-    public void btnSearchForSolutionsClick(View v) {
-        // TODO
+    private void btnSearchForSolutionsClick(View v) {
+        // TODO - add 10 character limitation
+        List<Cell> playerCharacterCells = BoardQuery.findCharacterCells(board,
+                PuzzleEditionUtils.getPuzzlePlayerTeamColor(), null);
+        if (playerCharacterCells.size() >= PuzzleSolverUtils.MAX_PLAYER_CHARACTER_COUNT) {
+            new AlertDialog.Builder(this, R.style.alert_dialog_theme)
+                    .setTitle(R.string.solution_search_not_recommended)
+                    .setMessage(String.format(getString(R.string.search_with_x_characters_can_take_a_long_time),
+                            PuzzleSolverUtils.MAX_PLAYER_CHARACTER_COUNT))
+                    .setPositiveButton(R.string.proceed, (dialog, which) -> searchForSolution())
+                    .setNegativeButton(R.string.cancel, null)
+                    .show();
+        } else {
+            searchForSolution();
+        }
+
+        setActionsMenuVisible(false);
     }
 
-    public void btnImportClick(View v) {
+    private void searchForSolution() {
+        String validityErrors = PuzzleEditionUtils.getPuzzleValidityErrors(this,
+                GameFactory.create(PuzzleEditionUtils.getDefaultHistory(board)));
+
+        if (validityErrors.isEmpty()) {
+            Intent intent = ActivityType.PuzzleSolver.getIntent(this);
+            intent.putExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, puzzleSaves.indexOf(puzzleSave));
+            GameHistorySerializer serializer = new GameHistorySerializer();
+            GameHistory gameHistory = PuzzleEditionUtils.getDefaultHistory(board);
+            try {
+                intent.putExtra(ExtraUtils.EXTRA_PUZZLE_DATAS, serializer.getAsJson(gameHistory).toString());
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+            goToActivity(intent);
+        } else {
+            new AlertDialog.Builder(this, R.style.alert_dialog_theme)
+                    .setTitle(R.string.invalid_puzzle)
+                    .setMessage(validityErrors)
+                    .setPositiveButton(R.string.ok, null)
+                    .show();
+        }
+    }
+
+    private void btnImportClick(View v) {
         GameHistory gameHistory = PuzzleImportUtils.importPuzzleFromClipboard(this);
         if (gameHistory != null) {
             loadPuzzleFromHistory(gameHistory);
@@ -598,7 +676,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
         setActionsMenuVisible(false);
     }
 
-    public void btnExportClick(View v) {
+    private void btnExportClick(View v) {
         String validityErrors = PuzzleEditionUtils.getPuzzleValidityErrors(this,
                 GameFactory.create(PuzzleEditionUtils.getDefaultHistory(board)));
 
@@ -609,13 +687,20 @@ public final class PuzzleEditorActivity extends BaseActivity {
             new AlertDialog.Builder(this, R.style.alert_dialog_theme)
                     .setTitle(R.string.invalid_puzzle)
                     .setMessage(validityErrors)
+                    .setPositiveButton(R.string.ok, null)
                     .show();
         }
 
         setActionsMenuVisible(false);
     }
 
-    public void vwDialogBgClick(View v) {
+    private void btnDisplayCellPosition(View v) {
+        bdvBoard.setCellPositionVisible(!bdvBoard.isCellPositionVisible());
+
+        setActionsMenuVisible(false);
+    }
+
+    private void vwDialogBgClick(View v) {
         if (amvPuzzleActions.getVisibility() == View.VISIBLE) {
             setActionsMenuVisible(false);
         } else if (psvSave.getVisibility() == View.VISIBLE) {
