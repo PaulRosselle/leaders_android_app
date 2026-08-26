@@ -43,7 +43,12 @@ public interface IGameFlowListener {
     @NonNull
     CompletableFuture<Void> onPhaseChanged(@NonNull GamePhase phase);
 
-    // TODO - javadoc
+    /**
+     * Fired whenever an action is undone.
+     *
+     * @param game the game in which the action was undone
+     * @return a future completed when the undo handling is complete
+     */
     @NonNull
     CompletableFuture<Void> onActionUndone(@NonNull Game game);
 
