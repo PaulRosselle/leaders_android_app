@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 
 import com.leaders.app.activities.MainActivity;
 import com.leaders.app.activities.puzzle.PuzzleEditorActivity;
+import com.leaders.app.activities.puzzle.PuzzlePlayerActivity;
 import com.leaders.app.activities.puzzle.PuzzleSelectionActivity;
 import com.leaders.app.activities.puzzle.PuzzleSolverActivity;
 
@@ -17,7 +18,8 @@ public enum ActivityType {
     // PUZZLES
     PuzzleSelection,
     PuzzleEditor,
-    PuzzleSolver;
+    PuzzleSolver,
+    PuzzlePlayer;
 
     @NonNull
     public Intent getIntent(@NonNull Context context) {
@@ -26,6 +28,7 @@ public enum ActivityType {
             case PuzzleSelection: return new Intent(context, PuzzleSelectionActivity.class);
             case PuzzleEditor: return new Intent(context, PuzzleEditorActivity.class);
             case PuzzleSolver: return new Intent(context, PuzzleSolverActivity.class);
+            case PuzzlePlayer: return new Intent(context, PuzzlePlayerActivity.class);
             default: throw new NoSuchElementException(String.format("No class found matching %s", this));
         }
     }
