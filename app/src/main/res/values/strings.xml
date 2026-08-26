@@ -139,4 +139,7 @@
     <string name="ok">OK</string>
     <string name="proceed">Continuer</string>
     <string name="reset">RESET</string>
+    <string name="new_attempt">Nouvelle tentative</string>
+    <string name="restart_puzzle">Voulez-vous recommencer ce puzzle ?</string>
+    <string name="start_over">Recommencer</string>
 </resources>

@@ -53,7 +53,7 @@ public final class ActionsMenuView extends LinearLayout {
         btnAction.setIconPadding((int) dpToPx(8, metrics));
         btnAction.setIconSize((int) dpToPx(24, metrics));
         // Every button is initialized as enabled
-        ButtonUtils.setButtonEnabled(btnAction, true);
+        ButtonUtils.setEnabled(btnAction, true);
         addView(btnAction, getButtonLP());
     }
 
@@ -62,7 +62,7 @@ public final class ActionsMenuView extends LinearLayout {
         for (int i = 0; i < getChildCount(); i++) {
             MaterialButton btnChild = (MaterialButton) getChildAt(i);
             if (Integer.parseInt(btnChild.getTag().toString()) == btnTag) {
-                ButtonUtils.setButtonEnabled(btnChild, enabled);
+                ButtonUtils.setEnabled(btnChild, enabled);
             }
         }
     }

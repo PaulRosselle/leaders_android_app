@@ -285,8 +285,7 @@ public final class GameHandler {
                     iterationExecution = runPlayCharacterAsync(currentPhase, getPlayableCharacterFromResult(result));
                     break;
                 case UndoLastAction:
-                    undoLastAction();
-                    iterationExecution = CompletableFuture.completedFuture(null);
+                    iterationExecution = undoLastAction();
                     break;
                 case EndPhase:
                     iterationExecution = CompletableFuture.completedFuture(null);
@@ -541,8 +540,7 @@ public final class GameHandler {
         return gameFlowListener.onInputRequired(request).thenCompose(result -> {
             // Since recruitments are mandatory
             if (result.getResultType() == InteractionResultType.UndoLastAction) {
-                undoLastAction();
-                return runSelectRecruitmentCardAsync(currentPhase);
+                return undoLastAction().thenCompose(ignored -> runSelectRecruitmentCardAsync(currentPhase));
             }
 
             if (result.getResultType() != InteractionResultType.SelectableCharacterCardChosen) {
@@ -723,7 +721,7 @@ public final class GameHandler {
      *
      * @throws IllegalStateException if no current phase exists or the current phase has no actions
      */
-    private void undoLastAction() {
+    private CompletableFuture<Void> undoLastAction() {
         IPhase currentPhase = GameHistoryQuery.findCurrentPhase(currentHistory);
         if (currentPhase == null || currentPhase.getActions().isEmpty()) {
             throw new IllegalStateException("Cannot undo an action outside of a game phase or within an empty phase");
@@ -735,6 +733,8 @@ public final class GameHandler {
 
         GameActionHandler actionHandler = GameActionHandlerFactory.create(currentGame, lastAction);
         actionHandler.undoAction();
+
+        return gameFlowListener.onActionUndone(currentGame);
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.leaders.app.activities.puzzle;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.view.View;
 
@@ -61,6 +62,7 @@ public final class PuzzlePlayerActivity extends BaseActivity implements Playable
     private PuzzleSave puzzleSave;
 
     private GameHandler gameHandler;
+    private CompletableFuture<Void> gameTask;
     private InteractionRequest pendingRequest;
     private CompletableFuture<InteractionResult> pendingRequestFuture;
 
@@ -140,22 +142,7 @@ public final class PuzzlePlayerActivity extends BaseActivity implements Playable
             throw new IllegalStateException("No puzzle data received by the player");
         }
 
-        clearInteractionUI();
-
-        // We call runAsync to start the "game". The whenComplete code allow us to handle
-        // exceptions within subsequent CompletableFuture like every other exception
-        gameHandlerExecutor.execute(() -> {
-            gameHandler = new GameHandler(puzzleGameHistory, this);
-            gameHandler.runAsync().whenComplete((result, throwable) -> {
-                if (throwable != null) {
-                    Thread thread = Thread.currentThread();
-                    Thread.UncaughtExceptionHandler exceptionHandler = thread.getUncaughtExceptionHandler();
-                    if (exceptionHandler != null) {
-                        exceptionHandler.uncaughtException(thread, throwable);
-                    }
-                }
-            });;
-        });
+        startGame(puzzleGameHistory);
     }
 
     @Override
@@ -215,11 +202,24 @@ public final class PuzzlePlayerActivity extends BaseActivity implements Playable
     //region VIEWS CLICK LISTENER METHODS
 
     private void onResetClick(View v) {
-        // TODO
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.alert_dialog_theme);
+        builder.setTitle(R.string.new_attempt);
+        builder.setMessage(R.string.restart_puzzle);
+        builder.setPositiveButton(R.string.start_over, (dialogInterface, i) -> {
+            onEmptyClick();
+            gameTask.complete(null);
+            startGame(puzzleSave.getPuzzleGameHistory());
+        });
+        builder.setNegativeButton(R.string.cancel, null);
+        builder.show();
     }
 
     private void onUndoLastAction(View v) {
-        // TODO
+        if (pendingRequest == null || pendingRequestFuture == null) {
+            throw new IllegalStateException("Targets should not exist outside of a valid request context");
+        }
+
+        completeInteraction(getResult(pendingRequest, InteractionResultType.UndoLastAction));
     }
 
     private void onDialogBgClick(View v) {
@@ -279,12 +279,47 @@ public final class PuzzlePlayerActivity extends BaseActivity implements Playable
             return;
         }
 
-        completeInteraction(getCancelResult(pendingRequest));
+        completeInteraction(getResult(pendingRequest, InteractionResultType.CancelAction));
     }
 
     //endregion
 
     //region INTERACTION METHODS
+
+    private void startGame(@NonNull GameHistory startGameHistory) {
+        clearInteractionUI();
+
+        // We call runAsync to start the "game". The whenComplete code allow us to handle
+        // exceptions within subsequent CompletableFuture like every other exception
+        gameHandlerExecutor.execute(() -> {
+            GameHandler handler = new GameHandler(startGameHistory, this);
+            gameHandler = handler;
+
+            gameTask = handler.runAsync();
+            gameTask.whenComplete((result, throwable) -> {
+                if (throwable != null) {
+                    Thread thread = Thread.currentThread();
+                    Thread.UncaughtExceptionHandler exceptionHandler =
+                            thread.getUncaughtExceptionHandler();
+
+                    if (exceptionHandler != null) {
+                        exceptionHandler.uncaughtException(thread, throwable);
+                    }
+                }
+            });
+        });
+    }
+
+    private CompletableFuture<Void> loadGame(@NonNull Game game) {
+        CompletableFuture<Void> future = new CompletableFuture<>();
+
+        runOnUiThread(() -> {
+            bdvBoard.setBoard(game.getBoard());
+            future.complete(null);
+        });
+
+        return future;
+    }
 
     private void updateInteractionUI(@NonNull InteractionRequest request) {
         List<InteractionResultType> legalResults = request.getLegalResults();
@@ -296,7 +331,7 @@ public final class PuzzlePlayerActivity extends BaseActivity implements Playable
                 gameHandler.getCurrentGame().getBoard()
         );
 
-        btnUndoLastAction.setEnabled(legalResults.contains(InteractionResultType.UndoLastAction));
+        ButtonUtils.setEnabled(btnUndoLastAction, legalResults.contains(InteractionResultType.UndoLastAction));
     }
 
     private void clearInteractionUI() {
@@ -304,7 +339,7 @@ public final class PuzzlePlayerActivity extends BaseActivity implements Playable
 
         bdvBoard.clearTargets();
 
-        ButtonUtils.setButtonEnabled(btnUndoLastAction, false);
+        ButtonUtils.setEnabled(btnUndoLastAction, false);
     }
 
     private void completeInteraction(@NonNull InteractionResult result) {
@@ -334,10 +369,10 @@ public final class PuzzlePlayerActivity extends BaseActivity implements Playable
                 target
         );
     }
-
-    private InteractionResult getCancelResult(@NonNull InteractionRequest request) {
+    private InteractionResult getResult(@NonNull InteractionRequest request,
+                                        @NonNull InteractionResultType resultType) {
         return new InteractionResult(
-                InteractionResultType.CancelAction,
+                resultType,
                 request.getContext(),
                 null
         );
@@ -350,14 +385,7 @@ public final class PuzzlePlayerActivity extends BaseActivity implements Playable
     @NonNull
     @Override
     public CompletableFuture<Void> onGameStarted(@NonNull Game game) {
-        CompletableFuture<Void> future = new CompletableFuture<>();
-
-        runOnUiThread(() -> {
-            bdvBoard.setBoard(game.getBoard());
-            future.complete(null);
-        });
-
-        return future;
+        return loadGame(game);
     }
 
     @NonNull
@@ -371,6 +399,12 @@ public final class PuzzlePlayerActivity extends BaseActivity implements Playable
     @Override
     public CompletableFuture<Void> onPhaseChanged(@NonNull GamePhase phase) {
         throw new IllegalStateException("Phase change is not supported within the puzzle player");
+    }
+
+    @NonNull
+    @Override
+    public CompletableFuture<Void> onActionUndone(@NonNull Game game) {
+        return loadGame(game);
     }
 
     @NonNull

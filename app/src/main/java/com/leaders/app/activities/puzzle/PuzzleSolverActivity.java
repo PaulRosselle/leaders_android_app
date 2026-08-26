@@ -464,8 +464,8 @@ public final class PuzzleSolverActivity extends BaseActivity {
         btnPreviousSolution.setVisibility(hasSolutions ? View.VISIBLE : View.INVISIBLE);
 
         if (hasSolutions) {
-            ButtonUtils.setButtonEnabled(btnNextSolution, solutionIndex < solutionsCount - 1);
-            ButtonUtils.setButtonEnabled(btnPreviousSolution, solutionIndex > 0);
+            ButtonUtils.setEnabled(btnNextSolution, solutionIndex < solutionsCount - 1);
+            ButtonUtils.setEnabled(btnPreviousSolution, solutionIndex > 0);
         }
     }
 
