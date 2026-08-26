@@ -136,5 +136,6 @@
     <string name="search_with_x_characters_can_take_a_long_time">With %d or more characters in the player\'s team, finding a solution may take several hours, or even days.</string>
     <string name="ok">OK</string>
     <string name="proceed">Proceed</string>
+    <string name="reset">RESET</string>
 
 </resources>

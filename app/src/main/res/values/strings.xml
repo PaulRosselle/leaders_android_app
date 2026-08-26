@@ -138,4 +138,5 @@
     <string name="search_with_x_characters_can_take_a_long_time">À partir de %d personnages dans l\'équipe du joueur, la recherche de solution peut prendre plusieurs heures, voire plusieurs jours.</string>
     <string name="ok">OK</string>
     <string name="proceed">Continuer</string>
+    <string name="reset">RESET</string>
 </resources>
