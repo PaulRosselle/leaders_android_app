@@ -3,25 +3,18 @@ package com.leaders.app.views.character;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import com.leaders.R;
-
 public final class CharacterDisplay {
     public enum ViewType {
-        Shadow,
         Character,
         Highlight
     }
 
     @NonNull
     private final CharacterView characterView;
-
-    @NonNull
-    private final ImageView shadowView;
 
     @NonNull
     private final CharacterHighlightView highlightView;
@@ -33,10 +26,6 @@ public final class CharacterDisplay {
         characterView.setOnClickListener(this::onCharacterClick);
         parentView.addView(characterView, getDefaultLayoutParams());
 
-        shadowView = new ImageView(context);
-        shadowView.setImageResource(R.drawable.character_piece_shadow);
-        parentView.addView(shadowView, getDefaultLayoutParams());
-
         highlightView = new CharacterHighlightView(context);
         parentView.addView(highlightView, getDefaultLayoutParams());
 
@@ -46,7 +35,6 @@ public final class CharacterDisplay {
     public void setSize(int size) {
         setSize(highlightView, size);
         setSize(characterView, size);
-        setSize(shadowView, size);
     }
 
     private void setSize(@NonNull View view, int size) {
@@ -60,11 +48,6 @@ public final class CharacterDisplay {
     @NonNull
     public CharacterView getCharacterView() {
         return characterView;
-    }
-
-    @NonNull
-    public ImageView getShadowView() {
-        return shadowView;
     }
 
     @NonNull
@@ -85,12 +68,9 @@ public final class CharacterDisplay {
     }
 
     public void reset() {
-        // TODO - take into account in progress animations ?
-
         characterView.clearTarget();
 
         characterView.setVisibility(View.GONE);
-        shadowView.setVisibility(View.GONE);
         highlightView.setVisibility(View.GONE);
     }
 
@@ -108,7 +88,6 @@ public final class CharacterDisplay {
 
     private View getCharacterViewFromType(@NonNull ViewType viewType) {
         switch (viewType) {
-            case Shadow: return shadowView;
             case Character: return characterView;
             case Highlight: return highlightView;
             default: throw new IllegalArgumentException("No character view found for type: " + viewType);

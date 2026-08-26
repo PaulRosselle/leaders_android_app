@@ -32,7 +32,6 @@ public class ActionAnimator {
         CharacterView characterView = characterDisplay.getCharacterView();
         characterDisplay.stopHighlightAnimation();
         characterDisplay.getHighlightView().setVisibility(View.GONE);
-        characterDisplay.getShadowView().setVisibility(View.GONE);
 
         characterView.animate().scaleX(0f).scaleY(0f).alpha(0f)
                 .setDuration(getAnimationDuration(duration))

@@ -696,7 +696,5 @@ public final class CharacterActionAnimator {
         characterDisplay.stopHighlightAnimation();
         characterDisplay.getHighlightView().setVisibility(View.GONE);
         characterDisplay.setPosition(CharacterDisplay.ViewType.Highlight, destX, destY);
-        characterDisplay.getShadowView().setVisibility(View.GONE);
-        characterDisplay.setPosition(CharacterDisplay.ViewType.Shadow, destX, destY);
     }
 }
