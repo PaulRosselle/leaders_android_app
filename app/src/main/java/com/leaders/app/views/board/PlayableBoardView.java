@@ -56,15 +56,15 @@ public class PlayableBoardView extends BoardView {
             switch (target.getCategory()) {
                 case PlayableCharacter:
                     applyPlayableCharacterTarget(target);
-
+                    break;
                 case RecruitmentDestination:
                 case MovementDestination:
                 case ActiveAbilityDestination:
                     applyDestinationTarget(target, context, board);
-
+                    break;
                 case ActiveAbilityTargetPosition:
                     applyActiveAbilityTarget(target);
-
+                    break;
                 default:
                     throw new IllegalArgumentException(
                             "target category \"" + target.getCategory() + "\" not handled by the playable board"
@@ -77,7 +77,8 @@ public class PlayableBoardView extends BoardView {
         PlayableCharacter playableCharacter = Objects.requireNonNull(target.getChosenPlayableCharacter(),
                 "Invalid playable character target : playable character missing");
 
-        getCharacterDisplay(playableCharacter.getPosition()).getCharacterView().setAsPlayableTarget(target);
+        CharacterDisplay characterDisplay = getCharacterDisplay(playableCharacter.getPosition());
+        characterDisplay.getCharacterView().setAsPlayableTarget(target);
     }
 
     private void applyDestinationTarget(@NonNull InteractionTarget target,
@@ -96,23 +97,23 @@ public class PlayableBoardView extends BoardView {
         switch (target.getCategory()) {
             case RecruitmentDestination:
                 destCellView.setAsRecruitmentDestinationTarget(target, orientation);
-
+                break;
             case MovementDestination:
                 destCellView.setAsMovementDestinationTarget(target, sourceCellView);
-
+                break;
             case ActiveAbilityDestination:
                 destCellView.setAsActiveAbilityDestinationTarget(target, sourceCellView);
-
+                break;
             default:
                 throw new IllegalArgumentException("Invalid destination target category: " + target.getCategory());
         }
     }
 
     private void applyActiveAbilityTarget(@NonNull InteractionTarget target) {
-        PlayableCharacter playableCharacter = Objects.requireNonNull(target.getChosenPlayableCharacter(),
+        Position targetPos = Objects.requireNonNull(target.getChosenPosition(),
                 "Invalid active ability target : playable character missing");
 
-        getCharacterDisplay(playableCharacter.getPosition()).getCharacterView().setAsActiveAbilityTarget(target);
+        getCharacterDisplay(targetPos).getCharacterView().setAsActiveAbilityTarget(target);
     }
 
     //endregion
@@ -128,8 +129,10 @@ public class PlayableBoardView extends BoardView {
         switch (feedback.getFeedbackType()) {
             case CharacterAction:
                 CharacterActionAnimator.animate(this, feedback.getCharacterActionMotions(), onAnimationEnd);
+                break;
             case RecruitmentAction:
                 RecruitmentActionAnimator.animate(this, feedback.getRecruitmentActionMotions(), onAnimationEnd);
+                break;
             default:
                 throw new IllegalArgumentException(
                         "Feedback type \"" + feedback.getFeedbackType() + "\" not handled by the playable board"

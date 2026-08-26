@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.view.View;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
@@ -12,16 +11,24 @@ import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.PuzzleSource;
+import com.leaders.app.utilities.ButtonUtils;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.views.board.PlayableBoardView;
 import com.leaders.app.views.character.CharacterNotificationView;
 import com.leaders.app.views.character.CharacterView;
+import com.leaders.gamelogic.GameHandler;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
+import com.leaders.gamelogic.entities.GamePhase;
+import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
-import com.leaders.gamelogic.factories.GameFactory;
+import com.leaders.gamelogic.interactions.IGameFlowListener;
+import com.leaders.gamelogic.interactions.InteractionFeedback;
+import com.leaders.gamelogic.interactions.InteractionRequest;
+import com.leaders.gamelogic.interactions.InteractionResult;
+import com.leaders.gamelogic.interactions.InteractionResultType;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
 import com.leaders.puzzlelogic.entities.PuzzleSave;
@@ -33,8 +40,11 @@ import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-public final class PuzzlePlayerActivity extends BaseActivity implements PlayableBoardView.OnTargetClickListener {
+public final class PuzzlePlayerActivity extends BaseActivity implements PlayableBoardView.OnTargetClickListener, IGameFlowListener {
     private MaterialButton btnPuzzleActions;
     private View vwDialogBg;
 
@@ -50,6 +60,13 @@ public final class PuzzlePlayerActivity extends BaseActivity implements Playable
     private List<? extends PuzzleSave> puzzleSaves;
     private PuzzleSave puzzleSave;
 
+    private GameHandler gameHandler;
+    private InteractionRequest pendingRequest;
+    private CompletableFuture<InteractionResult> pendingRequestFuture;
+
+    private boolean isCancellationAllowed;
+
+    private final ExecutorService gameHandlerExecutor = Executors.newSingleThreadExecutor();
 
     //region BASE ACTIVITY OVERRIDEN METHODS
 
@@ -72,7 +89,8 @@ public final class PuzzlePlayerActivity extends BaseActivity implements Playable
     protected void initListeners() {
         super.initListeners();
 
-        // TODO - Non interactive element listeners
+        // Non interactive element listeners
+        (findViewById(R.id.clyMain_actPuzzlePlayer)).setOnClickListener(this::onNonInteractiveElementClick);
 
         // Puzzle actions listeners
         btnPuzzleActions.setOnClickListener(this::onPuzzleActionsClick);
@@ -122,9 +140,22 @@ public final class PuzzlePlayerActivity extends BaseActivity implements Playable
             throw new IllegalStateException("No puzzle data received by the player");
         }
 
-        // TODO - start game
-        Game initialGame = GameFactory.create(puzzleGameHistory);
-        bdvBoard.post(() -> bdvBoard.setBoard(initialGame.getBoard()));
+        clearInteractionUI();
+
+        // We call runAsync to start the "game". The whenComplete code allow us to handle
+        // exceptions within subsequent CompletableFuture like every other exception
+        gameHandlerExecutor.execute(() -> {
+            gameHandler = new GameHandler(puzzleGameHistory, this);
+            gameHandler.runAsync().whenComplete((result, throwable) -> {
+                if (throwable != null) {
+                    Thread thread = Thread.currentThread();
+                    Thread.UncaughtExceptionHandler exceptionHandler = thread.getUncaughtExceptionHandler();
+                    if (exceptionHandler != null) {
+                        exceptionHandler.uncaughtException(thread, throwable);
+                    }
+                }
+            });;
+        });
     }
 
     @Override
@@ -137,7 +168,7 @@ public final class PuzzlePlayerActivity extends BaseActivity implements Playable
         return R.id.gdlRoot_actPuzzlePlayer;
     }
 
-    @Nullable
+    @NonNull
     @Override
     protected Integer getBtnBackResId() {
         return R.id.btnBack_actPuzzlePlayer;
@@ -221,19 +252,153 @@ public final class PuzzlePlayerActivity extends BaseActivity implements Playable
         return false;
     }
 
+    private void onNonInteractiveElementClick(View v) {
+        onEmptyClick();
+    }
+
     //endregion
 
     //region TARGET CLICK LISTENER METHODS
 
     @Override
     public void onTargetClick(@NonNull InteractionTarget target) {
-        // TODO
+        if (pendingRequest == null || pendingRequestFuture == null) {
+            throw new IllegalStateException("Targets should not exist outside of a valid request context");
+        }
+
+        if (!isLegalTarget(target)) {
+            throw new IllegalArgumentException("Invalid target :" + target);
+        }
+
+        completeInteraction(getTargetResult(pendingRequest, target));
     }
 
     @Override
     public void onEmptyClick() {
-        // TODO
+        if (!isCancellationAllowed || pendingRequest == null || pendingRequestFuture == null) {
+            return;
+        }
+
+        completeInteraction(getCancelResult(pendingRequest));
     }
 
     //endregion
+
+    //region INTERACTION METHODS
+
+    private void updateInteractionUI(@NonNull InteractionRequest request) {
+        List<InteractionResultType> legalResults = request.getLegalResults();
+        isCancellationAllowed = legalResults.contains(InteractionResultType.CancelAction);
+
+        bdvBoard.applyTargets(
+                request.getLegalTargets(),
+                request.getContext(),
+                gameHandler.getCurrentGame().getBoard()
+        );
+
+        btnUndoLastAction.setEnabled(legalResults.contains(InteractionResultType.UndoLastAction));
+    }
+
+    private void clearInteractionUI() {
+        isCancellationAllowed = false;
+
+        bdvBoard.clearTargets();
+
+        ButtonUtils.setButtonEnabled(btnUndoLastAction, false);
+    }
+
+    private void completeInteraction(@NonNull InteractionResult result) {
+        if (pendingRequestFuture == null || pendingRequestFuture.isDone()) {
+            return;
+        }
+
+        CompletableFuture<InteractionResult> future = pendingRequestFuture;
+
+        pendingRequest = null;
+        pendingRequestFuture = null;
+
+        clearInteractionUI();
+
+        future.complete(result);
+    }
+
+    private boolean isLegalTarget(@NonNull InteractionTarget target) {
+        return pendingRequest.getLegalTargets().contains(target);
+    }
+
+    private InteractionResult getTargetResult(@NonNull InteractionRequest request,
+                                              @NonNull InteractionTarget target) {
+        return new InteractionResult(
+                target.getCategory().getResultType(),
+                request.getContext(),
+                target
+        );
+    }
+
+    private InteractionResult getCancelResult(@NonNull InteractionRequest request) {
+        return new InteractionResult(
+                InteractionResultType.CancelAction,
+                request.getContext(),
+                null
+        );
+    }
+
+    //endregion
+
+    //region GAME FLOW LISTENERS
+
+    @NonNull
+    @Override
+    public CompletableFuture<Void> onGameStarted(@NonNull Game game) {
+        CompletableFuture<Void> future = new CompletableFuture<>();
+
+        runOnUiThread(() -> {
+            bdvBoard.setBoard(game.getBoard());
+            future.complete(null);
+        });
+
+        return future;
+    }
+
+    @NonNull
+    @Override
+    public CompletableFuture<Void> onGameEnded(@NonNull Player winner) {
+        // TODO - handle game end
+        return CompletableFuture.completedFuture(null);
+    }
+
+    @NonNull
+    @Override
+    public CompletableFuture<Void> onPhaseChanged(@NonNull GamePhase phase) {
+        throw new IllegalStateException("Phase change is not supported within the puzzle player");
+    }
+
+    @NonNull
+    @Override
+    public CompletableFuture<InteractionResult> onInputRequired(@NonNull InteractionRequest request) {
+        pendingRequest = request;
+        pendingRequestFuture = new CompletableFuture<>();
+
+        runOnUiThread(() -> updateInteractionUI(request));
+
+        return pendingRequestFuture;
+    }
+
+    @NonNull
+    @Override
+    public CompletableFuture<Void> onFeedback(@NonNull InteractionFeedback feedback) {
+        CompletableFuture<Void> future = new CompletableFuture<>();
+
+        runOnUiThread(() -> bdvBoard.animateFeedback(feedback, () -> future.complete(null)));
+
+        return future;
+    }
+
+    //endregion
+
+    @Override
+    protected void onDestroy() {
+        gameHandlerExecutor.shutdownNow();
+        super.onDestroy();
+    }
 }
