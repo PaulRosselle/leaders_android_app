@@ -120,4 +120,8 @@ public final class CharacterDisplay {
     public void stopHighlightAnimation() {
         highlightView.stopAnimation();
     }
+
+    public void clearTarget() {
+        characterView.clearTarget();
+    }
 }

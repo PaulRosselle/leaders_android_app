@@ -218,7 +218,7 @@ public abstract class BoardView extends ConstraintLayout {
             getCellView(position).clearTarget();
             CharacterDisplay characterDisplay = characterDisplayMap.get(position);
             if (characterDisplay != null) {
-                characterDisplay.getCharacterView().clearTarget();
+                characterDisplay.clearTarget();
             }
         }
     }

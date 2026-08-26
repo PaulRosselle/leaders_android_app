@@ -389,7 +389,7 @@ public final class CharacterActionAnimator {
             ObjectAnimator yAnimator = ObjectAnimator.ofFloat(characterView, View.Y, destY);
 
             Keyframe scaleStart = Keyframe.ofFloat(0f, 1f);
-            Keyframe scalePeak = Keyframe.ofFloat(0.45f, 1.25f);
+            Keyframe scalePeak = Keyframe.ofFloat(0.45f, 1.15f);
             Keyframe scaleEnd = Keyframe.ofFloat(1f, 1f);
 
             PropertyValuesHolder scaleX = PropertyValuesHolder.ofKeyframe(View.SCALE_X, scaleStart, scalePeak, scaleEnd);

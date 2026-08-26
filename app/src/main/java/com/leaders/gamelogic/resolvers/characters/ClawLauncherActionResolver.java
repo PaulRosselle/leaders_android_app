@@ -127,11 +127,14 @@ public final class ClawLauncherActionResolver extends CharacterActionResolver {
         List<Position> targets = new ArrayList<>();
 
         for (Direction direction : Direction.values()) {
-            Cell targetCell = BoardQuery.findVisibleCharacterCell(game.getBoard(), characterPos,
-                    direction, null, null);
+            Cell adjacentCell = BoardQuery.findAdjacentCell(game.getBoard(), characterPos, direction);
+            if (adjacentCell != null && adjacentCell.getCharacter() == null) {
+                Cell targetCell = BoardQuery.findVisibleCharacterCell(game.getBoard(), adjacentCell.getPosition(),
+                        direction, null, null);
 
-            if (targetCell != null) {
-                targets.add(targetCell.getPosition());
+                if (targetCell != null) {
+                    targets.add(targetCell.getPosition());
+                }
             }
         }
 
