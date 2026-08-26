@@ -46,7 +46,9 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".app.activities.puzzle.PuzzlePlayerActivity"
+            android:configChanges="orientation|keyboardHidden"
             android:exported="false"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
     </application>
 
