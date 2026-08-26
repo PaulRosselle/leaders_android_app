@@ -16,8 +16,11 @@ import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.views.board.PlayableBoardView;
 import com.leaders.app.views.character.CharacterNotificationView;
+import com.leaders.app.views.character.CharacterView;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
+import com.leaders.gamelogic.enums.CharacterCard;
+import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.factories.GameFactory;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
@@ -29,6 +32,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
+import java.util.Objects;
 
 public final class PuzzlePlayerActivity extends BaseActivity implements PlayableBoardView.OnTargetClickListener {
     private MaterialButton btnPuzzleActions;
@@ -86,6 +90,8 @@ public final class PuzzlePlayerActivity extends BaseActivity implements Playable
 
     @Override
     protected void initDatas() {
+        super.initDatas();
+
         puzzleSource = PuzzleSource.valueOf(getIntent().getStringExtra(ExtraUtils.EXTRA_PUZZLE_SOURCE));
 
         if (puzzleSource == PuzzleSource.OfficialSelection) {
@@ -190,7 +196,7 @@ public final class PuzzlePlayerActivity extends BaseActivity implements Playable
     }
 
     private void onCardInfoClick(View v) {
-        // TODO
+        cnvCardInfo.hide();
     }
 
     private void onPuzzleActionsClick(View v) {
@@ -198,7 +204,20 @@ public final class PuzzlePlayerActivity extends BaseActivity implements Playable
     }
 
     private boolean onCharacterLongClick(View v) {
-        // TODO
+        CharacterType characterType = Objects.requireNonNull(((CharacterView) v).getCharacterType(),
+                "An empty character piece is not authorized in the puzzle editor");
+        CharacterCard characterCard = characterType.getCharacterCard();
+
+        if (cnvCardInfo.getCharacterCard() == characterCard) {
+            cnvCardInfo.setCharacterCard(null);
+            cnvCardInfo.hide();
+        } else {
+            cnvCardInfo.setCharacterCard(characterCard);
+            if (cnvCardInfo.getVisibility() != View.VISIBLE) {
+                cnvCardInfo.show();
+            }
+        }
+
         return false;
     }
 
