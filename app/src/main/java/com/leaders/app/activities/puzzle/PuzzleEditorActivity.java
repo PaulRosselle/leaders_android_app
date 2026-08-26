@@ -36,7 +36,6 @@ import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
-import com.leaders.puzzlelogic.entities.PuzzleSave;
 import com.leaders.puzzlelogic.serializers.SerializationContext;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
 import com.leaders.puzzlelogic.utilities.PuzzleEditionUtils;

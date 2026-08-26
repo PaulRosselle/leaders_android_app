@@ -31,10 +31,6 @@ import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
 import com.leaders.puzzlelogic.entities.OfficialPuzzleSave;
 import com.leaders.puzzlelogic.entities.PuzzleSave;
 import com.leaders.puzzlelogic.enums.PuzzleCategory;
-import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
-import com.leaders.puzzlelogic.utilities.PuzzleEditionUtils;
-
-import org.json.JSONException;
 
 import java.util.List;
 
