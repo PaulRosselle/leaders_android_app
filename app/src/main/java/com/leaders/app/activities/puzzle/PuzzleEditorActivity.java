@@ -16,6 +16,7 @@ import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
+import com.leaders.app.enums.PuzzleSource;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.utilities.PuzzleExportUtils;
@@ -35,6 +36,7 @@ import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
+import com.leaders.puzzlelogic.entities.PuzzleSave;
 import com.leaders.puzzlelogic.serializers.SerializationContext;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
 import com.leaders.puzzlelogic.utilities.PuzzleEditionUtils;
@@ -626,7 +628,34 @@ public final class PuzzleEditorActivity extends BaseActivity {
     }
 
     private void btnPlayClick(View v) {
-        // TODO
+        String validityErrors = PuzzleEditionUtils.getPuzzleValidityErrors(this,
+                GameFactory.create(PuzzleEditionUtils.getDefaultHistory(board)));
+
+        if (validityErrors.isEmpty()) {
+            Intent intent = ActivityType.PuzzlePlayer.getIntent(this);
+
+            intent.putExtra(ExtraUtils.EXTRA_PUZZLE_SOURCE, PuzzleSource.Editor.name());
+            intent.putExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, puzzleSaves.indexOf(puzzleSave));
+
+            GameHistorySerializer serializer = new GameHistorySerializer();
+            try {
+                GameHistory gameHistory = PuzzleEditionUtils.getDefaultHistory(board);
+                intent.putExtra(ExtraUtils.EXTRA_PUZZLE_DATAS, serializer.getAsJson(gameHistory).toString());
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+
+            goToActivity(intent);
+
+        } else {
+            new AlertDialog.Builder(this, R.style.alert_dialog_theme)
+                    .setTitle(R.string.invalid_puzzle)
+                    .setMessage(validityErrors)
+                    .setPositiveButton(R.string.ok, null)
+                    .show();
+        }
+
+        setActionsMenuVisible(false);
     }
 
     private void btnSearchForSolutionsClick(View v) {

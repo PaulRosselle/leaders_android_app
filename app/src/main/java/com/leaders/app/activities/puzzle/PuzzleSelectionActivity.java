@@ -18,6 +18,7 @@ import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.enums.ActivityType;
+import com.leaders.app.enums.PuzzleSource;
 import com.leaders.app.utilities.ButtonUtils;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.JsonUtils;
@@ -30,6 +31,10 @@ import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
 import com.leaders.puzzlelogic.entities.OfficialPuzzleSave;
 import com.leaders.puzzlelogic.entities.PuzzleSave;
 import com.leaders.puzzlelogic.enums.PuzzleCategory;
+import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
+import com.leaders.puzzlelogic.utilities.PuzzleEditionUtils;
+
+import org.json.JSONException;
 
 import java.util.List;
 
@@ -122,6 +127,8 @@ public final class PuzzleSelectionActivity extends BaseActivity {
     protected void initListeners() {
         super.initListeners();
 
+        btnPlay.setOnClickListener(this::onPlayClick);
+
         vwDialogBg.setOnClickListener(this::hidePuzzleActions);
         btnPuzzleActions.setOnClickListener(this::btnPuzzleActionsClick);
         psgvPuzzles.setSelectionChangeListener(this::onPuzzleSelectionChange);
@@ -208,6 +215,25 @@ public final class PuzzleSelectionActivity extends BaseActivity {
     private void onPuzzleSelectionChange() {
         // A single puzzle must be selected
         ButtonUtils.setButtonEnabled(btnPlay, psgvPuzzles.getSelectedPuzzles().size() == 1);
+    }
+
+    private void onPlayClick(View v) {
+        List<PuzzleSave> selectedPuzzles = psgvPuzzles.getSelectedPuzzles();
+        if (selectedPuzzles.isEmpty()) {
+            throw new IllegalStateException("Cannot start the player without a selected puzzle");
+        }
+
+        Intent intent = ActivityType.PuzzlePlayer.getIntent(this);
+
+        PuzzleSource puzzleSource = puzzlesCategory == PuzzleCategory.Official ?
+                PuzzleSource.OfficialSelection : PuzzleSource.CustomSelection;
+        intent.putExtra(ExtraUtils.EXTRA_PUZZLE_SOURCE, puzzleSource.name());
+
+        PuzzleSave selectedPuzzle = selectedPuzzles.get(0);
+        intent.putExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, getPuzzlesFromCategory().indexOf(selectedPuzzle));
+        intent.putExtra(ExtraUtils.EXTRA_PUZZLE_DATAS, selectedPuzzle.getDatas().toString());
+
+        goToActivity(intent);
     }
 
     //region PUZZLE ACTIONS METHODS

@@ -8,7 +8,7 @@ import androidx.annotation.Nullable;
 import com.leaders.app.views.character.CharacterDisplay;
 import com.leaders.app.views.character.CharacterView;
 
-public class ActionAnimator {
+public final class ActionAnimator {
     private ActionAnimator(){
         throw new AssertionError("Cannot instantiate an animator class");
     }
