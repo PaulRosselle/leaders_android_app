@@ -210,7 +210,7 @@ public final class PuzzleSelectionActivity extends BaseActivity {
 
     private void onPuzzleSelectionChange() {
         // A single puzzle must be selected
-        ButtonUtils.setButtonEnabled(btnPlay, psgvPuzzles.getSelectedPuzzles().size() == 1);
+        ButtonUtils.setEnabled(btnPlay, psgvPuzzles.getSelectedPuzzles().size() == 1);
     }
 
     private void onPlayClick(View v) {

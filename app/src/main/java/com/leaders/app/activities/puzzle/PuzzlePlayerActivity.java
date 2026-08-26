@@ -215,7 +215,11 @@ public final class PuzzlePlayerActivity extends BaseActivity implements Playable
     }
 
     private void onUndoLastAction(View v) {
-        // TODO
+        if (pendingRequest == null || pendingRequestFuture == null) {
+            throw new IllegalStateException("Targets should not exist outside of a valid request context");
+        }
+
+        completeInteraction(getResult(pendingRequest, InteractionResultType.UndoLastAction));
     }
 
     private void onDialogBgClick(View v) {
@@ -275,7 +279,7 @@ public final class PuzzlePlayerActivity extends BaseActivity implements Playable
             return;
         }
 
-        completeInteraction(getCancelResult(pendingRequest));
+        completeInteraction(getResult(pendingRequest, InteractionResultType.CancelAction));
     }
 
     //endregion
@@ -306,6 +310,17 @@ public final class PuzzlePlayerActivity extends BaseActivity implements Playable
         });
     }
 
+    private CompletableFuture<Void> loadGame(@NonNull Game game) {
+        CompletableFuture<Void> future = new CompletableFuture<>();
+
+        runOnUiThread(() -> {
+            bdvBoard.setBoard(game.getBoard());
+            future.complete(null);
+        });
+
+        return future;
+    }
+
     private void updateInteractionUI(@NonNull InteractionRequest request) {
         List<InteractionResultType> legalResults = request.getLegalResults();
         isCancellationAllowed = legalResults.contains(InteractionResultType.CancelAction);
@@ -316,7 +331,7 @@ public final class PuzzlePlayerActivity extends BaseActivity implements Playable
                 gameHandler.getCurrentGame().getBoard()
         );
 
-        btnUndoLastAction.setEnabled(legalResults.contains(InteractionResultType.UndoLastAction));
+        ButtonUtils.setEnabled(btnUndoLastAction, legalResults.contains(InteractionResultType.UndoLastAction));
     }
 
     private void clearInteractionUI() {
@@ -324,7 +339,7 @@ public final class PuzzlePlayerActivity extends BaseActivity implements Playable
 
         bdvBoard.clearTargets();
 
-        ButtonUtils.setButtonEnabled(btnUndoLastAction, false);
+        ButtonUtils.setEnabled(btnUndoLastAction, false);
     }
 
     private void completeInteraction(@NonNull InteractionResult result) {
@@ -354,10 +369,10 @@ public final class PuzzlePlayerActivity extends BaseActivity implements Playable
                 target
         );
     }
-
-    private InteractionResult getCancelResult(@NonNull InteractionRequest request) {
+    private InteractionResult getResult(@NonNull InteractionRequest request,
+                                        @NonNull InteractionResultType resultType) {
         return new InteractionResult(
-                InteractionResultType.CancelAction,
+                resultType,
                 request.getContext(),
                 null
         );
@@ -370,14 +385,7 @@ public final class PuzzlePlayerActivity extends BaseActivity implements Playable
     @NonNull
     @Override
     public CompletableFuture<Void> onGameStarted(@NonNull Game game) {
-        CompletableFuture<Void> future = new CompletableFuture<>();
-
-        runOnUiThread(() -> {
-            bdvBoard.setBoard(game.getBoard());
-            future.complete(null);
-        });
-
-        return future;
+        return loadGame(game);
     }
 
     @NonNull
@@ -391,6 +399,12 @@ public final class PuzzlePlayerActivity extends BaseActivity implements Playable
     @Override
     public CompletableFuture<Void> onPhaseChanged(@NonNull GamePhase phase) {
         throw new IllegalStateException("Phase change is not supported within the puzzle player");
+    }
+
+    @NonNull
+    @Override
+    public CompletableFuture<Void> onActionUndone(@NonNull Game game) {
+        return loadGame(game);
     }
 
     @NonNull

@@ -43,6 +43,10 @@ public interface IGameFlowListener {
     @NonNull
     CompletableFuture<Void> onPhaseChanged(@NonNull GamePhase phase);
 
+    // TODO - javadoc
+    @NonNull
+    CompletableFuture<Void> onActionUndone(@NonNull Game game);
+
     /**
      * Fired whenever the game requires an input from the caller.
      * <p>

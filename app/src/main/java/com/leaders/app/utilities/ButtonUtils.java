@@ -14,7 +14,9 @@ public final class ButtonUtils {
         throw new AssertionError("Cannot instantiate utility class");
     }
 
-    public static void setButtonEnabled(@NonNull MaterialButton button, boolean enabled) {
+    public static void setEnabled(@NonNull MaterialButton button, boolean enabled) {
+        button.setClickable(enabled);
+
         button.setEnabled(enabled);
 
         int strokeAndFontColor = enabled ? R.color.font : R.color.darker_font;
