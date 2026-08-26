@@ -54,4 +54,9 @@ public final class InteractionFeedback {
     public static InteractionFeedback createForRecruitmentAction(@NonNull List<RecruitmentActionMotion> recruitmentActionMotions) {
         return new InteractionFeedback(FeedbackType.RecruitmentAction, null, recruitmentActionMotions);
     }
+
+    @NonNull
+    public FeedbackType getFeedbackType() {
+        return feedbackType;
+    }
 }

@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat;
 import com.leaders.R;
 import com.leaders.app.views.character.CharacterDisplay;
 import com.leaders.app.views.character.CharacterView;
+import com.leaders.app.views.character.OnCharacterDisplayClickListener;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.PlayableCharacter;
@@ -33,8 +34,8 @@ public final class PuzzleEditorBoardView extends BoardView {
         super.setOnCellClickListener(onCellClickListener);
     }
 
-    public void setOnCharacterClickListener(OnClickListener onCharacterClickListener) {
-        super.setOnCharacterClickListener(onCharacterClickListener);
+    public void setOnCharacterDisplayClickListener(OnCharacterDisplayClickListener onCharacterDisplayClickListener) {
+        super.setOnCharacterDisplayClickListener(onCharacterDisplayClickListener);
     }
 
     public void setOnCharacterLongClickListener(OnLongClickListener onCharacterLongClickListener) {

@@ -1,4 +1,4 @@
-package com.leaders.app.views.character;
+package com.leaders.app.views.animators;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -19,6 +19,8 @@ import androidx.annotation.Nullable;
 
 import com.leaders.app.views.board.BoardView;
 import com.leaders.app.views.board.CellView;
+import com.leaders.app.views.character.CharacterDisplay;
+import com.leaders.app.views.character.CharacterView;
 import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.actions.CharacterActionMotion;
 import com.leaders.gamelogic.actions.CharacterActionTarget;
@@ -39,11 +41,19 @@ public final class CharacterActionAnimator {
     private static final int DURATION_FLY = 600;
     private static final int DURATION_TRANSFORM = 800;
 
+    private CharacterActionAnimator(){
+        throw new AssertionError("Cannot instantiate an animator class");
+    }
+
     public static void animate(@NonNull BoardView boardView,
                                @NonNull CharacterAction action,
                                @Nullable Runnable onAnimationEnd) {
-        List<CharacterActionMotion> motions = action.getMotions();
+        animate(boardView, action.getMotions(), onAnimationEnd);
+    }
 
+    public static void animate(@NonNull BoardView boardView,
+                               @NonNull List<CharacterActionMotion> motions,
+                               @Nullable Runnable onAnimationEnd) {
         if (motions.isEmpty()) {
             if (onAnimationEnd != null) {
                 onAnimationEnd.run();
@@ -118,7 +128,7 @@ public final class CharacterActionAnimator {
             characterView.setAlpha(0f);
             characterView.setVisibility(View.VISIBLE);
 
-            animateFadeIn(characterDisplay, DURATION_ADD, onTargetAnimationEnd);
+            ActionAnimator.animateFadeIn(characterDisplay, DURATION_ADD, onTargetAnimationEnd);
         }
     }
 
@@ -189,7 +199,7 @@ public final class CharacterActionAnimator {
                 // 3. Fade in the character displays at their destinations
                 new Handler(Looper.getMainLooper()).postDelayed(() -> {
                     for (Position destPos : destinationPositions) {
-                        animateFadeIn(boardView.getCharacterDisplay(destPos), fadingDuration, onFadeInAnimationEnd);
+                        ActionAnimator.animateFadeIn(boardView.getCharacterDisplay(destPos), fadingDuration, onFadeInAnimationEnd);
                     }
                 }, respawnDelay);
             }
@@ -198,7 +208,7 @@ public final class CharacterActionAnimator {
         // 1. Fade out the character displays at their origin positions
         for (CharacterActionTarget target : targets) {
             Position fadeOutPos = Objects.requireNonNull(target.getOriginPos(), "Invalid teleport target : missing origin position");
-            animateFadeOut(boardView.getCharacterDisplay(fadeOutPos), fadingDuration, onFadeOutAnimationEnd);
+            ActionAnimator.animateFadeOut(boardView.getCharacterDisplay(fadeOutPos), fadingDuration, onFadeOutAnimationEnd);
         }
     }
 
@@ -245,7 +255,7 @@ public final class CharacterActionAnimator {
         setupForMovement(pushedCharacter, pushedDestX, pushedDestY);
         setupForMovement(pushingCharacter, pushingDestX, pushingDestY);
 
-        int totalDuration = getAnimationDuration(DURATION_PUSH);
+        int totalDuration = ActionAnimator.getAnimationDuration(DURATION_PUSH);
 
         // ANTICIPATION ANIMATION
         float dx = pushingDestX - pushingOriginX;
@@ -389,7 +399,7 @@ public final class CharacterActionAnimator {
             ObjectAnimator scaleAnimator = ObjectAnimator.ofPropertyValuesHolder(characterView, scaleX, scaleY);
 
 
-            int duration = getAnimationDuration(DURATION_JUMP);
+            int duration = ActionAnimator.getAnimationDuration(DURATION_JUMP);
 
             xAnimator.setDuration(duration);
             yAnimator.setDuration(duration);
@@ -434,7 +444,7 @@ public final class CharacterActionAnimator {
         for (CharacterActionTarget target : targets) {
             Position originPos = Objects.requireNonNull(target.getOriginPos(), "Invalid remove target : missing origin position");
             CharacterDisplay characterDisplay = boardView.getCharacterDisplay(originPos);
-            animateFadeOut(characterDisplay, DURATION_REMOVE, onTargetAnimationEnd);
+            ActionAnimator.animateFadeOut(characterDisplay, DURATION_REMOVE, onTargetAnimationEnd);
         }
     }
 
@@ -464,7 +474,7 @@ public final class CharacterActionAnimator {
         // Temporarily use the same CharacterDisplay for the transformation.
         // The new character will be injected in the middle of the animation.
 
-        int duration = getAnimationDuration(DURATION_TRANSFORM);
+        int duration = ActionAnimator.getAnimationDuration(DURATION_TRANSFORM);
 
         int transformOutDuration = duration / 2;
         int transformInDuration = duration - transformOutDuration;
@@ -621,7 +631,7 @@ public final class CharacterActionAnimator {
 
             ObjectAnimator rotationAnimator = ObjectAnimator.ofFloat(characterView, View.ROTATION, 0f, 5f * rotationDirection, 0f);
 
-            int duration = getAnimationDuration(DURATION_FLY);
+            int duration = ActionAnimator.getAnimationDuration(DURATION_FLY);
 
             xAnimator.setDuration(duration);
             yAnimator.setDuration(duration);
@@ -656,30 +666,6 @@ public final class CharacterActionAnimator {
         }
     }
 
-
-
-
-    private static void animateFadeIn(@NonNull CharacterDisplay characterDisplay, int duration,
-                                      @Nullable Runnable onAnimationEnd) {
-        characterDisplay.getCharacterView().animate().scaleX(1f).scaleY(1f).alpha(1f)
-                .setDuration(getAnimationDuration(duration))
-                .withEndAction(onAnimationEnd)
-                .start();
-    }
-
-    private static void animateFadeOut(@NonNull CharacterDisplay characterDisplay, int duration,
-                                       @Nullable Runnable onAnimationEnd) {
-        CharacterView characterView = characterDisplay.getCharacterView();
-        characterDisplay.stopHighlightAnimation();
-        characterDisplay.getHighlightView().setVisibility(View.GONE);
-        characterDisplay.getShadowView().setVisibility(View.GONE);
-
-        characterView.animate().scaleX(0f).scaleY(0f).alpha(0f)
-                .setDuration(getAnimationDuration(duration))
-                .withEndAction(onAnimationEnd)
-                .start();
-    }
-
     private static void animateMove(@NonNull CharacterDisplay characterDisplay,
                                     @NonNull CellView destCellView,
                                     @Nullable Runnable onAnimationEnd) {
@@ -689,7 +675,7 @@ public final class CharacterActionAnimator {
         setupForMovement(characterDisplay, x, y);
 
         characterDisplay.getCharacterView().animate().x(x).y(y)
-                .setDuration(getAnimationDuration(DURATION_MOVE))
+                .setDuration(ActionAnimator.getAnimationDuration(DURATION_MOVE))
                 .withEndAction(() -> {
                     // Realign the whole display at the destination position
                     characterDisplay.setPosition(x, y);
@@ -710,12 +696,5 @@ public final class CharacterActionAnimator {
         characterDisplay.stopHighlightAnimation();
         characterDisplay.getHighlightView().setVisibility(View.GONE);
         characterDisplay.setPosition(CharacterDisplay.ViewType.Highlight, destX, destY);
-        characterDisplay.getShadowView().setVisibility(View.GONE);
-        characterDisplay.setPosition(CharacterDisplay.ViewType.Shadow, destX, destY);
-    }
-
-    private static int getAnimationDuration(int duration) {
-        // Will be helpfull to add a global animation speed ratio
-        return duration;
     }
 }
