@@ -13,6 +13,7 @@ import com.leaders.app.enums.BoardOrientation;
 import com.leaders.app.views.character.CharacterDisplay;
 import com.leaders.app.views.character.CharacterDisplayPool;
 import com.leaders.app.views.character.CharacterView;
+import com.leaders.app.views.character.OnCharacterDisplayClickListener;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Position;
@@ -38,8 +39,7 @@ public abstract class BoardView extends ConstraintLayout {
     @NonNull
     protected BoardOrientation orientation;
 
-    private OnClickListener onCellClickListener;
-    private OnClickListener onCharacterClickListener;
+    private OnCharacterDisplayClickListener onCharacterDisplayClickListener;
     private OnLongClickListener onCharacterLongClickListener;
 
 
@@ -173,7 +173,7 @@ public abstract class BoardView extends ConstraintLayout {
     public final CharacterDisplay acquireCharacterDisplay(@NonNull Position position) {
         CharacterDisplay characterDisplay = characterDisplayPool.acquire();
 
-        characterDisplay.setOnCharacterClickListener(onCharacterClickListener);
+        characterDisplay.setOnClickListener(onCharacterDisplayClickListener);
         characterDisplay.setOnCharacterLongClickListener(onCharacterLongClickListener);
 
         characterDisplayMap.put(position, characterDisplay);
@@ -186,7 +186,7 @@ public abstract class BoardView extends ConstraintLayout {
 
         characterDisplay.reset();
 
-        characterDisplay.setOnCharacterClickListener(null);
+        characterDisplay.setOnClickListener(null);
         characterDisplay.setOnCharacterLongClickListener(null);
 
         characterDisplayPool.release(characterDisplay);
@@ -234,18 +234,16 @@ public abstract class BoardView extends ConstraintLayout {
     }
 
     protected void setOnCellClickListener(OnClickListener onCellClickListener) {
-        this.onCellClickListener = onCellClickListener;
-
         for (CellView cellView : cellViews) {
             cellView.setOnClickListener(onCellClickListener);
         }
     }
 
-    protected void setOnCharacterClickListener(OnClickListener onCharacterClickListener) {
-        this.onCharacterClickListener = onCharacterClickListener;
+    protected void setOnCharacterDisplayClickListener(OnCharacterDisplayClickListener onCharacterDisplayClickListener) {
+        this.onCharacterDisplayClickListener = onCharacterDisplayClickListener;
 
         for (CharacterDisplay characterDisplay : characterDisplayMap.values()) {
-            characterDisplay.setOnCharacterClickListener(onCharacterClickListener);
+            characterDisplay.setOnClickListener(onCharacterDisplayClickListener);
         }
     }
 

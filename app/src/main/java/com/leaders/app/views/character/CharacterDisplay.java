@@ -26,9 +26,11 @@ public final class CharacterDisplay {
     @NonNull
     private final CharacterHighlightView highlightView;
 
+    private OnCharacterDisplayClickListener onClickListener;
 
     public CharacterDisplay(@NonNull Context context, @NonNull ViewGroup parentView) {
         characterView = new CharacterView(context);
+        characterView.setOnClickListener(this::onCharacterClick);
         parentView.addView(characterView, getDefaultLayoutParams());
 
         shadowView = new ImageView(context);
@@ -113,8 +115,14 @@ public final class CharacterDisplay {
         }
     }
 
-    public void setOnCharacterClickListener(View.OnClickListener onClickListener) {
-        characterView.setOnClickListener(onClickListener);
+    private void onCharacterClick(View v) {
+        if (onClickListener != null) {
+            onClickListener.onCharacterDisplayClick(this);
+        }
+    }
+
+    public void setOnClickListener(OnCharacterDisplayClickListener onClickListener) {
+        this.onClickListener = onClickListener;
     }
 
     public void setOnCharacterLongClickListener(View.OnLongClickListener onLongClickListener) {

@@ -22,7 +22,7 @@ import com.leaders.app.utilities.PuzzleExportUtils;
 import com.leaders.app.utilities.PuzzleImportUtils;
 import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.board.CellView;
-import com.leaders.app.views.character.CharacterActionAnimator;
+import com.leaders.app.views.animators.CharacterActionAnimator;
 import com.leaders.app.views.character.CharacterDisplay;
 import com.leaders.app.views.puzzle.PuzzleSaveView;
 import com.leaders.gamelogic.actions.CharacterActionMotion;
@@ -171,7 +171,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
 
         // Board element listeners
         bdvBoard.setOnCellClickListener(this::onBoardCellClick);
-        bdvBoard.setOnCharacterClickListener(this::onBoardCharacterClick);
+        bdvBoard.setOnCharacterDisplayClickListener(this::onBoardCharacterClick);
         bdvBoard.setOnCharacterLongClickListener(this::onCharacterLongClick);
 
         // Character editor listeners
@@ -577,14 +577,15 @@ public final class PuzzleEditorActivity extends BaseActivity {
         }
     }
 
-    private void onBoardCharacterClick(View v) {
+    private void onBoardCharacterClick(@NonNull CharacterDisplay characterDisplay) {
         if (editorState == EditorState.Animating) {
             return;
         }
 
-        InteractionTarget target = Objects.requireNonNull(((CharacterView) v).getTarget(),
+        InteractionTarget target = Objects.requireNonNull(characterDisplay.getCharacterView().getTarget(),
                 "Target missing on character click in state: " + editorState);
-        PlayableCharacter playableCharacter = Objects.requireNonNull(target.getChosenPlayableCharacter(), "Invalid character target : playable character missing");
+        PlayableCharacter playableCharacter = Objects.requireNonNull(target.getChosenPlayableCharacter(),
+                "Invalid character target : playable character missing");
 
 
         if (editorState != EditorState.Default) {
