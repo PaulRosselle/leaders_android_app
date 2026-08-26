@@ -52,7 +52,9 @@ import com.leaders.gamelogic.resolvers.RecruitmentActionResolver;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 public final class GameHandler {
     private static final class GameEndedException extends RuntimeException {
@@ -78,11 +80,14 @@ public final class GameHandler {
     @NonNull
     private final IGameFlowListener gameFlowListener;
 
+    private volatile boolean stopped;
+
     public GameHandler(@NonNull GameHistory currentHistory,
                        @NonNull IGameFlowListener gameFlowListener) {
         this.currentHistory = currentHistory;
         this.currentGame = GameFactory.create(currentHistory);
         this.gameFlowListener = gameFlowListener;
+        this.stopped = false;
     }
 
     @NonNull
@@ -105,6 +110,16 @@ public final class GameHandler {
         return currentHistory.getConfig().getPlayers();
     }
 
+    public void stop() {
+        stopped = true;
+    }
+
+    private void checkStopped() {
+        if (stopped) {
+            throw new CancellationException();
+        }
+    }
+
     /**
      * Runs the game until it ends.
      *
@@ -112,6 +127,8 @@ public final class GameHandler {
      */
     @NonNull
     public CompletableFuture<Void> runAsync() {
+        checkStopped();
+
         // Start the game before scheduling the asynchronous game loop.
         return gameFlowListener.onGameStarted(currentGame)
                 .thenCompose(ignored -> runGameLoopAsync())
@@ -128,6 +145,8 @@ public final class GameHandler {
      */
     @NonNull
     private CompletableFuture<Void> runGameLoopAsync() {
+        checkStopped();
+
         IPhase currentPhase = GameHistoryQuery.findCurrentPhase(currentHistory);
         CompletableFuture<Void> phaseExecution;
 
@@ -155,34 +174,35 @@ public final class GameHandler {
      */
     @NonNull
     private CompletableFuture<Void> handleGameLoopResult(Void result, Throwable throwable) {
-        CompletableFuture<Void> handledResult;
-
         if (throwable == null) {
-            handledResult = CompletableFuture.completedFuture(null);
-        } else {
-            // Asynchronous failures may be wrapped in CompletionException.
-            // Unwrap it before checking the type of the actual failure.
-            Throwable cause = throwable;
-            if (throwable instanceof java.util.concurrent.CompletionException
-                    && throwable.getCause() != null) {
-                cause = throwable.getCause();
-            }
-
-            if (cause instanceof GameEndedException) {
-                // GameEndedException is the internal signal used to stop the loop
-                // and notify the listener with the winning player.
-                GameEndedException gameEndedException = (GameEndedException) cause;
-                handledResult = gameFlowListener.onGameEnded(gameEndedException.getWinner());
-            } else {
-                // Only GameEndedException is handled here. All other failures
-                // remain exceptional so they are propagated to the caller.
-                CompletableFuture<Void> failedResult = new CompletableFuture<>();
-                failedResult.completeExceptionally(cause);
-                handledResult = failedResult;
-            }
+            return CompletableFuture.completedFuture(null);
         }
 
-        return handledResult;
+        Throwable cause = throwable;
+
+        // Asynchronous failures may be wrapped in CompletionException.
+        // Unwrap it before checking the type of the actual failure.
+        if (throwable instanceof CompletionException && throwable.getCause() != null) {
+            cause = throwable.getCause();
+        }
+
+        // CancellationException is another internal signal used to stop the loop
+        // when an external caller wants to stop the gameHandler
+        if (cause instanceof CancellationException) {
+            return CompletableFuture.completedFuture(null);
+        }
+
+        // GameEndedException is the internal signal used to stop the loop
+        // and notify the listener with the winning player.
+        if (cause instanceof GameEndedException) {
+            GameEndedException gameEndedException = (GameEndedException) cause;
+            return gameFlowListener.onGameEnded(gameEndedException.getWinner());
+        }
+
+        // All other failures remain exceptional so they are propagated to the caller.
+        CompletableFuture<Void> failedResult = new CompletableFuture<>();
+        failedResult.completeExceptionally(cause);
+        return failedResult;
     }
 
     /**
@@ -388,6 +408,8 @@ public final class GameHandler {
      * @return the interaction result returned by the game flow listener
      */
     private CompletableFuture<InteractionResult> runSelectPlayableCharacterAsync(@NonNull GamePhase currentPhase) {
+        checkStopped();
+
         List<PlayableCharacter> playableCharacters = PlayabilityQuery.getPlayableCharacters(currentGame, currentHistory);
 
         List<InteractionTarget> legalTargets = new ArrayList<>();
@@ -452,6 +474,8 @@ public final class GameHandler {
     private CompletableFuture<Void> resolveCharacterActionAsync(@NonNull GamePhase currentPhase,
                                                                 @NonNull CharacterActionBuilder builder,
                                                                 @NonNull CharacterActionResolver resolver) {
+        checkStopped();
+
         // Cancellation stops the resolution before the action is applied to the game.
         if (builder.isBuildCancelled()) {
             return CompletableFuture.completedFuture(null);
@@ -468,6 +492,8 @@ public final class GameHandler {
 
         // Request the next input required to continue resolving the action.
         return gameFlowListener.onInputRequired(request).thenCompose(result -> {
+            checkStopped();
+
             builder.addResult(result);
 
             // A feedback may be generated from the newly received input.
@@ -514,6 +540,8 @@ public final class GameHandler {
      */
     @NonNull
     private CompletableFuture<SelectableCharacterCard> runSelectRecruitmentCardAsync(@NonNull GamePhase currentPhase) {
+        checkStopped();
+
         List<SelectableCharacterCard> selectableRecruitmentCards =
                 RecruitmentQuery.getSelectableRecruitmentCards(currentGame, currentHistory);
 
@@ -538,6 +566,8 @@ public final class GameHandler {
 
         // Request an input to select the recruited card
         return gameFlowListener.onInputRequired(request).thenCompose(result -> {
+            checkStopped();
+
             // Since recruitments are mandatory
             if (result.getResultType() == InteractionResultType.UndoLastAction) {
                 return undoLastAction().thenCompose(ignored -> runSelectRecruitmentCardAsync(currentPhase));
@@ -616,6 +646,8 @@ public final class GameHandler {
     private CompletableFuture<Void> resolveRecruitmentActionAsync(@NonNull GamePhase currentPhase,
                                                                   @NonNull RecruitmentActionBuilder builder,
                                                                   @NonNull RecruitmentActionResolver resolver) {
+        checkStopped();
+
         // Cancellation stops the resolution before the action is applied to the game.
         if (builder.isBuildCancelled()) {
             return CompletableFuture.completedFuture(null);
@@ -631,6 +663,8 @@ public final class GameHandler {
         }
 
         return gameFlowListener.onInputRequired(request).thenCompose(result -> {
+            checkStopped();
+
             builder.addResult(result);
 
             InteractionFeedback feedback = resolver.getNextFeedback(builder);
@@ -662,6 +696,8 @@ public final class GameHandler {
     }
 
     private CompletableFuture<Void> runBanishmentPhaseAsync(@NonNull GamePhase currentPhase) {
+        checkStopped();
+
         List<SelectableCharacterCard> selectableBanishmentCards =
                 BanishmentQuery.getSelectableBanishmentCards(currentGame);
 
@@ -678,6 +714,8 @@ public final class GameHandler {
         );
 
         return gameFlowListener.onInputRequired(request).thenAccept(result -> {
+            checkStopped();
+
             if (result.getResultType() != InteractionResultType.SelectableCharacterCardChosen) {
                 throw new IllegalStateException(
                         "Invalid interaction result : illegal type \"" +
