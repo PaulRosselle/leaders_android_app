@@ -227,7 +227,6 @@ public final class PuzzleSelectionActivity extends BaseActivity {
 
         PuzzleSave selectedPuzzle = selectedPuzzles.get(0);
         intent.putExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, getPuzzlesFromCategory().indexOf(selectedPuzzle));
-        intent.putExtra(ExtraUtils.EXTRA_PUZZLE_DATAS, selectedPuzzle.getDatas().toString());
 
         goToActivity(intent);
     }

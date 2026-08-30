@@ -61,7 +61,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class PuzzleEditorActivity extends BaseActivity {
-    enum EditorState {
+    private enum EditorState {
         Default,
         AddingCharacter,
         EditingCharacter,
