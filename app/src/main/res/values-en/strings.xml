@@ -146,5 +146,6 @@
     <string name="victory_subtitle">The opponent\\\'s leader has been neutralized</string>
     <string name="defeat_title">defeat</string>
     <string name="defeat_subtitle">Your leader has been neutralized</string>
+    <string name="player_name">player name</string>
 
 </resources>

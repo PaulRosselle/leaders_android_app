@@ -16,6 +16,8 @@
     <dimen name="character_action_element_size">38dp</dimen>
     <dimen name="character_action_height">156dp</dimen>
 
+    <dimen name="player_setup_leader_portrait_height">66dp</dimen>
+
     <dimen name="solver_progress_bar_size">30dp</dimen>
 
     <dimen name="seekbar_thumb_size">20dp</dimen>

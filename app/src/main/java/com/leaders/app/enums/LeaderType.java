@@ -25,4 +25,15 @@ public enum LeaderType {
 
         return getFromCharacterType(character.getCharacterType());
     }
+
+    public LeaderType getNext() {
+        LeaderType[] values = LeaderType.values();
+
+        int nextIdx = ordinal() + 1;
+        if (nextIdx < values.length) {
+            return values[nextIdx];
+        }
+
+        return values[0];
+    }
 }

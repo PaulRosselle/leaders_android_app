@@ -148,4 +148,5 @@
     <string name="victory_subtitle">le leader adverse a ÉtÉ neutralisÉ</string>
     <string name="defeat_title">dÉfaitE</string>
     <string name="defeat_subtitle">votre leader a ÉtÉ neutralisÉ</string>
+    <string name="player_name">nom du joueur</string>
 </resources>
