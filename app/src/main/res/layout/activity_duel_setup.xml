@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    tools:theme="@style/Theme.LeadersAndroidApp"
+    tools:context=".app.activities.DuelSetupActivity"
+    tools:ignore="SpUsage">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gdlRoot_actDuelSetup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="0dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gdl50V_actDuelSetup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintGuide_percent="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.leaders.app.views.decoration.DecorativeBackgroundView
+        android:id="@+id/decorativeBackgroundView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="gone" />
+
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnBack_actDuelSetup"
+        android:layout_width="@dimen/round_button_size"
+        android:layout_height="@dimen/round_button_size"
+        android:layout_marginStart="8dp"
+        android:background="@color/transparent"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        app:icon="@drawable/icon_back"
+        app:iconGravity="textStart"
+        app:iconPadding="0dp"
+        app:iconSize="@dimen/round_button_icon_size"
+        app:iconTint="@color/font"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actDuelSetup"
+        app:layout_constraintVertical_bias="0.0"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnPuzzleActions_actDuelSetup"
+        android:layout_width="@dimen/round_button_size"
+        android:layout_height="@dimen/round_button_size"
+        android:layout_marginEnd="8dp"
+        android:background="@color/transparent"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        app:icon="@drawable/icon_more_actions"
+        app:iconGravity="textStart"
+        app:iconPadding="0dp"
+        app:iconSize="@dimen/round_button_icon_size"
+        app:iconTint="@color/font"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actDuelSetup"
+        app:layout_constraintVertical_bias="0.0"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <TextView
+        android:id="@+id/txvTitle_actDuelSetup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/bourbon_test_regular"
+        android:text="@string/duel_title"
+        android:textAllCaps="false"
+        android:textColor="@color/app_golden"
+        android:textSize="@dimen/title_font_size"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actDuelSetup"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.PlayerSetupView
+        android:id="@+id/psvFirst_actDuelSetup"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnBack_actDuelSetup"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.PlayerSetupView
+        android:id="@+id/psvSecond_actDuelSetup"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/psvFirst_actDuelSetup"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <View
+        android:id="@+id/vwFirstPlayerBg_actDuelSetup"
+        android:layout_width="0dp"
+        android:layout_height="72dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/round_rect"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/psvSecond_actDuelSetup"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/txvFirstPlayerTitle_actDuelSetup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:fontFamily="@font/bobby_jones_condensed"
+        android:text="@string/first_player"
+        android:textColor="@color/font"
+        android:textSize="@dimen/default_text_font_size"
+        app:layout_constraintBottom_toBottomOf="@+id/vwFirstPlayerBg_actDuelSetup"
+        app:layout_constraintEnd_toEndOf="@+id/vwFirstPlayerBg_actDuelSetup"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/vwFirstPlayerBg_actDuelSetup"
+        app:layout_constraintTop_toTopOf="@+id/vwFirstPlayerBg_actDuelSetup" />
+
+    <com.leaders.app.views.character.CharacterView
+        android:id="@+id/chvTeamWhite_actDuelSetup"
+        android:layout_width="@dimen/round_button_size"
+        android:layout_height="@dimen/round_button_size"
+        android:layout_marginEnd="17dp"
+        app:layout_constraintBottom_toBottomOf="@+id/vwFirstPlayerBg_actDuelSetup"
+        app:layout_constraintEnd_toEndOf="@+id/vwFirstPlayerBg_actDuelSetup"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/vwFirstPlayerBg_actDuelSetup"
+        app:layout_constraintTop_toTopOf="@+id/vwFirstPlayerBg_actDuelSetup"
+        app:srcCompat="@drawable/character_piece_empty_w"
+        app:teamColor="White" />
+
+
+    <com.leaders.app.views.character.CharacterView
+        android:id="@+id/chvTeamBlack_actDuelSetup"
+        android:layout_width="@dimen/round_button_size"
+        android:layout_height="@dimen/round_button_size"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/vwFirstPlayerBg_actDuelSetup"
+        app:layout_constraintEnd_toStartOf="@+id/chvTeamWhite_actDuelSetup"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/vwFirstPlayerBg_actDuelSetup"
+        app:layout_constraintTop_toTopOf="@+id/vwFirstPlayerBg_actDuelSetup"
+        app:srcCompat="@drawable/character_piece_empty_w"
+        app:teamColor="Black" />
+
+    <com.leaders.app.views.character.CharacterHighlightView
+        android:id="@+id/chvTeamColorHighlight_actDuelSetup"
+        android:layout_width="@dimen/round_button_size"
+        android:layout_height="@dimen/round_button_size"
+        app:layout_constraintBottom_toBottomOf="@+id/vwFirstPlayerBg_actDuelSetup"
+        app:layout_constraintEnd_toEndOf="@+id/vwFirstPlayerBg_actDuelSetup"
+        app:layout_constraintStart_toStartOf="@+id/vwFirstPlayerBg_actDuelSetup"
+        app:layout_constraintTop_toTopOf="@+id/vwFirstPlayerBg_actDuelSetup"
+        app:srcCompat="@drawable/character_highlight"
+        tools:visibility="gone" />
+
+    <View
+        android:id="@+id/vwGameModeBg_actDuelSetup"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="-8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="-12dp"
+        android:background="@drawable/round_rect"
+        app:layout_constraintBottom_toBottomOf="@+id/txvGameModeSummary_actDuelSetup"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/txvGameModeTitle_actDuelSetup"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/txvGameModeTitle_actDuelSetup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:fontFamily="@font/bobby_jones_condensed"
+        android:text="@string/game_mode"
+        android:textColor="@color/font"
+        android:textSize="@dimen/default_text_font_size"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/vwGameModeBg_actDuelSetup"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/vwGameModeBg_actDuelSetup"
+        app:layout_constraintTop_toBottomOf="@+id/vwFirstPlayerBg_actDuelSetup"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <LinearLayout
+        android:id="@+id/llyGameModeButtons_actDuelSetup"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="16dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/vwGameModeBg_actDuelSetup"
+        app:layout_constraintStart_toStartOf="@+id/vwGameModeBg_actDuelSetup"
+        app:layout_constraintTop_toBottomOf="@+id/txvGameModeTitle_actDuelSetup"
+        app:layout_constraintVertical_bias="0.0">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnGameModeDiscovery_actDuelSetup"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="0dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginRight="0dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/selected_golden"
+            android:fontFamily="@font/bourbon_test_regular"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:paddingLeft="0dp"
+            android:paddingTop="2dp"
+            android:paddingRight="0dp"
+            android:text="@string/discovery_mode_title"
+            android:textColor="@color/font"
+            android:textSize="@dimen/default_text_font_size"
+            app:cornerRadius="8dp"
+            app:strokeColor="@color/font"
+            app:strokeWidth="@dimen/default_stroke_width" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnGameModeStrategist_actDuelSetup"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginRight="0dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/darker_background"
+            android:fontFamily="@font/bourbon_test_regular"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:paddingLeft="0dp"
+            android:paddingTop="2dp"
+            android:paddingRight="0dp"
+            android:text="@string/strategist_mode_title"
+            android:textColor="@color/font"
+            android:textSize="@dimen/default_text_font_size"
+            app:cornerRadius="8dp"
+            app:strokeColor="@color/font"
+            app:strokeWidth="@dimen/default_stroke_width" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/txvGameModeSummary_actDuelSetup"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="16dp"
+        android:fontFamily="@font/bobby_jones_condensed"
+        android:justificationMode="inter_word"
+        android:text="@string/discovery_mode_summary"
+        android:textColor="@color/font"
+        android:textSize="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/vwGameModeBg_actDuelSetup"
+        app:layout_constraintStart_toStartOf="@+id/txvGameModeTitle_actDuelSetup"
+        app:layout_constraintTop_toBottomOf="@+id/llyGameModeButtons_actDuelSetup"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <Button
+        android:id="@+id/btnStartGame_actDuelSetup"
+        android:layout_width="280dp"
+        android:layout_height="@dimen/round_button_size"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/darker_background"
+        android:fontFamily="@font/bobby_jones_condensed"
+        android:includeFontPadding="false"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:padding="0dp"
+        android:paddingStart="38dp"
+        android:paddingEnd="8dp"
+        android:text="@string/start_the_game"
+        android:textColor="@color/font"
+        android:textSize="24dp"
+        app:cornerRadius="8dp"
+        app:icon="@drawable/icon_arrow_head"
+        app:iconGravity="end"
+        app:iconPadding="0dp"
+        app:iconSize="24dp"
+        app:iconTint="@color/font"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio=""
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        app:strokeColor="@color/font"
+        app:strokeWidth="@dimen/default_stroke_width"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -17,8 +17,10 @@ import com.leaders.gamelogic.enums.TeamColor;
 
 public class PlayerSetupView extends ConstraintLayout {
     public interface PlayerSetupWatcher {
-        void onLeaderTypeChanged(@NonNull LeaderType leaderType);
-        void onTeamColorChanged(@NonNull TeamColor teamColor);
+        void onLeaderTypeChanged(@NonNull PlayerSetupView playerSetupView,
+                                 @NonNull LeaderType leaderType);
+        void onTeamColorChanged(@NonNull PlayerSetupView playerSetupView,
+                                @NonNull TeamColor teamColor);
     }
 
     private LeaderType leaderType;
@@ -52,7 +54,7 @@ public class PlayerSetupView extends ConstraintLayout {
         LeaderType newLeaderType = leaderType.getNext();
         setLeaderType(newLeaderType);
         if (watcher != null) {
-            watcher.onLeaderTypeChanged(newLeaderType);
+            watcher.onLeaderTypeChanged(this, newLeaderType);
         }
     }
 
@@ -60,7 +62,7 @@ public class PlayerSetupView extends ConstraintLayout {
         TeamColor newTeamColor = teamColor.getOpposite();
         setTeamColor(newTeamColor);
         if (watcher != null) {
-            watcher.onTeamColorChanged(newTeamColor);
+            watcher.onTeamColorChanged(this, newTeamColor);
         }
     }
 
@@ -78,10 +80,12 @@ public class PlayerSetupView extends ConstraintLayout {
 
     public void setLeaderType(LeaderType leaderType) {
         this.leaderType = leaderType;
+        ccpvLeader.setPortraitCard(leaderType.getCharacterCard());
     }
 
     public void setTeamColor(TeamColor teamColor) {
         this.teamColor = teamColor;
+        chvCharacterColor.setCharacter(null, teamColor);
     }
 
     public void setName(@NonNull String name) {

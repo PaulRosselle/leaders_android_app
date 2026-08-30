@@ -149,4 +149,12 @@
     <string name="defeat_title">dÉfaitE</string>
     <string name="defeat_subtitle">votre leader a ÉtÉ neutralisÉ</string>
     <string name="player_name">nom du joueur</string>
+    <string name="discovery_mode_title">dÉcouverte</string>
+    <string name="strategist_mode_title">stratÈge</string>
+    <string name="discovery_mode_summary">Recrutez vos personnages parmi une sélection de 3 tirée aléatoirement, renouvelée à chaque recrutement</string>
+    <string name="strategist_mode_summary">Recrutez parmi tous les personnages, mais bannissez-en un avant le 1er et le 3e recrutement</string>
+    <string name="start_the_game">Lancer la partie</string>
+    <string name="game_mode">Mode de jeu</string>
+    <string name="first_player">premier joueur</string>
+    <string name="duel_title">duel</string>
 </resources>

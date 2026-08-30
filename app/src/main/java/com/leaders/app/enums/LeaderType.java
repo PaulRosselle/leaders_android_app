@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.leaders.gamelogic.entities.Character;
+import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
 
 public enum LeaderType {
@@ -14,7 +15,7 @@ public enum LeaderType {
         switch (characterType) {
             case LeaderKing: return King;
             case LeaderQueen: return Queen;
-            default: throw new IllegalArgumentException("No leader type found matching characte type: " + characterType);
+            default: throw new IllegalArgumentException("No leader type found matching: " + characterType);
         }
     }
 
@@ -35,5 +36,13 @@ public enum LeaderType {
         }
 
         return values[0];
+    }
+
+    public CharacterCard getCharacterCard() {
+        switch (this) {
+            case King: return CharacterCard.LeaderKing;
+            case Queen: return CharacterCard.LeaderQueen;
+            default: throw new IllegalArgumentException("No character chard found matching: " + this);
+        }
     }
 }

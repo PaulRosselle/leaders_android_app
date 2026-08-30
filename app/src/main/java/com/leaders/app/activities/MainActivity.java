@@ -137,11 +137,7 @@ public final class MainActivity extends BaseActivity {
     }
 
     private void onPlayClick(View v) {
-        showNotImplementedDialog("v0.5.0",
-                List.of("Local multiplayer",
-                        "Discovery mode",
-                        "Strategist mode")
-        );
+        goToActivity(ActivityType.DuelSetup);
     }
 
     private void onReplayClick(View v) {
