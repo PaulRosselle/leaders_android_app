@@ -155,5 +155,7 @@
     <string name="game_mode">Game mode</string>
     <string name="first_player">first player</string>
     <string name="duel_title">duel</string>
+    <string name="card_already_banned">\"%s\" already banned</string>
+    <string name="card_cannot_be_recruited">\"%s\" cannot be recruited</string>
 
 </resources>

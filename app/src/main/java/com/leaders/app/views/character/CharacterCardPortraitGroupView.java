@@ -10,8 +10,10 @@ import androidx.annotation.Nullable;
 
 import com.leaders.R;
 import com.leaders.gamelogic.enums.CharacterCard;
+import com.leaders.gamelogic.interactions.InteractionTarget;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public final class CharacterCardPortraitGroupView extends LinearLayout {
     private static final int PORTRAIT_DEFAULT_MARGIN = 2;
@@ -19,7 +21,7 @@ public final class CharacterCardPortraitGroupView extends LinearLayout {
     private final ArrayList<CharacterCardPortraitView> characterCardPortraitViews;
     private OnClickListener onPortraitClickListener;
     private OnLongClickListener onPortraitLongClickListener;
-    private int portraitMargins;
+    private int portraitSpacing;
 
 
     public CharacterCardPortraitGroupView(Context context, @Nullable AttributeSet attrs) {
@@ -27,7 +29,7 @@ public final class CharacterCardPortraitGroupView extends LinearLayout {
         characterCardPortraitViews = new ArrayList<>();
         onPortraitClickListener = null;
         onPortraitLongClickListener = null;
-        portraitMargins = PORTRAIT_DEFAULT_MARGIN;
+        portraitSpacing = PORTRAIT_DEFAULT_MARGIN;
 
         try (TypedArray customAttrs = context.obtainStyledAttributes(attrs, R.styleable.CharacterCardPortraitGroupView)) {
             int groupSize = customAttrs.getInteger(R.styleable.CharacterCardPortraitGroupView_maxGroupSize, 6);
@@ -38,13 +40,32 @@ public final class CharacterCardPortraitGroupView extends LinearLayout {
     }
 
     public CharacterCardPortraitGroupView(@NonNull Context context,
-                                          @NonNull ArrayList<CharacterCard> portraitCards,
+                                          @NonNull List<CharacterCard> portraitCards,
                                           int groupSize) {
         this(context, null);
         setPortraits(portraitCards, groupSize);
     }
 
-    public void setPortraits(@NonNull ArrayList<CharacterCard> portraitCards, int groupSize) {
+
+    public CharacterCardPortraitGroupView(@NonNull Context context,
+                                          @NonNull List<CharacterCard> portraitCards,
+                                          @NonNull List<InteractionTarget> portraitTargets,
+                                          int groupSize) {
+        this(context, null);
+
+        if (portraitCards.size() != portraitTargets.size()) {
+            throw new IllegalArgumentException("Mismatch between portrait views and targets");
+        }
+
+        setPortraits(portraitCards, groupSize);
+
+        for (int i = 0; i < portraitTargets.size(); i++) {
+            characterCardPortraitViews.get(i).setTarget(portraitTargets.get(i));
+        }
+    }
+
+
+    public void setPortraits(@NonNull List<CharacterCard> portraitCards, int groupSize) {
         // The smallest value for group max size is 2 since it wouldn't make
         // sense to create a group view for less than two portraits
         groupSize = Math.max(groupSize, 2);
@@ -69,8 +90,8 @@ public final class CharacterCardPortraitGroupView extends LinearLayout {
         updatePortraitsLongClickListener();
     }
 
-    public void setPortraitMargins(int portraitMargins) {
-        this.portraitMargins = portraitMargins;
+    public void setPortraitSpacing(int portraitSpacing) {
+        this.portraitSpacing = portraitSpacing;
         for (CharacterCardPortraitView ptvPortrait : characterCardPortraitViews) {
             ptvPortrait.setLayoutParams(getPortraitLayoutParams());
         }
@@ -82,7 +103,7 @@ public final class CharacterCardPortraitGroupView extends LinearLayout {
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
 
-        int marginValueInPx = (int) (portraitMargins * getResources().getDisplayMetrics().density);
+        int marginValueInPx = (int) (portraitSpacing * getResources().getDisplayMetrics().density);
         layoutParams.setMarginStart(marginValueInPx);
         layoutParams.setMarginEnd(marginValueInPx);
         layoutParams.weight = 1;
