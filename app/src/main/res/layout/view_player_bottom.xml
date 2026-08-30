@@ -47,7 +47,7 @@
         android:gravity="center"
         android:includeFontPadding="true"
         android:textColor="@color/font"
-        android:textSize="20dp"
+        android:textSize="@dimen/default_text_font_size"
         app:layout_constraintBottom_toTopOf="@+id/gdl98H_vwPlayerBottom"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"

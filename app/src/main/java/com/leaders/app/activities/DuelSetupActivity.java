@@ -12,7 +12,7 @@ import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.LeaderType;
-import com.leaders.app.views.PlayerSetupView;
+import com.leaders.app.views.duel.PlayerSetupView;
 import com.leaders.app.views.character.CharacterHighlightView;
 import com.leaders.app.views.character.CharacterView;
 import com.leaders.gamelogic.enums.GameMode;
@@ -24,7 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-public class DuelSetupActivity extends BaseActivity implements PlayerSetupView.PlayerSetupWatcher {
+public final class DuelSetupActivity extends BaseActivity implements PlayerSetupView.PlayerSetupWatcher {
     private PlayerSetupView psvFirst, psvSecond;
     private CharacterView chvTeamBlack, chvTeamWhite;
     private CharacterHighlightView chvTeamColorHighlight;

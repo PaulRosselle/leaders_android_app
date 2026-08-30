@@ -96,7 +96,7 @@
         app:layout_constraintTop_toTopOf="@+id/gdlRoot_actDuelSetup"
         app:layout_constraintVertical_bias="0.0" />
 
-    <com.leaders.app.views.PlayerSetupView
+    <com.leaders.app.views.duel.PlayerSetupView
         android:id="@+id/psvFirst_actDuelSetup"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -109,7 +109,7 @@
         app:layout_constraintTop_toBottomOf="@+id/btnBack_actDuelSetup"
         app:layout_constraintVertical_bias="0.0" />
 
-    <com.leaders.app.views.PlayerSetupView
+    <com.leaders.app.views.duel.PlayerSetupView
         android:id="@+id/psvSecond_actDuelSetup"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
