@@ -10,11 +10,15 @@ import androidx.appcompat.widget.AppCompatImageView;
 
 import com.leaders.R;
 import com.leaders.gamelogic.enums.CharacterCard;
+import com.leaders.gamelogic.enums.CharacterCardSelectionStatus;
+import com.leaders.gamelogic.interactions.InteractionResultType;
+import com.leaders.gamelogic.interactions.InteractionTarget;
+
+import java.util.Objects;
 
 public final class CharacterCardPortraitView extends AppCompatImageView {
     public enum DisplayMode {
         Default,
-        Banned,
         Hexagonal
     }
 
@@ -23,8 +27,13 @@ public final class CharacterCardPortraitView extends AppCompatImageView {
     @NonNull
     private DisplayMode displayMode;
 
+    @Nullable
+    private InteractionTarget target;
+
     public CharacterCardPortraitView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+
+        target = null;
 
         setAdjustViewBounds(true);
 
@@ -51,7 +60,6 @@ public final class CharacterCardPortraitView extends AppCompatImageView {
         int resId;
         switch (displayMode) {
             case Default: resId = getPortraitDrawableId(); break;
-            case Banned: resId = getPortraitBannedDrawableId(); break;
             case Hexagonal: resId = getPortraitHexagonalDrawableId(); break;
             default: throw new IllegalStateException("Unexpected display mode: " + displayMode);
         }
@@ -59,6 +67,10 @@ public final class CharacterCardPortraitView extends AppCompatImageView {
     }
 
     private int getPortraitDrawableId() {
+        if (isBannedTargetPortrait()) {
+            return getPortraitBannedDrawableId();
+        }
+
         switch (portraitCard) {
             case Acrobat: return R.drawable.card_portrait_acrobat;
             case Archer: return R.drawable.card_portrait_archer;
@@ -97,5 +109,23 @@ public final class CharacterCardPortraitView extends AppCompatImageView {
     @NonNull
     public CharacterCard getPortraitCard() {
         return portraitCard;
+    }
+
+    private boolean isBannedTargetPortrait() {
+        return target != null &&
+                target.getCategory().getResultType() == InteractionResultType.SelectableCharacterCardChosen &&
+                Objects.requireNonNull(target.getChosenSelectableCharacterCard(),
+                        "Invalid portrait target: selectable character card missing"
+                ).getSelectionStatus() == CharacterCardSelectionStatus.AlreadyBanned;
+    }
+
+    @Nullable
+    public InteractionTarget getTarget() {
+        return target;
+    }
+
+    public void setTarget(@Nullable InteractionTarget target) {
+        this.target = target;
+        updateDisplay();
     }
 }
