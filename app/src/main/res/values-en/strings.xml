@@ -140,5 +140,7 @@
     <string name="new_attempt">New attempt</string>
     <string name="restart_puzzle">Would you like to start this puzzle again?</string>
     <string name="start_over">Start Over</string>
+    <string name="next_puzzle">Next puzzle</string>
+    <string name="previous_puzzle">Previous puzzle</string>
 
 </resources>

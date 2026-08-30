@@ -3,6 +3,7 @@ package com.leaders.app.activities.puzzle;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
@@ -16,6 +17,7 @@ import com.leaders.app.enums.PuzzleSource;
 import com.leaders.app.utilities.ButtonUtils;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.JsonUtils;
+import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.board.PlayableBoardView;
 import com.leaders.app.views.character.CharacterNotificationView;
 import com.leaders.app.views.character.CharacterView;
@@ -41,7 +43,37 @@ import java.util.Objects;
 
 public final class PuzzlePlayerActivity extends BaseActivity
         implements PlayableBoardView.OnTargetClickListener, PuzzlePlayerController.Listener {
+    private enum PuzzlePlayerAction {
+        GoToPreviousPuzzle,
+        GoToNextPuzzle;
+
+        private int getIconResId() {
+            switch (this) {
+                case GoToPreviousPuzzle: return R.drawable.icon_arrow_head_reversed;
+                case GoToNextPuzzle: return R.drawable.icon_arrow_head;
+                default: throw new IllegalStateException("No icon found for puzzle action: " + this);
+            }
+        }
+
+        private int getTextResId() {
+            switch (this) {
+                case GoToPreviousPuzzle: return R.string.previous_puzzle;
+                case GoToNextPuzzle: return R.string.next_puzzle;
+                default: throw new IllegalStateException("No text found for puzzle action: " + this);
+            }
+        }
+
+        private View.OnClickListener getOnClickListener(@NonNull PuzzlePlayerActivity activity) {
+            switch (this) {
+                case GoToPreviousPuzzle: return activity::onPreviousPuzzleClick;
+                case GoToNextPuzzle: return activity::onNextPuzzleClick;
+                default: throw new IllegalStateException("No click listener found for puzzle action: " + this);
+            }
+        }
+    }
+
     private MaterialButton btnPuzzleActions;
+    private ActionsMenuView amvPuzzleActions;
     private View vwDialogBg;
 
     private MaterialButton btnReset;
@@ -50,6 +82,8 @@ public final class PuzzlePlayerActivity extends BaseActivity
     private CharacterNotificationView cnvCardInfo;
 
     private PlayableBoardView bdvBoard;
+    private TextView txvPuzzleName;
+    private TextView txvAuthorName;
 
 
     private PuzzleSource puzzleSource;
@@ -68,6 +102,11 @@ public final class PuzzlePlayerActivity extends BaseActivity
 
         btnPuzzleActions = findViewById(R.id.btnPuzzleActions_actPuzzlePlayer);
         vwDialogBg = findViewById(R.id.vwDialogBg_actPuzzlePlayer);
+        amvPuzzleActions = findViewById(R.id.amvPuzzleActions_actPuzzlePlayer);
+        for (PuzzlePlayerAction action : PuzzlePlayerAction.values()) {
+            amvPuzzleActions.addActionButton(action.getIconResId(), action.getTextResId(),
+                    action.ordinal(), action.getOnClickListener(this));
+        }
 
         btnReset = findViewById(R.id.btnReset_actPuzzlePlayer);
         btnUndoLastAction = findViewById(R.id.btnUndoLastAction_actPuzzlePlayer);
@@ -75,6 +114,8 @@ public final class PuzzlePlayerActivity extends BaseActivity
         cnvCardInfo = findViewById(R.id.cnvCardInfo_actPuzzlePlayer);
 
         bdvBoard = findViewById(R.id.bdvBoard_actPuzzlePlayer);
+        txvPuzzleName = findViewById(R.id.txvPuzzleName_actPuzzlePlayer);
+        txvAuthorName = findViewById(R.id.txvAuthorName_actPuzzlePlayer);
     }
 
     @Override
@@ -132,9 +173,9 @@ public final class PuzzlePlayerActivity extends BaseActivity
             throw new IllegalStateException("No puzzle data received by the player");
         }
 
-
         controller = new PuzzlePlayerController(this);
         controller.startGame(puzzleGameHistory);
+        updatePuzzleInfos();
     }
 
     @Override
@@ -209,7 +250,7 @@ public final class PuzzlePlayerActivity extends BaseActivity
     }
 
     private void onDialogBgClick(View v) {
-        // TODO
+        hidePuzzleActions();
     }
 
     private void onCardInfoClick(View v) {
@@ -217,7 +258,11 @@ public final class PuzzlePlayerActivity extends BaseActivity
     }
 
     private void onPuzzleActionsClick(View v) {
-        // TODO
+        // Before showing the actions menu, we must update the available actions based on the puzzle state
+        updatePuzzleActions();
+
+        amvPuzzleActions.setVisibility(View.VISIBLE);
+        vwDialogBg.setVisibility(View.VISIBLE);
     }
 
     private boolean onCharacterLongClick(View v) {
@@ -318,6 +363,59 @@ public final class PuzzlePlayerActivity extends BaseActivity
     @Override
     public void onInteractionCleared() {
         runOnUiThread(this::clearInteractionUI);
+    }
+
+    //endregion
+
+    //region ACTIONS METHODS
+
+    private void onNextPuzzleClick(View v) {
+        loadPuzzle(puzzleSaves.get(puzzleSaves.indexOf(puzzleSave) + 1));
+    }
+
+    private void onPreviousPuzzleClick(View v) {
+        loadPuzzle(puzzleSaves.get(puzzleSaves.indexOf(puzzleSave) - 1));
+    }
+
+    private void loadPuzzle(@NonNull PuzzleSave puzzleSave) {
+        this.puzzleSave = puzzleSave;
+        controller.restartGame(puzzleSave.getPuzzleGameHistory());
+        updatePuzzleInfos();
+        hidePuzzleActions();
+    }
+
+    private void updatePuzzleInfos() {
+        String puzzleName = puzzleSave.getName();
+        String authorName = puzzleSave.getAuthor();
+
+        boolean showPuzzleName = !puzzleName.isEmpty();
+        boolean showPuzzleAuthor = showPuzzleName && !authorName.isEmpty();
+
+        txvPuzzleName.setVisibility(showPuzzleName ? View.VISIBLE : View.GONE);
+        txvAuthorName.setVisibility(showPuzzleAuthor ? View.VISIBLE : View.GONE);
+
+        txvPuzzleName.setText(puzzleName);
+        txvAuthorName.setText(String.format(getString(R.string.by_author), authorName));
+    }
+
+    private void updatePuzzleActions() {
+        boolean hasNextPuzzle = false;
+        boolean hasPreviousPuzzle = false;
+        if (puzzleSource != PuzzleSource.Editor) {
+            int puzzleIdx = puzzleSaves.indexOf(puzzleSave);
+            if (puzzleIdx != -1) {
+                hasNextPuzzle = puzzleIdx < puzzleSaves.size() - 1;
+                hasPreviousPuzzle = puzzleIdx > 0;
+            }
+        }
+
+        amvPuzzleActions.setButtonEnabled(PuzzlePlayerAction.GoToNextPuzzle.ordinal(), hasNextPuzzle);
+        amvPuzzleActions.setButtonEnabled(PuzzlePlayerAction.GoToPreviousPuzzle.ordinal(), hasPreviousPuzzle);
+    }
+
+    private void hidePuzzleActions() {
+        amvPuzzleActions.setVisibility(View.GONE);
+        vwDialogBg.setVisibility(View.GONE);
     }
 
     //endregion
