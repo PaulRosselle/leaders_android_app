@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/transparent_black"
+    tools:ignore="SpUsage">
+
+    <ImageView
+        android:id="@+id/imvTitleBg_vwEndGame"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginEnd="48dp"
+        android:foreground="@drawable/round_rect_stroke"
+        android:foregroundTint="@color/app_golden"
+        android:foregroundTintMode="multiply"
+        android:importantForAccessibility="no"
+        android:src="@drawable/round_rect"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.7" />
+
+    <ImageView
+        android:id="@+id/imvLeader_vwEndGame"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:adjustViewBounds="true"
+        android:importantForAccessibility="no"
+        android:scaleType="fitEnd"
+        app:layout_constraintBottom_toTopOf="@+id/imvTitleBg_vwEndGame"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/gdlTop_vwEndGame"
+        app:layout_constraintVertical_bias="1.0"
+        tools:srcCompat="@drawable/end_game_victory_queen" />
+
+    <TextView
+        android:id="@+id/txvSubTitle_vwEndGame"
+        android:layout_width="0dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:autoSizeMaxTextSize="20dp"
+        android:autoSizeMinTextSize="16dp"
+        android:autoSizePresetSizes="20dp"
+        android:autoSizeStepGranularity="2dp"
+        android:autoSizeTextType="uniform"
+        android:background="@drawable/end_game_victory_subtitle_bg"
+        android:fontFamily="@font/bourbon_test_regular"
+        android:gravity="center"
+        android:paddingStart="16dp"
+        android:paddingTop="0dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="2dp"
+        android:textAlignment="gravity"
+        android:textColor="@color/font"
+        android:textSize="@dimen/default_text_font_size"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/imvTitleBg_vwEndGame"
+        app:layout_constraintStart_toStartOf="@+id/imvTitleBg_vwEndGame"
+        app:layout_constraintTop_toBottomOf="@+id/imvTitleBg_vwEndGame"
+        app:layout_constraintVertical_bias="0.0"
+        tools:text="@string/victory_subtitle" />
+
+    <TextView
+        android:id="@+id/txvTitle_vwEndGame"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="4dp"
+        android:autoSizeMaxTextSize="48dp"
+        android:autoSizeMinTextSize="20dp"
+        android:autoSizePresetSizes="24dp"
+        android:autoSizeStepGranularity="4dp"
+        android:autoSizeTextType="uniform"
+        android:fontFamily="@font/bourbon_test_regular"
+        android:gravity="center"
+        android:paddingBottom="2dp"
+        android:textAlignment="gravity"
+        android:textColor="@color/app_golden"
+        app:layout_constraintBottom_toBottomOf="@+id/imvTitleBg_vwEndGame"
+        app:layout_constraintEnd_toStartOf="@+id/imvDecoRight_vwEndGame"
+        app:layout_constraintStart_toEndOf="@+id/imvDecoLeft_vwEndGame"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        tools:text="@string/victory_title" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gdlTop_vwEndGame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.15" />
+
+    <ImageView
+        android:id="@+id/imvDecoLeft_vwEndGame"
+        android:layout_width="wrap_content"
+        android:layout_height="90dp"
+        android:layout_marginStart="8dp"
+        android:adjustViewBounds="true"
+        android:importantForAccessibility="no"
+        app:layout_constraintBottom_toTopOf="@+id/txvSubTitle_vwEndGame"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imvLeader_vwEndGame"
+        app:srcCompat="@drawable/end_game_victory_side" />
+
+    <ImageView
+        android:id="@+id/imvDecoRight_vwEndGame"
+        android:layout_width="wrap_content"
+        android:layout_height="90dp"
+        android:layout_marginEnd="8dp"
+        android:adjustViewBounds="true"
+        android:rotationY="180"
+        android:importantForAccessibility="no"
+        app:layout_constraintBottom_toTopOf="@+id/txvSubTitle_vwEndGame"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imvLeader_vwEndGame"
+        app:srcCompat="@drawable/end_game_victory_side" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -211,4 +211,14 @@
         tools:text="by Author Name"
         tools:visibility="visible" />
 
+    <com.leaders.app.views.EndGameView
+        android:id="@+id/egvEndGame_actPuzzlePlayer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/gdlRoot_actPuzzlePlayer" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

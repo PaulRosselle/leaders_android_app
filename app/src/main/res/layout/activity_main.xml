@@ -20,7 +20,19 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="gone">
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="TextView"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </com.leaders.app.views.decoration.DecorativeBackgroundView>
 
     <ImageView
         android:id="@+id/imvLightHalo_actMain"
@@ -87,4 +99,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/gdlRoot_actMain" />
+
+    <TextView
+        android:id="@+id/txvVersion_actMain"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/futura"
+        android:text="@string/app_version"
+        android:textColor="@color/app_golden"
+        android:textSize="12dp"
+        app:layout_constraintBottom_toBottomOf="@+id/imvMainTitle_actMain"
+        app:layout_constraintEnd_toEndOf="@+id/imvMainTitle_actMain"
+        app:layout_constraintStart_toStartOf="@+id/imvMainTitle_actMain"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
 </androidx.constraintlayout.widget.ConstraintLayout>

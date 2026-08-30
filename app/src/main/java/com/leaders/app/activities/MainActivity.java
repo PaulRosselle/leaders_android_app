@@ -1,6 +1,7 @@
 package com.leaders.app.activities;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
@@ -12,7 +13,6 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.leaders.R;
 import com.leaders.app.entities.crash.CrashLog;
@@ -20,6 +20,8 @@ import com.leaders.app.enums.ActivityType;
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.views.mainmenu.CrashLogView;
 import com.leaders.app.views.mainmenu.MainMenuView;
+
+import java.util.List;
 
 public final class MainActivity extends BaseActivity {
     private CrashLogView clvCrashDialog;
@@ -42,11 +44,11 @@ public final class MainActivity extends BaseActivity {
         super.initListeners();
 
         MainMenuView mmvMainMenu = findViewById(R.id.mmvMainMenu_actMain);
-        mmvMainMenu.setOnPuzzlesClickListener(v -> goToActivity(ActivityType.PuzzleSelection));
-        mmvMainMenu.setOnPlayClickListener(this::btnNotImplementedClick);
-        mmvMainMenu.setOnReplayClickListener(this::btnNotImplementedClick);
-        mmvMainMenu.setOnRulesClickListener(this::btnNotImplementedClick);
-        mmvMainMenu.setOnSettingsClickListener(this::btnNotImplementedClick);
+        mmvMainMenu.setOnPuzzlesClickListener(this::onPuzzlesClick);
+        mmvMainMenu.setOnPlayClickListener(this::onPlayClick);
+        mmvMainMenu.setOnReplayClickListener(this::onReplayClick);
+        mmvMainMenu.setOnRulesClickListener(this::onRulesClick);
+        mmvMainMenu.setOnSettingsClickListener(this::onSettingsClick);
     }
 
     @Override
@@ -130,7 +132,56 @@ public final class MainActivity extends BaseActivity {
         return animator;
     }
 
-    private void btnNotImplementedClick(View v) {
-        Toast.makeText(v.getContext(), "Not implemented", Toast.LENGTH_SHORT).show();
+    private void onPuzzlesClick(View v) {
+        goToActivity(ActivityType.PuzzleSelection);
+    }
+
+    private void onPlayClick(View v) {
+        showNotImplementedDialog("v0.5.0",
+                List.of("Local multiplayer",
+                        "Discovery mode",
+                        "Strategist mode",
+                        "timed match")
+        );
+    }
+
+    private void onReplayClick(View v) {
+        showNotImplementedDialog("v0.6.0",
+                List.of("Game \"media\" player",
+                        "Local multiplayer game save",
+                        "Game saves import/export")
+        );
+    }
+
+    private void onRulesClick(View v) {
+        showNotImplementedDialog("v0.7.0",
+                List.of("Interactive explanation of Leaders rules",
+                        "Character introduction scenarios")
+        );
+    }
+
+    private void onSettingsClick(View v) {
+        showNotImplementedDialog("v0.8.0",
+                List.of("Animation speed",
+                        "Character highlight color",
+                        "Character appearances",
+                        "Default board coordinates visibility",
+                        "Default author name",
+                        "Contact")
+        );
+    }
+
+    private void showNotImplementedDialog(@NonNull String version, @NonNull List<String> content) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.alert_dialog_theme);
+        builder.setTitle("Will be available starting with " + version);
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Expected features :");
+        for (String contentItem : content) {
+            stringBuilder.append("\n• ");
+            stringBuilder.append(contentItem);
+        }
+        builder.setMessage(stringBuilder.toString());
+        builder.setNeutralButton(R.string.ok, null);
+        builder.show();
     }
 }

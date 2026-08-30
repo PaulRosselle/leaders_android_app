@@ -2,6 +2,7 @@ package com.leaders.app.views.characteraction;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.PorterDuff;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -77,6 +78,8 @@ public class CharacterActionTimelineView extends ConstraintLayout {
     private CharacterActionView getActionView(@NonNull CharacterAction action) {
         CharacterActionView cavAction = new CharacterActionView(getContext(), action);
         cavAction.setOnClickListener(this::onActionClick);
+        cavAction.setForegroundTintList(ContextCompat.getColorStateList(getContext(), R.color.app_golden));
+        cavAction.setForegroundTintMode(PorterDuff.Mode.MULTIPLY);
         return cavAction;
     }
 
@@ -107,7 +110,7 @@ public class CharacterActionTimelineView extends ConstraintLayout {
         for (int i = 0; i < llyActions.getChildCount(); i++) {
             CharacterActionView cavAction = (CharacterActionView) llyActions.getChildAt(i);
             cavAction.setForeground(i < lastMarkerIndex ?
-                    ContextCompat.getDrawable(getContext(), R.drawable.round_rect_stroke_golden) : null);
+                    ContextCompat.getDrawable(getContext(), R.drawable.round_rect_stroke) : null);
         }
     }
 

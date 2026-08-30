@@ -142,5 +142,9 @@
     <string name="start_over">Start Over</string>
     <string name="next_puzzle">Next puzzle</string>
     <string name="previous_puzzle">Previous puzzle</string>
+    <string name="victory_title">ViCtORY</string>
+    <string name="victory_subtitle">The opponent\\\'s leader has been neutralized</string>
+    <string name="defeat_title">defeat</string>
+    <string name="defeat_subtitle">Your leader has been neutralized</string>
 
 </resources>
