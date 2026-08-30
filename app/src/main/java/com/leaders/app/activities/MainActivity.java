@@ -140,8 +140,7 @@ public final class MainActivity extends BaseActivity {
         showNotImplementedDialog("v0.5.0",
                 List.of("Local multiplayer",
                         "Discovery mode",
-                        "Strategist mode",
-                        "timed match")
+                        "Strategist mode")
         );
     }
 
