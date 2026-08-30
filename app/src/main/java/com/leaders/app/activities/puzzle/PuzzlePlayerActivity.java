@@ -13,27 +13,34 @@ import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.controllers.PuzzlePlayerController;
 import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
+import com.leaders.app.enums.EndGameType;
+import com.leaders.app.enums.LeaderType;
 import com.leaders.app.enums.PuzzleSource;
 import com.leaders.app.utilities.ButtonUtils;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.views.ActionsMenuView;
+import com.leaders.app.views.EndGameView;
 import com.leaders.app.views.board.PlayableBoardView;
 import com.leaders.app.views.character.CharacterNotificationView;
 import com.leaders.app.views.character.CharacterView;
+import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
+import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.interactions.InteractionContext;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionTarget;
+import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
 import com.leaders.puzzlelogic.entities.PuzzleSave;
 import com.leaders.puzzlelogic.serializers.SerializationContext;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
+import com.leaders.puzzlelogic.utilities.PuzzleEditionUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -85,6 +92,7 @@ public final class PuzzlePlayerActivity extends BaseActivity
     private TextView txvPuzzleName;
     private TextView txvAuthorName;
 
+    private EndGameView egvEndGame;
 
     private PuzzleSource puzzleSource;
     private List<? extends PuzzleSave> puzzleSaves;
@@ -116,6 +124,8 @@ public final class PuzzlePlayerActivity extends BaseActivity
         bdvBoard = findViewById(R.id.bdvBoard_actPuzzlePlayer);
         txvPuzzleName = findViewById(R.id.txvPuzzleName_actPuzzlePlayer);
         txvAuthorName = findViewById(R.id.txvAuthorName_actPuzzlePlayer);
+
+        egvEndGame = findViewById(R.id.egvEndGame_actPuzzlePlayer);
     }
 
     @Override
@@ -137,6 +147,8 @@ public final class PuzzlePlayerActivity extends BaseActivity
         // Board element listeners
         bdvBoard.setOnTargetClickListener(this);
         bdvBoard.setOnCharacterLongClickListener(this::onCharacterLongClick);
+
+        egvEndGame.setOnClickListener(this::onEndGameClick);
     }
 
     @Override
@@ -287,6 +299,10 @@ public final class PuzzlePlayerActivity extends BaseActivity
         controller.cancelAction();
     }
 
+    private void onEndGameClick(View v) {
+        egvEndGame.hide();
+    }
+
     //endregion
 
     //region TARGET CLICK LISTENER METHODS
@@ -329,7 +345,22 @@ public final class PuzzlePlayerActivity extends BaseActivity
     @Override
     public void onGameEnded(@NonNull Player winner) {
         runOnUiThread(() -> {
-            // TODO afficher la victoire
+            TeamColor winnerColor = winner.getTeamColor();
+            boolean isVictory = winnerColor == PuzzleEditionUtils.getPuzzlePlayerTeamColor();
+
+            EndGameType endGameType = isVictory ? EndGameType.Victory : EndGameType.Defeat;
+            Cell leaderCell = Objects.requireNonNull(
+                    BoardQuery.findLeaderCell(controller.getCurrentGame().getBoard(), winnerColor),
+                    "No leader found for team: " + winnerColor
+            );
+            LeaderType leaderType = LeaderType.getFromCharacter(leaderCell.getCharacter());
+            int titleId = isVictory ? R.string.victory_title : R.string.defeat_title;
+            int subtitleId = isVictory ? R.string.victory_subtitle : R.string.defeat_subtitle;
+
+            egvEndGame.update(endGameType, leaderType, getString(titleId), getString(subtitleId));
+            egvEndGame.show();
+
+            // TODO - save progress
         });
     }
 

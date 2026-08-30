@@ -28,6 +28,8 @@ public class EndGameView extends ConstraintLayout {
     public EndGameView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
+        inflate(context, R.layout.view_end_game, this);
+
         // Initializing views
         imvLeader = findViewById(R.id.imvLeader_vwEndGame);
         imvTitleBg = findViewById(R.id.imvTitleBg_vwEndGame);

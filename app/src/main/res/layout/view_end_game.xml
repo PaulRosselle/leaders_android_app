@@ -38,7 +38,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/gdlTop_vwEndGame"
         app:layout_constraintVertical_bias="1.0"
-        tools:srcCompat="@drawable/end_game_victory_king" />
+        tools:srcCompat="@drawable/end_game_victory_queen" />
 
     <TextView
         android:id="@+id/txvSubTitle_vwEndGame"
@@ -65,7 +65,8 @@
         app:layout_constraintEnd_toEndOf="@+id/imvTitleBg_vwEndGame"
         app:layout_constraintStart_toStartOf="@+id/imvTitleBg_vwEndGame"
         app:layout_constraintTop_toBottomOf="@+id/imvTitleBg_vwEndGame"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.0"
+        tools:text="@string/victory_subtitle" />
 
     <TextView
         android:id="@+id/txvTitle_vwEndGame"
@@ -82,14 +83,14 @@
         android:fontFamily="@font/bourbon_test_regular"
         android:gravity="center"
         android:paddingBottom="2dp"
-        android:text="fin de la partie"
         android:textAlignment="gravity"
         android:textColor="@color/app_golden"
         app:layout_constraintBottom_toBottomOf="@+id/imvTitleBg_vwEndGame"
         app:layout_constraintEnd_toStartOf="@+id/imvDecoRight_vwEndGame"
         app:layout_constraintStart_toEndOf="@+id/imvDecoLeft_vwEndGame"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintVertical_bias="1.0"
+        tools:text="@string/victory_title" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/gdlTop_vwEndGame"
