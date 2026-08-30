@@ -1,4 +1,4 @@
-package com.leaders.app.activities;
+package com.leaders.app.activities.duel;
 
 import android.content.res.ColorStateList;
 import android.view.View;
@@ -10,6 +10,7 @@ import androidx.appcompat.content.res.AppCompatResources;
 
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
+import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.LeaderType;
 import com.leaders.app.views.duel.PlayerSetupView;

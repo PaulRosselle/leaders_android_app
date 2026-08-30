@@ -5,7 +5,7 @@ import android.content.Intent;
 
 import androidx.annotation.NonNull;
 
-import com.leaders.app.activities.DuelSetupActivity;
+import com.leaders.app.activities.duel.DuelSetupActivity;
 import com.leaders.app.activities.MainActivity;
 import com.leaders.app.activities.puzzle.PuzzleEditorActivity;
 import com.leaders.app.activities.puzzle.PuzzlePlayerActivity;

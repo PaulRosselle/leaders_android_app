@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@color/background"
     tools:theme="@style/Theme.LeadersAndroidApp"
-    tools:context=".app.activities.DuelSetupActivity"
+    tools:context=".app.activities.duel.DuelSetupActivity"
     tools:ignore="SpUsage">
 
     <androidx.constraintlayout.widget.Guideline
