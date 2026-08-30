@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/round_rect">
+    android:background="@drawable/round_rect_gloden_outline_bg">
 
     <com.leaders.app.views.character.CharacterCardPortraitView
         android:id="@+id/ccpvLeader_vwPlayerSetup"

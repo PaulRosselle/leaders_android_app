@@ -147,5 +147,13 @@
     <string name="defeat_title">defeat</string>
     <string name="defeat_subtitle">Your leader has been neutralized</string>
     <string name="player_name">player name</string>
+    <string name="discovery_mode_title">discovery</string>
+    <string name="strategist_mode_title">strategist</string>
+    <string name="discovery_mode_summary">Recruit your characters from a random selection of 3, refreshed after each recruitment</string>
+    <string name="strategist_mode_summary">Recruit from all characters, but ban one before the 1st and 3rd recruitment</string>
+    <string name="start_the_game">Start the game</string>
+    <string name="game_mode">Game mode</string>
+    <string name="first_player">first player</string>
+    <string name="duel_title">duel</string>
 
 </resources>
