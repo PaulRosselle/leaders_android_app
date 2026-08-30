@@ -37,7 +37,9 @@ import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
+import com.leaders.puzzlelogic.entities.OfficialPuzzleSave;
 import com.leaders.puzzlelogic.entities.PuzzleSave;
+import com.leaders.puzzlelogic.enums.PuzzleCategory;
 import com.leaders.puzzlelogic.serializers.SerializationContext;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
 import com.leaders.puzzlelogic.utilities.PuzzleEditionUtils;
@@ -45,6 +47,7 @@ import com.leaders.puzzlelogic.utilities.PuzzleEditionUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -250,9 +253,8 @@ public final class PuzzlePlayerActivity extends BaseActivity
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.alert_dialog_theme);
         builder.setTitle(R.string.new_attempt);
         builder.setMessage(R.string.restart_puzzle);
-        builder.setPositiveButton(R.string.start_over, (dialogInterface, i) -> {
-            controller.restartGame(puzzleSave.getPuzzleGameHistory());
-        });
+        builder.setPositiveButton(R.string.start_over, (dialogInterface, i) ->
+                controller.restartGame(puzzleSave.getPuzzleGameHistory()));
         builder.setNegativeButton(R.string.cancel, null);
         builder.show();
     }
@@ -330,6 +332,52 @@ public final class PuzzlePlayerActivity extends BaseActivity
         );
     }
 
+    private void showEndGame(@NonNull TeamColor winnerColor, boolean isVictory) {
+
+        EndGameType endGameType = isVictory ? EndGameType.Victory : EndGameType.Defeat;
+        Cell leaderCell = Objects.requireNonNull(
+                BoardQuery.findLeaderCell(controller.getCurrentGame().getBoard(), winnerColor),
+                "No leader found for team: " + winnerColor
+        );
+        LeaderType leaderType = LeaderType.getFromCharacter(leaderCell.getCharacter());
+        int titleId = isVictory ? R.string.victory_title : R.string.defeat_title;
+        int subtitleId = isVictory ? R.string.victory_subtitle : R.string.defeat_subtitle;
+
+        egvEndGame.update(endGameType, leaderType, getString(titleId), getString(subtitleId));
+        egvEndGame.show();
+    }
+
+    private void saveProgress(boolean isSolved) {
+        // Progression is never saved when a puzzle is tested in editor mode.
+        if (puzzleSource == PuzzleSource.Editor) {
+            return;
+        }
+
+        // We only save progress when the puzzle has been completed for the first time
+        if (!isSolved && !puzzleSave.isSolved()) {
+            return;
+        }
+
+        puzzleSave.setSolved(true);
+        if (!puzzleSaves.contains(puzzleSave)) {
+            throw new IllegalStateException("Cannot save progress for puzzle: " + puzzleSave.getName());
+        }
+
+        if (puzzleSave.getCategory() == PuzzleCategory.Official) {
+            List<OfficialPuzzleSave> officialPuzzleSaves = new ArrayList<>();
+            for (PuzzleSave officialPuzzleSave : puzzleSaves) {
+                officialPuzzleSaves.add((OfficialPuzzleSave) officialPuzzleSave);
+            }
+            JsonUtils.saveOfficialPuzzles(this, officialPuzzleSaves);
+        } else {
+            List<CustomPuzzleSave> customPuzzleSaves = new ArrayList<>();
+            for (PuzzleSave customPuzzleSave : puzzleSaves) {
+                customPuzzleSaves.add((CustomPuzzleSave) customPuzzleSave);
+            }
+            JsonUtils.saveCustomPuzzles(this, customPuzzleSaves);
+        }
+    }
+
     //endregion
 
     //region CONTROLLER METHODS
@@ -348,19 +396,8 @@ public final class PuzzlePlayerActivity extends BaseActivity
             TeamColor winnerColor = winner.getTeamColor();
             boolean isVictory = winnerColor == PuzzleEditionUtils.getPuzzlePlayerTeamColor();
 
-            EndGameType endGameType = isVictory ? EndGameType.Victory : EndGameType.Defeat;
-            Cell leaderCell = Objects.requireNonNull(
-                    BoardQuery.findLeaderCell(controller.getCurrentGame().getBoard(), winnerColor),
-                    "No leader found for team: " + winnerColor
-            );
-            LeaderType leaderType = LeaderType.getFromCharacter(leaderCell.getCharacter());
-            int titleId = isVictory ? R.string.victory_title : R.string.defeat_title;
-            int subtitleId = isVictory ? R.string.victory_subtitle : R.string.defeat_subtitle;
-
-            egvEndGame.update(endGameType, leaderType, getString(titleId), getString(subtitleId));
-            egvEndGame.show();
-
-            // TODO - save progress
+            saveProgress(isVictory);
+            showEndGame(winnerColor, isVictory);
         });
     }
 
