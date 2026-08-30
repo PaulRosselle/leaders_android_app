@@ -1,4 +1,4 @@
-package com.leaders.app.views;
+package com.leaders.app.views.duel;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -15,7 +15,7 @@ import com.leaders.app.views.character.CharacterCardPortraitView;
 import com.leaders.app.views.character.CharacterView;
 import com.leaders.gamelogic.enums.TeamColor;
 
-public class PlayerSetupView extends ConstraintLayout {
+public final class PlayerSetupView extends ConstraintLayout {
     public interface PlayerSetupWatcher {
         void onLeaderTypeChanged(@NonNull PlayerSetupView playerSetupView,
                                  @NonNull LeaderType leaderType);

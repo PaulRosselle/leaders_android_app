@@ -15,7 +15,7 @@ import com.leaders.R;
 import com.leaders.app.enums.EndGameType;
 import com.leaders.app.enums.LeaderType;
 
-public class EndGameView extends ConstraintLayout {
+public final class EndGameView extends ConstraintLayout {
     private static final int SHOW_ANIMATION_DURATION = 400;
     private static final int HIDE_ANIMATION_DURATION = 200;
 
