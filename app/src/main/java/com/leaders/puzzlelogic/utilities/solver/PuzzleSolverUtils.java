@@ -265,46 +265,6 @@ public final class PuzzleSolverUtils {
     }
 
     /**
-     * Returns the winning continuations common to both collections.
-     *
-     * @param first the first collection of continuations
-     * @param second the second collection of continuations
-     * @return the continuations present in both collections
-     */
-    @NonNull
-    private static List<List<CharacterAction>> intersectSolutions(@NonNull List<List<CharacterAction>> first,
-                                                                  @NonNull List<List<CharacterAction>> second) {
-        List<List<CharacterAction>> result = new ArrayList<>();
-
-        for (List<CharacterAction> solution : first) {
-            if (containsSolution(second, solution)) {
-                result.add(new ArrayList<>(solution));
-            }
-        }
-
-        return result;
-    }
-
-    /**
-     * Checks whether the given collection contains the specified continuation.
-     *
-     * @param solutions the collection of continuations to search
-     * @param candidate the continuation to look for
-     * @return {@code true} if the candidate is present in the collection;
-     *         {@code false} otherwise
-     */
-    private static boolean containsSolution(@NonNull List<List<CharacterAction>> solutions,
-                                            @NonNull List<CharacterAction> candidate) {
-        for (List<CharacterAction> solution : solutions) {
-            if (solution.equals(candidate)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Determines whether the specified character belongs to the opposing team
      * for the current actions phase.
      *

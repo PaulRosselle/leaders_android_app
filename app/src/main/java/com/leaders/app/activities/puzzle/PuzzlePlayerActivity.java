@@ -24,6 +24,7 @@ import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
+import com.leaders.gamelogic.interactions.InteractionContext;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionTarget;
@@ -260,6 +261,14 @@ public final class PuzzlePlayerActivity extends BaseActivity
         ButtonUtils.setEnabled(btnUndoLastAction, false);
     }
 
+    private void updatePlayableCharacters(@NonNull InteractionContext context) {
+        bdvBoard.highlightPlayableCharacters(
+                controller.getPlayableCharacters(),
+                context.getCharacter(),
+                controller.getCurrentGame().getBoard()
+        );
+    }
+
     //endregion
 
     //region CONTROLLER METHODS
@@ -294,13 +303,16 @@ public final class PuzzlePlayerActivity extends BaseActivity
                     controller.getCurrentGame().getBoard()
             );
 
+            updatePlayableCharacters(request.getContext());
+
             ButtonUtils.setEnabled(btnUndoLastAction, controller.canUndoLastAction());
         });
     }
 
     @Override
-    public void onFeedback(@NonNull InteractionFeedback feedback) {
-        runOnUiThread(() -> bdvBoard.animateFeedback(feedback, () -> {}));
+    public void onFeedback(@NonNull InteractionFeedback feedback,
+                           @NonNull PuzzlePlayerController.InteractionCompletion completion) {
+        runOnUiThread(() -> bdvBoard.animateFeedback(feedback, completion::complete));
     }
 
     @Override

@@ -1,12 +1,12 @@
 package com.leaders.app.controllers;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.leaders.gamelogic.GameHandler;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
+import com.leaders.gamelogic.entities.PlayableCharacter;
 import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.interactions.IGameFlowListener;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
@@ -14,7 +14,9 @@ import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
 import com.leaders.gamelogic.interactions.InteractionResultType;
 import com.leaders.gamelogic.interactions.InteractionTarget;
+import com.leaders.gamelogic.queries.PlayabilityQuery;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -30,9 +32,13 @@ public final class PuzzlePlayerController implements IGameFlowListener {
 
         void onInteractionRequired(@NonNull InteractionRequest request);
 
-        void onFeedback(@NonNull InteractionFeedback feedback);
+        void onFeedback(@NonNull InteractionFeedback feedback, @NonNull InteractionCompletion completion);
 
         void onInteractionCleared();
+    }
+
+    public interface InteractionCompletion {
+        void complete();
     }
 
     private final Listener listener;
@@ -216,9 +222,11 @@ public final class PuzzlePlayerController implements IGameFlowListener {
     @NonNull
     @Override
     public CompletableFuture<Void> onFeedback(@NonNull InteractionFeedback feedback) {
+        CompletableFuture<Void> future = new CompletableFuture<>();
 
-        listener.onFeedback(feedback);
-        return CompletableFuture.completedFuture(null);
+        listener.onFeedback(feedback, () -> future.complete(null));
+
+        return future;
     }
 
     public void shutdown() {
@@ -233,5 +241,17 @@ public final class PuzzlePlayerController implements IGameFlowListener {
         }
 
         return new Game(gameHandler.getCurrentGame());
+    }
+
+    @NonNull
+    public List<PlayableCharacter> getPlayableCharacters() {
+        if (gameHandler == null) {
+            throw new IllegalStateException("Game has not been started");
+        }
+
+        return PlayabilityQuery.getPlayableCharacters(
+                gameHandler.getCurrentGame(),
+                gameHandler.getCurrentHistory()
+        );
     }
 }

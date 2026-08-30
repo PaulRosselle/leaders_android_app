@@ -13,6 +13,8 @@ import com.leaders.app.views.character.CharacterDisplay;
 import com.leaders.app.views.character.CharacterHighlightView;
 import com.leaders.app.views.character.CharacterView;
 import com.leaders.gamelogic.entities.Board;
+import com.leaders.gamelogic.entities.Cell;
+import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.PlayableCharacter;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.interactions.InteractionContext;
@@ -21,6 +23,7 @@ import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.queries.BoardQuery;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -102,7 +105,7 @@ public class PlayableBoardView extends BoardView {
                 destCellView.setAsMovementDestinationTarget(target, sourceCellView);
                 break;
             case ActiveAbilityDestination:
-                destCellView.setAsActiveAbilityDestinationTarget(target, sourceCellView);
+                destCellView.setAsActiveAbilityDestinationTarget(target);
                 break;
             default:
                 throw new IllegalArgumentException("Invalid destination target category: " + target.getCategory());
@@ -120,8 +123,29 @@ public class PlayableBoardView extends BoardView {
 
     //region ANIMATION METHODS
 
-    public void animatePlayableCharacters() {
-        // TODO
+    public void highlightPlayableCharacters(@NonNull List<PlayableCharacter> playableCharacters,
+                                            @Nullable Character selectedCharacter,
+                                            @NonNull Board board) {
+        Position selectedCharacterPos = null;
+        if (selectedCharacter != null) {
+            Cell selectedCharacterCell = BoardQuery.getCellByCharacterId(board, selectedCharacter.getId());
+            selectedCharacterPos = selectedCharacterCell.getPosition();
+        }
+
+        for (Map.Entry<Position, CharacterDisplay> entry : characterDisplayMap.entrySet()) {
+            Position position = entry.getKey();
+            CharacterDisplay display = entry.getValue();
+
+            boolean isSelectedDisplay = position.equals(selectedCharacterPos);
+            boolean isPlayableCharacter = positionContainsPlayableCharacter(playableCharacters, position);
+
+            display.setHighlighted(isSelectedDisplay || isPlayableCharacter, true);
+            if (isSelectedDisplay) {
+                display.startHighlightAnimation();
+            } else {
+                display.stopHighlightAnimation();
+            }
+        }
     }
 
     public void animateFeedback(@NonNull InteractionFeedback feedback,
@@ -138,6 +162,16 @@ public class PlayableBoardView extends BoardView {
                         "Feedback type \"" + feedback.getFeedbackType() + "\" not handled by the playable board"
                 );
         }
+    }
+
+    private boolean positionContainsPlayableCharacter(@NonNull List<PlayableCharacter> playableCharacters,
+                                                      @NonNull Position position) {
+        for (PlayableCharacter playableCharacter : playableCharacters) {
+            if (playableCharacter.getPosition().equals(position)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     //endregion
