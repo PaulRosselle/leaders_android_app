@@ -52,14 +52,15 @@ public final class CellView extends AppCompatImageView {
                                                @NonNull CellView clvCharacter) {
         this.target = target;
         setImageResource(R.drawable.target_movement);
-        setAsCharacterActionTarget(clvCharacter);
+        rotateAwayFromCell(clvCharacter);
     }
 
-    public void setAsActiveAbilityDestinationTarget(@NonNull InteractionTarget target,
-                                                    @NonNull CellView clvCharacter) {
+    public void setAsActiveAbilityDestinationTarget(@NonNull InteractionTarget target) {
         this.target = target;
         setImageResource(R.drawable.target_ability_movement);
-        setAsCharacterActionTarget(clvCharacter);
+        setRotationY(0f);
+        setRotation(0f);
+        setRotationX(0f);
     }
 
     public void setAsTarget(@NonNull InteractionTarget target) {
@@ -67,7 +68,7 @@ public final class CellView extends AppCompatImageView {
         // This method is made to target a cellView without visual feedacks
     }
 
-    private void setAsCharacterActionTarget(@NonNull CellView clvCharacter) {
+    private void rotateAwayFromCell(@NonNull CellView clvCharacter) {
         Point characterCenter = clvCharacter.getCenter();
         Point destCenter = getCenter();
 
