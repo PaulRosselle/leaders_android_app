@@ -23,7 +23,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <ImageView
-        android:id="@+id/imvBackground_vwPlayerBottom"
+        android:id="@+id/imvLeader_vwPlayerBottom"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"

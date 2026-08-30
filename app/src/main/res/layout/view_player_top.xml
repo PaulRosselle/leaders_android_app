@@ -32,7 +32,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <ImageView
-        android:id="@+id/imvBackground_vwPlayerTop"
+        android:id="@+id/imvLeader_vwPlayerTop"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"

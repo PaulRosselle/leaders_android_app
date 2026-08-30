@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.leaders.app.enums.LeaderType;
 import com.leaders.gamelogic.entities.Player;
 
 public abstract class PlayerView extends ConstraintLayout {
@@ -30,13 +31,13 @@ public abstract class PlayerView extends ConstraintLayout {
 
     protected abstract int getTxvPlayerNameResId();
 
-    protected abstract int getLeaderResId();
+    protected abstract int getLeaderResId(@NonNull LeaderType leaderType);
 
-    protected abstract int getLeaderBackgroundResId();
+    protected abstract int getBackgroundResId(@NonNull Player player);
 
-    public void setPlayer(@NonNull Player player) {
+    public void setPlayer(@NonNull Player player, @NonNull LeaderType leaderType) {
         txvName.setText(player.getName());
-        imvLeader.setImageResource(getLeaderResId());
-        imvLeader.setBackgroundResource(getLeaderBackgroundResId());
+        imvLeader.setImageResource(getLeaderResId(leaderType));
+        imvLeader.setBackgroundResource(getBackgroundResId(player));
     }
 }
