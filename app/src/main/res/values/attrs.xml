@@ -47,8 +47,7 @@
     <declare-styleable name="CharacterCardPortraitView">
         <attr name="displayMode" format="enum">
             <enum name="Default" value="0"/>
-            <enum name="Banned" value="1"/>
-            <enum name="Hexagonal" value="2"/>
+            <enum name="Hexagonal" value="1"/>
         </attr>
     </declare-styleable>
 

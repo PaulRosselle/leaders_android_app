@@ -1,5 +1,6 @@
 package com.leaders.app.activities.duel;
 
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.view.View;
 import android.widget.TextView;
@@ -203,7 +204,11 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
     }
 
     private void onStartGameClick(View v) {
+        Intent intent = ActivityType.DuelPlayer.getIntent(this);
+
         // TODO
+
+        goToActivity(intent);
     }
 
     //endregion

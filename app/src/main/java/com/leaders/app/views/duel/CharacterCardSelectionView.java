@@ -1,8 +1,12 @@
 package com.leaders.app.views.duel;
 
 import android.content.Context;
+import android.transition.Fade;
+import android.transition.Transition;
+import android.transition.TransitionManager;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Toast;
@@ -31,7 +35,6 @@ public class CharacterCardSelectionView extends ConstraintLayout {
         void onRecruitmentCardSelected(@NonNull InteractionTarget target);
         void onBanishmentCardSelected(@NonNull InteractionTarget target);
     }
-
 
     private final LinearLayout llyPortraits;
     private final ScrollView scvPortraits;
@@ -186,5 +189,21 @@ public class CharacterCardSelectionView extends ConstraintLayout {
 
     public void setOnCardSelectedListener(OnCardSelectedListener onCardSelectedListener) {
         this.onCardSelectedListener = onCardSelectedListener;
+    }
+
+    public void show(boolean animate) {
+        // We use a fading animation for the visibility change
+        if (animate) {
+            Transition transition = new Fade();
+            transition.setDuration(400);
+            transition.addTarget(this);
+            TransitionManager.beginDelayedTransition((ViewGroup) this.getParent(), transition);
+        }
+        setVisibility(VISIBLE);
+    }
+
+    public void hide() {
+        // Hiding the view is always instantaneous
+        setVisibility(GONE);
     }
 }

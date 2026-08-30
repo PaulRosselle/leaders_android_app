@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    tools:theme="@style/Theme.LeadersAndroidApp"
+    tools:context=".app.activities.duel.DuelPlayerActivity"
+    tools:ignore="SpUsage">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gdlRoot_actDuelPlayer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="0dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gdl50V_actDuelPlayer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintGuide_percent="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.leaders.app.views.decoration.DecorativeBackgroundView
+        android:id="@+id/decorativeBackgroundView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="gone" />
+
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnBack_actDuelPlayer"
+        android:layout_width="@dimen/round_button_size"
+        android:layout_height="@dimen/round_button_size"
+        android:layout_marginStart="8dp"
+        android:background="@color/transparent"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        app:icon="@drawable/icon_back"
+        app:iconGravity="textStart"
+        app:iconPadding="0dp"
+        app:iconSize="@dimen/round_button_icon_size"
+        app:iconTint="@color/font"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actDuelPlayer"
+        app:layout_constraintVertical_bias="0.0"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnActions_actDuelPlayer"
+        android:layout_width="@dimen/round_button_size"
+        android:layout_height="@dimen/round_button_size"
+        android:layout_marginEnd="8dp"
+        android:background="@color/transparent"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        app:icon="@drawable/icon_more_actions"
+        app:iconGravity="textStart"
+        app:iconPadding="0dp"
+        app:iconSize="@dimen/round_button_icon_size"
+        app:iconTint="@color/font"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actDuelPlayer"
+        app:layout_constraintVertical_bias="0.0"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <com.leaders.app.views.duel.CharacterCardSelectionView
+        android:id="@+id/ccsvCardSelector"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="16dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/btnUndoLastAction_actDuelPlayer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pbvCurrentPlayer_actDuelPlayer" />
+
+    <com.leaders.app.views.board.PlayableBoardView
+        android:id="@+id/bdvBoard_actDuelPlayer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:animateLayoutChanges="true"
+        app:layout_constraintBottom_toTopOf="@+id/btnCards_actDuelPlayer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnBack_actDuelPlayer" />
+
+    <com.leaders.app.views.duel.PlayerTopView
+        android:id="@+id/ptvOpposingPlayer_actDuelPlayer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/gdl50V_actDuelPlayer"
+        app:layout_constraintTop_toBottomOf="@+id/btnBack_actDuelPlayer"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.duel.PlayerBottomView
+        android:id="@+id/pbvCurrentPlayer_actDuelPlayer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="16dp"
+        android:animateLayoutChanges="true"
+        app:layout_constraintBottom_toTopOf="@+id/btnUndoLastAction_actDuelPlayer"
+        app:layout_constraintEnd_toStartOf="@+id/gdl50V_actDuelPlayer"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnBack_actDuelPlayer"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnCards_actDuelPlayer"
+        android:layout_width="@dimen/round_button_size"
+        android:layout_height="@dimen/round_button_size"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/darker_background"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        app:icon="@drawable/icon_cards"
+        app:iconGravity="textStart"
+        app:iconPadding="0dp"
+        app:iconSize="@dimen/round_button_icon_size"
+        app:iconTint="@color/font"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toStartOf="@+id/gdl50V_actDuelPlayer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        app:strokeColor="@color/font"
+        app:strokeWidth="1dp"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnUndoLastAction_actDuelPlayer"
+        android:layout_width="@dimen/round_button_size"
+        android:layout_height="@dimen/round_button_size"
+        android:layout_marginBottom="16dp"
+        android:alpha="0.5"
+        android:backgroundTint="@color/darker_background"
+        android:clickable="false"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        app:icon="@drawable/icon_cancel"
+        app:iconGravity="textStart"
+        app:iconPadding="0dp"
+        app:iconSize="@dimen/round_button_icon_size"
+        app:iconTint="@color/font"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        app:strokeColor="@color/font"
+        app:strokeWidth="1dp"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnNextPhase_actDuelPlayer"
+        android:layout_width="@dimen/round_button_size"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/darker_background"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:padding="0dp"
+        app:icon="@drawable/icon_arrow_head"
+        app:iconGravity="textStart"
+        app:iconPadding="0dp"
+        app:iconSize="@dimen/round_button_icon_size"
+        app:iconTint="@color/font"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/gdl50V_actDuelPlayer"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        app:strokeColor="@color/font"
+        app:strokeWidth="1dp"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <ImageView
+        android:id="@+id/imvNextPhase_actDuelPlayer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginLeft="-1dp"
+        android:layout_marginTop="-1dp"
+        android:layout_marginRight="-1dp"
+        android:layout_marginBottom="-1dp"
+        android:clickable="false"
+        android:importantForAccessibility="no"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/btnNextPhase_actDuelPlayer"
+        app:layout_constraintLeft_toLeftOf="@+id/btnNextPhase_actDuelPlayer"
+        app:layout_constraintRight_toRightOf="@+id/btnNextPhase_actDuelPlayer"
+        app:layout_constraintTop_toTopOf="@+id/btnNextPhase_actDuelPlayer"
+        app:srcCompat="@drawable/character_highlight" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
