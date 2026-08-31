@@ -12,6 +12,7 @@ import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.enums.ActivityType;
+import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.views.board.PlayableBoardView;
 import com.leaders.app.views.character.CharacterCardPortraitView;
 import com.leaders.app.views.character.CharacterNotificationView;
@@ -19,9 +20,16 @@ import com.leaders.app.views.character.CharacterView;
 import com.leaders.app.views.duel.CharacterCardSelectionView;
 import com.leaders.app.views.duel.PlayerBottomView;
 import com.leaders.app.views.duel.PlayerTopView;
+import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
+import com.leaders.gamelogic.factories.GameFactory;
 import com.leaders.gamelogic.interactions.InteractionTarget;
+import com.leaders.puzzlelogic.serializers.SerializationContext;
+import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Objects;
 
@@ -50,12 +58,12 @@ public class DuelPlayerActivity extends BaseActivity implements
 
         bdvBoard = findViewById(R.id.bdvBoard_actDuelPlayer);
 
-        ccsvCardSelector = findViewById(R.id.ccsvCardSelector);
+        ccsvCardSelector = findViewById(R.id.ccsvCardSelector_actDuelPlayer);
 
         pbvCurrentPlayer = findViewById(R.id.pbvCurrentPlayer_actDuelPlayer);
         ptvOpposingPlayer = findViewById(R.id.ptvOpposingPlayer_actDuelPlayer);
 
-        cnvCardInfo = findViewById(R.id.cnvCardInfo_actPuzzlePlayer);
+        cnvCardInfo = findViewById(R.id.cnvCardInfo_actDuelPlayer);
 
         btnActions = findViewById(R.id.btnActions_actDuelPlayer);
         btnCards = findViewById(R.id.btnCards_actDuelPlayer);
@@ -74,6 +82,8 @@ public class DuelPlayerActivity extends BaseActivity implements
         ccsvCardSelector.setOnCardSelectedListener(this);
         ccsvCardSelector.setOnPortraitLongClickListener(this::onPortraitLongClick);
 
+        cnvCardInfo.setOnClickListener(v -> cnvCardInfo.hide());
+
         btnActions.setOnClickListener(this::onActionsClick);
         btnCards.setOnClickListener(this::onCardsClick);
         btnUndoLastAction.setOnClickListener(this::onUndoLastActionClick);
@@ -85,6 +95,23 @@ public class DuelPlayerActivity extends BaseActivity implements
         super.initDatas();
 
         // TODO
+        String gameDatas = getIntent().getStringExtra(ExtraUtils.EXTRA_DUEL_GAME_DATAS);
+        if (gameDatas == null || gameDatas.isEmpty()) {
+            throw new IllegalStateException("Invalid duel game datas: missing datas");
+        }
+
+        GameHistory gameHistory;
+        GameHistorySerializer serializer = new GameHistorySerializer();
+        try {
+            JSONObject joGameDatas = new JSONObject(gameDatas);
+            gameHistory = serializer.getFromJson(joGameDatas, new SerializationContext());
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+
+        // TODO - remove when the DuelPlayerController is implemented
+        bdvBoard.post(() -> bdvBoard.setBoard(GameFactory.create(gameHistory).getBoard()));
+        // TODO - load ccsvCardSelector with recruitable cards
     }
 
     @Override

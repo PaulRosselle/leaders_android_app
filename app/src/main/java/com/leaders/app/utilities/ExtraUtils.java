@@ -9,6 +9,7 @@ public final class ExtraUtils {
     public static final String EXTRA_PUZZLE_INDEX = "EXTRA_PUZZLE_INDEX";
     public static final String EXTRA_PUZZLE_IMPORTED = "EXTRA_PUZZLE_IMPORTED";
     public static final String EXTRA_PUZZLE_DATAS = "EXTRA_PUZZLE_IMPORTED";
+    public static final String EXTRA_DUEL_GAME_DATAS = "EXTRA_DUEL_GAME_DATAS";
 
     private ExtraUtils(){
         throw new AssertionError("Cannot instantiate utility class");

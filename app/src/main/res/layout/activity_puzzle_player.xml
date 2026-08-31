@@ -138,19 +138,6 @@
         app:strokeColor="@color/font"
         app:strokeWidth="@dimen/default_stroke_width" />
 
-    <com.leaders.app.views.character.CharacterNotificationView
-        android:id="@+id/cnvCardInfo_actPuzzlePlayer"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/gdlRoot_actPuzzlePlayer"
-        app:layout_constraintVertical_bias="0.0" />
-
     <TextView
         android:id="@+id/txvPuzzleName_actPuzzlePlayer"
         android:layout_width="wrap_content"
@@ -186,6 +173,19 @@
         app:layout_constraintVertical_bias="0.0"
         tools:text="by Author Name"
         tools:visibility="visible" />
+
+    <com.leaders.app.views.character.CharacterNotificationView
+        android:id="@+id/cnvCardInfo_actPuzzlePlayer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/gdlRoot_actPuzzlePlayer"
+        app:layout_constraintVertical_bias="0.0" />
 
     <View
         android:id="@+id/vwDialogBg_actPuzzlePlayer"

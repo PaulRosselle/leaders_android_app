@@ -69,4 +69,16 @@ public final class DuelStartUtils {
 
         return new GameHistory(gameConfig, new ArrayList<>());
     }
+
+    public static List<CharacterCard> getDefaultRecruitableCards() {
+        List<CharacterCard> characterCards = new ArrayList<>();
+
+        for (CharacterCard characterCard : CharacterCard.values()) {
+            if (characterCard.canBeRecruited()) {
+                characterCards.add(characterCard);
+            }
+        }
+
+        return characterCards;
+    }
 }
