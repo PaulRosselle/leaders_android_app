@@ -84,7 +84,7 @@ public class DuelPlayerActivity extends BaseActivity implements
     protected void initDatas() {
         super.initDatas();
 
-        // TOD
+        // TODO
     }
 
     @Override
