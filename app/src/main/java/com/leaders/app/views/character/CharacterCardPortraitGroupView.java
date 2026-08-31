@@ -9,11 +9,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.leaders.R;
+import com.leaders.gamelogic.entities.SelectableCharacterCard;
 import com.leaders.gamelogic.enums.CharacterCard;
+import com.leaders.gamelogic.enums.CharacterCardSelectionStatus;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public final class CharacterCardPortraitGroupView extends LinearLayout {
     private static final int PORTRAIT_DEFAULT_MARGIN = 2;
@@ -38,32 +41,6 @@ public final class CharacterCardPortraitGroupView extends LinearLayout {
 
         setOrientation(HORIZONTAL);
     }
-
-    public CharacterCardPortraitGroupView(@NonNull Context context,
-                                          @NonNull List<CharacterCard> portraitCards,
-                                          int groupSize) {
-        this(context, null);
-        setPortraits(portraitCards, groupSize);
-    }
-
-
-    public CharacterCardPortraitGroupView(@NonNull Context context,
-                                          @NonNull List<CharacterCard> portraitCards,
-                                          @NonNull List<InteractionTarget> portraitTargets,
-                                          int groupSize) {
-        this(context, null);
-
-        if (portraitCards.size() != portraitTargets.size()) {
-            throw new IllegalArgumentException("Mismatch between portrait views and targets");
-        }
-
-        setPortraits(portraitCards, groupSize);
-
-        for (int i = 0; i < portraitTargets.size(); i++) {
-            characterCardPortraitViews.get(i).setTarget(portraitTargets.get(i));
-        }
-    }
-
 
     public void setPortraits(@NonNull List<CharacterCard> portraitCards, int groupSize) {
         // The smallest value for group max size is 2 since it wouldn't make
@@ -132,4 +109,55 @@ public final class CharacterCardPortraitGroupView extends LinearLayout {
         }
     }
 
+    public static CharacterCardPortraitGroupView createFromCards(@NonNull Context context,
+                                                                 @NonNull List<CharacterCard> portraitCards,
+                                                                 int groupSize) {
+        CharacterCardPortraitGroupView groupView = new CharacterCardPortraitGroupView(context, null);
+        groupView.setPortraits(portraitCards, groupSize);
+        return groupView;
+    }
+
+
+    public static CharacterCardPortraitGroupView createFromTargets(@NonNull Context context,
+                                                                   @NonNull List<InteractionTarget> portraitTargets,
+                                                                   int groupSize) {
+        CharacterCardPortraitGroupView groupView = new CharacterCardPortraitGroupView(context, null);
+
+        List<CharacterCard> portraitCards = new ArrayList<>();
+        for (InteractionTarget target : portraitTargets) {
+            portraitCards.add(Objects.requireNonNull(
+                            target.getChosenSelectableCharacterCard(),
+                            "Invalid portrait target: character card missing")
+                    .getCharacterCard()
+            );
+        }
+
+        groupView.setPortraits(portraitCards, groupSize);
+
+        for (int i = 0; i < portraitTargets.size(); i++) {
+            groupView.characterCardPortraitViews.get(i).setTarget(portraitTargets.get(i));
+        }
+
+        return groupView;
+    }
+
+    public static CharacterCardPortraitGroupView createFromSelectableCards(@NonNull Context context,
+                                                                           @NonNull List<SelectableCharacterCard> selectableCards,
+                                                                           int groupSize) {
+        CharacterCardPortraitGroupView groupView = new CharacterCardPortraitGroupView(context, null);
+
+        List<CharacterCard> portraitCards = new ArrayList<>();
+        for (SelectableCharacterCard selectableCard : selectableCards) {
+            portraitCards.add(selectableCard.getCharacterCard());
+        }
+
+        groupView.setPortraits(portraitCards, groupSize);
+
+        for (int i = 0; i < selectableCards.size(); i++) {
+            groupView.characterCardPortraitViews.get(i).setUseBannedDisplay(
+                    selectableCards.get(i).getSelectionStatus() == CharacterCardSelectionStatus.AlreadyBanned);
+        }
+
+        return groupView;
+    }
 }

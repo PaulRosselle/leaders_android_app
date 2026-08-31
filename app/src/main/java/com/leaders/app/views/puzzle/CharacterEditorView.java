@@ -92,7 +92,7 @@ public final class CharacterEditorView extends ConstraintLayout {
                 portraitsCards.add(allCards.remove(0));
             }
             CharacterCardPortraitGroupView ptvPortraits =
-                    new CharacterCardPortraitGroupView(context, portraitsCards, PORTRAITS_PER_GROUP);
+                    CharacterCardPortraitGroupView.createFromCards(context, portraitsCards, PORTRAITS_PER_GROUP);
             ptvPortraits.setClickable(false);
             ptvPortraits.setLongClickable(false);
             llyPortraits.addView(ptvPortraits, getPortraitsGroupLayoutParams());

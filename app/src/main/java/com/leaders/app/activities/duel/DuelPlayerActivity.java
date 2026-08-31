@@ -20,11 +20,14 @@ import com.leaders.app.views.character.CharacterView;
 import com.leaders.app.views.duel.CharacterCardSelectionView;
 import com.leaders.app.views.duel.PlayerBottomView;
 import com.leaders.app.views.duel.PlayerTopView;
+import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.factories.GameFactory;
 import com.leaders.gamelogic.interactions.InteractionTarget;
+import com.leaders.gamelogic.queries.RecruitmentQuery;
+import com.leaders.gamelogic.queries.SelectableCardsQuery;
 import com.leaders.puzzlelogic.serializers.SerializationContext;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
 
@@ -76,6 +79,8 @@ public class DuelPlayerActivity extends BaseActivity implements
     protected void initListeners() {
         super.initListeners();
 
+        // TODO - onNonInteractive click listener
+
         bdvBoard.setOnTargetClickListener(this);
         bdvBoard.setOnCharacterLongClickListener(this::onBoardCharacterLongClick);
 
@@ -110,8 +115,12 @@ public class DuelPlayerActivity extends BaseActivity implements
         }
 
         // TODO - remove when the DuelPlayerController is implemented
-        bdvBoard.post(() -> bdvBoard.setBoard(GameFactory.create(gameHistory).getBoard()));
-        // TODO - load ccsvCardSelector with recruitable cards
+        Game game = GameFactory.create(gameHistory);
+        bdvBoard.post(() -> bdvBoard.setBoard(game.getBoard()));
+        ccsvCardSelector.applyGameModeParams(gameHistory.getConfig().getGameMode());
+        ccsvCardSelector.post(() -> ccsvCardSelector.setCards(
+                SelectableCardsQuery.getSelectableCards(game, gameHistory)
+        ));
     }
 
     @Override
@@ -189,7 +198,7 @@ public class DuelPlayerActivity extends BaseActivity implements
 
     @Override
     public void onEmptyClick() {
-
+        // TODO - handle game phases
     }
 
     @Override

@@ -20,7 +20,6 @@ import com.leaders.app.utilities.CharacterCardUtils;
 import com.leaders.app.views.character.CharacterCardPortraitGroupView;
 import com.leaders.app.views.character.CharacterCardPortraitView;
 import com.leaders.gamelogic.entities.SelectableCharacterCard;
-import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterCardSelectionStatus;
 import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.interactions.InteractionResultType;
@@ -60,52 +59,74 @@ public class CharacterCardSelectionView extends ConstraintLayout {
 
     public void applyGameModeParams(@NonNull GameMode gameMode) {
         // Portrait display params changes depending on the game mode
+        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) scvPortraits.getLayoutParams();
         if (gameMode == GameMode.Discovery) {
             portraitsPerGroup = 3;
             portraitSpacing = 16;
+            params.height = ConstraintLayout.LayoutParams.WRAP_CONTENT;
         } else {
             portraitsPerGroup = 6;
             portraitSpacing = 2;
+            params.height = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT;
         }
     }
 
-    private void setTargets(@NonNull List<InteractionTarget> targets) {
+    public void setTargets(@NonNull List<InteractionTarget> targets) {
         this.targets = targets;
-        updatePortraits();
+        updatePortraitsFromTargets();
     }
 
-    private void updatePortraits() {
+    public void setCards(@NonNull List<SelectableCharacterCard> selectableCards) {
+        this.targets = null;
+        updatePortraitsFromCards(selectableCards);
+    }
+
+    private void updatePortraitsFromTargets() {
         llyPortraits.removeAllViews();
 
         for (int start = 0; start < targets.size(); start += portraitsPerGroup) {
             int end = Math.min(start + portraitsPerGroup, targets.size());
 
-            List<CharacterCard> groupCards = new ArrayList<>(end - start);
             List<InteractionTarget> groupTargets = new ArrayList<>(end - start);
 
             for (int groupIdx = start; groupIdx < end; groupIdx++) {
                 InteractionTarget target = targets.get(groupIdx);
 
-                groupCards.add(Objects.requireNonNull(
-                            target.getChosenSelectableCharacterCard(),
-                            "Invalid portrait target: character card missing")
-                        .getCharacterCard()
-                );
                 groupTargets.add(target);
             }
 
-            addPortraitsGroup(groupCards, groupTargets);
+            CharacterCardPortraitGroupView portraitsGroupView = CharacterCardPortraitGroupView.createFromTargets(
+                    getContext(), groupTargets, portraitsPerGroup
+            );
+            initPortraitsGroup(portraitsGroupView);
         }
 
         scvPortraits.setVisibility(VISIBLE);
     }
 
-    private void addPortraitsGroup(@NonNull List<CharacterCard> groupCards,
-                                   @NonNull List<InteractionTarget> groupTargets) {
-        CharacterCardPortraitGroupView portraitsGroupView = new CharacterCardPortraitGroupView(
-                getContext(), groupCards, groupTargets, portraitsPerGroup
-        );
 
+    private void updatePortraitsFromCards(@NonNull List<SelectableCharacterCard> selectableCards) {
+        llyPortraits.removeAllViews();
+
+        for (int start = 0; start < selectableCards.size(); start += portraitsPerGroup) {
+            int end = Math.min(start + portraitsPerGroup, selectableCards.size());
+
+            List<SelectableCharacterCard> groupCards = new ArrayList<>(end - start);
+
+            for (int groupIdx = start; groupIdx < end; groupIdx++) {
+                groupCards.add(selectableCards.get(groupIdx));
+            }
+
+            CharacterCardPortraitGroupView portraitsGroupView = CharacterCardPortraitGroupView.createFromSelectableCards(
+                    getContext(), groupCards, portraitsPerGroup
+            );
+            initPortraitsGroup(portraitsGroupView);
+        }
+
+        scvPortraits.setVisibility(VISIBLE);
+    }
+
+    private void initPortraitsGroup(@NonNull CharacterCardPortraitGroupView portraitsGroupView) {
         portraitsGroupView.setPortraitsClickListener(this::onPortraitClick);
         portraitsGroupView.setPortraitsLongClickListener(onPortraitLongClickListener);
         portraitsGroupView.setPortraitSpacing(portraitSpacing);
@@ -118,7 +139,7 @@ public class CharacterCardSelectionView extends ConstraintLayout {
 
         InteractionTarget target = portraitView.getTarget();
         if (target == null) {
-            throw new IllegalStateException("Invalid portrait view: target missing");
+            return;
         }
 
         if (target.getCategory().getResultType() != InteractionResultType.SelectableCharacterCardChosen) {

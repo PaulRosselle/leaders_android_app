@@ -26,6 +26,7 @@ public final class CharacterCardPortraitView extends AppCompatImageView {
     private CharacterCard portraitCard;
     @NonNull
     private DisplayMode displayMode;
+    private boolean useBannedDisplay;
 
     @Nullable
     private InteractionTarget target;
@@ -34,6 +35,7 @@ public final class CharacterCardPortraitView extends AppCompatImageView {
         super(context, attrs);
 
         target = null;
+        useBannedDisplay = false;
 
         setAdjustViewBounds(true);
 
@@ -67,7 +69,7 @@ public final class CharacterCardPortraitView extends AppCompatImageView {
     }
 
     private int getPortraitDrawableId() {
-        if (isBannedTargetPortrait()) {
+        if (useBannedDisplay) {
             return getPortraitBannedDrawableId();
         }
 
@@ -111,14 +113,6 @@ public final class CharacterCardPortraitView extends AppCompatImageView {
         return portraitCard;
     }
 
-    private boolean isBannedTargetPortrait() {
-        return target != null &&
-                target.getCategory().getResultType() == InteractionResultType.SelectableCharacterCardChosen &&
-                Objects.requireNonNull(target.getChosenSelectableCharacterCard(),
-                        "Invalid portrait target: selectable character card missing"
-                ).getSelectionStatus() == CharacterCardSelectionStatus.AlreadyBanned;
-    }
-
     @Nullable
     public InteractionTarget getTarget() {
         return target;
@@ -126,6 +120,18 @@ public final class CharacterCardPortraitView extends AppCompatImageView {
 
     public void setTarget(@Nullable InteractionTarget target) {
         this.target = target;
+
+        boolean isBannedTarget = target != null &&
+                target.getCategory().getResultType() == InteractionResultType.SelectableCharacterCardChosen &&
+                Objects.requireNonNull(target.getChosenSelectableCharacterCard(),
+                        "Invalid portrait target: selectable character card missing"
+                ).getSelectionStatus() == CharacterCardSelectionStatus.AlreadyBanned;
+
+        setUseBannedDisplay(isBannedTarget);
+    }
+
+    public void setUseBannedDisplay(boolean useBannedDisplay) {
+        this.useBannedDisplay = useBannedDisplay;
         updateDisplay();
     }
 }

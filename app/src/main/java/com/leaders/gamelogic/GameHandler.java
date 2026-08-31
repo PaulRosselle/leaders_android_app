@@ -543,7 +543,7 @@ public final class GameHandler {
         checkStopped();
 
         List<SelectableCharacterCard> selectableRecruitmentCards =
-                RecruitmentQuery.getSelectableRecruitmentCards(currentGame, currentHistory);
+                RecruitmentQuery.getCurrentSelectableCards(currentGame, currentHistory);
 
         List<InteractionTarget> legalTargets = new ArrayList<>();
         for (SelectableCharacterCard selectableRecruitmentCard : selectableRecruitmentCards) {
@@ -699,7 +699,7 @@ public final class GameHandler {
         checkStopped();
 
         List<SelectableCharacterCard> selectableBanishmentCards =
-                BanishmentQuery.getSelectableBanishmentCards(currentGame);
+                BanishmentQuery.getCurrentSelectableCards(currentGame);
 
         List<InteractionTarget> legalTargets = new ArrayList<>();
         for (SelectableCharacterCard selectableBanishmentCard : selectableBanishmentCards) {

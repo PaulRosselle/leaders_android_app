@@ -135,14 +135,14 @@ public class BanishmentQueryTest {
     }
 
     @Test
-    public void getSelectableBanishmentCards_shouldMarkRecruitableCardsAsBanishable() {
+    public void getCurrentSelectableCards_shouldMarkRecruitableCardsAsBanishable() {
         Game game = createTestGame();
 
         game.getRecruitableCards().add(CharacterCard.Archer);
         game.getRecruitableCards().add(CharacterCard.Bruiser);
 
         List<SelectableCharacterCard> selectableCards =
-                BanishmentQuery.getSelectableBanishmentCards(game);
+                BanishmentQuery.getCurrentSelectableCards(game);
 
         assertEquals(2, selectableCards.size());
 
@@ -154,14 +154,14 @@ public class BanishmentQueryTest {
     }
 
     @Test
-    public void getSelectableBanishmentCards_shouldIncludeAlreadyBannedCards() {
+    public void getCurrentSelectableCards_shouldIncludeAlreadyBannedCards() {
         Game game = createTestGame();
 
         game.getRecruitableCards().add(CharacterCard.Archer);
 
         game.addBanishedCard(TeamColor.Black, CharacterCard.Acrobat);
 
-        List<SelectableCharacterCard> selectableCards = BanishmentQuery.getSelectableBanishmentCards(game);
+        List<SelectableCharacterCard> selectableCards = BanishmentQuery.getCurrentSelectableCards(game);
 
         assertEquals(2, selectableCards.size());
 
@@ -173,13 +173,13 @@ public class BanishmentQueryTest {
     }
 
     @Test
-    public void getSelectableBanishmentCards_shouldIncludeAlreadyBannedCardsFromBothTeams() {
+    public void getCurrentSelectableCards_shouldIncludeAlreadyBannedCardsFromBothTeams() {
         Game game = createTestGame();
 
         game.addBanishedCard(TeamColor.Black, CharacterCard.Archer);
         game.addBanishedCard(TeamColor.White, CharacterCard.Bruiser);
 
-        List<SelectableCharacterCard> selectableCards = BanishmentQuery.getSelectableBanishmentCards(game);
+        List<SelectableCharacterCard> selectableCards = BanishmentQuery.getCurrentSelectableCards(game);
 
         assertEquals(2, selectableCards.size());
 
@@ -192,10 +192,10 @@ public class BanishmentQueryTest {
     }
 
     @Test
-    public void getSelectableBanishmentCards_shouldReturnEmptyWhenNoCardsAreAvailable() {
+    public void getCurrentSelectableCards_shouldReturnEmptyWhenNoCardsAreAvailable() {
         Game game = createTestGame();
 
-        List<SelectableCharacterCard> selectableCards = BanishmentQuery.getSelectableBanishmentCards(game);
+        List<SelectableCharacterCard> selectableCards = BanishmentQuery.getCurrentSelectableCards(game);
 
         assertTrue(selectableCards.isEmpty());
     }

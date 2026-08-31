@@ -225,7 +225,7 @@ public class RecruitmentQueryTest {
     }
 
     @Test
-    public void getValidRecruitmentCards_shouldThrowsOutsideOfRecruitmentPhase() {
+    public void getValidRecruitmentCards_shouldThrowsOutsideOfPhase() {
         Game game = createTestGame(new Board());
         game.getRecruitableCards().add(CharacterCard.Archer);
 
@@ -233,23 +233,23 @@ public class RecruitmentQueryTest {
 
         assertThrows(
                 IllegalStateException.class,
-                () -> invokeGetValidRecruitmentCards(game, history)
+                () -> invokeGetCurrentValidCards(game, history)
         );
     }
 
     @Test
-    public void getValidRecruitmentCards_shouldReturnCardsDuringRecruitmentPhase() {
+    public void getValidRecruitmentCards_shouldReturnCardsDuringPhase() {
         Game game = createTestGame(new Board());
         game.getRecruitableCards().add(CharacterCard.Archer);
 
         GameHistory history = createTestGameHistory();
         addRecruitmentPhase(history);
 
-        assertTrue(invokeGetValidRecruitmentCards(game, history).contains(CharacterCard.Archer));
+        assertTrue(invokeGetCurrentValidCards(game, history).contains(CharacterCard.Archer));
     }
 
     @Test
-    public void getValidRecruitmentCards_shouldReturnEmptyWhenNoRecruitmentCellIsAvailable() {
+    public void getValidRecruitmentCards_shouldReturnEmptyWhenNoCellIsAvailable() {
         Board board = new Board();
 
         for (Cell cell : BoardQuery.getRecruitmentCells(board, TeamColor.Black)) {
@@ -262,11 +262,11 @@ public class RecruitmentQueryTest {
         GameHistory history = createTestGameHistory();
         addRecruitmentPhase(history);
 
-        assertTrue(invokeGetValidRecruitmentCards(game, history).isEmpty());
+        assertTrue(invokeGetCurrentValidCards(game, history).isEmpty());
     }
 
     @Test
-    public void getSelectableRecruitmentCards_shouldMarkValidCardsAsRecruitable() {
+    public void getCurrentSelectableCards_shouldMarkValidCardsAsRecruitable() {
         Game game = createTestGame(new Board());
         game.getRecruitableCards().add(CharacterCard.Archer);
 
@@ -274,7 +274,7 @@ public class RecruitmentQueryTest {
         addRecruitmentPhase(history);
 
         List<SelectableCharacterCard> cards =
-                RecruitmentQuery.getSelectableRecruitmentCards(game, history);
+                RecruitmentQuery.getCurrentSelectableCards(game, history);
 
         assertEquals(1, cards.size());
         assertEquals(CharacterCard.Archer, cards.get(0).getCharacterCard());
@@ -282,7 +282,7 @@ public class RecruitmentQueryTest {
     }
 
     @Test
-    public void getSelectableRecruitmentCards_shouldMarkInvalidCardsAsRecruitmentImpossible() {
+    public void getSelectableRecruitmentCards_shouldMarkInvalidCardsAsImpossible() {
         Game game = createTestGame(new Board());
 
         game.getRecruitableCards().add(CharacterCard.Archer);
@@ -296,7 +296,7 @@ public class RecruitmentQueryTest {
             cell.setCharacter(Character.create(CharacterType.Archer, TeamColor.Black));
         }
 
-        List<SelectableCharacterCard> cards = RecruitmentQuery.getSelectableRecruitmentCards(game, history);
+        List<SelectableCharacterCard> cards = RecruitmentQuery.getCurrentSelectableCards(game, history);
 
         assertEquals(2, cards.size());
 
@@ -305,7 +305,7 @@ public class RecruitmentQueryTest {
     }
 
     @Test
-    public void getSelectableRecruitmentCards_shouldIncludeAlreadyBannedCards() {
+    public void getCurrentSelectableCards_shouldIncludeAlreadyBannedCards() {
         Game game = createTestGame(new Board());
 
         game.getRecruitableCards().add(CharacterCard.Archer);
@@ -316,7 +316,7 @@ public class RecruitmentQueryTest {
         addRecruitmentPhase(history);
 
         List<SelectableCharacterCard> cards =
-                RecruitmentQuery.getSelectableRecruitmentCards(
+                RecruitmentQuery.getCurrentSelectableCards(
                         game,
                         history
                 );
@@ -331,7 +331,7 @@ public class RecruitmentQueryTest {
     }
 
     @Test
-    public void getSelectableRecruitmentCards_shouldIncludeBannedCardsFromBothTeams() {
+    public void getCurrentSelectableCards_shouldIncludeBannedCardsFromBothTeams() {
         Game game = createTestGame(new Board());
 
         game.getRecruitableCards().add(CharacterCard.Archer);
@@ -343,7 +343,7 @@ public class RecruitmentQueryTest {
         addRecruitmentPhase(history);
 
         List<SelectableCharacterCard> cards =
-                RecruitmentQuery.getSelectableRecruitmentCards(
+                RecruitmentQuery.getCurrentSelectableCards(
                         game,
                         history
                 );
@@ -361,7 +361,7 @@ public class RecruitmentQueryTest {
     }
 
     @Test
-    public void getSelectableRecruitmentCards_shouldThrowOutsideRecruitmentPhaseForRecruitableCards() {
+    public void getSelectableRecruitmentCards_shouldThrowOutsidePhaseForRecruitableCards() {
         Game game = createTestGame(new Board());
         game.getRecruitableCards().add(CharacterCard.Archer);
 
@@ -370,7 +370,7 @@ public class RecruitmentQueryTest {
 
         assertThrows(
                 IllegalStateException.class,
-                () -> RecruitmentQuery.getSelectableRecruitmentCards(
+                () -> RecruitmentQuery.getCurrentSelectableCards(
                         game,
                         history
                 )
@@ -378,7 +378,7 @@ public class RecruitmentQueryTest {
     }
 
     @SuppressWarnings("unchecked")
-    private List<CharacterCard> invokeGetValidRecruitmentCards(@NonNull Game game, @NonNull GameHistory gameHistory) {
+    private List<CharacterCard> invokeGetCurrentValidCards(@NonNull Game game, @NonNull GameHistory gameHistory) {
         try {
             Method method = RecruitmentQuery.class.getDeclaredMethod("getValidRecruitmentCards", Game.class, GameHistory.class);
 
