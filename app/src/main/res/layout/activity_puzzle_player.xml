@@ -151,30 +151,6 @@
         app:layout_constraintTop_toTopOf="@id/gdlRoot_actPuzzlePlayer"
         app:layout_constraintVertical_bias="0.0" />
 
-    <View
-        android:id="@+id/vwDialogBg_actPuzzlePlayer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@color/transparent_black"
-        android:clickable="true"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <com.leaders.app.views.ActionsMenuView
-        android:id="@+id/amvPuzzleActions_actPuzzlePlayer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/btnPuzzleActions_actPuzzlePlayer"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnPuzzleActions_actPuzzlePlayer"
-        app:layout_constraintVertical_bias="0.0" />
-
     <TextView
         android:id="@+id/txvPuzzleName_actPuzzlePlayer"
         android:layout_width="wrap_content"
@@ -210,6 +186,30 @@
         app:layout_constraintVertical_bias="0.0"
         tools:text="by Author Name"
         tools:visibility="visible" />
+
+    <View
+        android:id="@+id/vwDialogBg_actPuzzlePlayer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/transparent_black"
+        android:clickable="true"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.leaders.app.views.ActionsMenuView
+        android:id="@+id/amvPuzzleActions_actPuzzlePlayer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/btnPuzzleActions_actPuzzlePlayer"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnPuzzleActions_actPuzzlePlayer"
+        app:layout_constraintVertical_bias="0.0" />
 
     <com.leaders.app.views.EndGameView
         android:id="@+id/egvEndGame_actPuzzlePlayer"
