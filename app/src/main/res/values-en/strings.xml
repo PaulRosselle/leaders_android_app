@@ -157,8 +157,8 @@
     <string name="duel_title">duel</string>
     <string name="card_already_banned">\"%s\" already banned</string>
     <string name="card_cannot_be_recruited">\"%s\" cannot be recruited</string>
-    <string name="black_name">Black</string>
-    <string name="white_name">White</string>
-    <string name="default_player_name">Player %s</string>
+    <string name="black_name">black</string>
+    <string name="white_name">white</string>
+    <string name="default_player_name">player %s</string>
 
 </resources>

@@ -12,6 +12,8 @@ import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.enums.ActivityType;
+import com.leaders.app.enums.BoardOrientation;
+import com.leaders.app.enums.LeaderType;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.views.board.PlayableBoardView;
 import com.leaders.app.views.character.CharacterCardPortraitView;
@@ -20,12 +22,17 @@ import com.leaders.app.views.character.CharacterView;
 import com.leaders.app.views.duel.CharacterCardSelectionView;
 import com.leaders.app.views.duel.PlayerBottomView;
 import com.leaders.app.views.duel.PlayerTopView;
+import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Game;
+import com.leaders.gamelogic.entities.GameConfig;
 import com.leaders.gamelogic.entities.GameHistory;
+import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
+import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.factories.GameFactory;
 import com.leaders.gamelogic.interactions.InteractionTarget;
+import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.gamelogic.queries.RecruitmentQuery;
 import com.leaders.gamelogic.queries.SelectableCardsQuery;
 import com.leaders.puzzlelogic.serializers.SerializationContext;
@@ -116,11 +123,29 @@ public class DuelPlayerActivity extends BaseActivity implements
 
         // TODO - remove when the DuelPlayerController is implemented
         Game game = GameFactory.create(gameHistory);
+        GameConfig gameConfig = gameHistory.getConfig();
+        TeamColor firstPlayerTeamColor = gameConfig.getFirstPlayer().getTeamColor();
+        bdvBoard.setOrientation(firstPlayerTeamColor == TeamColor.Black ?
+                BoardOrientation.Default : BoardOrientation.Rotated);
+
         bdvBoard.post(() -> bdvBoard.setBoard(game.getBoard()));
-        ccsvCardSelector.applyGameModeParams(gameHistory.getConfig().getGameMode());
+        ccsvCardSelector.applyGameModeParams(gameConfig.getGameMode());
         ccsvCardSelector.post(() -> ccsvCardSelector.setCards(
                 SelectableCardsQuery.getSelectableCards(game, gameHistory)
         ));
+
+        for (Player player : gameConfig.getPlayers()) {
+            Cell leaderCell = BoardQuery.findLeaderCell(game.getBoard(), player.getTeamColor());
+            if (leaderCell == null) {
+                throw new IllegalStateException("No leader found for player: " + player);
+            }
+            LeaderType leaderType = LeaderType.getFromCharacter(leaderCell.getCharacter());
+            if (player.getTeamColor() == firstPlayerTeamColor) {
+                pbvCurrentPlayer.setPlayer(player, leaderType);
+            } else {
+                ptvOpposingPlayer.setPlayer(player, leaderType);
+            }
+        }
     }
 
     @Override
