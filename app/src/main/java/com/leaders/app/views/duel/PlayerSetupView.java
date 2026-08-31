@@ -10,7 +10,9 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.leaders.R;
+import com.leaders.app.entities.PlayerSetup;
 import com.leaders.app.enums.LeaderType;
+import com.leaders.app.utilities.TeamColorUtils;
 import com.leaders.app.views.character.CharacterCardPortraitView;
 import com.leaders.app.views.character.CharacterView;
 import com.leaders.gamelogic.enums.TeamColor;
@@ -76,6 +78,19 @@ public final class PlayerSetupView extends ConstraintLayout {
 
     public String getName() {
         return edtName.getText().toString().trim();
+    }
+
+    public PlayerSetup getPlayerSetup() {
+        String name = getName();
+        if (name.isEmpty()) {
+            Context context = getContext();
+            name = String.format(
+                    context.getString(R.string.default_player_name),
+                    TeamColorUtils.getName(context, getTeamColor())
+            );
+        }
+
+        return new PlayerSetup(name, getTeamColor(), getLeaderType());
     }
 
     public void setLeaderType(LeaderType leaderType) {

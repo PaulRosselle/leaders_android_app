@@ -51,7 +51,13 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".app.activities.DuelSetupActivity"
+            android:name=".app.activities.duel.DuelSetupActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".app.activities.duel.DuelPlayerActivity"
             android:configChanges="orientation|keyboardHidden"
             android:exported="false"
             android:screenOrientation="portrait"

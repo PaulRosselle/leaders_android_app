@@ -1,5 +1,6 @@
-package com.leaders.app.activities;
+package com.leaders.app.activities.duel;
 
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.view.View;
 import android.widget.TextView;
@@ -10,13 +11,21 @@ import androidx.appcompat.content.res.AppCompatResources;
 
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
+import com.leaders.app.activities.BaseActivity;
+import com.leaders.app.entities.PlayerSetup;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.LeaderType;
+import com.leaders.app.utilities.DuelStartUtils;
+import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.views.duel.PlayerSetupView;
 import com.leaders.app.views.character.CharacterHighlightView;
 import com.leaders.app.views.character.CharacterView;
+import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.TeamColor;
+import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
+
+import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -202,7 +211,26 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
     }
 
     private void onStartGameClick(View v) {
-        // TODO
+        Intent intent = ActivityType.DuelPlayer.getIntent(this);
+
+        List<PlayerSetup> playerSetups = new ArrayList<>();
+        for (PlayerSetupView playerSetupView : List.of(psvFirst, psvSecond)) {
+            playerSetups.add(playerSetupView.getPlayerSetup());
+        }
+
+        GameHistory gameHistory = DuelStartUtils.getDefaultHistory(
+                playerSetups, firstTeamColor, gameMode,
+                DuelStartUtils.getDefaultRecruitableCards()
+        );
+
+        GameHistorySerializer serializer = new GameHistorySerializer();
+        try {
+            intent.putExtra(ExtraUtils.EXTRA_DUEL_GAME_DATAS, serializer.getAsJson(gameHistory).toString());
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+
+        goToActivity(intent);
     }
 
     //endregion

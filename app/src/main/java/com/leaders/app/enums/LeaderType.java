@@ -7,6 +7,8 @@ import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
 
+import java.util.List;
+
 public enum LeaderType {
     King,
     Queen;
@@ -42,7 +44,16 @@ public enum LeaderType {
         switch (this) {
             case King: return CharacterCard.LeaderKing;
             case Queen: return CharacterCard.LeaderQueen;
-            default: throw new IllegalArgumentException("No character chard found matching: " + this);
+            default: throw new IllegalArgumentException("No character card found matching: " + this);
         }
+    }
+
+    public CharacterType getCharacterType() {
+        List<CharacterType> leaderTypes = CharacterType.getCharacterTypesMatchingCard(getCharacterCard());
+        if (leaderTypes.size() != 1) {
+            throw new IllegalStateException("A leader card should be mapped to a single character type");
+        }
+
+        return leaderTypes.get(0);
     }
 }

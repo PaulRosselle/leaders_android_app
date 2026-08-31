@@ -39,7 +39,7 @@ public final class BanishmentQuery {
                 teamBanishmentCount < recruitedCardsCount / 2 + 1;
     }
 
-    public static List<SelectableCharacterCard> getSelectableBanishmentCards(@NonNull Game game) {
+    public static List<SelectableCharacterCard> getCurrentSelectableCards(@NonNull Game game) {
         List<SelectableCharacterCard> selectableCards = new ArrayList<>();
         // First, we add recruitable cards as banishable ones
         for (CharacterCard banishableCard : game.getRecruitableCards()) {

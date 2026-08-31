@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@color/background"
     tools:theme="@style/Theme.LeadersAndroidApp"
-    tools:context=".app.activities.DuelSetupActivity"
+    tools:context=".app.activities.duel.DuelSetupActivity"
     tools:ignore="SpUsage">
 
     <androidx.constraintlayout.widget.Guideline
@@ -101,7 +101,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -209,7 +209,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="24dp"
         android:fontFamily="@font/bobby_jones_condensed"
         android:text="@string/game_mode"
         android:textColor="@color/font"

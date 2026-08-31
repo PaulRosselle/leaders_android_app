@@ -10,7 +10,7 @@ import com.leaders.R;
 import com.leaders.app.enums.LeaderType;
 import com.leaders.gamelogic.entities.Player;
 
-public class PlayerTopView extends PlayerView {
+public final class PlayerTopView extends PlayerView {
     public PlayerTopView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
