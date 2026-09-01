@@ -4,9 +4,9 @@ import androidx.annotation.NonNull;
 
 import com.leaders.gamelogic.GameHandler;
 import com.leaders.gamelogic.entities.Game;
+import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
-import com.leaders.gamelogic.entities.PlayableCharacter;
 import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.interactions.IGameFlowListener;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
@@ -14,9 +14,7 @@ import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
 import com.leaders.gamelogic.interactions.InteractionResultType;
 import com.leaders.gamelogic.interactions.InteractionTarget;
-import com.leaders.gamelogic.queries.PlayabilityQuery;
 
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -235,23 +233,11 @@ public final class PuzzlePlayerController implements IGameFlowListener {
     }
 
     @NonNull
-    public Game getCurrentGame() {
+    public GameContext getCurrentContext() {
         if (gameHandler == null) {
             throw new IllegalStateException("Game has not been started");
         }
 
-        return new Game(gameHandler.getCurrentGame());
-    }
-
-    @NonNull
-    public List<PlayableCharacter> getPlayableCharacters() {
-        if (gameHandler == null) {
-            throw new IllegalStateException("Game has not been started");
-        }
-
-        return PlayabilityQuery.getPlayableCharacters(
-                gameHandler.getCurrentGame(),
-                gameHandler.getCurrentHistory()
-        );
+        return gameHandler.getCurrentContext();
     }
 }

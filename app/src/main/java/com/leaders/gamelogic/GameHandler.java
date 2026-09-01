@@ -9,6 +9,7 @@ import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.actions.RecruitmentAction;
 import com.leaders.gamelogic.actions.WarningAction;
 import com.leaders.gamelogic.entities.Game;
+import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.PlayableCharacter;
@@ -787,5 +788,13 @@ public final class GameHandler {
             Player winner = GameHistoryQuery.getPlayerFromTeam(currentHistory, winnerTeam);
             throw new GameEndedException(winner);
         }
+    }
+
+    /**
+     * Creates on demand an unmutable instance of GameContext based on the current state of the game.
+     */
+    @NonNull
+    public GameContext getCurrentContext() {
+        return GameContext.createCurrent(currentGame, currentHistory);
     }
 }
