@@ -6,8 +6,8 @@ import androidx.annotation.Nullable;
 import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.actions.CharacterActionMotion;
 import com.leaders.gamelogic.actions.CharacterActionTarget;
-import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
+import com.leaders.gamelogic.entities.CharacterPath;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.Position;
@@ -111,7 +111,8 @@ public class CharacterActionResolver {
     @NonNull
     protected List<Position> getNormalMovementValidDestinations(@NonNull CharacterActionBuilder builder) {
         List<Position> destPositions = new ArrayList<>();
-        for (Cell destCell : CharacterAbilityQuery.getNormalMovementDestCells(game, character)) {
+        for (CharacterPath path : CharacterAbilityQuery.getNormalMovementPaths(game, character)) {
+            Position destPos = path.getDestination();
             // Create a temporary action builder containing the tested position choice.
             // This allows the resulting action to be validated before exposing the
             // destination as a legal interaction option.
@@ -119,20 +120,21 @@ public class CharacterActionResolver {
             nextMovementBuilder.addResult(new InteractionResult(
                     InteractionResultType.PositionChosen,
                     new InteractionContext(character),
-                    new InteractionTarget(TargetCategory.MovementDestination, destCell.getPosition()))
+                    new InteractionTarget(TargetCategory.MovementDestination, destPos))
             );
             nextMovementBuilder.addFeedback(InteractionFeedback.createForCharacterAction(
                     List.of(new CharacterActionMotion(
                             CharacterMotionType.Move,
                             List.of(new CharacterActionTarget(character,
                                     characterPos,
-                                    destCell.getPosition())
-                            )))
+                                    destPos)
+                            ))
+                    )
             ));
 
             CharacterAction movementAction = buildAction(nextMovementBuilder);
             if (isActionValid(movementAction)) {
-                destPositions.add(destCell.getPosition());
+                destPositions.add(destPos);
             }
         }
         return destPositions;
@@ -206,14 +208,8 @@ public class CharacterActionResolver {
             throw new IllegalArgumentException("The default action resolver only handles normal movement");
         }
 
-        CharacterActionTarget target = new CharacterActionTarget(character, characterPos,
-                Objects.requireNonNull(Objects.requireNonNull(result.getChosenTarget(),
-                                "Movement interaction result invalid : no target")
-                                .getChosenPosition(),
-                        "Movement interaction result invalid : no target")
-        );
-        return InteractionFeedback.createForCharacterAction(
-                List.of(new CharacterActionMotion(CharacterMotionType.Move, List.of(target))));
+        List<CharacterPath> paths = CharacterAbilityQuery.getNormalMovementPaths(game, character);
+        return buildNormalMovementFeedback(getPathMatchingResult(result, paths));
     }
 
     /**
@@ -232,6 +228,56 @@ public class CharacterActionResolver {
             characterActionMotions.addAll(feedback.getCharacterActionMotions());
         }
         return new CharacterAction(builder.getSourceCharacter(), characterActionMotions);
+    }
+
+    @NonNull
+    protected final CharacterPath getPathMatchingResult(@NonNull InteractionResult result,
+                                                        @NonNull List<CharacterPath> paths) {
+        Position destPos = Objects.requireNonNull(
+                Objects.requireNonNull(
+                        result.getChosenTarget(),
+                        "Invalid Path interaction result: no data"
+                ).getChosenPosition(),
+                "Invalid Path interaction result: no destination position"
+        );
+
+        // We search for the shortest path matching the result
+        CharacterPath bestMatchingPath = null;
+        for (CharacterPath path : paths) {
+            if (path.getDestination().equals(destPos) &&
+                    (bestMatchingPath == null ||
+                            bestMatchingPath.getPositions().size() > path.getPositions().size())) {
+                bestMatchingPath = path;
+            }
+        }
+
+        if (bestMatchingPath == null) {
+            throw new IllegalArgumentException("No path found matching result: " + result);
+        }
+
+        return bestMatchingPath;
+    }
+
+
+    @NonNull
+    protected final InteractionFeedback buildNormalMovementFeedback(@NonNull CharacterPath path) {
+        List<CharacterActionMotion> motions = new ArrayList<>();
+
+        if (path.getStepsCount() > 2) {
+            throw new IllegalArgumentException("Invalid normal movement path: path should not exceed two steps");
+        }
+
+        Position previousPos = path.getStart();
+        for (Position position : path.getPositions()) {
+            if (!position.equals(path.getStart())) {
+                motions.add(new CharacterActionMotion(CharacterMotionType.Move,
+                        List.of(new CharacterActionTarget(character, previousPos, position)))
+                );
+                previousPos = position;
+            }
+        }
+
+        return InteractionFeedback.createForCharacterAction(motions);
     }
 
     protected boolean isNormalMovementResult(@NonNull InteractionResult result) {

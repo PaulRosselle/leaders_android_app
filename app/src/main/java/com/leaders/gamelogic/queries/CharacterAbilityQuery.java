@@ -7,6 +7,7 @@ import com.leaders.gamelogic.actions.CharacterActionMotion;
 import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
+import com.leaders.gamelogic.entities.CharacterPath;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.AbilityType;
@@ -303,25 +304,8 @@ public final class CharacterAbilityQuery {
     }
 
     /**
-     * Checks whether a team has recruited a character of the given type.
-     *
-     * @param game the current game state
-     * @param characterType the character type to search for
-     * @param teamColor the team color to search within
-     * @return {@code true} if the team has recruited a character of the given type, {@code false} otherwise
-     */
-    private static boolean teamContainsCharacter(@NonNull Game game,
-                                                 @NonNull CharacterType characterType,
-                                                 @NonNull TeamColor teamColor) {
-        return game.getRecruitedCharacters().stream()
-                .anyMatch(recruitedCharacter ->
-                        recruitedCharacter.getCharacterType() == characterType &&
-                                recruitedCharacter.getTeamColor() == teamColor);
-    }
-
-    /**
-     * Returns the cells the specified character can move to using its normal movement.
-     * Handles the cross-character extension granted by an allied Vizier for leaders.
+     * Returns the paths the specified character can take using its normal movement.
+     * Handles passive character abilities impacting other characters.
      * <p>
      * Does not handle Nemesis, whose movement is fully self-contained and resolved
      * by its dedicated {@code CharacterActionResolver} override.
@@ -332,17 +316,19 @@ public final class CharacterAbilityQuery {
      * @throws IllegalArgumentException if character is a Nemesis
      */
     @NonNull
-    public static List<Cell> getNormalMovementDestCells(@NonNull Game game,
-                                                        @NonNull Character character) {
+    public static List<CharacterPath> getNormalMovementPaths(@NonNull Game game,
+                                                             @NonNull Character character) {
         // Nemesis is an exception and uses her own movement algorithm
         if (character.getCharacterType() == CharacterType.Nemesis) {
             throw new IllegalArgumentException("Nemesis movement logic is handled apart from the generic movement function");
         }
-        // By default, normal movement allow characters to go to an adjacent empty tile.
-        // Leaders can move up to two cells when they have a vizier in their team
-        return BoardQuery.findEmptyCellsAround(game.getBoard(),
-                BoardQuery.getCellByCharacterId(game.getBoard(), character.getId()).getPosition(),
-                character.getCharacterType().getCharacterCard().isLeader() &&
-                        teamContainsCharacter(game, CharacterType.Vizier, character.getTeamColor()) ? 2 : 1);
+
+        // Leaders can move up to two cells when they have a vizier on the board in their team.
+        boolean isEnhancedMovement = (character.getCharacterType().getCharacterCard().isLeader() &&
+                !BoardQuery.findCharacterCells(game.getBoard(), character.getTeamColor(), CharacterType.Vizier).isEmpty());
+
+        Position characterPos = BoardQuery.getCellByCharacterId(game.getBoard(), character.getId()).getPosition();
+
+        return BoardQuery.getEmptyPathsAround(game.getBoard(), characterPos, isEnhancedMovement ? 2 : 1);
     }
 }

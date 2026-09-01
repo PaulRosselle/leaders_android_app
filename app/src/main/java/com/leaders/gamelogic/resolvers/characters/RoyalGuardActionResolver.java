@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -183,45 +182,17 @@ public final class RoyalGuardActionResolver extends CharacterActionResolver {
     }
 
     @NonNull
-    private CharacterPath getPathMatchingResult(@NonNull InteractionResult result,
-                                                @NonNull List<CharacterPath> paths) {
-        Position destPos = Objects.requireNonNull(
-                Objects.requireNonNull(
-                        result.getChosenTarget(),
-                        "Royal Guard destination interaction result invalid: no data"
-                ).getChosenPosition(),
-                "Royal Guard destination interaction result invalid: no destination position"
-        );
-
-        // We search for the shortest path matching the result
-        CharacterPath bestMatchingPath = null;
-        for (CharacterPath path : paths) {
-            if (path.getDestination().equals(destPos) &&
-                    (bestMatchingPath == null ||
-                            bestMatchingPath.getPositions().size() > path.getPositions().size())) {
-                bestMatchingPath = path;
-            }
-        }
-
-        if (bestMatchingPath == null) {
-            throw new IllegalArgumentException("No path found matching result: " + result);
-        }
-
-        return bestMatchingPath;
-    }
-
-    @NonNull
     private InteractionFeedback buildRoyalGuardMovementFeedback(@NonNull CharacterPath path) {
         List<CharacterActionMotion> abilityMotions = new ArrayList<>();
 
-        List<Position> pathPositions = path.getPositions();
-        if (pathPositions.size() > 3) {
+        int stepsCount = path.getStepsCount();
+        if (stepsCount > 2) {
             throw new IllegalArgumentException("Invalid royal guard path: path should not exceed two steps");
         }
 
-        if (pathPositions.size() > 2) {
+        if (stepsCount > 1) {
             Position previousPos = path.getStart();
-            for (Position position : pathPositions) {
+            for (Position position : path.getPositions()) {
                 if (!position.equals(path.getStart())) {
                     CharacterMotionType motionType = position.equals(path.getDestination()) ?
                             CharacterMotionType.Move : CharacterMotionType.Teleport;

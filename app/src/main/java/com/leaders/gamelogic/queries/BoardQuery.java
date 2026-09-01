@@ -6,15 +6,19 @@ import androidx.annotation.Nullable;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
+import com.leaders.gamelogic.entities.CharacterPath;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.Direction;
 import com.leaders.gamelogic.enums.TeamColor;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.UUID;
 
 public final class BoardQuery {
@@ -166,6 +170,56 @@ public final class BoardQuery {
         }
 
         return new ArrayList<>(emptyCells);
+    }
+
+    @NonNull
+    public static List<CharacterPath> getEmptyPathsAround(@NonNull Board board,
+                                                          @NonNull Position position,
+                                                          int distance) {
+        if (distance <= 0) {
+            return Collections.emptyList();
+        }
+
+        List<CharacterPath> paths = new ArrayList<>();
+        Set<Position> destinations = new HashSet<>();
+
+        findEmptyPathsAround(
+                board, position, position, distance,
+                new ArrayList<>(List.of(position)),
+                destinations, paths
+        );
+
+        return paths;
+    }
+
+    private static void findEmptyPathsAround(@NonNull Board board, @NonNull Position startPos,
+                                             @NonNull Position currentPos, int remainingDistance,
+                                             @NonNull List<Position> currentPath,
+                                             @NonNull Set<Position> destinations,
+                                             @NonNull List<CharacterPath> paths) {
+        if (remainingDistance == 0) {
+            return;
+        }
+
+        for (Cell cell : BoardQuery.findEmptyCellsAround(board, currentPos, 1)) {
+            Position adjacentPos = cell.getPosition();
+
+            List<Position> newPath = new ArrayList<>(currentPath);
+            newPath.add(adjacentPos);
+
+            CharacterPath path = new CharacterPath(newPath);
+
+            // We keep only the first path per destination
+            if (!startPos.equals(adjacentPos) && destinations.add(adjacentPos)) {
+                paths.add(path);
+            }
+
+            findEmptyPathsAround(
+                    board, startPos, adjacentPos,
+                    remainingDistance - 1,
+                    newPath, destinations, paths
+            );
+        }
     }
 
     /**

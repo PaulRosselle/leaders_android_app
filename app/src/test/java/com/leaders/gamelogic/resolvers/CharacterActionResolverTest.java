@@ -140,7 +140,7 @@ public class CharacterActionResolverTest {
 
     @Test
     public void buildAction_shouldBuildActionFromFeedback() {
-        Position destination = new Position(3, 1);
+        Position destination = new Position(3, 2);
         CharacterActionBuilder builder = createBuilder();
         builder.addResult(createPositionResult(destination));
 
