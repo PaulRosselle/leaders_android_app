@@ -458,8 +458,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
 
         if (cleaHighlight) {
             characterDisplay.stopHighlightAnimation();
-            characterDisplay.getHighlightView().setVisibility(View.GONE);
-            characterDisplay.getCharacterView().scaleForHighlight(false, true);
+            characterDisplay.setIsHighlighted(false, true);
         }
 
         CharacterType characterType = character.getCharacterType();

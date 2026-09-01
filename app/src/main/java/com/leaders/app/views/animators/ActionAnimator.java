@@ -30,8 +30,8 @@ public final class ActionAnimator {
     public static void animateFadeOut(@NonNull CharacterDisplay characterDisplay, int duration,
                                        @Nullable Runnable onAnimationEnd) {
         CharacterView characterView = characterDisplay.getCharacterView();
+        characterDisplay.setIsHighlighted(false, false);
         characterDisplay.stopHighlightAnimation();
-        characterDisplay.getHighlightView().setVisibility(View.GONE);
 
         characterView.animate().scaleX(0f).scaleY(0f).alpha(0f)
                 .setDuration(getAnimationDuration(duration))

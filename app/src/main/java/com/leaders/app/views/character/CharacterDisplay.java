@@ -10,14 +10,18 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 public final class CharacterDisplay {
     public enum ViewType {
         Character,
-        Highlight
+        Highlight,
+        Shine
     }
 
     @NonNull
     private final CharacterView characterView;
-
     @NonNull
     private final CharacterHighlightView highlightView;
+    @NonNull
+    private final CharacterShineView shineView;
+
+    private boolean isHighlighted;
 
     private OnCharacterDisplayClickListener onClickListener;
 
@@ -26,6 +30,9 @@ public final class CharacterDisplay {
         characterView.setOnClickListener(this::onCharacterClick);
         parentView.addView(characterView, getDefaultLayoutParams());
 
+        shineView = new CharacterShineView(context);
+        parentView.addView(shineView, getDefaultLayoutParams());
+
         highlightView = new CharacterHighlightView(context);
         parentView.addView(highlightView, getDefaultLayoutParams());
 
@@ -33,8 +40,9 @@ public final class CharacterDisplay {
     }
 
     public void setSize(int size) {
-        setSize(highlightView, size);
-        setSize(characterView, size);
+        for (ViewType viewType : ViewType.values()) {
+            setSize(getCharacterViewFromType(viewType), size);
+        }
     }
 
     private void setSize(@NonNull View view, int size) {
@@ -48,11 +56,6 @@ public final class CharacterDisplay {
     @NonNull
     public CharacterView getCharacterView() {
         return characterView;
-    }
-
-    @NonNull
-    public CharacterHighlightView getHighlightView() {
-        return highlightView;
     }
 
     private ConstraintLayout.LayoutParams getDefaultLayoutParams() {
@@ -70,8 +73,9 @@ public final class CharacterDisplay {
     public void reset() {
         characterView.clearTarget();
 
+        setIsHighlighted(false, false);
+
         characterView.setVisibility(View.GONE);
-        highlightView.setVisibility(View.GONE);
     }
 
     public void setPosition(float x, float y) {
@@ -90,6 +94,7 @@ public final class CharacterDisplay {
         switch (viewType) {
             case Character: return characterView;
             case Highlight: return highlightView;
+            case Shine: return shineView;
             default: throw new IllegalArgumentException("No character view found for type: " + viewType);
         }
     }
@@ -108,17 +113,45 @@ public final class CharacterDisplay {
         characterView.setOnLongClickListener(onLongClickListener);
     }
 
-    public void setHighlighted(boolean highlighted, boolean animateCharacterScaling) {
-        characterView.scaleForHighlight(highlighted, animateCharacterScaling);
-        highlightView.setVisibility(highlighted ? View.VISIBLE : View.GONE);
+    public void setIsHighlighted(boolean isHighlighted, boolean animateCharacterScaling) {
+        this.isHighlighted = isHighlighted;
+
+        characterView.scaleForHighlight(isHighlighted, animateCharacterScaling);
+        highlightView.setVisibility(isHighlighted ? View.VISIBLE : View.GONE);
+        shineView.setVisibility(isHighlighted ? View.VISIBLE : View.GONE);
+    }
+
+    public boolean isHighlighted() {
+        return isHighlighted;
+    }
+
+    public void playShineAnimation() {
+        if (!isHighlighted) {
+            return;
+        }
+
+        bringToFront();
+        shineView.playShine();
+    }
+
+    public void stopShineAnimation() {
+        shineView.stopShine();
     }
 
     public void startHighlightAnimation() {
-        highlightView.startAnimation();
+        if (isHighlighted) {
+            highlightView.startAnimation();
+        }
     }
 
     public void stopHighlightAnimation() {
         highlightView.stopAnimation();
+    }
+
+    public void bringToFront() {
+        characterView.bringToFront();
+        shineView.bringToFront();
+        highlightView.bringToFront();
     }
 
     public void clearTarget() {
