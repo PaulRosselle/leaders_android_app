@@ -10,7 +10,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 public final class CharacterDisplay {
     public enum ViewType {
         Character,
-        Highlight
+        Highlight,
+        Shine
     }
 
     @NonNull
@@ -18,6 +19,9 @@ public final class CharacterDisplay {
 
     @NonNull
     private final CharacterHighlightView highlightView;
+
+    @NonNull
+    private final CharacterShineView shineView;
 
     private OnCharacterDisplayClickListener onClickListener;
 
@@ -27,14 +31,23 @@ public final class CharacterDisplay {
         parentView.addView(characterView, getDefaultLayoutParams());
 
         highlightView = new CharacterHighlightView(context);
+        highlightView.setId(View.generateViewId());
         parentView.addView(highlightView, getDefaultLayoutParams());
 
+        shineView = new CharacterShineView(context);
+        parentView.addView(shineView, getShineLayoutParams());
+
         reset();
+    }
+
+    public void animateShine() {
+        shineView.playShine();
     }
 
     public void setSize(int size) {
         setSize(highlightView, size);
         setSize(characterView, size);
+        // setSize(shineView, size);
     }
 
     private void setSize(@NonNull View view, int size) {
@@ -55,6 +68,11 @@ public final class CharacterDisplay {
         return highlightView;
     }
 
+    @NonNull
+    public CharacterShineView getShineView() {
+        return shineView;
+    }
+
     private ConstraintLayout.LayoutParams getDefaultLayoutParams() {
         ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(
                 ConstraintLayout.LayoutParams.MATCH_CONSTRAINT,
@@ -63,6 +81,21 @@ public final class CharacterDisplay {
 
         params.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
         params.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
+
+        return params;
+    }
+
+
+    private ConstraintLayout.LayoutParams getShineLayoutParams() {
+        ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(
+                ConstraintLayout.LayoutParams.MATCH_CONSTRAINT,
+                ConstraintLayout.LayoutParams.MATCH_CONSTRAINT
+        );
+
+        params.startToStart = highlightView.getId();
+        params.topToTop = highlightView.getId();
+        params.endToEnd = highlightView.getId();
+        params.bottomToBottom = highlightView.getId();
 
         return params;
     }
@@ -90,6 +123,7 @@ public final class CharacterDisplay {
         switch (viewType) {
             case Character: return characterView;
             case Highlight: return highlightView;
+            case Shine: return shineView;
             default: throw new IllegalArgumentException("No character view found for type: " + viewType);
         }
     }

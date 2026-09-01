@@ -123,6 +123,14 @@ public class PlayableBoardView extends BoardView {
 
     //region ANIMATION METHODS
 
+    public void animateShine() {
+        for (CharacterDisplay characterDisplay : characterDisplayMap.values()) {
+            characterDisplay.getShineView().bringToFront();
+            characterDisplay.getHighlightView().bringToFront();
+            characterDisplay.animateShine();
+        }
+    }
+
     public void highlightPlayableCharacters(@Nullable List<PlayableCharacter> playableCharacters,
                                             @Nullable Character selectedCharacter,
                                             @NonNull Board board) {

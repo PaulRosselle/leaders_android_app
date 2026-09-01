@@ -318,6 +318,7 @@ public final class PuzzlePlayerActivity extends BaseActivity
     @Override
     public void onEmptyClick() {
         controller.cancelAction();
+        bdvBoard.animateShine();
     }
 
     private void clearInteractionUI() {
