@@ -5,13 +5,14 @@ import androidx.annotation.Nullable;
 
 import com.leaders.gamelogic.actions.CharacterActionMotion;
 import com.leaders.gamelogic.actions.CharacterActionTarget;
+import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
+import com.leaders.gamelogic.entities.CharacterPath;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterMotionType;
-import com.leaders.gamelogic.enums.Direction;
 import com.leaders.gamelogic.interactions.CharacterActionBuilder;
 import com.leaders.gamelogic.interactions.InteractionContext;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
@@ -26,8 +27,11 @@ import com.leaders.gamelogic.queries.CharacterAbilityQuery;
 import com.leaders.gamelogic.resolvers.CharacterActionResolver;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Resolves the Royal Guard's active ability.
@@ -67,9 +71,10 @@ public final class RoyalGuardActionResolver extends CharacterActionResolver {
 
 
         if (CharacterAbilityQuery.canUseActiveAbility(game, character)) {
-            for (Position destination : getRoyalGuardDestinations(builder)) {
-                if (!movementDestinations.contains(destination)) {
-                    legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityDestination, destination));
+            for (CharacterPath path : getRoyalGuardAbilityPaths(builder)) {
+                Position pathDestination = path.getDestination();
+                if (!movementDestinations.contains(pathDestination)) {
+                    legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityDestination, pathDestination));
                 }
             }
         }
@@ -97,7 +102,12 @@ public final class RoyalGuardActionResolver extends CharacterActionResolver {
         if (isNormalMovementResult(result)) {
             feedback = super.getNextFeedback(builder);
         } else if (isRoyalGuardDestinationResult(result)){
-            feedback = buildRoyalGuardMovementFeedback(result);
+            // We recover all legal paths using an empty builder to find one matching the result
+            List<CharacterPath> legalPaths = getRoyalGuardAbilityPaths(
+                    new CharacterActionBuilder(character, new ArrayList<>(), new ArrayList<>())
+            );
+            CharacterPath resultPath = getPathMatchingResult(result, legalPaths);
+            feedback = buildRoyalGuardMovementFeedback(resultPath);
         } else {
             throw new IllegalArgumentException("Invalid Royal Guard interaction type " + result.getResultType());
         }
@@ -105,8 +115,7 @@ public final class RoyalGuardActionResolver extends CharacterActionResolver {
     }
 
     /**
-     * Returns all valid final destinations reachable through the Royal Guard's
-     * active ability.
+     * Returns all valid paths reachable through the Royal Guard's active ability.
      *
      * <p>The first movement must place the Royal Guard on an empty cell adjacent
      * to its Leader. From each such intermediate position, the Guard may then
@@ -114,37 +123,68 @@ public final class RoyalGuardActionResolver extends CharacterActionResolver {
      * its final destination is exposed to the player.</p>
      */
     @NonNull
-    private List<Position> getRoyalGuardDestinations(@NonNull CharacterActionBuilder builder) {
-        List<Position> destinations = new ArrayList<>();
+    private List<CharacterPath> getRoyalGuardAbilityPaths(@NonNull CharacterActionBuilder builder) {
+        Board board = game.getBoard();
+        Cell leaderCell = BoardQuery.findLeaderCell(board, character.getTeamColor());
 
-        Cell leaderCell = BoardQuery.findLeaderCell(game.getBoard(), character.getTeamColor());
         if (leaderCell == null) {
-            return destinations;
+            return Collections.emptyList();
         }
 
-        for (Cell destCell : BoardQuery.findEmptyCellsAround(game.getBoard(), leaderCell.getPosition(), 2)) {
-            Position destPos = destCell.getPosition();
+        List<CharacterPath> paths = new ArrayList<>();
+        Set<Position> destinations = new HashSet<>();
 
-            CharacterActionBuilder destBuilder = new CharacterActionBuilder(builder);
-            InteractionResult result = new InteractionResult(
-                    InteractionResultType.PositionChosen,
-                    new InteractionContext(character),
-                    new InteractionTarget(TargetCategory.ActiveAbilityDestination, destPos)
-            );
-            destBuilder.addResult(result);
+        // First movement: an empty cell adjacent to the Leader.
+        for (Cell firstLayerCell : BoardQuery.findEmptyCellsAround(board, leaderCell.getPosition(), 1)) {
+            Position firstLayerPos = firstLayerCell.getPosition();
 
-            destBuilder.addFeedback(buildRoyalGuardMovementFeedback(result));
+            CharacterPath firstLayerPath = new CharacterPath(List.of(characterPos, firstLayerPos));
+            if (isPathValid(builder, firstLayerPath)) {
+                paths.add(firstLayerPath);
+                destinations.add(firstLayerPath.getDestination());
+            }
 
-            if (isActionValid(buildAction(destBuilder))) {
-                destinations.add(destPos);
+            // Second movement: any adjacent empty cell.
+            for (Cell secondLayerCell : BoardQuery.findEmptyCellsAround(board, firstLayerPos, 1)) {
+                Position secondLayerPos = secondLayerCell.getPosition();
+
+                // Keep only the first valid path for each destination.
+                if (destinations.contains(secondLayerPos)) {
+                    continue;
+                }
+
+                CharacterPath secondLayerPath = new CharacterPath(
+                        List.of(characterPos, firstLayerPos, secondLayerPos)
+                );
+
+                if (isPathValid(builder, secondLayerPath)) {
+                    paths.add(secondLayerPath);
+                    destinations.add(secondLayerPath.getDestination());
+                }
             }
         }
 
-        return destinations;
+        return paths;
+    }
+
+    private boolean isPathValid(@NonNull CharacterActionBuilder builder, @NonNull CharacterPath path) {
+        CharacterActionBuilder pathBuilder = new CharacterActionBuilder(builder);
+
+        InteractionResult result = new InteractionResult(
+                InteractionResultType.PositionChosen,
+                new InteractionContext(character),
+                new InteractionTarget(TargetCategory.ActiveAbilityDestination, path.getDestination())
+        );
+
+        pathBuilder.addResult(result);
+        pathBuilder.addFeedback(buildRoyalGuardMovementFeedback(path));
+
+        return isActionValid(buildAction(pathBuilder));
     }
 
     @NonNull
-    private InteractionFeedback buildRoyalGuardMovementFeedback(@NonNull InteractionResult result) {
+    private CharacterPath getPathMatchingResult(@NonNull InteractionResult result,
+                                                @NonNull List<CharacterPath> paths) {
         Position destPos = Objects.requireNonNull(
                 Objects.requireNonNull(
                         result.getChosenTarget(),
@@ -153,53 +193,52 @@ public final class RoyalGuardActionResolver extends CharacterActionResolver {
                 "Royal Guard destination interaction result invalid: no destination position"
         );
 
+        // We search for the shortest path matching the result
+        CharacterPath bestMatchingPath = null;
+        for (CharacterPath path : paths) {
+            if (path.getDestination().equals(destPos) &&
+                    (bestMatchingPath == null ||
+                            bestMatchingPath.getPositions().size() > path.getPositions().size())) {
+                bestMatchingPath = path;
+            }
+        }
 
+        if (bestMatchingPath == null) {
+            throw new IllegalArgumentException("No path found matching result: " + result);
+        }
+
+        return bestMatchingPath;
+    }
+
+    @NonNull
+    private InteractionFeedback buildRoyalGuardMovementFeedback(@NonNull CharacterPath path) {
         List<CharacterActionMotion> abilityMotions = new ArrayList<>();
 
-        Position intermediatePos = getIntermediatePosition(destPos);
-        if (intermediatePos != null) {
-            abilityMotions.add(new CharacterActionMotion(CharacterMotionType.Teleport,
-                    List.of(new CharacterActionTarget(character, characterPos, intermediatePos))));
-            abilityMotions.add(new CharacterActionMotion(CharacterMotionType.Move,
-                    List.of(new CharacterActionTarget(character, intermediatePos, destPos))));
+        List<Position> pathPositions = path.getPositions();
+        if (pathPositions.size() > 3) {
+            throw new IllegalArgumentException("Invalid royal guard path: path should not exceed two steps");
+        }
+
+        if (pathPositions.size() > 2) {
+            Position previousPos = path.getStart();
+            for (Position position : pathPositions) {
+                if (!position.equals(path.getStart())) {
+                    CharacterMotionType motionType = position.equals(path.getDestination()) ?
+                            CharacterMotionType.Move : CharacterMotionType.Teleport;
+                    abilityMotions.add(new CharacterActionMotion(motionType,
+                            List.of(new CharacterActionTarget(character, previousPos, position)))
+                    );
+                    previousPos = position;
+                }
+            }
+
         } else {
             abilityMotions.add(new CharacterActionMotion(CharacterMotionType.Teleport,
-                    List.of(new CharacterActionTarget(character, characterPos, destPos))));
+                    List.of(new CharacterActionTarget(character, path.getStart(), path.getDestination())))
+            );
         }
 
         return InteractionFeedback.createForCharacterAction(abilityMotions);
-    }
-
-    @Nullable
-    private Position getIntermediatePosition(@NonNull Position destPos) {
-        Cell leaderCell = BoardQuery.findLeaderCell(game.getBoard(), character.getTeamColor());
-        if (leaderCell == null) {
-            throw new IllegalStateException("Cannot find a royal guard teleportation destination without an ally leader");
-        }
-
-        List<Position> intermediatePositions = new ArrayList<>();
-        for (Direction direction : Direction.values()) {
-            Position teleportPos = leaderCell.getPosition().adjacent(direction);
-            if (teleportPos == null) {
-                continue;
-            }
-
-            // Destination is accessible with the initial teleportation -> no intermediate needed
-            if (teleportPos.equals(destPos)) {
-                return null;
-            }
-
-            if (teleportPos.distanceTo(destPos) == 1) {
-                intermediatePositions.add(teleportPos);
-            }
-        }
-
-        // If we get here, it means the destPos is not adjacent to the leader
-        if (!intermediatePositions.isEmpty()) {
-            return intermediatePositions.get(0);
-        }
-
-        throw new IllegalArgumentException("Unreachable Royal Guard destination: " + destPos);
     }
 
     private boolean isRoyalGuardDestinationResult(@NonNull InteractionResult result) {

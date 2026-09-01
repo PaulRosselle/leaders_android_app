@@ -64,7 +64,9 @@ public final class CharacterAbilityQuery {
      */
     private static int getLeaderDistance(@NonNull Game game, @NonNull Cell leaderCell,
                                          @NonNull Character character) {
-        return leaderCell.getPosition().distanceTo(BoardQuery.getCellByCharacterId(game.getBoard(), character.getId()).getPosition());
+        return leaderCell.getPosition().distanceTo(
+                BoardQuery.getCellByCharacterId(game.getBoard(), character.getId()).getPosition()
+        );
     }
 
     /**

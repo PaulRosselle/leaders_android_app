@@ -69,6 +69,8 @@ public class GameHandlerTest {
         private GamePhase lastPhaseChanged;
         private boolean phaseWasStartedWhenNotified;
         private int inputRequiredCount;
+        private int actionUndoneCount;
+        private Game lastActionUndoneGame;
         private int gameStartedCount;
         private InteractionRequest lastInputRequired;
         private final List<InteractionResult> inputRequiredResults = new ArrayList<>();
@@ -99,6 +101,14 @@ public class GameHandlerTest {
             lastPhaseChanged = phase;
             phaseWasStartedWhenNotified = isCurrentPhaseStarted();
             return phaseChangedResult;
+        }
+
+        @NonNull
+        @Override
+        public CompletableFuture<Void> onActionUndone(@NonNull Game game) {
+            actionUndoneCount++;
+            lastActionUndoneGame = game;
+            return CompletableFuture.completedFuture(null);
         }
 
         @NonNull
@@ -160,6 +170,14 @@ public class GameHandlerTest {
 
         InteractionFeedback getLastFeedback() {
             return lastFeedback;
+        }
+
+        int getActionUndoneCount() {
+            return actionUndoneCount;
+        }
+
+        Game getLastActionUndoneGame() {
+            return lastActionUndoneGame;
         }
     }
 
@@ -912,16 +930,19 @@ public class GameHandlerTest {
     }
 
     @Test
-    public void runActionsPhaseAsync_shouldUndoLastActionAndContinue() throws Exception {
+    public void runActionsPhaseAsync_shouldNotifyListenerWhenActionIsUndone() throws Exception {
         List<Character> characters = new ArrayList<>();
         GameHistory history = createPlayableCharacterGameHistory(characters);
 
         Turn turn = (Turn) history.getEntries().get(0);
         ActionsPhase actionsPhase = (ActionsPhase) turn.getSubPhase(GamePhaseType.Actions);
+
         CharacterAction action = new CharacterAction(characters.get(0), new ArrayList<>());
         actionsPhase.getActions().add(action);
 
         TestGameFlowListener listener = new TestGameFlowListener(history);
+
+        // First interaction: undo the existing action.
         listener.inputRequiredResults.add(
                 new InteractionResult(
                         InteractionResultType.UndoLastAction,
@@ -929,6 +950,8 @@ public class GameHandlerTest {
                         null
                 )
         );
+
+        // Second interaction: stop the phase.
         listener.inputRequiredResults.add(
                 new InteractionResult(
                         InteractionResultType.EndPhase,
@@ -945,9 +968,19 @@ public class GameHandlerTest {
 
         invokeRunActionsPhase(gameHandler, currentPhase).join();
 
-        assertEquals(2, listener.getInputRequiredCount());
+        // The listener must have been notified exactly once.
+        assertEquals(1, listener.getActionUndoneCount());
+
+        // The notified game must be the current game.
+        assertSame(gameHandler.getCurrentGame(), listener.getLastActionUndoneGame());
+
+        // The action must actually have been undone.
         assertTrue(actionsPhase.getActions().isEmpty());
+
+        // The actions phase must have continued after the undo.
+        assertEquals(2, listener.getInputRequiredCount());
     }
+
 
     @Test
     public void runActionsPhaseAsync_shouldResolveCharacterActionAndStartNextIteration() throws Exception {
