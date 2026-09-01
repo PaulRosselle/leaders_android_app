@@ -1,7 +1,6 @@
 package com.leaders.gamelogic.resolvers.characters;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -152,22 +151,20 @@ public class NemesisActionResolverTest {
     @Test
     public void getNextInteraction_shouldFallbackToOneStepDestinations() {
         placeCharacter(new Position(0, 1));
-        placeCharacter(new Position(1, 0));
-        placeCharacter(new Position(1, 2));
+        placeCharacter(new Position(1, 1));
+        placeCharacter(new Position(2, 0));
         placeCharacter(new Position(2, 1));
-        placeCharacter(new Position(2, 2));
 
         CharacterActionBuilder builder = createBuilder();
 
         InteractionRequest request = resolver.getNextInteraction(builder);
 
         assertNotNull(request);
-        assertFalse(request.getLegalTargets().isEmpty());
+        assertEquals(1, request.getLegalTargets().size());
 
-        for (InteractionTarget target : request.getLegalTargets()) {
-            assertNotNull(target.getChosenPosition());
-            assertTrue(isAdjacentToCharacter(target.getChosenPosition()));
-        }
+        InteractionTarget target = request.getLegalTargets().get(0);
+        assertNotNull(target.getChosenPosition());
+        assertTrue(isAdjacentToCharacter(target.getChosenPosition()));
     }
 
     @Test
@@ -197,7 +194,8 @@ public class NemesisActionResolverTest {
 
     @Test
     public void getNextFeedback_shouldCreateMoveFeedback() {
-        Position destination = new Position(3, 1);
+        Position intermediatePos = new Position(1, 1);
+        Position destination = new Position(2, 2);
         CharacterActionBuilder builder = createBuilder();
         builder.addResult(createMovementResult(destination));
 
@@ -207,14 +205,23 @@ public class NemesisActionResolverTest {
 
         List<CharacterActionMotion> motions = feedback.getCharacterActionMotions();
 
-        assertEquals(1, motions.size());
-        CharacterActionMotion motion = motions.get(0);
+        assertEquals(2, motions.size());
 
-        assertEquals(CharacterMotionType.Move, motion.getMotionType());
-        assertEquals(1, motion.getTargets().size());
-        assertEquals(character, motion.getTargets().get(0).getCharacter());
-        assertEquals(NEMESIS_POSITION, motion.getTargets().get(0).getOriginPos());
-        assertEquals(destination, motion.getTargets().get(0).getDestPos());
+        CharacterActionMotion firstMotion = motions.get(0);
+
+        assertEquals(CharacterMotionType.Move, firstMotion.getMotionType());
+        assertEquals(1, firstMotion.getTargets().size());
+        assertEquals(character, firstMotion.getTargets().get(0).getCharacter());
+        assertEquals(NEMESIS_POSITION, firstMotion.getTargets().get(0).getOriginPos());
+        assertEquals(intermediatePos, firstMotion.getTargets().get(0).getDestPos());
+
+        CharacterActionMotion secondMotion = motions.get(1);
+
+        assertEquals(CharacterMotionType.Move, secondMotion.getMotionType());
+        assertEquals(1, secondMotion.getTargets().size());
+        assertEquals(character, secondMotion.getTargets().get(0).getCharacter());
+        assertEquals(intermediatePos, secondMotion.getTargets().get(0).getOriginPos());
+        assertEquals(destination, secondMotion.getTargets().get(0).getDestPos());
     }
 
     @Test
@@ -234,7 +241,7 @@ public class NemesisActionResolverTest {
 
     @Test
     public void buildAction_shouldBuildActionFromFeedback() {
-        Position destination = new Position(3, 1);
+        Position destination = new Position(2, 2);
         CharacterActionBuilder builder = createBuilder();
         builder.addResult(createMovementResult(destination));
 
@@ -247,13 +254,14 @@ public class NemesisActionResolverTest {
         CharacterAction action = resolver.buildAction(builder);
 
         assertEquals(character, action.getSrcCharacter());
-        assertEquals(1, action.getMotions().size());
-        assertEquals(CharacterMotionType.Move,
-                action.getMotions().get(0).getMotionType());
+        assertEquals(2, action.getMotions().size());
+        assertEquals(CharacterMotionType.Move, action.getMotions().get(1).getMotionType());
+        assertEquals(1, action.getMotions().get(1).getTargets().size());
+        assertEquals(destination, action.getMotions().get(1).getTargets().get(0).getDestPos());
     }
 
     private boolean isAdjacentToCharacter(@NonNull Position position) {
-        return position.distanceTo(NEMESIS_POSITION) == 1 ;
+        return position.distanceTo(NEMESIS_POSITION) == 1;
     }
 
     private boolean isReachableInTwoSteps(@NonNull Position destination) {

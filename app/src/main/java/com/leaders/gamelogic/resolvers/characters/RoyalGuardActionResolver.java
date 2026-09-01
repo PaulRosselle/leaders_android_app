@@ -185,14 +185,14 @@ public final class RoyalGuardActionResolver extends CharacterActionResolver {
     private InteractionFeedback buildRoyalGuardMovementFeedback(@NonNull CharacterPath path) {
         List<CharacterActionMotion> abilityMotions = new ArrayList<>();
 
-        List<Position> pathPositions = path.getPositions();
-        if (pathPositions.size() > 3) {
+        int stepsCount = path.getStepsCount();
+        if (stepsCount > 2) {
             throw new IllegalArgumentException("Invalid royal guard path: path should not exceed two steps");
         }
 
-        if (pathPositions.size() > 2) {
+        if (stepsCount > 1) {
             Position previousPos = path.getStart();
-            for (Position position : pathPositions) {
+            for (Position position : path.getPositions()) {
                 if (!position.equals(path.getStart())) {
                     CharacterMotionType motionType = position.equals(path.getDestination()) ?
                             CharacterMotionType.Move : CharacterMotionType.Teleport;

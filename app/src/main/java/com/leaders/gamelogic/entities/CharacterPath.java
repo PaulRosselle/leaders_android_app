@@ -30,4 +30,8 @@ public final class CharacterPath {
     public Position getDestination() {
         return path.get(path.size() - 1);
     }
+
+    public int getStepsCount() {
+        return path.size() - 1;
+    }
 }

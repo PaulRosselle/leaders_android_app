@@ -5,7 +5,6 @@ import androidx.annotation.NonNull;
 import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.actions.CharacterActionMotion;
 import com.leaders.gamelogic.actions.CharacterActionTarget;
-import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.CharacterPath;
@@ -18,11 +17,8 @@ import com.leaders.gamelogic.enums.Direction;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.historyentries.segments.ActionsPhase;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Centralizes read-only queries related to character abilities whose scope goes
@@ -308,23 +304,6 @@ public final class CharacterAbilityQuery {
     }
 
     /**
-     * Checks whether a team has recruited a character of the given type.
-     *
-     * @param game the current game state
-     * @param characterType the character type to search for
-     * @param teamColor the team color to search within
-     * @return {@code true} if the team has recruited a character of the given type, {@code false} otherwise
-     */
-    private static boolean teamContainsCharacter(@NonNull Game game,
-                                                 @NonNull CharacterType characterType,
-                                                 @NonNull TeamColor teamColor) {
-        return game.getRecruitedCharacters().stream()
-                .anyMatch(recruitedCharacter ->
-                        recruitedCharacter.getCharacterType() == characterType &&
-                                recruitedCharacter.getTeamColor() == teamColor);
-    }
-
-    /**
      * Returns the paths the specified character can take using its normal movement.
      * Handles passive character abilities impacting other characters.
      * <p>
@@ -344,40 +323,12 @@ public final class CharacterAbilityQuery {
             throw new IllegalArgumentException("Nemesis movement logic is handled apart from the generic movement function");
         }
 
-        // Leaders can move up to two cells when they have a vizier in their team
-        boolean isEnhancedMovement = character.getCharacterType().getCharacterCard().isLeader() &&
-                teamContainsCharacter(game, CharacterType.Vizier, character.getTeamColor());
+        // Leaders can move up to two cells when they have a vizier on the board in their team.
+        boolean isEnhancedMovement = (character.getCharacterType().getCharacterCard().isLeader() &&
+                !BoardQuery.findCharacterCells(game.getBoard(), character.getTeamColor(), CharacterType.Vizier).isEmpty());
 
-        Board board = game.getBoard();
         Position characterPos = BoardQuery.getCellByCharacterId(game.getBoard(), character.getId()).getPosition();
 
-        List<CharacterPath> paths = new ArrayList<>();
-        Set<Position> destinations = new HashSet<>();
-
-        for (Cell firstLayerCell : BoardQuery.findEmptyCellsAround(board, characterPos, 1)) {
-            // The default movement can be to any adjacent empty cell
-            Position firstLayerPos = firstLayerCell.getPosition();
-
-            CharacterPath firstLayerPath = new CharacterPath(List.of(characterPos, firstLayerPos));
-            if (destinations.add(firstLayerPath.getDestination())) {
-                paths.add(firstLayerPath);
-            }
-
-            // Enhanced movement allows to move one step further
-            if (!isEnhancedMovement) {
-                continue;
-            }
-            for (Cell secondLayerCell : BoardQuery.findEmptyCellsAround(board, firstLayerPos, 1)) {
-                Position secondLayerPos = secondLayerCell.getPosition();
-
-                // Keep only the first valid path for each destination.
-                CharacterPath secondLayerPath = new CharacterPath(List.of(characterPos, firstLayerPos, secondLayerPos));
-                if (destinations.add(secondLayerPath.getDestination())) {
-                    paths.add(secondLayerPath);
-                }
-            }
-        }
-
-        return paths;
+        return BoardQuery.getEmptyPathsAround(game.getBoard(), characterPos, isEnhancedMovement ? 2 : 1);
     }
 }

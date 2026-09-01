@@ -185,13 +185,12 @@ public final class AcrobatActionResolver extends CharacterActionResolver {
     private InteractionFeedback buildAcrobatJumpFeedback(@NonNull CharacterPath jumpPath) {
         List<CharacterActionMotion> jumpMotions = new ArrayList<>();
 
-        List<Position> pathPositions = jumpPath.getPositions();
-        if (pathPositions.size() > 3) {
+        if (jumpPath.getStepsCount() > 2) {
             throw new IllegalArgumentException("Invalid Acrobat jump path: path should not exceed two steps");
         }
 
         Position previousPos = jumpPath.getStart();
-        for (Position position : pathPositions) {
+        for (Position position : jumpPath.getPositions()) {
             if (!position.equals(jumpPath.getStart())) {
                 jumpMotions.add(new CharacterActionMotion(CharacterMotionType.Jump,
                         List.of(new CharacterActionTarget(character, previousPos, position)))

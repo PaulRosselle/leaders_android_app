@@ -260,16 +260,15 @@ public class CharacterActionResolver {
 
 
     @NonNull
-    private InteractionFeedback buildNormalMovementFeedback(@NonNull CharacterPath path) {
+    protected final InteractionFeedback buildNormalMovementFeedback(@NonNull CharacterPath path) {
         List<CharacterActionMotion> motions = new ArrayList<>();
 
-        List<Position> pathPositions = path.getPositions();
-        if (pathPositions.size() > 3) {
+        if (path.getStepsCount() > 2) {
             throw new IllegalArgumentException("Invalid normal movement path: path should not exceed two steps");
         }
 
         Position previousPos = path.getStart();
-        for (Position position : pathPositions) {
+        for (Position position : path.getPositions()) {
             if (!position.equals(path.getStart())) {
                 motions.add(new CharacterActionMotion(CharacterMotionType.Move,
                         List.of(new CharacterActionTarget(character, previousPos, position)))
