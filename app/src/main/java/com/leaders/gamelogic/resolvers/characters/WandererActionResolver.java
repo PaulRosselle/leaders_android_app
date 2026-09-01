@@ -83,15 +83,12 @@ public final class WandererActionResolver extends CharacterActionResolver {
     @Nullable
     public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
         if (builder.getResults().isEmpty() ||
-                !builder.getFeedbacks().isEmpty()) {
+                !builder.getFeedbacks().isEmpty() ||
+                builder.isBuildCancelled()) {
             return null;
         }
 
         InteractionResult result = builder.getResults().get(0);
-
-        if (result.getResultType() == InteractionResultType.CancelAction) {
-            return null;
-        }
 
         InteractionFeedback feedback;
         if (isNormalMovementResult(result)) {

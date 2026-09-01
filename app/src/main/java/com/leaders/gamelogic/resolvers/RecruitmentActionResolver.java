@@ -70,13 +70,10 @@ public final class RecruitmentActionResolver {
     @Nullable
     public InteractionRequest getNextInteraction(@NonNull RecruitmentActionBuilder builder) {
         List<InteractionResult> results = builder.getResults();
-        if (!results.isEmpty()) {
-            // If the recruitment was canceled, there is no next interaction
-            for (InteractionResult result : results) {
-                if (result.getResultType() == InteractionResultType.CancelAction) {
-                    return null;
-                }
-            }
+
+        // If the recruitment was canceled, there is no next interaction
+        if (builder.isBuildCancelled()) {
+            return null;
         }
 
         // If every character matching the card has been recruited, there is no next interaction
@@ -124,7 +121,7 @@ public final class RecruitmentActionResolver {
         }
 
         InteractionResult result = results.get(results.size() - 1);
-        if (result.getResultType() == InteractionResultType.CancelAction) {
+        if (builder.isBuildCancelled()) {
             return buildCancellationFeedback(builder);
         }
 
@@ -221,6 +218,10 @@ public final class RecruitmentActionResolver {
 
     @Nullable
     private InteractionFeedback buildCancellationFeedback(@NonNull RecruitmentActionBuilder builder) {
+        if (builder.getFeedbacks().isEmpty()) {
+            return null;
+        }
+
         List<RecruitmentActionMotion> cancellationMotions = new ArrayList<>();
         // We go through every feedback motion in reverse order and add them as remove motions
         for (int i = builder.getFeedbacks().size() - 1; i >= 0; i--) {
@@ -232,7 +233,7 @@ public final class RecruitmentActionResolver {
             }
         }
         if (cancellationMotions.isEmpty()) {
-            return null;
+            throw new IllegalStateException("Cannot generate recruitment cancellation feedback");
         }
         return InteractionFeedback.createForRecruitmentAction(cancellationMotions);
     }
