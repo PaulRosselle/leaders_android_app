@@ -48,10 +48,11 @@ public final class BrewmasterActionResolver extends CharacterActionResolver {
             return buildInitialInteraction(builder);
         }
 
-        InteractionResult firstResult = builder.getResults().get(0);
-        if (firstResult.getResultType() == InteractionResultType.CancelAction) {
+        if (builder.isBuildCancelled()) {
             return null;
         }
+
+        InteractionResult firstResult = builder.getResults().get(0);
 
         // If the first interaction was a normal movement
         if (isNormalMovementResult(firstResult)) {
@@ -78,14 +79,11 @@ public final class BrewmasterActionResolver extends CharacterActionResolver {
     @Nullable
     public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
         // Brewmaster actions generate a single feedback.
-        if (!builder.getFeedbacks().isEmpty()) {
+        if (!builder.getFeedbacks().isEmpty() || builder.isBuildCancelled()) {
             return null;
         }
 
         InteractionResult firstResult = builder.getResults().get(0);
-        if (firstResult.getResultType() == InteractionResultType.CancelAction) {
-            return null;
-        }
 
         // A normal movement only requires the first interaction, so its feedback
         // can be generated directly by the default resolver.

@@ -192,16 +192,15 @@ public class CharacterActionResolver {
     @Nullable
     public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
         // The default movement action only requires a single interaction.
-        // When the result is gotten, a single feedback can be generated containing the movement instructions
+        // When the result is gotten, a single feedback can be generated containing the movement instructions.
+        // No feedback is generated after an action cancellation for the default movement
         if (builder.getResults().size() != 1 ||
-                !builder.getFeedbacks().isEmpty()) {
+                !builder.getFeedbacks().isEmpty() ||
+                builder.isBuildCancelled()) {
             return null;
         }
 
         InteractionResult result = builder.getResults().get(0);
-        if (result.getResultType() == InteractionResultType.CancelAction) {
-            return null;
-        }
 
         if (!isNormalMovementResult(result)) {
             throw new IllegalArgumentException("The default action resolver only handles normal movement");

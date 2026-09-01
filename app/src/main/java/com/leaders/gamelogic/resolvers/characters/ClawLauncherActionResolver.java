@@ -93,15 +93,12 @@ public final class ClawLauncherActionResolver extends CharacterActionResolver {
     @Nullable
     public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
         if (builder.getResults().isEmpty() ||
-                !builder.getFeedbacks().isEmpty()) {
+                !builder.getFeedbacks().isEmpty() ||
+                builder.isBuildCancelled()) {
             return null;
         }
 
         InteractionResult result = builder.getResults().get(0);
-
-        if (result.getResultType() == InteractionResultType.CancelAction) {
-            return null;
-        }
 
         if (isNormalMovementResult(result)) {
             return super.getNextFeedback(builder);

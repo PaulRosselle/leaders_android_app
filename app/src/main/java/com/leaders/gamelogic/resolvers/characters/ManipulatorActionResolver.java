@@ -52,10 +52,11 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
             return buildInitialInteraction(builder);
         }
 
-        InteractionResult firstResult = builder.getResults().get(0);
-        if (firstResult.getResultType() == InteractionResultType.CancelAction) {
+        if (builder.isBuildCancelled()) {
             return null;
         }
+
+        InteractionResult firstResult = builder.getResults().get(0);
 
         if (isNormalMovementResult(firstResult)) {
             return super.getNextInteraction(builder);
@@ -78,19 +79,13 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
     @Override
     @Nullable
     public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
-        if (!builder.getFeedbacks().isEmpty()) {
-            return null;
-        }
-
-        if (builder.getResults().isEmpty()) {
+        if (!builder.getFeedbacks().isEmpty() ||
+                builder.getResults().isEmpty() ||
+                builder.isBuildCancelled()) {
             return null;
         }
 
         InteractionResult firstResult = builder.getResults().get(0);
-
-        if (firstResult.getResultType() == InteractionResultType.CancelAction) {
-            return null;
-        }
 
         if (isNormalMovementResult(firstResult)) {
             return super.getNextFeedback(builder);

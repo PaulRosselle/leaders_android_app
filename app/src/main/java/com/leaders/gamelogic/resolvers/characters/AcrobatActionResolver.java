@@ -84,14 +84,12 @@ public final class AcrobatActionResolver extends CharacterActionResolver {
         // When the result is gotten, a single feedback can be generated
         // containing either movement or active ability instructions
         if (builder.getResults().size() != 1 ||
-                !builder.getFeedbacks().isEmpty()) {
+                !builder.getFeedbacks().isEmpty() ||
+                builder.isBuildCancelled()) {
             return null;
         }
 
         InteractionResult result = builder.getResults().get(0);
-        if (result.getResultType() == InteractionResultType.CancelAction) {
-            return null;
-        }
 
         InteractionFeedback feedback;
         if (isNormalMovementResult(result)) {
