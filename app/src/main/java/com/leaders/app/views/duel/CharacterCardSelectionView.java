@@ -33,6 +33,7 @@ public class CharacterCardSelectionView extends ConstraintLayout {
     public interface OnCardSelectedListener {
         void onRecruitmentCardSelected(@NonNull InteractionTarget target);
         void onBanishmentCardSelected(@NonNull InteractionTarget target);
+        void onNotSelectableCardClick();
     }
 
     private final LinearLayout llyPortraits;
@@ -152,6 +153,9 @@ public class CharacterCardSelectionView extends ConstraintLayout {
         );
 
         switch (selectedCard.getSelectionStatus()) {
+            case NotSelectable: onNotSelectableCardClick();
+                break;
+
             case Recruitable: onRecruitableCardSelected(target);
                 break;
 
@@ -167,6 +171,12 @@ public class CharacterCardSelectionView extends ConstraintLayout {
         }
     }
 
+    private void onNotSelectableCardClick() {
+        if (onCardSelectedListener != null) {
+            onCardSelectedListener.onNotSelectableCardClick();
+        }
+    }
+
     private void onRecruitableCardSelected(@NonNull InteractionTarget target) {
         if (onCardSelectedListener != null) {
             onCardSelectedListener.onRecruitmentCardSelected(target);
@@ -179,6 +189,13 @@ public class CharacterCardSelectionView extends ConstraintLayout {
     }
 
     private void onInvalidCardSelected(@NonNull SelectableCharacterCard selectedCard) {
+        // Without a valid target, invalid cards are considered like not selectable cards
+        if (targets == null) {
+            if (onCardSelectedListener != null) {
+                onCardSelectedListener.onNotSelectableCardClick();
+            }
+        }
+
         String messageFormat;
         if (selectedCard.getSelectionStatus() == CharacterCardSelectionStatus.AlreadyBanned) {
             messageFormat = getContext().getString(R.string.card_already_banned);

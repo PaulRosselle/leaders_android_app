@@ -15,6 +15,10 @@ public final class Player {
         this.name = name;
     }
 
+    public Player(@NonNull Player refPlayer) {
+        this(refPlayer.getTeamColor(), refPlayer.getName());
+    }
+
     @NonNull
     public TeamColor getTeamColor() {
         return teamColor;

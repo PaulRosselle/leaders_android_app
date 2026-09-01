@@ -699,7 +699,7 @@ public final class GameHandler {
         checkStopped();
 
         List<SelectableCharacterCard> selectableBanishmentCards =
-                BanishmentQuery.getCurrentSelectableCards(currentGame);
+                BanishmentQuery.getCurrentSelectableCards(currentGame, currentHistory);
 
         List<InteractionTarget> legalTargets = new ArrayList<>();
         for (SelectableCharacterCard selectableBanishmentCard : selectableBanishmentCards) {

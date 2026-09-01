@@ -5,12 +5,10 @@ import androidx.annotation.NonNull;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.SelectableCharacterCard;
-import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterCardSelectionStatus;
 import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.TeamColor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public final class BanishmentQuery {
@@ -39,22 +37,12 @@ public final class BanishmentQuery {
                 teamBanishmentCount < recruitedCardsCount / 2 + 1;
     }
 
-    public static List<SelectableCharacterCard> getCurrentSelectableCards(@NonNull Game game) {
-        List<SelectableCharacterCard> selectableCards = new ArrayList<>();
-        // First, we add recruitable cards as banishable ones
-        for (CharacterCard banishableCard : game.getRecruitableCards()) {
-            selectableCards.add(new SelectableCharacterCard(banishableCard,
-                    CharacterCardSelectionStatus.Banishable));
-        }
-
-        // Then we add already banished cards as an indication
-        for (TeamColor playerTeamColor : TeamColor.values()) {
-            for (CharacterCard banishedCard : game.getBanishedCards(playerTeamColor)) {
-                selectableCards.add(new SelectableCharacterCard(banishedCard,
-                        CharacterCardSelectionStatus.AlreadyBanned));
-            }
-        }
-
-        return selectableCards;
+    public static List<SelectableCharacterCard> getCurrentSelectableCards(@NonNull Game game,
+                                                                          @NonNull GameHistory gameHistory) {
+        return SelectableCardsQuery.getSelectableCards(
+                game, gameHistory, null,
+                CharacterCardSelectionStatus.Banishable,
+                CharacterCardSelectionStatus.NotSelectable
+        );
     }
 }
