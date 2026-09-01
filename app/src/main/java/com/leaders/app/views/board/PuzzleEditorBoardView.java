@@ -45,13 +45,13 @@ public final class PuzzleEditorBoardView extends BoardView {
     public void selectCharacterAt(@NonNull Position position) {
         CharacterDisplay characterDisplay = Objects.requireNonNull(characterDisplayMap.get(position),
                 "Character to unselected not found at position:" + position);
-        characterDisplay.setHighlighted(true, true);
+        characterDisplay.setIsHighlighted(true, true);
         characterDisplay.startHighlightAnimation();
     }
 
     public void clearCharacterSelection() {
         for (CharacterDisplay characterDisplay : characterDisplayMap.values()) {
-            characterDisplay.setHighlighted(false, true);
+            characterDisplay.setIsHighlighted(false, true);
             characterDisplay.stopHighlightAnimation();
         }
     }

@@ -32,10 +32,10 @@ import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.TeamColor;
-import com.leaders.gamelogic.interactions.InteractionContext;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionTarget;
+import com.leaders.gamelogic.interactions.InteractionType;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
 import com.leaders.puzzlelogic.entities.OfficialPuzzleSave;
@@ -318,7 +318,6 @@ public final class PuzzlePlayerActivity extends BaseActivity
     @Override
     public void onEmptyClick() {
         controller.cancelAction();
-        bdvBoard.animateShine();
     }
 
     private void clearInteractionUI() {
@@ -327,12 +326,18 @@ public final class PuzzlePlayerActivity extends BaseActivity
     }
 
     private void updatePlayableCharacters(@NonNull GameContext gameContext,
-                                          @NonNull InteractionContext context) {
+                                          @NonNull InteractionRequest request) {
         bdvBoard.highlightPlayableCharacters(
                 gameContext.getPlayableCharacters(),
-                context.getCharacter(),
+                request.getContext().getCharacter(),
                 gameContext.getBoard()
         );
+
+        if (request.getRequestType() == InteractionType.PlayableCharacterExpected) {
+            bdvBoard.startPlayableCharactersShineAnimation();
+        } else {
+            bdvBoard.stopPlayableCharactersShineAnimation();
+        }
     }
 
     private void showEndGame(@NonNull TeamColor winnerColor, boolean isVictory) {
@@ -417,7 +422,7 @@ public final class PuzzlePlayerActivity extends BaseActivity
 
             bdvBoard.applyTargets(request.getLegalTargets(), request.getContext(), gameContext.getBoard());
 
-            updatePlayableCharacters(gameContext, request.getContext());
+            updatePlayableCharacters(gameContext, request);
 
             ButtonUtils.setEnabled(btnUndoLastAction, controller.canUndoLastAction());
         });

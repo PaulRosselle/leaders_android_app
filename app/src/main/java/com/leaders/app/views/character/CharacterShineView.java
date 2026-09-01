@@ -18,7 +18,7 @@ import android.view.animation.DecelerateInterpolator;
 import androidx.annotation.NonNull;
 
 public class CharacterShineView extends View {
-    private static final long SHINE_ANIMATION_DURATION = 550L;
+    private static final int SHINE_ANIMATION_DURATION = 600;
     private static final float SHINE_THICKNESS_RATIO = 0.26f;
 
     private final Paint shinePaint;
@@ -74,8 +74,8 @@ public class CharacterShineView extends View {
         float shineThickness = size * SHINE_THICKNESS_RATIO;
 
         int edgeColor = Color.TRANSPARENT;
-        int middleColor = Color.argb(40, 255, 255, 255);
-        int centerColor = Color.argb(180, 255, 255, 255);
+        int middleColor = Color.argb(30, 255, 255, 255);
+        int centerColor = Color.argb(120, 255, 255, 255);
 
         int[] colorValues = new int[] { edgeColor, middleColor, centerColor, middleColor, edgeColor };
         float[] colorPositions = new float[] {0.0f, 0.30f, 0.50f, 0.70f, 1.0f};

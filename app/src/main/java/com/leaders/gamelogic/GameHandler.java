@@ -424,7 +424,7 @@ public final class GameHandler {
         );
 
         InteractionRequest request = new InteractionRequest(
-                InteractionType.PositionExpected,
+                InteractionType.PlayableCharacterExpected,
                 new InteractionContext(),
                 legalTargets,
                 legalResults

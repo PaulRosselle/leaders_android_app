@@ -16,12 +16,12 @@ public final class CharacterDisplay {
 
     @NonNull
     private final CharacterView characterView;
-
     @NonNull
     private final CharacterHighlightView highlightView;
-
     @NonNull
     private final CharacterShineView shineView;
+
+    private boolean isHighlighted;
 
     private OnCharacterDisplayClickListener onClickListener;
 
@@ -30,24 +30,19 @@ public final class CharacterDisplay {
         characterView.setOnClickListener(this::onCharacterClick);
         parentView.addView(characterView, getDefaultLayoutParams());
 
-        highlightView = new CharacterHighlightView(context);
-        highlightView.setId(View.generateViewId());
-        parentView.addView(highlightView, getDefaultLayoutParams());
-
         shineView = new CharacterShineView(context);
-        parentView.addView(shineView, getShineLayoutParams());
+        parentView.addView(shineView, getDefaultLayoutParams());
+
+        highlightView = new CharacterHighlightView(context);
+        parentView.addView(highlightView, getDefaultLayoutParams());
 
         reset();
     }
 
-    public void animateShine() {
-        shineView.playShine();
-    }
-
     public void setSize(int size) {
-        setSize(highlightView, size);
-        setSize(characterView, size);
-        // setSize(shineView, size);
+        for (ViewType viewType : ViewType.values()) {
+            setSize(getCharacterViewFromType(viewType), size);
+        }
     }
 
     private void setSize(@NonNull View view, int size) {
@@ -63,16 +58,6 @@ public final class CharacterDisplay {
         return characterView;
     }
 
-    @NonNull
-    public CharacterHighlightView getHighlightView() {
-        return highlightView;
-    }
-
-    @NonNull
-    public CharacterShineView getShineView() {
-        return shineView;
-    }
-
     private ConstraintLayout.LayoutParams getDefaultLayoutParams() {
         ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(
                 ConstraintLayout.LayoutParams.MATCH_CONSTRAINT,
@@ -85,26 +70,12 @@ public final class CharacterDisplay {
         return params;
     }
 
-
-    private ConstraintLayout.LayoutParams getShineLayoutParams() {
-        ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(
-                ConstraintLayout.LayoutParams.MATCH_CONSTRAINT,
-                ConstraintLayout.LayoutParams.MATCH_CONSTRAINT
-        );
-
-        params.startToStart = highlightView.getId();
-        params.topToTop = highlightView.getId();
-        params.endToEnd = highlightView.getId();
-        params.bottomToBottom = highlightView.getId();
-
-        return params;
-    }
-
     public void reset() {
         characterView.clearTarget();
 
+        setIsHighlighted(false, false);
+
         characterView.setVisibility(View.GONE);
-        highlightView.setVisibility(View.GONE);
     }
 
     public void setPosition(float x, float y) {
@@ -142,17 +113,45 @@ public final class CharacterDisplay {
         characterView.setOnLongClickListener(onLongClickListener);
     }
 
-    public void setHighlighted(boolean highlighted, boolean animateCharacterScaling) {
-        characterView.scaleForHighlight(highlighted, animateCharacterScaling);
-        highlightView.setVisibility(highlighted ? View.VISIBLE : View.GONE);
+    public void setIsHighlighted(boolean isHighlighted, boolean animateCharacterScaling) {
+        this.isHighlighted = isHighlighted;
+
+        characterView.scaleForHighlight(isHighlighted, animateCharacterScaling);
+        highlightView.setVisibility(isHighlighted ? View.VISIBLE : View.GONE);
+        shineView.setVisibility(isHighlighted ? View.VISIBLE : View.GONE);
+    }
+
+    public boolean isHighlighted() {
+        return isHighlighted;
+    }
+
+    public void playShineAnimation() {
+        if (!isHighlighted) {
+            return;
+        }
+
+        bringToFront();
+        shineView.playShine();
+    }
+
+    public void stopShineAnimation() {
+        shineView.stopShine();
     }
 
     public void startHighlightAnimation() {
-        highlightView.startAnimation();
+        if (isHighlighted) {
+            highlightView.startAnimation();
+        }
     }
 
     public void stopHighlightAnimation() {
         highlightView.stopAnimation();
+    }
+
+    public void bringToFront() {
+        characterView.bringToFront();
+        shineView.bringToFront();
+        highlightView.bringToFront();
     }
 
     public void clearTarget() {
