@@ -380,7 +380,7 @@ public class RecruitmentQueryTest {
     @SuppressWarnings("unchecked")
     private List<CharacterCard> invokeGetCurrentValidCards(@NonNull Game game, @NonNull GameHistory gameHistory) {
         try {
-            Method method = RecruitmentQuery.class.getDeclaredMethod("getValidRecruitmentCards", Game.class, GameHistory.class);
+            Method method = RecruitmentQuery.class.getDeclaredMethod("getCurrentValidCards", Game.class, GameHistory.class);
 
             method.setAccessible(true);
 
