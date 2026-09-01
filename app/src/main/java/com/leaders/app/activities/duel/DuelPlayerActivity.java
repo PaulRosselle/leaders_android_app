@@ -238,6 +238,11 @@ public class DuelPlayerActivity extends BaseActivity implements
         // TODO - handle banishment phase
     }
 
+    @Override
+    public void onNotSelectableCardClick() {
+        // TODO - handle game phases
+    }
+
     //endregion
 
     private void showCardDescriptionNotification(@NonNull CharacterCard characterCard) {

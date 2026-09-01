@@ -123,7 +123,7 @@ public class PlayableBoardView extends BoardView {
 
     //region ANIMATION METHODS
 
-    public void highlightPlayableCharacters(@NonNull List<PlayableCharacter> playableCharacters,
+    public void highlightPlayableCharacters(@Nullable List<PlayableCharacter> playableCharacters,
                                             @Nullable Character selectedCharacter,
                                             @NonNull Board board) {
         Position selectedCharacterPos = null;
@@ -137,7 +137,8 @@ public class PlayableBoardView extends BoardView {
             CharacterDisplay display = entry.getValue();
 
             boolean isSelectedDisplay = position.equals(selectedCharacterPos);
-            boolean isPlayableCharacter = positionContainsPlayableCharacter(playableCharacters, position);
+            boolean isPlayableCharacter = playableCharacters != null &&
+                    positionContainsPlayableCharacter(playableCharacters, position);
 
             display.setHighlighted(isSelectedDisplay || isPlayableCharacter, true);
             if (isSelectedDisplay) {

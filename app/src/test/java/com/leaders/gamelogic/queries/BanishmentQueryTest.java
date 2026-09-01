@@ -141,8 +141,9 @@ public class BanishmentQueryTest {
         game.getRecruitableCards().add(CharacterCard.Archer);
         game.getRecruitableCards().add(CharacterCard.Bruiser);
 
+        GameHistory history = createTestGameHistory(GameMode.Strategist);
         List<SelectableCharacterCard> selectableCards =
-                BanishmentQuery.getCurrentSelectableCards(game);
+                BanishmentQuery.getCurrentSelectableCards(game, history);
 
         assertEquals(2, selectableCards.size());
 
@@ -158,10 +159,10 @@ public class BanishmentQueryTest {
         Game game = createTestGame();
 
         game.getRecruitableCards().add(CharacterCard.Archer);
-
         game.addBanishedCard(TeamColor.Black, CharacterCard.Acrobat);
 
-        List<SelectableCharacterCard> selectableCards = BanishmentQuery.getCurrentSelectableCards(game);
+        GameHistory history = createTestGameHistory(GameMode.Strategist);
+        List<SelectableCharacterCard> selectableCards = BanishmentQuery.getCurrentSelectableCards(game, history);
 
         assertEquals(2, selectableCards.size());
 
@@ -179,7 +180,8 @@ public class BanishmentQueryTest {
         game.addBanishedCard(TeamColor.Black, CharacterCard.Archer);
         game.addBanishedCard(TeamColor.White, CharacterCard.Bruiser);
 
-        List<SelectableCharacterCard> selectableCards = BanishmentQuery.getCurrentSelectableCards(game);
+        GameHistory history = createTestGameHistory(GameMode.Strategist);
+        List<SelectableCharacterCard> selectableCards = BanishmentQuery.getCurrentSelectableCards(game, history);
 
         assertEquals(2, selectableCards.size());
 
@@ -195,7 +197,8 @@ public class BanishmentQueryTest {
     public void getCurrentSelectableCards_shouldReturnEmptyWhenNoCardsAreAvailable() {
         Game game = createTestGame();
 
-        List<SelectableCharacterCard> selectableCards = BanishmentQuery.getCurrentSelectableCards(game);
+        GameHistory history = createTestGameHistory(GameMode.Strategist);
+        List<SelectableCharacterCard> selectableCards = BanishmentQuery.getCurrentSelectableCards(game, history);
 
         assertTrue(selectableCards.isEmpty());
     }

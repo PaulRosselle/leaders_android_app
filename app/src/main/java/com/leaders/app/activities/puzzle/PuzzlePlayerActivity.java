@@ -26,6 +26,7 @@ import com.leaders.app.views.character.CharacterNotificationView;
 import com.leaders.app.views.character.CharacterView;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Game;
+import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.enums.CharacterCard;
@@ -324,19 +325,21 @@ public final class PuzzlePlayerActivity extends BaseActivity
         ButtonUtils.setEnabled(btnUndoLastAction, false);
     }
 
-    private void updatePlayableCharacters(@NonNull InteractionContext context) {
+    private void updatePlayableCharacters(@NonNull GameContext gameContext,
+                                          @NonNull InteractionContext context) {
         bdvBoard.highlightPlayableCharacters(
-                controller.getPlayableCharacters(),
+                gameContext.getPlayableCharacters(),
                 context.getCharacter(),
-                controller.getCurrentGame().getBoard()
+                gameContext.getBoard()
         );
     }
 
     private void showEndGame(@NonNull TeamColor winnerColor, boolean isVictory) {
+        GameContext gameContext = controller.getCurrentContext();
 
         EndGameType endGameType = isVictory ? EndGameType.Victory : EndGameType.Defeat;
         Cell leaderCell = Objects.requireNonNull(
-                BoardQuery.findLeaderCell(controller.getCurrentGame().getBoard(), winnerColor),
+                BoardQuery.findLeaderCell(gameContext.getBoard(), winnerColor),
                 "No leader found for team: " + winnerColor
         );
         LeaderType leaderType = LeaderType.getFromCharacter(leaderCell.getCharacter());
@@ -408,15 +411,12 @@ public final class PuzzlePlayerActivity extends BaseActivity
 
     @Override
     public void onInteractionRequired(@NonNull InteractionRequest request) {
-
         runOnUiThread(() -> {
-            bdvBoard.applyTargets(
-                    request.getLegalTargets(),
-                    request.getContext(),
-                    controller.getCurrentGame().getBoard()
-            );
+            GameContext gameContext = controller.getCurrentContext();
 
-            updatePlayableCharacters(request.getContext());
+            bdvBoard.applyTargets(request.getLegalTargets(), request.getContext(), gameContext.getBoard());
+
+            updatePlayableCharacters(gameContext, request.getContext());
 
             ButtonUtils.setEnabled(btnUndoLastAction, controller.canUndoLastAction());
         });
