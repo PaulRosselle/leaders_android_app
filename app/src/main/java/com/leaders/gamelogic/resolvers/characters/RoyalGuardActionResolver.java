@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -180,34 +179,6 @@ public final class RoyalGuardActionResolver extends CharacterActionResolver {
         pathBuilder.addFeedback(buildRoyalGuardMovementFeedback(path));
 
         return isActionValid(buildAction(pathBuilder));
-    }
-
-    @NonNull
-    private CharacterPath getPathMatchingResult(@NonNull InteractionResult result,
-                                                @NonNull List<CharacterPath> paths) {
-        Position destPos = Objects.requireNonNull(
-                Objects.requireNonNull(
-                        result.getChosenTarget(),
-                        "Royal Guard destination interaction result invalid: no data"
-                ).getChosenPosition(),
-                "Royal Guard destination interaction result invalid: no destination position"
-        );
-
-        // We search for the shortest path matching the result
-        CharacterPath bestMatchingPath = null;
-        for (CharacterPath path : paths) {
-            if (path.getDestination().equals(destPos) &&
-                    (bestMatchingPath == null ||
-                            bestMatchingPath.getPositions().size() > path.getPositions().size())) {
-                bestMatchingPath = path;
-            }
-        }
-
-        if (bestMatchingPath == null) {
-            throw new IllegalArgumentException("No path found matching result: " + result);
-        }
-
-        return bestMatchingPath;
     }
 
     @NonNull

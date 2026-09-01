@@ -8,6 +8,7 @@ import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
+import com.leaders.gamelogic.entities.CharacterPath;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterType;
@@ -261,19 +262,19 @@ public class CharacterAbilityQueryTest {
     }
 
     @Test
-    public void getNormalMovementDestCells_shouldReturnAdjacentEmptyCells() {
+    public void getNormalMovementPaths_shouldReturnAdjacentEmptyCells() {
         Board board = new Board();
         Character character = createCharacter(CharacterType.Acrobat, TeamColor.Black);
         Position position = new Position(3, 3);
         board.getCell(position).setCharacter(character);
 
         Game game = createTestGame(board);
-        List<Cell> destinations = CharacterAbilityQuery.getNormalMovementDestCells(game, character);
+        List<CharacterPath> destinations = CharacterAbilityQuery.getNormalMovementPaths(game, character);
         assertEquals(Direction.values().length, destinations.size());
     }
 
     @Test
-    public void getNormalMovementDestCells_shouldExtendLeaderMovementWithVizier() {
+    public void getNormalMovementPaths_shouldExtendLeaderMovementWithVizier() {
         Board board = new Board();
 
         Character leader = createCharacter(CharacterType.LeaderKing, TeamColor.Black);
@@ -285,16 +286,16 @@ public class CharacterAbilityQueryTest {
         Game game = createTestGame(board);
         game.getRecruitedCharacters().add(vizier);
 
-        List<Cell> destinations = CharacterAbilityQuery.getNormalMovementDestCells(game, leader);
+        List<CharacterPath> destinations = CharacterAbilityQuery.getNormalMovementPaths(game, leader);
         assertEquals(Direction.values().length * 3, destinations.size());
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void getNormalMovementDestCells_shouldThrowForNemesis() {
+    public void getNormalMovementPaths_shouldThrowForNemesis() {
         Board board = new Board();
         Character nemesis = createCharacter(CharacterType.Nemesis, TeamColor.Black);
         board.getCell(new Position(3, 3)).setCharacter(nemesis);
         Game game = createTestGame(board);
-        CharacterAbilityQuery.getNormalMovementDestCells(game, nemesis);
+        CharacterAbilityQuery.getNormalMovementPaths(game, nemesis);
     }
 }

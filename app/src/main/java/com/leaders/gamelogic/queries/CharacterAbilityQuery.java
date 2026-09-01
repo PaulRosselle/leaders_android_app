@@ -5,8 +5,10 @@ import androidx.annotation.NonNull;
 import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.actions.CharacterActionMotion;
 import com.leaders.gamelogic.actions.CharacterActionTarget;
+import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
+import com.leaders.gamelogic.entities.CharacterPath;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.AbilityType;
@@ -16,8 +18,11 @@ import com.leaders.gamelogic.enums.Direction;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.historyentries.segments.ActionsPhase;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Centralizes read-only queries related to character abilities whose scope goes
@@ -320,8 +325,8 @@ public final class CharacterAbilityQuery {
     }
 
     /**
-     * Returns the cells the specified character can move to using its normal movement.
-     * Handles the cross-character extension granted by an allied Vizier for leaders.
+     * Returns the paths the specified character can take using its normal movement.
+     * Handles passive character abilities impacting other characters.
      * <p>
      * Does not handle Nemesis, whose movement is fully self-contained and resolved
      * by its dedicated {@code CharacterActionResolver} override.
@@ -332,17 +337,47 @@ public final class CharacterAbilityQuery {
      * @throws IllegalArgumentException if character is a Nemesis
      */
     @NonNull
-    public static List<Cell> getNormalMovementDestCells(@NonNull Game game,
-                                                        @NonNull Character character) {
+    public static List<CharacterPath> getNormalMovementPaths(@NonNull Game game,
+                                                             @NonNull Character character) {
         // Nemesis is an exception and uses her own movement algorithm
         if (character.getCharacterType() == CharacterType.Nemesis) {
             throw new IllegalArgumentException("Nemesis movement logic is handled apart from the generic movement function");
         }
-        // By default, normal movement allow characters to go to an adjacent empty tile.
+
         // Leaders can move up to two cells when they have a vizier in their team
-        return BoardQuery.findEmptyCellsAround(game.getBoard(),
-                BoardQuery.getCellByCharacterId(game.getBoard(), character.getId()).getPosition(),
-                character.getCharacterType().getCharacterCard().isLeader() &&
-                        teamContainsCharacter(game, CharacterType.Vizier, character.getTeamColor()) ? 2 : 1);
+        boolean isEnhancedMovement = character.getCharacterType().getCharacterCard().isLeader() &&
+                teamContainsCharacter(game, CharacterType.Vizier, character.getTeamColor());
+
+        Board board = game.getBoard();
+        Position characterPos = BoardQuery.getCellByCharacterId(game.getBoard(), character.getId()).getPosition();
+
+        List<CharacterPath> paths = new ArrayList<>();
+        Set<Position> destinations = new HashSet<>();
+
+        for (Cell firstLayerCell : BoardQuery.findEmptyCellsAround(board, characterPos, 1)) {
+            // The default movement can be to any adjacent empty cell
+            Position firstLayerPos = firstLayerCell.getPosition();
+
+            CharacterPath firstLayerPath = new CharacterPath(List.of(characterPos, firstLayerPos));
+            if (destinations.add(firstLayerPath.getDestination())) {
+                paths.add(firstLayerPath);
+            }
+
+            // Enhanced movement allows to move one step further
+            if (!isEnhancedMovement) {
+                continue;
+            }
+            for (Cell secondLayerCell : BoardQuery.findEmptyCellsAround(board, firstLayerPos, 1)) {
+                Position secondLayerPos = secondLayerCell.getPosition();
+
+                // Keep only the first valid path for each destination.
+                CharacterPath secondLayerPath = new CharacterPath(List.of(characterPos, firstLayerPos, secondLayerPos));
+                if (destinations.add(secondLayerPath.getDestination())) {
+                    paths.add(secondLayerPath);
+                }
+            }
+        }
+
+        return paths;
     }
 }
