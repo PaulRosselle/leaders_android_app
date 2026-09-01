@@ -103,6 +103,12 @@ public class GameHandlerTest {
 
         @NonNull
         @Override
+        public CompletableFuture<Void> onActionUndone(@NonNull Game game) {
+            return null; // TODO
+        }
+
+        @NonNull
+        @Override
         public CompletableFuture<InteractionResult> onInputRequired(@NonNull InteractionRequest request) {
             inputRequiredCount++;
             lastInputRequired = request;
