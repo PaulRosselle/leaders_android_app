@@ -7,6 +7,7 @@ import com.leaders.gamelogic.actions.CharacterActionMotion;
 import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
+import com.leaders.gamelogic.entities.CharacterPath;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.Position;
@@ -67,8 +68,8 @@ public final class AcrobatActionResolver extends CharacterActionResolver {
             legalTargets.add(new InteractionTarget(TargetCategory.MovementDestination, movementDest));
         }
         if (CharacterAbilityQuery.canUseActiveAbility(game, character)) {
-            for (Position abilityDestination : getAcrobatJumpDestinations(builder)) {
-                legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityDestination, abilityDestination));
+            for (CharacterPath jumpPaths : getAcrobatJumpPaths(builder)) {
+                legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityDestination, jumpPaths.getDestination()));
             }
         }
 
@@ -95,7 +96,12 @@ public final class AcrobatActionResolver extends CharacterActionResolver {
         if (isNormalMovementResult(result)) {
             feedback = super.getNextFeedback(builder);
         } else if (isInteractionResultAcrobatJump(result)){
-            feedback = buildAcrobatJumpFeedback(result);
+            // We recover all legal paths using an empty builder to find one matching the result
+            List<CharacterPath> legalPaths = getAcrobatJumpPaths(
+                    new CharacterActionBuilder(character, new ArrayList<>(), new ArrayList<>())
+            );
+            CharacterPath resultPath = getPathMatchingResult(result, legalPaths);
+            feedback = buildAcrobatJumpFeedback(resultPath);
         } else {
             throw new IllegalArgumentException("Invalid Acrobat interaction type " + result.getResultType());
         }
@@ -109,19 +115,31 @@ public final class AcrobatActionResolver extends CharacterActionResolver {
     }
 
     @NonNull
-    private List<Position> getAcrobatJumpDestinations(@NonNull CharacterActionBuilder builder) {
-        // First we find every jump destination
-        Set<Position> destinationsSet = new HashSet<>();
+    private List<CharacterPath> getAcrobatJumpPaths(@NonNull CharacterActionBuilder builder) {
+        // First we find every jump path
+        List<CharacterPath> jumpPaths = new ArrayList<>();
+        Set<Position> destinations = new HashSet<>();
+
         for (Direction firstDirection : Direction.values()) {
             Cell firstJumpDestination = findJumpDestination(characterPos, firstDirection);
             if (firstJumpDestination != null) {
                 Position firstJumpPos = firstJumpDestination.getPosition();
-                destinationsSet.add(firstJumpPos);
+                // First jump paths
+                if (!destinations.contains(firstJumpPos)) {
+                    jumpPaths.add(new CharacterPath(List.of(characterPos, firstJumpPos)));
+                    destinations.add(firstJumpPos);
+                }
+
                 for (Direction secondDirection : Direction.values()) {
                     if (secondDirection != firstDirection.getOpposite()) {
                         Cell secondJumpDestination = findJumpDestination(firstJumpPos, secondDirection);
+                        // Second jump paths
                         if (secondJumpDestination != null) {
-                            destinationsSet.add(secondJumpDestination.getPosition());
+                            Position secondJumpPos = secondJumpDestination.getPosition();
+                            if (!destinations.contains(secondJumpPos)) {
+                                jumpPaths.add(new CharacterPath(List.of(characterPos, firstJumpPos, secondJumpPos)));
+                                destinations.add(secondJumpPos);
+                            }
                         }
                     }
                 }
@@ -129,24 +147,23 @@ public final class AcrobatActionResolver extends CharacterActionResolver {
         }
 
         // Then we filter out every invalid destination
-        List<Position> destinations = new ArrayList<>(destinationsSet);
-        for (int i = destinations.size() - 1; i >= 0; i--) {
-            Position destination = destinations.get(i);
+        for (int i = jumpPaths.size() - 1; i >= 0; i--) {
+            CharacterPath jumpPath = jumpPaths.get(i);
 
             CharacterActionBuilder jumpBuilder = new CharacterActionBuilder(builder);
             InteractionResult jumpResult = new InteractionResult(InteractionResultType.PositionChosen,
                     new InteractionContext(character),
-                    new InteractionTarget(TargetCategory.ActiveAbilityDestination, destination)
+                    new InteractionTarget(TargetCategory.ActiveAbilityDestination, jumpPath.getDestination())
             );
             jumpBuilder.addResult(jumpResult);
-            jumpBuilder.addFeedback(buildAcrobatJumpFeedback(jumpResult));
+            jumpBuilder.addFeedback(buildAcrobatJumpFeedback(jumpPath));
 
             if (!isActionValid(buildAction(jumpBuilder))) {
-                destinations.remove(i);
+                jumpPaths.remove(i);
             }
         }
 
-        return destinations;
+        return jumpPaths;
     }
 
     @Nullable
@@ -166,26 +183,52 @@ public final class AcrobatActionResolver extends CharacterActionResolver {
     }
 
     @NonNull
-    private InteractionFeedback buildAcrobatJumpFeedback(@NonNull InteractionResult result) {
-        if (result.getChosenTarget() == null ||
-                result.getChosenTarget().getCategory() != TargetCategory.ActiveAbilityDestination) {
-            throw new IllegalArgumentException("Expected an ActiveAbilityDestination for an Acrobat jump");
+    private CharacterPath getPathMatchingResult(@NonNull InteractionResult result,
+                                                @NonNull List<CharacterPath> paths) {
+        InteractionTarget target = Objects.requireNonNull(result.getChosenTarget(),
+                "Acrobat destination interaction result invalid: no data"
+        );
+        if (target.getCategory() != TargetCategory.ActiveAbilityDestination) {
+            throw new IllegalArgumentException("ActiveAbilityDestination expected for an Acrobat jump");
+        }
+        Position destPos = Objects.requireNonNull(target.getChosenPosition(),
+                "Acrobat destination interaction result invalid: no destination position"
+        );
+
+        // We search for the shortest path matching the result
+        CharacterPath bestMatchingPath = null;
+        for (CharacterPath path : paths) {
+            if (path.getDestination().equals(destPos) &&
+                    (bestMatchingPath == null ||
+                            bestMatchingPath.getPositions().size() > path.getPositions().size())) {
+                bestMatchingPath = path;
+            }
         }
 
-        Position destPos = Objects.requireNonNull(result.getChosenTarget().getChosenPosition(),
-                "Invalid jump target : destination position missing");
+        if (bestMatchingPath == null) {
+            throw new IllegalArgumentException("No path found matching result: " + result);
+        }
 
+        return bestMatchingPath;
+    }
+
+    @NonNull
+    private InteractionFeedback buildAcrobatJumpFeedback(@NonNull CharacterPath jumpPath) {
         List<CharacterActionMotion> jumpMotions = new ArrayList<>();
 
-        Position intermediatePos = getIntermediateJump(destPos);
-        if (intermediatePos != null) {
-            jumpMotions.add(new CharacterActionMotion(CharacterMotionType.Jump,
-                    List.of(new CharacterActionTarget(character, characterPos, intermediatePos))));
-            jumpMotions.add(new CharacterActionMotion(CharacterMotionType.Jump,
-                    List.of(new CharacterActionTarget(character, intermediatePos, destPos))));
-        } else {
-            jumpMotions.add(new CharacterActionMotion(CharacterMotionType.Jump,
-                    List.of(new CharacterActionTarget(character, characterPos, destPos))));
+        List<Position> pathPositions = jumpPath.getPositions();
+        if (pathPositions.size() > 3) {
+            throw new IllegalArgumentException("Invalid Acrobat jump path: path should not exceed two steps");
+        }
+
+        Position previousPos = jumpPath.getStart();
+        for (Position position : pathPositions) {
+            if (!position.equals(jumpPath.getStart())) {
+                jumpMotions.add(new CharacterActionMotion(CharacterMotionType.Jump,
+                        List.of(new CharacterActionTarget(character, previousPos, position)))
+                );
+                previousPos = position;
+            }
         }
 
         return InteractionFeedback.createForCharacterAction(jumpMotions);
