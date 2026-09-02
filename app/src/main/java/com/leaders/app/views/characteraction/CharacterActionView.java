@@ -18,8 +18,7 @@ import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterMotionType;
 
-import org.w3c.dom.Attr;
-
+import java.util.List;
 import java.util.Objects;
 
 public class CharacterActionView extends LinearLayoutCompat {
@@ -47,39 +46,16 @@ public class CharacterActionView extends LinearLayoutCompat {
                                @NonNull CharacterAction characterAction) {
         this(context, (AttributeSet) null);
 
-
         chvSourceCharacter.setCharacter(characterAction.getSrcCharacter());
 
-        CharacterActionTarget normalMovementTarget = getNormalMovementTarget(characterAction);
-        if (normalMovementTarget != null) {
-            imvActiveAbility.setVisibility(GONE);
-            chvTargetCharacter.setVisibility(GONE);
-            Position destPos = Objects.requireNonNull(
-                    normalMovementTarget.getDestPos(),
-                    "Invalid normal movement target : Destination missing"
-            );
-            txvDestination.setText(LbeUtils.getPositionExportStr(destPos));
-            return;
+        if (characterAction.getMotions().isEmpty()) {
+            throw new IllegalArgumentException("No display can be loaded for an empty character action");
         }
 
-        CharacterActionTarget otherCharacterAbilityTarget = getOtherCharacterAbilityTarget(characterAction);
-        if (otherCharacterAbilityTarget != null) {
-            imvActiveAbility.setVisibility(VISIBLE);
-            chvTargetCharacter.setVisibility(VISIBLE);
-            chvTargetCharacter.setCharacter(otherCharacterAbilityTarget.getCharacter());
-            if (motionHasDestination(characterAction)) {
-                setDestinationText(otherCharacterAbilityTarget);
-            }
-            return;
-        }
-
-        CharacterActionTarget sourceCharacterAbilityTarget = getSourceCharacterAbilityTarget(characterAction);
-        if (sourceCharacterAbilityTarget != null) {
-            imvActiveAbility.setVisibility(VISIBLE);
-            chvTargetCharacter.setVisibility(GONE);
-            if (motionHasDestination(characterAction)) {
-                setDestinationText(sourceCharacterAbilityTarget);
-            }
+        if (isNormalMovement(characterAction)) {
+            handleNormalMovement(characterAction);
+        } else {
+            handleCharacterAbility(characterAction);
         }
     }
 
@@ -91,47 +67,69 @@ public class CharacterActionView extends LinearLayoutCompat {
         txvDestination.setText(LbeUtils.getPositionExportStr(destPos));
     }
 
-    private boolean motionHasDestination(@NonNull CharacterAction characterAction) {
-        CharacterMotionType motionType = characterAction.getMotions().get(0).getMotionType();
-        return motionType != CharacterMotionType.Remove &&
-                motionType != CharacterMotionType.Transform &&
-                motionType != CharacterMotionType.Swap;
-    }
-
-    @Nullable
-    private CharacterActionTarget getNormalMovementTarget(@NonNull CharacterAction characterAction) {
-        if (characterAction.getMotions().size() == 1) {
-            CharacterActionMotion motion = characterAction.getMotions().get(0);
-            if (motion.getMotionType() == CharacterMotionType.Move &&
-                motion.getTargets().size() == 1) {
-                CharacterActionTarget target = motion.getTargets().get(0);
-                if (target.getCharacter().getId().equals(characterAction.getSrcCharacter().getId())) {
-                    return target;
-                }
-            }
-        }
-        return null;
-    }
-
-    private CharacterActionTarget getSourceCharacterAbilityTarget(@NonNull CharacterAction characterAction) {
-        return getCharacterAbilityTarget(characterAction, true);
-    }
-
-    private CharacterActionTarget getOtherCharacterAbilityTarget(@NonNull CharacterAction characterAction) {
-        return getCharacterAbilityTarget(characterAction, false);
-    }
-
-
-    private CharacterActionTarget getCharacterAbilityTarget(@NonNull CharacterAction characterAction,
-                                                            boolean mustBeSourceCharacter) {
+    private boolean isNormalMovement(@NonNull CharacterAction characterAction) {
         for (CharacterActionMotion motion : characterAction.getMotions()) {
-            for (CharacterActionTarget target : motion.getTargets()) {
-                if (target.getCharacter().getId().equals(characterAction.getSrcCharacter().getId()) == mustBeSourceCharacter) {
-                    return target;
-                }
+            List<CharacterActionTarget> targets = motion.getTargets();
+            if (motion.getMotionType() != CharacterMotionType.Move ||
+                    targets.size() != 1 ||
+                    targets.get(0).getCharacter() != characterAction.getSrcCharacter()) {
+                return false;
             }
         }
-        return null;
+
+        return true;
+    }
+
+    private void handleNormalMovement(@NonNull CharacterAction characterAction) {
+        imvActiveAbility.setVisibility(GONE);
+        chvTargetCharacter.setVisibility(GONE);
+
+        List<CharacterActionMotion> motions = characterAction.getMotions();
+        setDestinationText(motions.get(motions.size() - 1).getTargets().get(0));
+    }
+
+    private void handleCharacterAbility(@NonNull CharacterAction characterAction) {
+        List<CharacterActionMotion> motions = characterAction.getMotions();
+
+        CharacterActionMotion motion = motions.get(0);
+        if (!isSingleInteractionMotion(motion)) {
+            motion = motions.get(motions.size() - 1);
+        }
+
+        List<CharacterActionTarget> targets = motion.getTargets();
+        CharacterActionTarget abilityTarget = targets.get(targets.size() - 1);
+
+        imvActiveAbility.setVisibility(VISIBLE);
+
+        if (abilityTarget.getCharacter() != characterAction.getSrcCharacter()) {
+            chvTargetCharacter.setCharacter(abilityTarget.getCharacter());
+            chvTargetCharacter.setVisibility(VISIBLE);
+        } else {
+            chvTargetCharacter.setVisibility(GONE);
+        }
+
+        if (motionHasDestination(motion)) {
+            setDestinationText(abilityTarget);
+        }
+    }
+
+    private boolean isSingleInteractionMotion(@NonNull CharacterActionMotion motion) {
+        return List.of(
+                CharacterMotionType.Transform,
+                CharacterMotionType.Add,
+                CharacterMotionType.Remove,
+                CharacterMotionType.Push,
+                CharacterMotionType.Swap,
+                CharacterMotionType.Fly
+        ).contains(motion.getMotionType());
+    }
+
+    private boolean motionHasDestination(@NonNull CharacterActionMotion motion) {
+        return !List.of(
+                CharacterMotionType.Remove,
+                CharacterMotionType.Transform,
+                CharacterMotionType.Swap
+        ).contains(motion.getMotionType());
     }
 
 }
