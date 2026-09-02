@@ -69,7 +69,7 @@ public class ManipulatorActionResolverTest {
     }
 
     private CharacterActionBuilder createBuilder() {
-        return new CharacterActionBuilder(manipulator, new ArrayList<>(), new ArrayList<>());
+        return new CharacterActionBuilder(manipulator);
     }
 
     @Before

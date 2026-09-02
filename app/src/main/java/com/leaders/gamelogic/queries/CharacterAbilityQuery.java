@@ -329,6 +329,6 @@ public final class CharacterAbilityQuery {
 
         Position characterPos = BoardQuery.getCellByCharacterId(game.getBoard(), character.getId()).getPosition();
 
-        return BoardQuery.getEmptyPathsAround(game.getBoard(), characterPos, isEnhancedMovement ? 2 : 1);
+        return BoardQuery.getEmptyPathsAround(game.getBoard(), characterPos, isEnhancedMovement ? 2 : 1, true);
     }
 }

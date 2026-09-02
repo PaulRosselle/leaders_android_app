@@ -102,9 +102,7 @@ public final class RoyalGuardActionResolver extends CharacterActionResolver {
             feedback = super.getNextFeedback(builder);
         } else if (isRoyalGuardDestinationResult(result)){
             // We recover all legal paths using an empty builder to find one matching the result
-            List<CharacterPath> legalPaths = getRoyalGuardAbilityPaths(
-                    new CharacterActionBuilder(character, new ArrayList<>(), new ArrayList<>())
-            );
+            List<CharacterPath> legalPaths = getRoyalGuardAbilityPaths(new CharacterActionBuilder(character));
             CharacterPath resultPath = getPathMatchingResult(result, legalPaths);
             feedback = buildRoyalGuardMovementFeedback(resultPath);
         } else {

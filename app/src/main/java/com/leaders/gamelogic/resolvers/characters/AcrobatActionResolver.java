@@ -96,9 +96,7 @@ public final class AcrobatActionResolver extends CharacterActionResolver {
             feedback = super.getNextFeedback(builder);
         } else if (isInteractionResultAcrobatJump(result)){
             // We recover all legal paths using an empty builder to find one matching the result
-            List<CharacterPath> legalPaths = getAcrobatJumpPaths(
-                    new CharacterActionBuilder(character, new ArrayList<>(), new ArrayList<>())
-            );
+            List<CharacterPath> legalPaths = getAcrobatJumpPaths(new CharacterActionBuilder(character));
             CharacterPath resultPath = getPathMatchingResult(result, legalPaths);
             feedback = buildAcrobatJumpFeedback(resultPath);
         } else {

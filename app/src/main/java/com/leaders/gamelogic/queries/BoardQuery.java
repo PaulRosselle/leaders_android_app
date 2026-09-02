@@ -175,7 +175,8 @@ public final class BoardQuery {
     @NonNull
     public static List<CharacterPath> getEmptyPathsAround(@NonNull Board board,
                                                           @NonNull Position position,
-                                                          int distance) {
+                                                          int distance,
+                                                          boolean avoidDuplicates) {
         if (distance <= 0) {
             return Collections.emptyList();
         }
@@ -186,7 +187,7 @@ public final class BoardQuery {
         findEmptyPathsAround(
                 board, position, position, distance,
                 new ArrayList<>(List.of(position)),
-                destinations, paths
+                destinations, paths, avoidDuplicates
         );
 
         return paths;
@@ -196,7 +197,8 @@ public final class BoardQuery {
                                              @NonNull Position currentPos, int remainingDistance,
                                              @NonNull List<Position> currentPath,
                                              @NonNull Set<Position> destinations,
-                                             @NonNull List<CharacterPath> paths) {
+                                             @NonNull List<CharacterPath> paths,
+                                             boolean avoidDuplicates) {
         if (remainingDistance == 0) {
             return;
         }
@@ -210,14 +212,15 @@ public final class BoardQuery {
             CharacterPath path = new CharacterPath(newPath);
 
             // We keep only the first path per destination
-            if (!startPos.equals(adjacentPos) && destinations.add(adjacentPos)) {
+            if (!startPos.equals(adjacentPos) && (!avoidDuplicates || destinations.add(adjacentPos))) {
                 paths.add(path);
             }
 
             findEmptyPathsAround(
                     board, startPos, adjacentPos,
                     remainingDistance - 1,
-                    newPath, destinations, paths
+                    newPath, destinations, paths,
+                    avoidDuplicates
             );
         }
     }

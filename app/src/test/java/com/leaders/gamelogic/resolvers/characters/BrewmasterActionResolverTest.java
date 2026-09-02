@@ -66,7 +66,7 @@ public class BrewmasterActionResolverTest {
     }
 
     private CharacterActionBuilder createBuilder() {
-        return new CharacterActionBuilder(brewmaster, new ArrayList<>(), new ArrayList<>());
+        return new CharacterActionBuilder(brewmaster);
     }
 
 

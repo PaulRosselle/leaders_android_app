@@ -71,7 +71,7 @@ public class WandererActionResolverTest {
     }
 
     private CharacterActionBuilder createBuilder() {
-        return new CharacterActionBuilder(wanderer, new ArrayList<>(), new ArrayList<>());
+        return new CharacterActionBuilder(wanderer);
     }
 
     @Before

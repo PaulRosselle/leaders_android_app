@@ -78,9 +78,7 @@ public final class NemesisActionResolver extends CharacterActionResolver {
         }
 
         // We recover all legal paths using an empty builder to find one matching the result
-        List<CharacterPath> legalPaths = getValidNemesisMovementPaths(
-                new CharacterActionBuilder(character, new ArrayList<>(), new ArrayList<>())
-        );
+        List<CharacterPath> legalPaths = getValidNemesisMovementPaths(new CharacterActionBuilder(character));
         CharacterPath resultPath = getPathMatchingResult(result, legalPaths);
 
         return buildNormalMovementFeedback(resultPath);
@@ -101,7 +99,7 @@ public final class NemesisActionResolver extends CharacterActionResolver {
      */
     @NonNull
     private List<CharacterPath> getValidNemesisMovementPaths(@NonNull CharacterActionBuilder builder) {
-        List<CharacterPath> allPaths = BoardQuery.getEmptyPathsAround(game.getBoard(), characterPos, 2);
+        List<CharacterPath> allPaths = BoardQuery.getEmptyPathsAround(game.getBoard(), characterPos, 2, false);
 
         List<CharacterPath> pathsAtTwo = getValidPathsAtDistance(builder, allPaths, 2);
         if (!pathsAtTwo.isEmpty()) {

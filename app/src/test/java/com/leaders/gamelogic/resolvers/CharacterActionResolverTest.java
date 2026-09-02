@@ -68,7 +68,7 @@ public class CharacterActionResolverTest {
     }
 
     private CharacterActionBuilder createBuilder() {
-        return new CharacterActionBuilder(character, new ArrayList<>(), new ArrayList<>());
+        return new CharacterActionBuilder(character);
     }
 
     @NonNull

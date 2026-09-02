@@ -68,7 +68,7 @@ public class RiderActionResolverTest {
     }
 
     private CharacterActionBuilder createBuilder() {
-        return new CharacterActionBuilder(rider, new ArrayList<>(), new ArrayList<>());
+        return new CharacterActionBuilder(rider);
     }
 
     @Before

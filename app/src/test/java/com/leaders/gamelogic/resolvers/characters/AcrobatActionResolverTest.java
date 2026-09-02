@@ -74,7 +74,7 @@ public class AcrobatActionResolverTest {
     }
 
     private CharacterActionBuilder createBuilder() {
-        return new CharacterActionBuilder(acrobat, new ArrayList<>(), new ArrayList<>());
+        return new CharacterActionBuilder(acrobat);
     }
 
     private void placeCharacter(@NonNull Position position) {

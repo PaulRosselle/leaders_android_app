@@ -313,8 +313,7 @@ public final class PuzzleSolverUtils {
         CharacterActionResolver resolver =
                 CharacterActionResolverFactory.create(game, history, character);
 
-        CharacterActionBuilder builder =
-                new CharacterActionBuilder(character, new ArrayList<>(), new ArrayList<>());
+        CharacterActionBuilder builder = new CharacterActionBuilder(character);
 
         List<CharacterAction> actions = new ArrayList<>();
 

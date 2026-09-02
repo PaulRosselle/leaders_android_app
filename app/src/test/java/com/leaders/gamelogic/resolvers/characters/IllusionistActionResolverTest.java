@@ -69,7 +69,7 @@ public class IllusionistActionResolverTest {
     }
 
     private CharacterActionBuilder createBuilder() {
-        return new CharacterActionBuilder(illusionist, new ArrayList<>(), new ArrayList<>());
+        return new CharacterActionBuilder(illusionist);
     }
 
     @Before

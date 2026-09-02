@@ -19,6 +19,10 @@ public final class CharacterActionBuilder extends GameActionBuilder {
         this.sourceCharacter = sourceCharacter;
     }
 
+    public CharacterActionBuilder(@NonNull Character sourceCharacter) {
+        this(sourceCharacter, new ArrayList<>(), new ArrayList<>());
+    }
+
     public CharacterActionBuilder(@NonNull CharacterActionBuilder refBuilder) {
         this(refBuilder.sourceCharacter,
                 new ArrayList<>(refBuilder.getResults()),
