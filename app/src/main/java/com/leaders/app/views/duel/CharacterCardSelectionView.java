@@ -20,14 +20,17 @@ import com.leaders.app.utilities.CharacterCardUtils;
 import com.leaders.app.views.character.CharacterCardPortraitGroupView;
 import com.leaders.app.views.character.CharacterCardPortraitView;
 import com.leaders.gamelogic.entities.SelectableCharacterCard;
+import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterCardSelectionStatus;
 import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.interactions.InteractionResultType;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class CharacterCardSelectionView extends ConstraintLayout {
     public interface OnCardSelectedListener {
@@ -95,13 +98,30 @@ public class CharacterCardSelectionView extends ConstraintLayout {
     private void updatePortraitsFromTargets() {
         llyPortraits.removeAllViews();
 
-        for (int start = 0; start < targets.size(); start += portraitsPerGroup) {
-            int end = Math.min(start + portraitsPerGroup, targets.size());
+        // First we order each target from their card
+        List<CharacterCard> allCards = new ArrayList<>(Arrays.asList(CharacterCard.values()));
+        Context context = getContext();
+        CharacterCardUtils.sort(context, allCards);
+
+        List<InteractionTarget> sortedTargets = new ArrayList<>();
+        for (CharacterCard card : allCards) {
+            Optional<InteractionTarget> matchingTarget = targets.stream()
+                    .filter(target ->
+                            Objects.requireNonNull(
+                                    target.getChosenSelectableCharacterCard(),
+                                    "Invalid selectable card target: missing selectable card")
+                                    .getCharacterCard() == card)
+                    .findFirst();
+            matchingTarget.ifPresent(sortedTargets::add);
+        }
+
+        for (int start = 0; start < sortedTargets.size(); start += portraitsPerGroup) {
+            int end = Math.min(start + portraitsPerGroup, sortedTargets.size());
 
             List<InteractionTarget> groupTargets = new ArrayList<>(end - start);
 
             for (int groupIdx = start; groupIdx < end; groupIdx++) {
-                InteractionTarget target = targets.get(groupIdx);
+                InteractionTarget target = sortedTargets.get(groupIdx);
 
                 groupTargets.add(target);
             }
@@ -119,13 +139,25 @@ public class CharacterCardSelectionView extends ConstraintLayout {
     private void updatePortraitsFromCards(@NonNull List<SelectableCharacterCard> selectableCards) {
         llyPortraits.removeAllViews();
 
-        for (int start = 0; start < selectableCards.size(); start += portraitsPerGroup) {
-            int end = Math.min(start + portraitsPerGroup, selectableCards.size());
+        // First we order each selectable card
+        List<CharacterCard> allCards = new ArrayList<>(Arrays.asList(CharacterCard.values()));
+        Context context = getContext();
+        CharacterCardUtils.sort(context, allCards);
+
+        List<SelectableCharacterCard> sortedSelectableCards = new ArrayList<>();
+        for (CharacterCard card : allCards) {
+            Optional<SelectableCharacterCard> matchingSelectableCard = selectableCards.stream()
+                    .filter(selectableCard -> selectableCard.getCharacterCard() == card).findFirst();
+            matchingSelectableCard.ifPresent(sortedSelectableCards::add);
+        }
+
+        for (int start = 0; start < sortedSelectableCards.size(); start += portraitsPerGroup) {
+            int end = Math.min(start + portraitsPerGroup, sortedSelectableCards.size());
 
             List<SelectableCharacterCard> groupCards = new ArrayList<>(end - start);
 
             for (int groupIdx = start; groupIdx < end; groupIdx++) {
-                groupCards.add(selectableCards.get(groupIdx));
+                groupCards.add(sortedSelectableCards.get(groupIdx));
             }
 
             CharacterCardPortraitGroupView portraitsGroupView = CharacterCardPortraitGroupView.createFromSelectableCards(
