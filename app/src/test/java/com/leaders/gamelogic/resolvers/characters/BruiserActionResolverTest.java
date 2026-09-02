@@ -68,7 +68,7 @@ public class BruiserActionResolverTest {
     }
 
     private CharacterActionBuilder createBuilder() {
-        return new CharacterActionBuilder(bruiser, new ArrayList<>(), new ArrayList<>());
+        return new CharacterActionBuilder(bruiser);
     }
 
     @Before
