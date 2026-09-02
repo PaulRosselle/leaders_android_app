@@ -79,6 +79,7 @@ public class GameHistoryQueryTest {
         GameHistory gameHistory = createTestGameHistory();
         BanishmentPhase phase = new BanishmentPhase(TeamColor.Black);
         gameHistory.getEntries().add(phase);
+        phase.start();
 
         assertSame(phase, GameHistoryQuery.findCurrentPhase(gameHistory));
     }

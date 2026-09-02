@@ -183,46 +183,45 @@ public final class BoardQuery {
 
         List<CharacterPath> paths = new ArrayList<>();
         Set<Position> destinations = new HashSet<>();
+        Set<Position> visited = new HashSet<>();
 
-        findEmptyPathsAround(
-                board, position, position, distance,
-                new ArrayList<>(List.of(position)),
-                destinations, paths, avoidDuplicates
-        );
+        List<List<Position>> currentLevel = new ArrayList<>();
+        currentLevel.add(new ArrayList<>(List.of(position)));
+        visited.add(position);
 
-        return paths;
-    }
+        for (int currentDistance = 1; currentDistance <= distance; currentDistance++) {
+            List<List<Position>> nextLevel = new ArrayList<>();
 
-    private static void findEmptyPathsAround(@NonNull Board board, @NonNull Position startPos,
-                                             @NonNull Position currentPos, int remainingDistance,
-                                             @NonNull List<Position> currentPath,
-                                             @NonNull Set<Position> destinations,
-                                             @NonNull List<CharacterPath> paths,
-                                             boolean avoidDuplicates) {
-        if (remainingDistance == 0) {
-            return;
-        }
+            for (List<Position> currentPath : currentLevel) {
+                Position currentPosition = currentPath.get(currentPath.size() - 1);
 
-        for (Cell cell : BoardQuery.findEmptyCellsAround(board, currentPos, 1)) {
-            Position adjacentPos = cell.getPosition();
+                for (Cell cell : BoardQuery.findEmptyCellsAround(board, currentPosition, 1)) {
+                    Position adjacentPosition = cell.getPosition();
 
-            List<Position> newPath = new ArrayList<>(currentPath);
-            newPath.add(adjacentPos);
+                    if (visited.contains(adjacentPosition)) {
+                        continue;
+                    }
 
-            CharacterPath path = new CharacterPath(newPath);
+                    visited.add(adjacentPosition);
 
-            // We keep only the first path per destination
-            if (!startPos.equals(adjacentPos) && (!avoidDuplicates || destinations.add(adjacentPos))) {
-                paths.add(path);
+                    List<Position> newPath = new ArrayList<>(currentPath);
+                    newPath.add(adjacentPosition);
+
+                    // On ajoute les solutions de cette distance avant de passer
+                    // au niveau suivant.
+                    if (!position.equals(adjacentPosition)
+                            && (!avoidDuplicates || destinations.add(adjacentPosition))) {
+                        paths.add(new CharacterPath(newPath));
+                    }
+
+                    nextLevel.add(newPath);
+                }
             }
 
-            findEmptyPathsAround(
-                    board, startPos, adjacentPos,
-                    remainingDistance - 1,
-                    newPath, destinations, paths,
-                    avoidDuplicates
-            );
+            currentLevel = nextLevel;
         }
+
+        return paths;
     }
 
     /**

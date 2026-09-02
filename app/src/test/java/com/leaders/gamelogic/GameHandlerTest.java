@@ -664,7 +664,7 @@ public class GameHandlerTest {
         InteractionRequest request = listener.getLastInputRequired();
 
         assertNotNull(request);
-        assertEquals(InteractionType.PositionExpected, request.getRequestType());
+        assertEquals(InteractionType.PlayableCharacterExpected, request.getRequestType());
         assertEquals(
                 Arrays.asList(
                         InteractionResultType.PlayableCharacterChosen,
