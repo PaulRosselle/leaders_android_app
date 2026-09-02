@@ -59,28 +59,6 @@
         app:layout_constraintVertical_bias="0.0"
         tools:ignore="SpeakableTextPresentCheck" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnPuzzleActions_actDuelSetup"
-        android:layout_width="@dimen/round_button_size"
-        android:layout_height="@dimen/round_button_size"
-        android:layout_marginEnd="8dp"
-        android:background="@color/transparent"
-        android:insetTop="0dp"
-        android:insetBottom="0dp"
-        app:icon="@drawable/icon_more_actions"
-        app:iconGravity="textStart"
-        app:iconPadding="0dp"
-        app:iconSize="@dimen/round_button_icon_size"
-        app:iconTint="@color/font"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actDuelSetup"
-        app:layout_constraintVertical_bias="0.0"
-        tools:ignore="SpeakableTextPresentCheck" />
-
     <TextView
         android:id="@+id/txvTitle_actDuelSetup"
         android:layout_width="wrap_content"
