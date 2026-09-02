@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public final class PuzzlePlayerController implements IGameFlowListener {
+public final class GameController implements IGameFlowListener {
 
     public interface Listener {
         void onGameStarted(@NonNull Game game);
@@ -29,6 +29,8 @@ public final class PuzzlePlayerController implements IGameFlowListener {
         void onActionUndone(@NonNull Game game);
 
         void onInteractionRequired(@NonNull InteractionRequest request);
+
+        void onPhaseChanged(@NonNull GamePhase phase, @NonNull InteractionCompletion completion);
 
         void onFeedback(@NonNull InteractionFeedback feedback, @NonNull InteractionCompletion completion);
 
@@ -49,7 +51,7 @@ public final class PuzzlePlayerController implements IGameFlowListener {
     private InteractionRequest pendingRequest;
     private CompletableFuture<InteractionResult> pendingRequestFuture;
 
-    public PuzzlePlayerController(@NonNull Listener listener) {
+    public GameController(@NonNull Listener listener) {
         this.listener = listener;
     }
 
@@ -110,9 +112,7 @@ public final class PuzzlePlayerController implements IGameFlowListener {
 
     public void selectTarget(@NonNull InteractionTarget target) {
         if (!hasPendingInteraction()) {
-            throw new IllegalStateException(
-                    "Targets should not exist outside of a valid request context"
-            );
+            throw new IllegalStateException("Targets should not exist outside of a valid request context");
         }
 
         if (!isLegalTarget(target)) {
@@ -132,9 +132,7 @@ public final class PuzzlePlayerController implements IGameFlowListener {
 
     public void undoLastAction() {
         if (!hasPendingInteraction()) {
-            throw new IllegalStateException(
-                    "Undo should not exist outside of a valid request context"
-            );
+            throw new IllegalStateException("Undo should not exist outside of a valid request context");
         }
 
         if (!canUndoLastAction()) {
@@ -195,7 +193,11 @@ public final class PuzzlePlayerController implements IGameFlowListener {
     @NonNull
     @Override
     public CompletableFuture<Void> onPhaseChanged(@NonNull GamePhase phase) {
-        throw new IllegalStateException("Phase change is not supported within the puzzle player");
+        CompletableFuture<Void> future = new CompletableFuture<>();
+
+        listener.onPhaseChanged(phase, () -> future.complete(null));
+
+        return future;
     }
 
     @NonNull
@@ -208,7 +210,6 @@ public final class PuzzlePlayerController implements IGameFlowListener {
     @NonNull
     @Override
     public CompletableFuture<InteractionResult> onInputRequired(@NonNull InteractionRequest request) {
-
         pendingRequest = request;
         pendingRequestFuture = new CompletableFuture<>();
 

@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
-import com.leaders.app.controllers.PuzzlePlayerController;
+import com.leaders.app.controllers.GameController;
 import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.EndGameType;
@@ -28,6 +28,7 @@ import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.GameHistory;
+import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
@@ -53,7 +54,7 @@ import java.util.List;
 import java.util.Objects;
 
 public final class PuzzlePlayerActivity extends BaseActivity
-        implements PlayableBoardView.OnTargetClickListener, PuzzlePlayerController.Listener {
+        implements PlayableBoardView.OnTargetClickListener, GameController.Listener {
     private enum PuzzlePlayerAction {
         GoToPreviousPuzzle,
         GoToNextPuzzle,
@@ -107,7 +108,7 @@ public final class PuzzlePlayerActivity extends BaseActivity
     private PuzzleSave puzzleSave;
 
 
-    private PuzzlePlayerController controller;
+    private GameController controller;
 
 
     //region BASE ACTIVITY OVERRIDEN METHODS
@@ -193,7 +194,7 @@ public final class PuzzlePlayerActivity extends BaseActivity
             throw new IllegalStateException("No puzzle data received by the player");
         }
 
-        controller = new PuzzlePlayerController(this);
+        controller = new GameController(this);
         controller.startGame(puzzleGameHistory);
         updatePuzzleInfos();
     }
@@ -433,8 +434,13 @@ public final class PuzzlePlayerActivity extends BaseActivity
     }
 
     @Override
+    public void onPhaseChanged(@NonNull GamePhase phase, @NonNull GameController.InteractionCompletion completion) {
+        throw new IllegalStateException("Phase change is not supported within the puzzle player");
+    }
+
+    @Override
     public void onFeedback(@NonNull InteractionFeedback feedback,
-                           @NonNull PuzzlePlayerController.InteractionCompletion completion) {
+                           @NonNull GameController.InteractionCompletion completion) {
         runOnUiThread(() -> bdvBoard.animateFeedback(feedback, completion::complete));
     }
 
