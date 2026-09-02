@@ -6,7 +6,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
 
 import com.google.android.material.button.MaterialButton;
@@ -115,7 +114,7 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
         return R.id.gdlRoot_actDuelSetup;
     }
 
-    @Nullable
+    @NonNull
     @Override
     protected Integer getBtnBackResId() {
         return R.id.btnBack_actDuelSetup;

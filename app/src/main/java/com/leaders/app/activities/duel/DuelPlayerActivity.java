@@ -15,6 +15,7 @@ import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.BoardOrientation;
 import com.leaders.app.enums.LeaderType;
 import com.leaders.app.utilities.ExtraUtils;
+import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.board.PlayableBoardView;
 import com.leaders.app.views.character.CharacterCardPortraitView;
 import com.leaders.app.views.character.CharacterNotificationView;
@@ -33,7 +34,6 @@ import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.factories.GameFactory;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.queries.BoardQuery;
-import com.leaders.gamelogic.queries.RecruitmentQuery;
 import com.leaders.gamelogic.queries.SelectableCardsQuery;
 import com.leaders.puzzlelogic.serializers.SerializationContext;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
@@ -46,14 +46,19 @@ import java.util.Objects;
 public class DuelPlayerActivity extends BaseActivity implements
         PlayableBoardView.OnTargetClickListener,
         CharacterCardSelectionView.OnCardSelectedListener {
+
     private PlayableBoardView bdvBoard;
     private CharacterCardSelectionView ccsvCardSelector;
     private PlayerBottomView pbvCurrentPlayer;
     private PlayerTopView ptvOpposingPlayer;
 
+
     private CharacterNotificationView cnvCardInfo;
 
     private MaterialButton btnActions;
+    private ActionsMenuView amvActions;
+    private View vwDialogBg;
+
     private MaterialButton btnCards;
     private MaterialButton btnUndoLastAction;
     private MaterialButton btnNextPhase;
@@ -76,6 +81,10 @@ public class DuelPlayerActivity extends BaseActivity implements
         cnvCardInfo = findViewById(R.id.cnvCardInfo_actDuelPlayer);
 
         btnActions = findViewById(R.id.btnActions_actDuelPlayer);
+        amvActions = findViewById(R.id.amvActions_actDuelPlayer);
+        amvActions.addActionButton(R.drawable.icon_position, R.string.board_coordinates, 0, this::onDisplayCellPositionClick);
+        vwDialogBg = findViewById(R.id.vwDialogBg_actDuelPlayer);
+
         btnCards = findViewById(R.id.btnCards_actDuelPlayer);
         btnUndoLastAction = findViewById(R.id.btnUndoLastAction_actDuelPlayer);
         btnNextPhase = findViewById(R.id.btnNextPhase_actDuelPlayer);
@@ -97,6 +106,8 @@ public class DuelPlayerActivity extends BaseActivity implements
         cnvCardInfo.setOnClickListener(v -> cnvCardInfo.hide());
 
         btnActions.setOnClickListener(this::onActionsClick);
+        vwDialogBg.setOnClickListener(this::vwDialogBgClick);
+
         btnCards.setOnClickListener(this::onCardsClick);
         btnUndoLastAction.setOnClickListener(this::onUndoLastActionClick);
         btnNextPhase.setOnClickListener(this::onNextPhaseClick);
@@ -202,7 +213,7 @@ public class DuelPlayerActivity extends BaseActivity implements
     }
 
     private void onActionsClick(View v) {
-        // TODO - show actions menu
+        setActionsMenuVisible(true);
     }
 
     private boolean onBoardCharacterLongClick(View v) {
@@ -215,6 +226,25 @@ public class DuelPlayerActivity extends BaseActivity implements
     private boolean onPortraitLongClick(View v) {
         showCardDescriptionNotification(((CharacterCardPortraitView) v).getPortraitCard());
         return true;
+    }
+
+    //endregion
+
+    //region ACTIONS METHODS
+
+    private void vwDialogBgClick(View v) {
+        setActionsMenuVisible(false);
+    }
+
+    private void onDisplayCellPositionClick(View v) {
+        bdvBoard.setCellPositionVisible(!bdvBoard.isCellPositionVisible());
+
+        setActionsMenuVisible(false);
+    }
+
+    private void setActionsMenuVisible(boolean visible) {
+        amvActions.setVisibility(visible ? View.VISIBLE : View.GONE);
+        vwDialogBg.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     //endregion
