@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+    android:id="@+id/clyMain_actDuelPlayer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
@@ -156,8 +156,8 @@
         app:srcCompat="@drawable/character_piece_empty_w"
         app:teamColor="Black" />
 
-    <com.leaders.app.views.character.CharacterHighlightView
-        android:id="@+id/chvTeamColorHighlight_actDuelSetup"
+    <com.leaders.app.views.character.HighlightView
+        android:id="@+id/hlvTeamColorHighlight_actDuelSetup"
         android:layout_width="@dimen/round_button_size"
         android:layout_height="@dimen/round_button_size"
         app:layout_constraintBottom_toBottomOf="@+id/vwFirstPlayerBg_actDuelSetup"

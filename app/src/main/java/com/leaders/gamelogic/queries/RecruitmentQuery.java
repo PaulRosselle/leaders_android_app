@@ -48,7 +48,7 @@ public final class RecruitmentQuery {
         int recruitmentCount = getRecruitedCards(game, teamColor, false).size();
 
         // The 2nd player is allowed to recruit twice during their first recruitment phase.
-        if (recruitmentCount == 0 && teamColor != gameHistory.getConfig().getFirstPlayer().getTeamColor()) {
+        if (recruitmentCount < 2 && teamColor != gameHistory.getConfig().getFirstPlayer().getTeamColor()) {
             return 2;
         }
 

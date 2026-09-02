@@ -689,8 +689,8 @@ public final class CharacterActionAnimator {
 
     private static void setupForMovement(@NonNull CharacterDisplay characterDisplay,
                                          float destX, float destY, boolean bringToFront) {
+        characterDisplay.stopHighlightAnimation();
         characterDisplay.setIsHighlighted(false, true);
-        characterDisplay.startHighlightAnimation();
         if (bringToFront) {
             characterDisplay.bringToFront();
         }

@@ -20,19 +20,22 @@ import com.leaders.app.utilities.CharacterCardUtils;
 import com.leaders.app.views.character.CharacterCardPortraitGroupView;
 import com.leaders.app.views.character.CharacterCardPortraitView;
 import com.leaders.gamelogic.entities.SelectableCharacterCard;
+import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterCardSelectionStatus;
 import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.interactions.InteractionResultType;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class CharacterCardSelectionView extends ConstraintLayout {
     public interface OnCardSelectedListener {
         void onRecruitmentCardSelected(@NonNull InteractionTarget target);
-        void onBanishmentCardSelected(@NonNull InteractionTarget target);
+        void onBanishmentCardSelected();
         void onNotSelectableCardClick();
     }
 
@@ -42,6 +45,7 @@ public class CharacterCardSelectionView extends ConstraintLayout {
     private int portraitsPerGroup;
     private int portraitSpacing;
     private List<InteractionTarget> targets;
+    private InteractionTarget selectedTarget;
 
     private OnLongClickListener onPortraitLongClickListener;
 
@@ -49,6 +53,9 @@ public class CharacterCardSelectionView extends ConstraintLayout {
 
     public CharacterCardSelectionView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+
+        targets = null;
+        selectedTarget = null;
 
         inflate(context, R.layout.view_character_card_selection, this);
 
@@ -72,26 +79,49 @@ public class CharacterCardSelectionView extends ConstraintLayout {
         }
     }
 
-    public void setTargets(@NonNull List<InteractionTarget> targets) {
+    public void applyTargets(@NonNull List<InteractionTarget> targets) {
         this.targets = targets;
+        selectedTarget = null;
         updatePortraitsFromTargets();
     }
 
-    public void setCards(@NonNull List<SelectableCharacterCard> selectableCards) {
+    public void applyCards(@NonNull List<SelectableCharacterCard> selectableCards) {
         this.targets = null;
+        selectedTarget = null;
         updatePortraitsFromCards(selectableCards);
+    }
+
+    public InteractionTarget getSelectedTarget() {
+        return selectedTarget;
     }
 
     private void updatePortraitsFromTargets() {
         llyPortraits.removeAllViews();
 
-        for (int start = 0; start < targets.size(); start += portraitsPerGroup) {
-            int end = Math.min(start + portraitsPerGroup, targets.size());
+        // First we order each target from their card
+        List<CharacterCard> allCards = new ArrayList<>(Arrays.asList(CharacterCard.values()));
+        Context context = getContext();
+        CharacterCardUtils.sort(context, allCards);
+
+        List<InteractionTarget> sortedTargets = new ArrayList<>();
+        for (CharacterCard card : allCards) {
+            Optional<InteractionTarget> matchingTarget = targets.stream()
+                    .filter(target ->
+                            Objects.requireNonNull(
+                                    target.getChosenSelectableCharacterCard(),
+                                    "Invalid selectable card target: missing selectable card")
+                                    .getCharacterCard() == card)
+                    .findFirst();
+            matchingTarget.ifPresent(sortedTargets::add);
+        }
+
+        for (int start = 0; start < sortedTargets.size(); start += portraitsPerGroup) {
+            int end = Math.min(start + portraitsPerGroup, sortedTargets.size());
 
             List<InteractionTarget> groupTargets = new ArrayList<>(end - start);
 
             for (int groupIdx = start; groupIdx < end; groupIdx++) {
-                InteractionTarget target = targets.get(groupIdx);
+                InteractionTarget target = sortedTargets.get(groupIdx);
 
                 groupTargets.add(target);
             }
@@ -109,13 +139,25 @@ public class CharacterCardSelectionView extends ConstraintLayout {
     private void updatePortraitsFromCards(@NonNull List<SelectableCharacterCard> selectableCards) {
         llyPortraits.removeAllViews();
 
-        for (int start = 0; start < selectableCards.size(); start += portraitsPerGroup) {
-            int end = Math.min(start + portraitsPerGroup, selectableCards.size());
+        // First we order each selectable card
+        List<CharacterCard> allCards = new ArrayList<>(Arrays.asList(CharacterCard.values()));
+        Context context = getContext();
+        CharacterCardUtils.sort(context, allCards);
+
+        List<SelectableCharacterCard> sortedSelectableCards = new ArrayList<>();
+        for (CharacterCard card : allCards) {
+            Optional<SelectableCharacterCard> matchingSelectableCard = selectableCards.stream()
+                    .filter(selectableCard -> selectableCard.getCharacterCard() == card).findFirst();
+            matchingSelectableCard.ifPresent(sortedSelectableCards::add);
+        }
+
+        for (int start = 0; start < sortedSelectableCards.size(); start += portraitsPerGroup) {
+            int end = Math.min(start + portraitsPerGroup, sortedSelectableCards.size());
 
             List<SelectableCharacterCard> groupCards = new ArrayList<>(end - start);
 
             for (int groupIdx = start; groupIdx < end; groupIdx++) {
-                groupCards.add(selectableCards.get(groupIdx));
+                groupCards.add(sortedSelectableCards.get(groupIdx));
             }
 
             CharacterCardPortraitGroupView portraitsGroupView = CharacterCardPortraitGroupView.createFromSelectableCards(
@@ -178,13 +220,35 @@ public class CharacterCardSelectionView extends ConstraintLayout {
     }
 
     private void onRecruitableCardSelected(@NonNull InteractionTarget target) {
+        selectedTarget = target;
+
         if (onCardSelectedListener != null) {
             onCardSelectedListener.onRecruitmentCardSelected(target);
         }
     }
     private void onBanishableCardSelected(@NonNull InteractionTarget target) {
+        selectedTarget = target;
+        for (int i = 0; i < llyPortraits.getChildCount(); i++) {
+            CharacterCardPortraitGroupView groupView = (CharacterCardPortraitGroupView) llyPortraits.getChildAt(i);
+            for (CharacterCardPortraitView portraitView : groupView.getPortraits()) {
+                if (selectedTarget == portraitView.getTarget()) {
+                    portraitView.setUseBannedDisplay(true);
+                } else {
+                    boolean alreadyBanned = Objects.requireNonNull(
+                            Objects.requireNonNull(portraitView.getTarget(),
+                                            "Invalid portrait: target missing")
+                                    .getChosenSelectableCharacterCard(),
+                                    "Invalid portrait target: card missing")
+                            .getSelectionStatus() == CharacterCardSelectionStatus.AlreadyBanned;
+                    if (!alreadyBanned) {
+                        portraitView.setUseBannedDisplay(false);
+                    }
+                }
+            }
+        }
+
         if (onCardSelectedListener != null) {
-            onCardSelectedListener.onBanishmentCardSelected(target);
+            onCardSelectedListener.onBanishmentCardSelected();
         }
     }
 
@@ -229,6 +293,10 @@ public class CharacterCardSelectionView extends ConstraintLayout {
         this.onCardSelectedListener = onCardSelectedListener;
     }
 
+    public void setOnScrollViewClickListener(OnClickListener onScrollViewClickListener) {
+        scvPortraits.setOnClickListener(onScrollViewClickListener);
+    }
+
     public void show(boolean animate) {
         // We use a fading animation for the visibility change
         if (animate) {
@@ -243,5 +311,9 @@ public class CharacterCardSelectionView extends ConstraintLayout {
     public void hide() {
         // Hiding the view is always instantaneous
         setVisibility(GONE);
+    }
+
+    public void setPortraitsVisible(boolean visible) {
+        scvPortraits.setVisibility(visible ? VISIBLE : GONE);
     }
 }

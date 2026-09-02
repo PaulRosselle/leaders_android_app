@@ -173,11 +173,13 @@ public class PlayabilityQueryTest {
     public void getCharacterPlayableStates_shouldReturnOnlyCharacterThatMustActNow() {
         Board board = new Board();
 
-        Character leader = createCharacter(CharacterType.LeaderKing, TeamColor.White);
+        Character blackLeader = createCharacter(CharacterType.LeaderQueen, TeamColor.Black);
+        Character whiteLeader = createCharacter(CharacterType.LeaderKing, TeamColor.White);
         Character nemesis = createCharacter(CharacterType.Nemesis, TeamColor.Black);
         Character acrobat = createCharacter(CharacterType.Acrobat, TeamColor.Black);
 
-        board.getCell(new Position(3, 2)).setCharacter(leader);
+        board.getCell(new Position(3, 6)).setCharacter(blackLeader);
+        board.getCell(new Position(3, 2)).setCharacter(whiteLeader);
         board.getCell(new Position(3, 3)).setCharacter(nemesis);
         board.getCell(new Position(3, 4)).setCharacter(acrobat);
 
@@ -189,10 +191,10 @@ public class PlayabilityQueryTest {
          * Here we only need to verify PlayabilityQuery's contract:
          * when mustActNow() is true, this character is returned alone.
          */
-        CharacterAction leaderAction = new CharacterAction(leader,
+        CharacterAction leaderAction = new CharacterAction(whiteLeader,
                 List.of(new CharacterActionMotion(CharacterMotionType.Move,
                         List.of(new CharacterActionTarget(
-                                leader,
+                                whiteLeader,
                                 new Position(3, 1),
                                 new Position(3, 2)
                         ))

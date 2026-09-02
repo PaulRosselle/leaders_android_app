@@ -40,7 +40,7 @@ public final class RecruitmentActionHandler extends GameActionHandler {
             CharacterCard card = motion.getCharacter().getCharacterType().getCharacterCard();
 
             if (!game.getRecruitableCards().contains(card)) {
-                game.getRecruitableCards().add(card);
+                game.getRecruitableCards().add(0, card);
             }
 
             // Remove the character from the board.

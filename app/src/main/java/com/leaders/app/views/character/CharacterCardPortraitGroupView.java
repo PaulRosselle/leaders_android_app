@@ -15,6 +15,7 @@ import com.leaders.gamelogic.enums.CharacterCardSelectionStatus;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -49,6 +50,7 @@ public final class CharacterCardPortraitGroupView extends LinearLayout {
 
         characterCardPortraitViews.clear();
         removeAllViews();
+
         for (int i = 0; i < groupSize; i++) {
             CharacterCardPortraitView portraitView = new CharacterCardPortraitView(getContext(), null);
 
@@ -65,6 +67,17 @@ public final class CharacterCardPortraitGroupView extends LinearLayout {
 
         updatePortraitsClickListener();
         updatePortraitsLongClickListener();
+    }
+
+    public List<CharacterCardPortraitView> getPortraits() {
+        List<CharacterCardPortraitView> portraitViews = new ArrayList<>();
+        for (CharacterCardPortraitView portraitView : characterCardPortraitViews) {
+            if (portraitView.getVisibility() == VISIBLE) {
+                portraitViews.add(portraitView);
+            }
+        }
+
+        return Collections.unmodifiableList(portraitViews);
     }
 
     public void setPortraitSpacing(int portraitSpacing) {

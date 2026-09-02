@@ -17,7 +17,7 @@ import com.leaders.app.enums.LeaderType;
 import com.leaders.app.utilities.DuelStartUtils;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.views.duel.PlayerSetupView;
-import com.leaders.app.views.character.CharacterHighlightView;
+import com.leaders.app.views.character.HighlightView;
 import com.leaders.app.views.character.CharacterView;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.enums.GameMode;
@@ -35,7 +35,7 @@ import java.util.Random;
 public final class DuelSetupActivity extends BaseActivity implements PlayerSetupView.PlayerSetupWatcher {
     private PlayerSetupView psvFirst, psvSecond;
     private CharacterView chvTeamBlack, chvTeamWhite;
-    private CharacterHighlightView chvTeamColorHighlight;
+    private HighlightView hlvTeamColorHighlight;
     private MaterialButton btnGameModeDiscovery, btnGameModeStrategist;
     private TextView txvGameModeSummary;
 
@@ -53,7 +53,7 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
 
         chvTeamBlack = findViewById(R.id.chvTeamBlack_actDuelSetup);
         chvTeamWhite = findViewById(R.id.chvTeamWhite_actDuelSetup);
-        chvTeamColorHighlight = findViewById(R.id.chvTeamColorHighlight_actDuelSetup);
+        hlvTeamColorHighlight = findViewById(R.id.hlvTeamColorHighlight_actDuelSetup);
 
         btnGameModeDiscovery = findViewById(R.id.btnGameModeDiscovery_actDuelSetup);
         btnGameModeStrategist = findViewById(R.id.btnGameModeStrategist_actDuelSetup);
@@ -100,7 +100,7 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
         updateGameMode(btnGameModeDiscovery);
 
         // First player initialization needs to wait until team color views are loaded
-        chvTeamColorHighlight.post(() ->
+        hlvTeamColorHighlight.post(() ->
                 updateFirstTeamColor(random.nextBoolean() ? chvTeamBlack : chvTeamWhite));
     }
 
@@ -154,8 +154,8 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
         otherChv.scaleForHighlight(false, true);
 
         this.firstTeamColor = characterView.getTeamColor();
-        chvTeamColorHighlight.setX(characterView.getX());
-        chvTeamColorHighlight.setY(characterView.getY());
+        hlvTeamColorHighlight.setX(characterView.getX());
+        hlvTeamColorHighlight.setY(characterView.getY());
     }
 
     private void updateGameMode(@NonNull MaterialButton btnGameMode) {

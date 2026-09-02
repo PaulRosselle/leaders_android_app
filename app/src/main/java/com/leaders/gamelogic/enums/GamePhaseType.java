@@ -10,6 +10,16 @@ public enum GamePhaseType {
     TurnEnd;
 
     /**
+     * Indicates whether this phase is part of a turn.
+     *
+     * @return {@code true} if this phase belongs to a turn; {@code false} for
+     *         {@link #Banishment}
+     */
+    public boolean isTurnPhase() {
+        return this != Banishment;
+    }
+
+    /**
      * Returns the {@link TransitionTarget} corresponding to this game phase type.
      *
      * @return the matching {@link TransitionTarget}

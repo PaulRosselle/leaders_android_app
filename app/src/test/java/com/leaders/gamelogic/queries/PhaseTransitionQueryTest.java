@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import com.leaders.gamelogic.actions.RecruitmentAction;
 import com.leaders.gamelogic.entities.Board;
+import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameConfig;
@@ -18,13 +19,14 @@ import com.leaders.gamelogic.historyentries.segments.ActionsPhase;
 import com.leaders.gamelogic.historyentries.segments.BanishmentPhase;
 import com.leaders.gamelogic.historyentries.segments.RecruitmentPhase;
 import com.leaders.gamelogic.historyentries.segments.Turn;
-import com.leaders.gamelogic.historyentries.segments.TurnEndPhase;
+import com.leaders.gamelogic.historyentries.segments.TurnPhase;
 import com.leaders.gamelogic.historyentries.segments.TurnStartPhase;
 
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 
 public class PhaseTransitionQueryTest {
 
@@ -40,13 +42,15 @@ public class PhaseTransitionQueryTest {
 
     private GameHistory createTestGameHistory(GameMode gameMode) {
         ArrayList<Player> players = new ArrayList<>();
+        Player firstPlayer = new Player(TeamColor.White, "Elise");
+
         players.add(new Player(TeamColor.Black, "Paul"));
-        players.add(new Player(TeamColor.White, "Elise"));
+        players.add(firstPlayer);
 
         return new GameHistory(
                 new GameConfig(
                         players,
-                        players.get(1), // firstPlayer
+                        firstPlayer,
                         gameMode,
                         new ArrayList<>(), // initialRecruitableCards
                         new ArrayList<>() // initialPlacements
@@ -89,7 +93,7 @@ public class PhaseTransitionQueryTest {
         Turn turn = createTestTurn();
         history.getEntries().add(turn);
 
-        TurnStartPhase turnStartPhase = (TurnStartPhase) turn.getSubPhasesInOrder()[0];
+        TurnStartPhase turnStartPhase = (TurnStartPhase) turn.getSubPhase(GamePhaseType.TurnStart);
         turnStartPhase.start();
         turnStartPhase.end();
 
@@ -106,12 +110,12 @@ public class PhaseTransitionQueryTest {
         Turn turn = createTestTurn();
         history.getEntries().add(turn);
 
-        ActionsPhase actionsPhase = (ActionsPhase) turn.getSubPhasesInOrder()[1];
+        ActionsPhase actionsPhase = (ActionsPhase) turn.getSubPhase(GamePhaseType.Actions);
         actionsPhase.start();
         actionsPhase.end();
 
         RecruitmentPhase recruitmentPhase =
-                (RecruitmentPhase) turn.getSubPhasesInOrder()[2];
+                (RecruitmentPhase) turn.getSubPhase(GamePhaseType.Recruitment);
         recruitmentPhase.start();
 
         GamePhase nextPhase = PhaseTransitionQuery.getNextPhase(game, history);
@@ -123,16 +127,25 @@ public class PhaseTransitionQueryTest {
     @Test
     public void getNextPhase_shouldReturnTurnEndWhenRecruitmentIsNotPossible() {
         Game game = createTestGame();
+
         GameHistory history = createTestGameHistory(GameMode.Discovery);
         Turn turn = createTestTurn();
         history.getEntries().add(turn);
 
-        ActionsPhase actionsPhase = (ActionsPhase) turn.getSubPhasesInOrder()[1];
-        actionsPhase.start();
-        actionsPhase.end();
 
-        RecruitmentPhase recruitmentPhase =
-                (RecruitmentPhase) turn.getSubPhasesInOrder()[2];
+        for (Cell recruitmentCell : BoardQuery.getRecruitmentCells(game.getBoard(), turn.getTeamColor())) {
+            if (recruitmentCell.getCharacter() == null) {
+                recruitmentCell.setCharacter(Character.create(CharacterType.Archer, turn.getTeamColor()));
+            }
+        }
+
+        for (GamePhaseType phaseType : List.of(GamePhaseType.TurnStart, GamePhaseType.Actions)) {
+            TurnPhase turnPhase = turn.getSubPhase(phaseType);
+            turnPhase.start();
+            turnPhase.end();
+        }
+
+        RecruitmentPhase recruitmentPhase = (RecruitmentPhase) turn.getSubPhase(GamePhaseType.Recruitment);
         recruitmentPhase.start();
         recruitmentPhase.getActions().add(new RecruitmentAction(new ArrayList<>()));
 
@@ -148,10 +161,11 @@ public class PhaseTransitionQueryTest {
         Turn turn = createTestTurn();
         history.getEntries().add(turn);
 
-        RecruitmentPhase recruitmentPhase =
-                (RecruitmentPhase) turn.getSubPhasesInOrder()[2];
-        recruitmentPhase.start();
-        recruitmentPhase.end();
+        for (GamePhaseType phaseType : List.of(GamePhaseType.TurnStart, GamePhaseType.Actions, GamePhaseType.Recruitment)) {
+            TurnPhase turnPhase = turn.getSubPhase(phaseType);
+            turnPhase.start();
+            turnPhase.end();
+        }
 
         GamePhase nextPhase = getNextPhase(history);
 
@@ -160,22 +174,15 @@ public class PhaseTransitionQueryTest {
     }
 
     @Test
-    public void getNextPhase_shouldReturnBanishmentForOppositePlayerWhenBanishmentIsPossible() {
+    public void getNextPhase_shouldReturnBanishmentForSecondPlayerWhenBanishmentIsPossible() {
         Game game = createTestGame();
         GameHistory history = createTestGameHistory(GameMode.Strategist);
 
-        Turn turn = createTestTurn();
-        history.getEntries().add(turn);
-
-        TurnEndPhase turnEndPhase =
-                (TurnEndPhase) turn.getSubPhasesInOrder()[3];
-        turnEndPhase.start();
-        turnEndPhase.end();
-
         GamePhase nextPhase = PhaseTransitionQuery.getNextPhase(game, history);
 
+        // Here first player is White so the banihsment starts with the Black player
         assertEquals(GamePhaseType.Banishment, nextPhase.getPhaseType());
-        assertEquals(TeamColor.White, nextPhase.getPhasePlayer().getTeamColor());
+        assertEquals(TeamColor.Black, nextPhase.getPhasePlayer().getTeamColor());
     }
 
     @Test
@@ -186,10 +193,13 @@ public class PhaseTransitionQueryTest {
         Turn turn = createTestTurn();
         history.getEntries().add(turn);
 
-        TurnEndPhase turnEndPhase =
-                (TurnEndPhase) turn.getSubPhasesInOrder()[3];
-        turnEndPhase.start();
-        turnEndPhase.end();
+        for (GamePhaseType phaseType : GamePhaseType.values()) {
+            if (phaseType.isTurnPhase()) {
+                TurnPhase turnPhase = turn.getSubPhase(phaseType);
+                turnPhase.start();
+                turnPhase.end();
+            }
+        }
 
         GamePhase nextPhase = PhaseTransitionQuery.getNextPhase(game, history);
 
@@ -202,8 +212,7 @@ public class PhaseTransitionQueryTest {
         Game game = createTestGame();
         GameHistory history = createTestGameHistory(GameMode.Strategist);
 
-        BanishmentPhase banishmentPhase =
-                new BanishmentPhase(TeamColor.Black);
+        BanishmentPhase banishmentPhase = new BanishmentPhase(TeamColor.Black);
         banishmentPhase.start();
         banishmentPhase.end();
         history.getEntries().add(banishmentPhase);
@@ -219,8 +228,7 @@ public class PhaseTransitionQueryTest {
         Game game = createTestGame();
         GameHistory history = createTestGameHistory(GameMode.Discovery);
 
-        BanishmentPhase banishmentPhase =
-                new BanishmentPhase(TeamColor.Black);
+        BanishmentPhase banishmentPhase = new BanishmentPhase(TeamColor.Black);
         banishmentPhase.start();
         banishmentPhase.end();
         history.getEntries().add(banishmentPhase);

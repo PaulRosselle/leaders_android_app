@@ -99,7 +99,9 @@ public final class NemesisActionResolver extends CharacterActionResolver {
      */
     @NonNull
     private List<CharacterPath> getValidNemesisMovementPaths(@NonNull CharacterActionBuilder builder) {
-        List<CharacterPath> allPaths = BoardQuery.getEmptyPathsAround(game.getBoard(), characterPos, 2, false);
+        List<CharacterPath> allPaths = BoardQuery.getEmptyPathsAround(
+                game.getBoard(), characterPos, 2, false
+        );
 
         List<CharacterPath> pathsAtTwo = getValidPathsAtDistance(builder, allPaths, 2);
         if (!pathsAtTwo.isEmpty()) {

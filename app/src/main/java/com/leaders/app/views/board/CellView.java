@@ -42,9 +42,10 @@ public final class CellView extends AppCompatImageView {
                 "Recruitment interaction target invalid: no position").getQ();
         setImageResource(columnAxisPos == 0 ?
                 R.drawable.target_recruitment_center : R.drawable.target_recruitment_side);
-        setRotationY(columnAxisPos > 0 ||
-                (boardOrientation == BoardOrientation.Rotated && columnAxisPos < 0) ? 180f : 0f);
+        boolean rotateImg = boardOrientation == BoardOrientation.Rotated ? columnAxisPos < 0 : columnAxisPos > 0;
+
         setRotation(0f);
+        setRotationY(rotateImg ? 180f : 0f);
         setRotationX(0f);
     }
 
