@@ -525,6 +525,10 @@ public final class GameHandler {
         TeamColor recruitmentTeamColor = currentPhase.getPhasePlayer().getTeamColor();
 
         if (!RecruitmentQuery.canRecruit(currentGame, currentHistory, recruitmentTeamColor)) {
+            // When the user cannot undo recruitments, the phase ends automatically
+            if (canUndoLastRecruitment(currentPhase)) {
+                return runRequestEndRecruitmentPhase(currentPhase);
+            }
             return CompletableFuture.completedFuture(null);
         }
 
@@ -532,6 +536,56 @@ public final class GameHandler {
                 .thenCompose(selectableCard ->
                         runRecruitCardAsync(currentPhase, selectableCard.getCharacterCard()))
                 .thenCompose(ignored -> runRecruitmentPhaseAsync(currentPhase));
+    }
+
+    /**
+     * Determines whether the last recruitment action can be undone.
+     *
+     * @param currentPhase the current game phase
+     * @return {@code true} if the last recruitment action can be undone;
+     *         {@code false} otherwise
+     */
+    private boolean canUndoLastRecruitment(@NonNull GamePhase currentPhase) {
+        // A recruitment action can only be undone in Strategist mode.
+        return getGameMode() == GameMode.Strategist && currentTurnPhaseContainsActions(currentPhase);
+    }
+
+    /**
+     * Requests the user an input to end the current recruitment phase.
+     *
+     * @param currentPhase the current game phase
+     * @return a future completed when the phase-ending request is resolved
+     */
+    private CompletableFuture<Void> runRequestEndRecruitmentPhase(@NonNull GamePhase currentPhase) {
+        checkStopped();
+
+        List<InteractionResultType> legalResults = new ArrayList<>();
+        legalResults.add(InteractionResultType.EndPhase);
+        if (canUndoLastRecruitment(currentPhase)) {
+            legalResults.add(InteractionResultType.UndoLastAction);
+        }
+
+        InteractionRequest request = new InteractionRequest(
+                InteractionType.NoTargetExpected,
+                new InteractionContext(),
+                new ArrayList<>(), // Legal targets
+                legalResults
+        );
+
+        return gameFlowListener.onInputRequired(request).thenCompose(result -> {
+            checkStopped();
+
+            // Since recruitments are mandatory we reenter immediately after an undo
+            if (result.getResultType() == InteractionResultType.UndoLastAction) {
+                return undoLastAction().thenCompose(ignored -> runRecruitmentPhaseAsync(currentPhase));
+            }
+
+            if (result.getResultType() != InteractionResultType.EndPhase) {
+                throw new IllegalStateException("Invalid interaction result : illegal type \"" + result.getResultType() + "\" end phase request");
+            }
+
+            return CompletableFuture.completedFuture(null);
+        });
     }
 
     /**
@@ -553,8 +607,7 @@ public final class GameHandler {
 
         List<InteractionResultType> legalResults = new ArrayList<>();
         legalResults.add(InteractionResultType.SelectableCharacterCardChosen);
-        // A recruitment action can only be undone in Strategist mode.
-        if (getGameMode() == GameMode.Strategist && currentTurnPhaseContainsActions(currentPhase)) {
+        if (canUndoLastRecruitment(currentPhase)) {
             legalResults.add(InteractionResultType.UndoLastAction);
         }
 
@@ -569,7 +622,7 @@ public final class GameHandler {
         return gameFlowListener.onInputRequired(request).thenCompose(result -> {
             checkStopped();
 
-            // Since recruitments are mandatory
+            // Since recruitments are mandatory we reenter immediately after an undo
             if (result.getResultType() == InteractionResultType.UndoLastAction) {
                 return undoLastAction().thenCompose(ignored -> runSelectRecruitmentCardAsync(currentPhase));
             }

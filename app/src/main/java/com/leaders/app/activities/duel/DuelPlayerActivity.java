@@ -214,7 +214,7 @@ public final class DuelPlayerActivity extends BaseActivity implements
     }
 
     private void onUndoLastActionClick(View v) {
-        // TODO - undo last action
+        controller.undoLastAction();
     }
 
     private void onNextPhaseClick(View v) {
@@ -486,16 +486,16 @@ public final class DuelPlayerActivity extends BaseActivity implements
 
     @Override
     public void onActionUndone(@NonNull Game game) {
-        // TODO - handle undo
+        runOnUiThread(() -> bdvBoard.setBoard(game.getBoard()));
     }
 
     @Override
     public void onInteractionRequired(@NonNull InteractionRequest request) {
         runOnUiThread(() -> {
             GameContext gameContext = controller.getCurrentContext();
-
-            
             switch (request.getRequestType()) {
+                case NoTargetExpected: // Only require to choose a result within legalResults
+                    break;
                 case SelectableCharacterCardExpected:
                     ccsvCardSelector.applyTargets(request.getLegalTargets());
                     break;
@@ -503,7 +503,6 @@ public final class DuelPlayerActivity extends BaseActivity implements
                 case PositionExpected: {
                     bdvBoard.applyTargets(request.getLegalTargets(), request.getContext(), gameContext.getBoard());
                 } break;
-
                 default:
                     throw new IllegalStateException("Unexpected request type: " + request.getRequestType());
             }
