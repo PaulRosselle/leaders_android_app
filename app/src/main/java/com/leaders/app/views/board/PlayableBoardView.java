@@ -27,6 +27,7 @@ import com.leaders.gamelogic.queries.BoardQuery;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -95,23 +96,24 @@ public class PlayableBoardView extends BoardView {
     private void applyDestinationTarget(@NonNull InteractionTarget target,
                                         @NonNull InteractionContext context,
                                         @NonNull Board board) {
-        UUID characterID = Objects.requireNonNull(context.getCharacter(),
-                "Invalid destination context : source character missing").getId();
-
-        Position sourcePos = BoardQuery.getCellByCharacterId(board, characterID).getPosition();
         Position destPos = Objects.requireNonNull(target.getChosenPosition(),
                 "Invalid destination target : destination position missing");
 
-        CellView sourceCellView = getCellView(sourcePos);
         CellView destCellView = getCellView(destPos);
 
         switch (target.getCategory()) {
             case RecruitmentDestination:
                 destCellView.setAsRecruitmentDestinationTarget(target, orientation);
                 break;
-            case MovementDestination:
+            case MovementDestination: {
+                UUID characterID = Objects.requireNonNull(context.getCharacter(),
+                        "Invalid destination context : source character missing").getId();
+                Position sourcePos = BoardQuery.getCellByCharacterId(board, characterID).getPosition();
+
+                CellView sourceCellView = getCellView(sourcePos);
                 destCellView.setAsMovementDestinationTarget(target, sourceCellView);
-                break;
+            } break;
+
             case ActiveAbilityDestination:
                 destCellView.setAsActiveAbilityDestinationTarget(target);
                 break;
@@ -198,10 +200,17 @@ public class PlayableBoardView extends BoardView {
     public void highlightPlayableCharacters(@Nullable List<PlayableCharacter> playableCharacters,
                                             @Nullable Character selectedCharacter,
                                             @NonNull Board board) {
-        Position selectedCharacterPos = null;
+        Position selectedCharacterPos;
         if (selectedCharacter != null) {
-            Cell selectedCharacterCell = BoardQuery.getCellByCharacterId(board, selectedCharacter.getId());
-            selectedCharacterPos = selectedCharacterCell.getPosition();
+            try {
+                // During a recruitment, a selected character can be outside the board
+                Cell selectedCharacterCell = BoardQuery.getCellByCharacterId(board, selectedCharacter.getId());
+                selectedCharacterPos = selectedCharacterCell.getPosition();
+            } catch (NoSuchElementException e) {
+                selectedCharacterPos = null;
+            }
+        } else {
+            selectedCharacterPos = null;
         }
 
         for (Map.Entry<Position, CharacterDisplay> entry : characterDisplayMap.entrySet()) {

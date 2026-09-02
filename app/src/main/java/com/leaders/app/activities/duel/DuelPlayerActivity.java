@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.android.material.button.MaterialButton;
@@ -19,6 +20,7 @@ import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.board.PlayableBoardView;
 import com.leaders.app.views.character.CharacterCardPortraitView;
+import com.leaders.app.views.character.CharacterDisplay;
 import com.leaders.app.views.character.HighlightView;
 import com.leaders.app.views.character.CharacterNotificationView;
 import com.leaders.app.views.character.CharacterView;
@@ -27,6 +29,7 @@ import com.leaders.app.views.duel.PlayerBottomView;
 import com.leaders.app.views.duel.PlayerTopView;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
+import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.GameHistory;
@@ -66,6 +69,8 @@ public final class DuelPlayerActivity extends BaseActivity implements
     private ActionsMenuView amvActions;
     private View vwDialogBg;
 
+    private CharacterDisplay chdNewCharacter;
+
     private MaterialButton btnCards;
     private MaterialButton btnUndoLastAction;
     private MaterialButton btnNextPhase;
@@ -84,6 +89,7 @@ public final class DuelPlayerActivity extends BaseActivity implements
         bdvBoard = findViewById(R.id.bdvBoard_actDuelPlayer);
 
         ccsvCardSelector = findViewById(R.id.ccsvCardSelector_actDuelPlayer);
+        chdNewCharacter = new CharacterDisplay(this, ccsvCardSelector);
 
         pbvCurrentPlayer = findViewById(R.id.pbvCurrentPlayer_actDuelPlayer);
         ptvOpposingPlayer = findViewById(R.id.ptvOpposingPlayer_actDuelPlayer);
@@ -391,6 +397,27 @@ public final class DuelPlayerActivity extends BaseActivity implements
         setCardSelectorVisible(lockSelectableCardsView);
     }
 
+    private void setNewCharacterVisible(@Nullable Character newCharacter, boolean visible) {
+        chdNewCharacter.getCharacterView().setVisibility(visible ? View.VISIBLE : View.GONE);
+        chdNewCharacter.setIsHighlighted(visible, false);
+
+        if (visible) {
+            int size = bdvBoard.getCharacterDisplaySize();
+            chdNewCharacter.setSize(size);
+            chdNewCharacter.setPosition(
+                    (ccsvCardSelector.getWidth() - size) / 2f,
+                    (ccsvCardSelector.getHeight() - size) / 2f
+            );
+
+            if (newCharacter != null) {
+                chdNewCharacter.getCharacterView().setCharacter(newCharacter);
+            }
+            chdNewCharacter.startHighlightAnimation();
+        } else {
+            chdNewCharacter.stopHighlightAnimation();
+        }
+    }
+
     //endregion
 
     //region INTERACTION METHODS
@@ -398,6 +425,10 @@ public final class DuelPlayerActivity extends BaseActivity implements
     private void clearInteractionUI(@NonNull GameContext gameContext) {
         bdvBoard.clearTargets();
         ccsvCardSelector.applyCards(gameContext.getAvailableCharacterCards());
+
+        ccsvCardSelector.setPortraitsVisible(true);
+        setNewCharacterVisible(null, false);
+
         ButtonUtils.setEnabled(btnUndoLastAction, false);
         setBtnNextPhaseEnabled(false, false);
     }
@@ -408,6 +439,13 @@ public final class DuelPlayerActivity extends BaseActivity implements
 
         ButtonUtils.setEnabled(btnUndoLastAction, controller.canUndoLastAction());
         setBtnNextPhaseEnabled(controller.canEndPhaseAction(), request.getLegalTargets().isEmpty());
+
+        // TODO - Hide/Show chvNewCharacter
+        if (request.getRequestType() == InteractionType.PositionExpected &&
+                gameContext.getGamePhase().getPhaseType() == GamePhaseType.Recruitment) {
+            ccsvCardSelector.setPortraitsVisible(false);
+            setNewCharacterVisible(request.getContext().getCharacter(), true);
+        }
 
         applyPhaseChange(gameContext.getGamePhase());
     }
@@ -451,18 +489,19 @@ public final class DuelPlayerActivity extends BaseActivity implements
         runOnUiThread(() -> {
             GameContext gameContext = controller.getCurrentContext();
 
-            GamePhaseType phaseType = gameContext.getGamePhase().getPhaseType();
-            switch (phaseType) {
-                case Banishment:
-                case Recruitment:
+            
+            switch (request.getRequestType()) {
+                case SelectableCharacterCardExpected:
                     ccsvCardSelector.applyTargets(request.getLegalTargets());
                     break;
-
-                case Actions:
+                case PlayableCharacterExpected:
+                case PositionExpected: {
+                    // TODO - chvNewCharacter
                     bdvBoard.applyTargets(request.getLegalTargets(), request.getContext(), gameContext.getBoard());
-                    break;
+                } break;
 
-                default: throw new IllegalStateException("Request not handled during phase: " + phaseType);
+                default:
+                    throw new IllegalStateException("Unexpected request type: " + request.getRequestType());
             }
 
             updateInteractionUI(gameContext, request);

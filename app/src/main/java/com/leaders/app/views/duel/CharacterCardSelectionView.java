@@ -280,4 +280,8 @@ public class CharacterCardSelectionView extends ConstraintLayout {
         // Hiding the view is always instantaneous
         setVisibility(GONE);
     }
+
+    public void setPortraitsVisible(boolean visible) {
+        scvPortraits.setVisibility(visible ? VISIBLE : GONE);
+    }
 }
