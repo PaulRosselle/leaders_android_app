@@ -537,7 +537,13 @@ public final class GameHandler {
                 .thenCompose(ignored -> runRecruitmentPhaseAsync(currentPhase));
     }
 
-    // TODO - javadoc
+    /**
+     * Determines whether the last recruitment action can be undone.
+     *
+     * @param currentPhase the current game phase
+     * @return {@code true} if the last recruitment action can be undone;
+     *         {@code false} otherwise
+     */
     private boolean canUndoLastRecruitment(@NonNull GamePhase currentPhase) {
         // A recruitment action can only be undone in Strategist mode.
         return getGameMode() == GameMode.Strategist && currentTurnPhaseContainsActions(currentPhase);
