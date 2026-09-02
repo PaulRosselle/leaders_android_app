@@ -9,6 +9,7 @@ import android.view.animation.LinearInterpolator;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.leaders.R;
 import com.leaders.app.enums.BoardOrientation;
 import com.leaders.app.views.animators.CharacterActionAnimator;
 import com.leaders.app.views.animators.RecruitmentActionAnimator;
@@ -295,6 +296,11 @@ public class PlayableBoardView extends BoardView {
     }
 
     //endregion
+
+    @Override
+    protected int getCellPositionResId() {
+        return orientation == BoardOrientation.Rotated ? R.drawable.cell_positions_rotated : R.drawable.cell_positions;
+    }
 
     @Override
     protected void onDetachedFromWindow() {

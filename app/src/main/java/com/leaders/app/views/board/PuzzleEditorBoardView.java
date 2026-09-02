@@ -5,7 +5,6 @@ import android.util.AttributeSet;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 
 import com.leaders.R;
 import com.leaders.app.views.character.CharacterDisplay;
@@ -22,7 +21,6 @@ import java.util.Map;
 import java.util.Objects;
 
 public final class PuzzleEditorBoardView extends BoardView {
-    private boolean isCellPositionVisible;
 
     public PuzzleEditorBoardView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -77,18 +75,5 @@ public final class PuzzleEditorBoardView extends BoardView {
                     entry.getKey()
             ));
         }
-    }
-
-    public void setCellPositionVisible(boolean visible) {
-        isCellPositionVisible = visible;
-        if (visible) {
-            imvBoard.setForeground(ContextCompat.getDrawable(getContext(), R.drawable.cell_positions));
-        } else {
-            imvBoard.setForeground(null);
-        }
-    }
-
-    public boolean isCellPositionVisible() {
-        return isCellPositionVisible;
     }
 }

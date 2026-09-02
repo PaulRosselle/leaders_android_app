@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 
 import com.leaders.R;
 import com.leaders.app.enums.BoardOrientation;
@@ -38,6 +39,7 @@ public abstract class BoardView extends ConstraintLayout {
 
     @NonNull
     protected BoardOrientation orientation;
+    protected boolean isCellPositionVisible;
 
     private OnCharacterDisplayClickListener onCharacterDisplayClickListener;
     private OnLongClickListener onCharacterLongClickListener;
@@ -57,6 +59,7 @@ public abstract class BoardView extends ConstraintLayout {
         characterDisplayPool = new CharacterDisplayPool(getContext(), this);
 
         setOrientation(BoardOrientation.Default);
+        isCellPositionVisible = false;
     }
 
     private int[] getCellViewIds() {
@@ -231,6 +234,23 @@ public abstract class BoardView extends ConstraintLayout {
     @NonNull
     public final CharacterDisplay getCharacterDisplay(@NonNull Position position) {
         return Objects.requireNonNull(characterDisplayMap.get(position), "No CharacterDisplay found at Position:" + position);
+    }
+
+    protected int getCellPositionResId() {
+        return R.drawable.cell_positions;
+    }
+
+    public final void setCellPositionVisible(boolean visible) {
+        isCellPositionVisible = visible;
+        if (visible) {
+            imvBoard.setForeground(ContextCompat.getDrawable(getContext(), getCellPositionResId()));
+        } else {
+            imvBoard.setForeground(null);
+        }
+    }
+
+    public final boolean isCellPositionVisible() {
+        return isCellPositionVisible;
     }
 
     protected void setOnCellClickListener(OnClickListener onCellClickListener) {
