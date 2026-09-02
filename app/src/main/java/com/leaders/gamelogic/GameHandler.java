@@ -525,6 +525,7 @@ public final class GameHandler {
         TeamColor recruitmentTeamColor = currentPhase.getPhasePlayer().getTeamColor();
 
         if (!RecruitmentQuery.canRecruit(currentGame, currentHistory, recruitmentTeamColor)) {
+            // When the user cannot undo recruitments, the phase ends automatically
             if (canUndoLastRecruitment(currentPhase)) {
                 return runRequestEndRecruitmentPhase(currentPhase);
             }
@@ -549,6 +550,12 @@ public final class GameHandler {
         return getGameMode() == GameMode.Strategist && currentTurnPhaseContainsActions(currentPhase);
     }
 
+    /**
+     * Requests the user an input to end the current recruitment phase.
+     *
+     * @param currentPhase the current game phase
+     * @return a future completed when the phase-ending request is resolved
+     */
     private CompletableFuture<Void> runRequestEndRecruitmentPhase(@NonNull GamePhase currentPhase) {
         checkStopped();
 
