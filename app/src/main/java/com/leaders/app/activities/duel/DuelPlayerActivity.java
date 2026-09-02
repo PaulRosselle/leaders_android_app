@@ -394,7 +394,8 @@ public final class DuelPlayerActivity extends BaseActivity implements
         return !playerName.isEmpty() && (vowels.indexOf(playerName.charAt(0)) != -1);
     }
 
-    private void applyPhaseChange(@NonNull GamePhase gamePhase) {
+    private void applyPhaseChange(@NonNull GamePhase gamePhase,
+                                  boolean canChangeSelectableCardsVisibility) {
         String playerName = gamePhase.getPhasePlayer().getName();
         int playerTurnFormat = isPlayerNameFirstCharVowel(playerName) ? R.string.player_turn_vowel : R.string.player_turn_consonant;
         txvPlayerTurn.setText(String.format(getString(playerTurnFormat), playerName));
@@ -402,7 +403,9 @@ public final class DuelPlayerActivity extends BaseActivity implements
         boolean lockSelectableCardsView = gamePhase.getPhaseType() == GamePhaseType.Recruitment ||
                 gamePhase.getPhaseType() == GamePhaseType.Banishment;
         ButtonUtils.setEnabled(btnCards, !lockSelectableCardsView);
-        setCardSelectorVisible(lockSelectableCardsView);
+        if (canChangeSelectableCardsVisibility) {
+            setCardSelectorVisible(lockSelectableCardsView);
+        }
     }
 
     private void setNewCharacterVisible(@Nullable Character newCharacter, boolean visible) {
@@ -448,14 +451,13 @@ public final class DuelPlayerActivity extends BaseActivity implements
         ButtonUtils.setEnabled(btnUndoLastAction, controller.canUndoLastAction());
         setBtnNextPhaseEnabled(controller.canEndPhaseAction(), request.getLegalTargets().isEmpty());
 
-        // TODO - Hide/Show chvNewCharacter
         if (request.getRequestType() == InteractionType.PositionExpected &&
                 gameContext.getGamePhase().getPhaseType() == GamePhaseType.Recruitment) {
             ccsvCardSelector.setPortraitsVisible(false);
             setNewCharacterVisible(request.getContext().getCharacter(), true);
         }
 
-        applyPhaseChange(gameContext.getGamePhase());
+        applyPhaseChange(gameContext.getGamePhase(), false);
     }
 
     //endregion
@@ -466,14 +468,6 @@ public final class DuelPlayerActivity extends BaseActivity implements
     public void onGameStarted(@NonNull Game game) {
         runOnUiThread(() -> {
             GameContext gameContext = controller.getCurrentContext();
-
-            applyPhaseChange(gameContext.getGamePhase());
-
-            applyPlayerChange(
-                    gameContext.getCurrentPlayer(),
-                    gameContext.getOpposingPlayer(),
-                    gameContext.getBoard()
-            );
 
             bdvBoard.setBoard(game.getBoard());
             ccsvCardSelector.applyGameModeParams(gameContext.getGameMode());
@@ -504,7 +498,6 @@ public final class DuelPlayerActivity extends BaseActivity implements
                     break;
                 case PlayableCharacterExpected:
                 case PositionExpected: {
-                    // TODO - chvNewCharacter
                     bdvBoard.applyTargets(request.getLegalTargets(), request.getContext(), gameContext.getBoard());
                 } break;
 
@@ -527,7 +520,7 @@ public final class DuelPlayerActivity extends BaseActivity implements
                     gameContext.getBoard()
             );
 
-            applyPhaseChange(phase);
+            applyPhaseChange(phase, true);
         });
     }
 
