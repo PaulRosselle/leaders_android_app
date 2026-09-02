@@ -214,7 +214,7 @@ public final class DuelPlayerActivity extends BaseActivity implements
     }
 
     private void onUndoLastActionClick(View v) {
-        // TODO - undo last action
+        controller.undoLastAction();
     }
 
     private void onNextPhaseClick(View v) {
@@ -486,7 +486,7 @@ public final class DuelPlayerActivity extends BaseActivity implements
 
     @Override
     public void onActionUndone(@NonNull Game game) {
-        // TODO - handle undo
+        runOnUiThread(() -> bdvBoard.setBoard(game.getBoard()));
     }
 
     @Override

@@ -103,17 +103,22 @@ public class CharacterCardSelectionView extends ConstraintLayout {
         Context context = getContext();
         CharacterCardUtils.sort(context, allCards);
 
+        List<InteractionTarget> sortedBannedTargets = new ArrayList<>();
         List<InteractionTarget> sortedTargets = new ArrayList<>();
         for (CharacterCard card : allCards) {
             Optional<InteractionTarget> matchingTarget = targets.stream()
-                    .filter(target ->
-                            Objects.requireNonNull(
-                                    target.getChosenSelectableCharacterCard(),
-                                    "Invalid selectable card target: missing selectable card")
-                                    .getCharacterCard() == card)
+                    .filter(target -> getSelectableCardFromTarget(target).getCharacterCard() == card)
                     .findFirst();
-            matchingTarget.ifPresent(sortedTargets::add);
+
+            if (matchingTarget.isPresent()) {
+                if (getSelectableCardFromTarget(matchingTarget.get()).getSelectionStatus() == CharacterCardSelectionStatus.AlreadyBanned) {
+                    sortedBannedTargets.add(matchingTarget.get());
+                } else {
+                    sortedTargets.add(matchingTarget.get());
+                }
+            }
         }
+        sortedTargets.addAll(sortedBannedTargets);
 
         for (int start = 0; start < sortedTargets.size(); start += portraitsPerGroup) {
             int end = Math.min(start + portraitsPerGroup, sortedTargets.size());
@@ -144,12 +149,20 @@ public class CharacterCardSelectionView extends ConstraintLayout {
         Context context = getContext();
         CharacterCardUtils.sort(context, allCards);
 
+        List<SelectableCharacterCard> sortedBannedCards = new ArrayList<>();
         List<SelectableCharacterCard> sortedSelectableCards = new ArrayList<>();
         for (CharacterCard card : allCards) {
             Optional<SelectableCharacterCard> matchingSelectableCard = selectableCards.stream()
                     .filter(selectableCard -> selectableCard.getCharacterCard() == card).findFirst();
-            matchingSelectableCard.ifPresent(sortedSelectableCards::add);
+            if (matchingSelectableCard.isPresent()) {
+                if (matchingSelectableCard.get().getSelectionStatus() == CharacterCardSelectionStatus.AlreadyBanned) {
+                    sortedBannedCards.add(matchingSelectableCard.get());
+                } else {
+                    sortedSelectableCards.add(matchingSelectableCard.get());
+                }
+            }
         }
+        sortedSelectableCards.addAll(sortedBannedCards);
 
         for (int start = 0; start < sortedSelectableCards.size(); start += portraitsPerGroup) {
             int end = Math.min(start + portraitsPerGroup, sortedSelectableCards.size());
@@ -189,10 +202,7 @@ public class CharacterCardSelectionView extends ConstraintLayout {
             throw new IllegalStateException("Invalid portrait target category: " + target.getCategory());
         }
 
-        SelectableCharacterCard selectedCard = Objects.requireNonNull(
-                target.getChosenSelectableCharacterCard(),
-                "Invalid portrait target: selectable character card missing"
-        );
+        SelectableCharacterCard selectedCard = getSelectableCardFromTarget(target);
 
         switch (selectedCard.getSelectionStatus()) {
             case NotSelectable: onNotSelectableCardClick();
@@ -211,6 +221,13 @@ public class CharacterCardSelectionView extends ConstraintLayout {
 
             default: throw new IllegalStateException("Unexpected selectable card status: " + selectedCard.getSelectionStatus());
         }
+    }
+
+    private SelectableCharacterCard getSelectableCardFromTarget(@NonNull InteractionTarget target) {
+        return Objects.requireNonNull(
+                target.getChosenSelectableCharacterCard(),
+                "Invalid portrait target: selectable character card missing"
+        );
     }
 
     private void onNotSelectableCardClick() {
