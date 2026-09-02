@@ -56,12 +56,14 @@ public final class PuzzlePlayerActivity extends BaseActivity
         implements PlayableBoardView.OnTargetClickListener, PuzzlePlayerController.Listener {
     private enum PuzzlePlayerAction {
         GoToPreviousPuzzle,
-        GoToNextPuzzle;
+        GoToNextPuzzle,
+        DisplayCellPositions;
 
         private int getIconResId() {
             switch (this) {
                 case GoToPreviousPuzzle: return R.drawable.icon_arrow_head_reversed;
                 case GoToNextPuzzle: return R.drawable.icon_arrow_head;
+                case DisplayCellPositions: return R.drawable.icon_position;
                 default: throw new IllegalStateException("No icon found for puzzle action: " + this);
             }
         }
@@ -70,6 +72,7 @@ public final class PuzzlePlayerActivity extends BaseActivity
             switch (this) {
                 case GoToPreviousPuzzle: return R.string.previous_puzzle;
                 case GoToNextPuzzle: return R.string.next_puzzle;
+                case DisplayCellPositions: return R.string.board_coordinates;
                 default: throw new IllegalStateException("No text found for puzzle action: " + this);
             }
         }
@@ -78,6 +81,7 @@ public final class PuzzlePlayerActivity extends BaseActivity
             switch (this) {
                 case GoToPreviousPuzzle: return activity::onPreviousPuzzleClick;
                 case GoToNextPuzzle: return activity::onNextPuzzleClick;
+                case DisplayCellPositions: return activity::onDisplayCellPositionClick;
                 default: throw new IllegalStateException("No click listener found for puzzle action: " + this);
             }
         }
@@ -455,6 +459,11 @@ public final class PuzzlePlayerActivity extends BaseActivity
         this.puzzleSave = puzzleSave;
         controller.restartGame(puzzleSave.getPuzzleGameHistory());
         updatePuzzleInfos();
+        hidePuzzleActions();
+    }
+
+    private void onDisplayCellPositionClick(View v) {
+        bdvBoard.setCellPositionVisible(!bdvBoard.isCellPositionVisible());
         hidePuzzleActions();
     }
 
