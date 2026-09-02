@@ -32,7 +32,7 @@ import java.util.Objects;
 public class CharacterCardSelectionView extends ConstraintLayout {
     public interface OnCardSelectedListener {
         void onRecruitmentCardSelected(@NonNull InteractionTarget target);
-        void onBanishmentCardSelected(@NonNull InteractionTarget target);
+        void onBanishmentCardSelected();
         void onNotSelectableCardClick();
     }
 
@@ -42,6 +42,7 @@ public class CharacterCardSelectionView extends ConstraintLayout {
     private int portraitsPerGroup;
     private int portraitSpacing;
     private List<InteractionTarget> targets;
+    private InteractionTarget selectedTarget;
 
     private OnLongClickListener onPortraitLongClickListener;
 
@@ -49,6 +50,9 @@ public class CharacterCardSelectionView extends ConstraintLayout {
 
     public CharacterCardSelectionView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+
+        targets = null;
+        selectedTarget = null;
 
         inflate(context, R.layout.view_character_card_selection, this);
 
@@ -72,14 +76,20 @@ public class CharacterCardSelectionView extends ConstraintLayout {
         }
     }
 
-    public void setTargets(@NonNull List<InteractionTarget> targets) {
+    public void applyTargets(@NonNull List<InteractionTarget> targets) {
         this.targets = targets;
+        selectedTarget = null;
         updatePortraitsFromTargets();
     }
 
-    public void setCards(@NonNull List<SelectableCharacterCard> selectableCards) {
+    public void applyCards(@NonNull List<SelectableCharacterCard> selectableCards) {
         this.targets = null;
+        selectedTarget = null;
         updatePortraitsFromCards(selectableCards);
+    }
+
+    public InteractionTarget getSelectedTarget() {
+        return selectedTarget;
     }
 
     private void updatePortraitsFromTargets() {
@@ -178,13 +188,35 @@ public class CharacterCardSelectionView extends ConstraintLayout {
     }
 
     private void onRecruitableCardSelected(@NonNull InteractionTarget target) {
+        selectedTarget = target;
+
         if (onCardSelectedListener != null) {
             onCardSelectedListener.onRecruitmentCardSelected(target);
         }
     }
     private void onBanishableCardSelected(@NonNull InteractionTarget target) {
+        selectedTarget = target;
+        for (int i = 0; i < llyPortraits.getChildCount(); i++) {
+            CharacterCardPortraitGroupView groupView = (CharacterCardPortraitGroupView) llyPortraits.getChildAt(i);
+            for (CharacterCardPortraitView portraitView : groupView.getPortraits()) {
+                if (selectedTarget == portraitView.getTarget()) {
+                    portraitView.setUseBannedDisplay(true);
+                } else {
+                    boolean alreadyBanned = Objects.requireNonNull(
+                            Objects.requireNonNull(portraitView.getTarget(),
+                                            "Invalid portrait: target missing")
+                                    .getChosenSelectableCharacterCard(),
+                                    "Invalid portrait target: card missing")
+                            .getSelectionStatus() == CharacterCardSelectionStatus.AlreadyBanned;
+                    if (!alreadyBanned) {
+                        portraitView.setUseBannedDisplay(false);
+                    }
+                }
+            }
+        }
+
         if (onCardSelectedListener != null) {
-            onCardSelectedListener.onBanishmentCardSelected(target);
+            onCardSelectedListener.onBanishmentCardSelected();
         }
     }
 
@@ -227,6 +259,10 @@ public class CharacterCardSelectionView extends ConstraintLayout {
 
     public void setOnCardSelectedListener(OnCardSelectedListener onCardSelectedListener) {
         this.onCardSelectedListener = onCardSelectedListener;
+    }
+
+    public void setOnScrollViewClickListener(OnClickListener onScrollViewClickListener) {
+        scvPortraits.setOnClickListener(onScrollViewClickListener);
     }
 
     public void show(boolean animate) {

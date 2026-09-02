@@ -16,6 +16,8 @@ import java.util.List;
 
 public final class GameContext {
     @NonNull
+    private final GamePhase gamePhase;
+    @NonNull
     private final Player currentPlayer;
     @NonNull
     private final Player opposingPlayer;
@@ -30,16 +32,23 @@ public final class GameContext {
     @Nullable
     private final List<PlayableCharacter> playableCharacters;
 
-    public GameContext(@NonNull Player currentPlayer, @NonNull Player opposingPlayer,
+    public GameContext(@NonNull GamePhase gamePhase,
+                       @NonNull Player currentPlayer, @NonNull Player opposingPlayer,
                        @NonNull GameMode gameMode, @NonNull Board board,
                        @NonNull List<SelectableCharacterCard> availableCharacterCards,
                        @Nullable List<PlayableCharacter> playableCharacters) {
+        this.gamePhase = gamePhase;
         this.currentPlayer = new Player(currentPlayer);
         this.opposingPlayer = new Player(opposingPlayer);
         this.gameMode = gameMode;
         this.board = new Board(board);
         this.availableCharacterCards = List.copyOf(availableCharacterCards);
         this.playableCharacters = playableCharacters != null ? List.copyOf(playableCharacters) : null;
+    }
+
+    @NonNull
+    public GamePhase getGamePhase() {
+        return gamePhase;
     }
 
     @NonNull
@@ -124,12 +133,13 @@ public final class GameContext {
                 gameHistory, currentPlayer.getTeamColor().getOpposite()
         );
 
-        return new GameContext(
+        return new GameContext(currentGamePhase,
                 currentPlayer,
                 opposingPlayer,
                 gameHistory.getConfig().getGameMode(),
                 game.getBoard(),
                 SelectableCardsQuery.getSelectableCards(game, gameHistory),
-                playableCharacters);
+                playableCharacters
+        );
     }
 }

@@ -330,8 +330,8 @@ public final class PuzzlePlayerActivity extends BaseActivity
         ButtonUtils.setEnabled(btnUndoLastAction, false);
     }
 
-    private void updatePlayableCharacters(@NonNull GameContext gameContext,
-                                          @NonNull InteractionRequest request) {
+    private void highlightPlayableCharacters(@NonNull GameContext gameContext,
+                                             @NonNull InteractionRequest request) {
         bdvBoard.highlightPlayableCharacters(
                 gameContext.getPlayableCharacters(),
                 request.getContext().getCharacter(),
@@ -427,14 +427,14 @@ public final class PuzzlePlayerActivity extends BaseActivity
 
             bdvBoard.applyTargets(request.getLegalTargets(), request.getContext(), gameContext.getBoard());
 
-            updatePlayableCharacters(gameContext, request);
+            highlightPlayableCharacters(gameContext, request);
 
             ButtonUtils.setEnabled(btnUndoLastAction, controller.canUndoLastAction());
         });
     }
 
     @Override
-    public void onPhaseChanged(@NonNull GamePhase phase, @NonNull GameController.InteractionCompletion completion) {
+    public void onPhaseChanged(@NonNull GamePhase phase) {
         throw new IllegalStateException("Phase change is not supported within the puzzle player");
     }
 

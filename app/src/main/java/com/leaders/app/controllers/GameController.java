@@ -30,7 +30,7 @@ public final class GameController implements IGameFlowListener {
 
         void onInteractionRequired(@NonNull InteractionRequest request);
 
-        void onPhaseChanged(@NonNull GamePhase phase, @NonNull InteractionCompletion completion);
+        void onPhaseChanged(@NonNull GamePhase phase);
 
         void onFeedback(@NonNull InteractionFeedback feedback, @NonNull InteractionCompletion completion);
 
@@ -110,6 +110,10 @@ public final class GameController implements IGameFlowListener {
         return hasLegalResult(InteractionResultType.UndoLastAction);
     }
 
+    public boolean canEndPhaseAction() {
+        return hasLegalResult(InteractionResultType.EndPhase);
+    }
+
     public void selectTarget(@NonNull InteractionTarget target) {
         if (!hasPendingInteraction()) {
             throw new IllegalStateException("Targets should not exist outside of a valid request context");
@@ -140,6 +144,14 @@ public final class GameController implements IGameFlowListener {
         }
 
         completeInteraction(getResult(pendingRequest, InteractionResultType.UndoLastAction));
+    }
+
+    public void endPhase() {
+        if (!hasPendingInteraction() || !canEndPhaseAction()) {
+            throw new IllegalStateException("Undo should not exist outside of a valid request context");
+        }
+
+        completeInteraction(getResult(pendingRequest, InteractionResultType.EndPhase));
     }
 
     private boolean hasLegalResult(@NonNull InteractionResultType resultType) {
@@ -193,11 +205,8 @@ public final class GameController implements IGameFlowListener {
     @NonNull
     @Override
     public CompletableFuture<Void> onPhaseChanged(@NonNull GamePhase phase) {
-        CompletableFuture<Void> future = new CompletableFuture<>();
-
-        listener.onPhaseChanged(phase, () -> future.complete(null));
-
-        return future;
+        listener.onPhaseChanged(phase);
+        return CompletableFuture.completedFuture(null);
     }
 
     @NonNull

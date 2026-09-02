@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+    android:id="@+id/clyMain_actDuelPlayer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
@@ -204,6 +204,20 @@
         app:strokeColor="@color/font"
         app:strokeWidth="1dp"
         tools:ignore="SpeakableTextPresentCheck" />
+
+    <TextView
+        android:id="@+id/txvPlayerTurn_actDuelPlayer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/futura"
+        android:textAllCaps="true"
+        android:textColor="@color/app_golden"
+        android:textSize="@dimen/default_text_font_size"
+        app:layout_constraintBottom_toBottomOf="@+id/btnBack_actDuelPlayer"
+        app:layout_constraintEnd_toStartOf="@+id/btnActions_actDuelPlayer"
+        app:layout_constraintStart_toEndOf="@+id/btnBack_actDuelPlayer"
+        app:layout_constraintTop_toTopOf="@id/gdlRoot_actDuelPlayer"
+        tools:text="Au tour de Nemesis is top tier" />
 
     <com.leaders.app.views.character.HighlightView
         android:id="@+id/hlvNextPhase_actDuelPlayer"

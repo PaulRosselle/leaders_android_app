@@ -2,9 +2,9 @@ package com.leaders.app.activities.duel;
 
 import android.animation.LayoutTransition;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.android.material.button.MaterialButton;
@@ -34,10 +34,12 @@ import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
+import com.leaders.gamelogic.enums.GamePhaseType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionTarget;
+import com.leaders.gamelogic.interactions.InteractionType;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.puzzlelogic.serializers.SerializationContext;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
@@ -56,7 +58,7 @@ public final class DuelPlayerActivity extends BaseActivity implements
     private CharacterCardSelectionView ccsvCardSelector;
     private PlayerBottomView pbvCurrentPlayer;
     private PlayerTopView ptvOpposingPlayer;
-
+    private TextView txvPlayerTurn;
 
     private CharacterNotificationView cnvCardInfo;
 
@@ -85,6 +87,7 @@ public final class DuelPlayerActivity extends BaseActivity implements
 
         pbvCurrentPlayer = findViewById(R.id.pbvCurrentPlayer_actDuelPlayer);
         ptvOpposingPlayer = findViewById(R.id.ptvOpposingPlayer_actDuelPlayer);
+        txvPlayerTurn = findViewById(R.id.txvPlayerTurn_actDuelPlayer);
 
         cnvCardInfo = findViewById(R.id.cnvCardInfo_actDuelPlayer);
 
@@ -103,7 +106,12 @@ public final class DuelPlayerActivity extends BaseActivity implements
     protected void initListeners() {
         super.initListeners();
 
-        // TODO - onNonInteractive click listener
+
+        // Non interactive element listeners
+        (findViewById(R.id.clyMain_actDuelPlayer)).setOnClickListener(this::onNonInteractiveElementClick);
+        ccsvCardSelector.setOnClickListener(this::onNonInteractiveElementClick);
+        ccsvCardSelector.setOnScrollViewClickListener(this::onNonInteractiveElementClick);
+        // TODO - add all non interactive element
 
         bdvBoard.setOnTargetClickListener(this);
         bdvBoard.setOnCharacterLongClickListener(this::onBoardCharacterLongClick);
@@ -125,7 +133,6 @@ public final class DuelPlayerActivity extends BaseActivity implements
     protected void initDatas() {
         super.initDatas();
 
-        // TODO
         String gameDatas = getIntent().getStringExtra(ExtraUtils.EXTRA_DUEL_GAME_DATAS);
         if (gameDatas == null || gameDatas.isEmpty()) {
             throw new IllegalStateException("Invalid duel game datas: missing datas");
@@ -154,7 +161,7 @@ public final class DuelPlayerActivity extends BaseActivity implements
         return R.id.gdlRoot_actDuelPlayer;
     }
 
-    @Nullable
+    @NonNull
     @Override
     protected Integer getBtnBackResId() {
         return R.id.btnBack_actDuelPlayer;
@@ -185,6 +192,10 @@ public final class DuelPlayerActivity extends BaseActivity implements
 
     //region VIEW LISTENER METHODS
 
+    public void onNonInteractiveElementClick(View v) {
+        controller.cancelAction();
+    }
+
     private void onCardsClick(View v) {
         setCardSelectorVisible(ccsvCardSelector.getVisibility() != View.VISIBLE);
     }
@@ -194,7 +205,13 @@ public final class DuelPlayerActivity extends BaseActivity implements
     }
 
     private void onNextPhaseClick(View v) {
-        // TODO - next phase
+        GameContext gameContext = controller.getCurrentContext();
+
+        if (gameContext.getGamePhase().getPhaseType() == GamePhaseType.Banishment) {
+            controller.selectTarget(ccsvCardSelector.getSelectedTarget());
+        } else {
+            controller.endPhase();
+        }
     }
 
     private void onActionsClick(View v) {
@@ -238,24 +255,26 @@ public final class DuelPlayerActivity extends BaseActivity implements
 
     @Override
     public void onEmptyClick() {
-        // TODO - handle game phases
+        controller.cancelAction();
     }
 
     @Override
     public void onTargetClick(@NonNull InteractionTarget target) {
-        // TODO - handle actions phase
+        controller.selectTarget(target);
     }
 
     public void onRecruitmentCardSelected(@NonNull InteractionTarget target) {
-        // TODO - handle recruitment phase
+        controller.selectTarget(target);
     }
-    public void onBanishmentCardSelected(@NonNull InteractionTarget target) {
-        // TODO - handle banishment phase
+    public void onBanishmentCardSelected() {
+        if (!btnNextPhase.isEnabled()) {
+            setBtnNextPhaseEnabled(true, true);
+        }
     }
 
     @Override
     public void onNotSelectableCardClick() {
-        // TODO - handle game phases
+        controller.cancelAction();
     }
 
     //endregion
@@ -331,6 +350,21 @@ public final class DuelPlayerActivity extends BaseActivity implements
         return LeaderType.getFromCharacter(leaderCell.getCharacter());
     }
 
+    private void highlightPlayableCharacters(@NonNull GameContext gameContext,
+                                             @NonNull InteractionRequest request) {
+        bdvBoard.highlightPlayableCharacters(
+                gameContext.getPlayableCharacters(),
+                request.getContext().getCharacter(),
+                gameContext.getBoard()
+        );
+
+        if (request.getRequestType() == InteractionType.PlayableCharacterExpected) {
+            bdvBoard.startPlayableCharactersShineAnimation();
+        } else {
+            bdvBoard.stopPlayableCharactersShineAnimation();
+        }
+    }
+
     private void applyPlayerChange(@NonNull Player currentPlayer,
                                    @NonNull Player opposingPlayer,
                                    @NonNull Board board) {
@@ -341,14 +375,41 @@ public final class DuelPlayerActivity extends BaseActivity implements
         ptvOpposingPlayer.setPlayer(opposingPlayer, getPlayerLeaderType(opposingPlayer, board));
     }
 
+    private boolean isPlayerNameFirstCharVowel(@NonNull String playerName) {
+        final String vowels = "aeiouAEIOU";
+        return !playerName.isEmpty() && (vowels.indexOf(playerName.charAt(0)) != -1);
+    }
+
+    private void applyPhaseChange(@NonNull GamePhase gamePhase) {
+        String playerName = gamePhase.getPhasePlayer().getName();
+        int playerTurnFormat = isPlayerNameFirstCharVowel(playerName) ? R.string.player_turn_vowel : R.string.player_turn_consonant;
+        txvPlayerTurn.setText(String.format(getString(playerTurnFormat), playerName));
+
+        boolean lockSelectableCardsView = gamePhase.getPhaseType() == GamePhaseType.Recruitment ||
+                gamePhase.getPhaseType() == GamePhaseType.Banishment;
+        ButtonUtils.setEnabled(btnCards, !lockSelectableCardsView);
+        setCardSelectorVisible(lockSelectableCardsView);
+    }
+
     //endregion
 
     //region INTERACTION METHODS
 
-    private void clearInteractionUI() {
+    private void clearInteractionUI(@NonNull GameContext gameContext) {
         bdvBoard.clearTargets();
+        ccsvCardSelector.applyCards(gameContext.getAvailableCharacterCards());
         ButtonUtils.setEnabled(btnUndoLastAction, false);
         setBtnNextPhaseEnabled(false, false);
+    }
+
+    private void updateInteractionUI(@NonNull GameContext gameContext,
+                                     @NonNull InteractionRequest request) {
+        highlightPlayableCharacters(gameContext, request);
+
+        ButtonUtils.setEnabled(btnUndoLastAction, controller.canUndoLastAction());
+        setBtnNextPhaseEnabled(controller.canEndPhaseAction(), request.getLegalTargets().isEmpty());
+
+        applyPhaseChange(gameContext.getGamePhase());
     }
 
     //endregion
@@ -359,6 +420,9 @@ public final class DuelPlayerActivity extends BaseActivity implements
     public void onGameStarted(@NonNull Game game) {
         runOnUiThread(() -> {
             GameContext gameContext = controller.getCurrentContext();
+
+            applyPhaseChange(gameContext.getGamePhase());
+
             applyPlayerChange(
                     gameContext.getCurrentPlayer(),
                     gameContext.getOpposingPlayer(),
@@ -367,38 +431,68 @@ public final class DuelPlayerActivity extends BaseActivity implements
 
             bdvBoard.setBoard(game.getBoard());
             ccsvCardSelector.applyGameModeParams(gameContext.getGameMode());
-            ccsvCardSelector.setCards(gameContext.getAvailableCharacterCards());
+
+            clearInteractionUI(gameContext);
         });
     }
 
     @Override
     public void onGameEnded(@NonNull Player winner) {
-        // TODO - show game end
+        // TODO - handle game end
     }
 
     @Override
     public void onActionUndone(@NonNull Game game) {
-        // TODO - reload board
+        // TODO - handle undo
     }
 
     @Override
     public void onInteractionRequired(@NonNull InteractionRequest request) {
-        // TODO
+        runOnUiThread(() -> {
+            GameContext gameContext = controller.getCurrentContext();
+
+            GamePhaseType phaseType = gameContext.getGamePhase().getPhaseType();
+            switch (phaseType) {
+                case Banishment:
+                case Recruitment:
+                    ccsvCardSelector.applyTargets(request.getLegalTargets());
+                    break;
+
+                case Actions:
+                    bdvBoard.applyTargets(request.getLegalTargets(), request.getContext(), gameContext.getBoard());
+                    break;
+
+                default: throw new IllegalStateException("Request not handled during phase: " + phaseType);
+            }
+
+            updateInteractionUI(gameContext, request);
+        });
     }
 
     @Override
-    public void onPhaseChanged(@NonNull GamePhase phase, @NonNull GameController.InteractionCompletion completion) {
-        // TODO - add phase view
+    public void onPhaseChanged(@NonNull GamePhase phase) {
+        runOnUiThread(() -> {
+            GameContext gameContext = controller.getCurrentContext();
+
+            applyPlayerChange(
+                    gameContext.getCurrentPlayer(),
+                    gameContext.getOpposingPlayer(),
+                    gameContext.getBoard()
+            );
+
+            applyPhaseChange(phase);
+        });
     }
 
     @Override
-    public void onFeedback(@NonNull InteractionFeedback feedback, @NonNull GameController.InteractionCompletion completion) {
+    public void onFeedback(@NonNull InteractionFeedback feedback,
+                           @NonNull GameController.InteractionCompletion completion) {
         runOnUiThread(() -> bdvBoard.animateFeedback(feedback, completion::complete));
     }
 
     @Override
     public void onInteractionCleared() {
-        runOnUiThread(this::clearInteractionUI);
+        runOnUiThread(() -> clearInteractionUI(controller.getCurrentContext()));
     }
 
     //enregion

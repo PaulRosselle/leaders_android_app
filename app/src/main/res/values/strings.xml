@@ -159,7 +159,9 @@
     <string name="duel_title">duel</string>
     <string name="card_already_banned">\"%s\" a déjà été banni</string>
     <string name="card_cannot_be_recruited">\"%s\" est impossible à recruter</string>
-    <string name="black_name">noir</string>
+    <string name="black_name" translatable="false">noir</string>
     <string name="white_name">blanc</string>
     <string name="default_player_name">joueur %s</string>
+    <string name="player_turn_consonant">Au tour de %s</string>
+    <string name="player_turn_vowel">Au tour d\'%s</string>
 </resources>
