@@ -125,7 +125,6 @@ public final class DuelPlayerActivity extends BaseActivity implements
         (findViewById(R.id.clyMain_actDuelPlayer)).setOnClickListener(this::onNonInteractiveElementClick);
         ccsvCardSelector.setOnClickListener(this::onNonInteractiveElementClick);
         ccsvCardSelector.setOnScrollViewClickListener(this::onNonInteractiveElementClick);
-        // TODO - add all non interactive element
 
         bdvBoard.setOnTargetClickListener(this);
         bdvBoard.setOnCharacterLongClickListener(this::onBoardCharacterLongClick);

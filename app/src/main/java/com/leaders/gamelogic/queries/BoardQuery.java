@@ -195,10 +195,16 @@ public final class BoardQuery {
             for (List<Position> currentPath : currentLevel) {
                 Position currentPosition = currentPath.get(currentPath.size() - 1);
 
-                for (Cell cell : BoardQuery.findEmptyCellsAround(board, currentPosition, 1)) {
-                    Position adjacentPosition = cell.getPosition();
+                for (Direction direction : Direction.values()) {
+                    Position adjacentPosition = currentPosition.adjacent(direction);
 
-                    if (visited.contains(adjacentPosition)) {
+                    if (adjacentPosition == null || visited.contains(adjacentPosition)) {
+                        continue;
+                    }
+
+                    Cell cell = board.getCell(adjacentPosition);
+
+                    if (cell.getCharacter() != null) {
                         continue;
                     }
 
@@ -207,8 +213,6 @@ public final class BoardQuery {
                     List<Position> newPath = new ArrayList<>(currentPath);
                     newPath.add(adjacentPosition);
 
-                    // On ajoute les solutions de cette distance avant de passer
-                    // au niveau suivant.
                     if (!position.equals(adjacentPosition)
                             && (!avoidDuplicates || destinations.add(adjacentPosition))) {
                         paths.add(new CharacterPath(newPath));
