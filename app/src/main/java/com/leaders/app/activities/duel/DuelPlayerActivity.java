@@ -2,7 +2,6 @@ package com.leaders.app.activities.duel;
 
 import android.animation.LayoutTransition;
 import android.view.View;
-import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -11,30 +10,35 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
+import com.leaders.app.controllers.GameController;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.BoardOrientation;
 import com.leaders.app.enums.LeaderType;
+import com.leaders.app.utilities.ButtonUtils;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.board.PlayableBoardView;
 import com.leaders.app.views.character.CharacterCardPortraitView;
+import com.leaders.app.views.character.HighlightView;
 import com.leaders.app.views.character.CharacterNotificationView;
 import com.leaders.app.views.character.CharacterView;
 import com.leaders.app.views.duel.CharacterCardSelectionView;
 import com.leaders.app.views.duel.PlayerBottomView;
 import com.leaders.app.views.duel.PlayerTopView;
+import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Game;
-import com.leaders.gamelogic.entities.GameConfig;
+import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.GameHistory;
+import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.TeamColor;
-import com.leaders.gamelogic.factories.GameFactory;
+import com.leaders.gamelogic.interactions.InteractionFeedback;
+import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.queries.BoardQuery;
-import com.leaders.gamelogic.queries.SelectableCardsQuery;
 import com.leaders.puzzlelogic.serializers.SerializationContext;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
 
@@ -43,9 +47,10 @@ import org.json.JSONObject;
 
 import java.util.Objects;
 
-public class DuelPlayerActivity extends BaseActivity implements
+public final class DuelPlayerActivity extends BaseActivity implements
         PlayableBoardView.OnTargetClickListener,
-        CharacterCardSelectionView.OnCardSelectedListener {
+        CharacterCardSelectionView.OnCardSelectedListener,
+        GameController.Listener {
 
     private PlayableBoardView bdvBoard;
     private CharacterCardSelectionView ccsvCardSelector;
@@ -62,7 +67,10 @@ public class DuelPlayerActivity extends BaseActivity implements
     private MaterialButton btnCards;
     private MaterialButton btnUndoLastAction;
     private MaterialButton btnNextPhase;
-    private ImageView imvNextPhase;
+    private HighlightView hlvNextPhase;
+
+
+    private GameController controller;
     
 
     //region BASE ACTIVITY OVERRIDEN METHODS
@@ -88,7 +96,7 @@ public class DuelPlayerActivity extends BaseActivity implements
         btnCards = findViewById(R.id.btnCards_actDuelPlayer);
         btnUndoLastAction = findViewById(R.id.btnUndoLastAction_actDuelPlayer);
         btnNextPhase = findViewById(R.id.btnNextPhase_actDuelPlayer);
-        imvNextPhase = findViewById(R.id.imvNextPhase_actDuelPlayer);
+        hlvNextPhase = findViewById(R.id.hlvNextPhase_actDuelPlayer);
     }
 
     @Override
@@ -132,31 +140,8 @@ public class DuelPlayerActivity extends BaseActivity implements
             throw new RuntimeException(e);
         }
 
-        // TODO - remove when the DuelPlayerController is implemented
-        Game game = GameFactory.create(gameHistory);
-        GameConfig gameConfig = gameHistory.getConfig();
-        TeamColor firstPlayerTeamColor = gameConfig.getFirstPlayer().getTeamColor();
-        bdvBoard.setOrientation(firstPlayerTeamColor == TeamColor.Black ?
-                BoardOrientation.Default : BoardOrientation.Rotated);
-
-        bdvBoard.post(() -> bdvBoard.setBoard(game.getBoard()));
-        ccsvCardSelector.applyGameModeParams(gameConfig.getGameMode());
-        ccsvCardSelector.post(() -> ccsvCardSelector.setCards(
-                SelectableCardsQuery.getSelectableCards(game, gameHistory)
-        ));
-
-        for (Player player : gameConfig.getPlayers()) {
-            Cell leaderCell = BoardQuery.findLeaderCell(game.getBoard(), player.getTeamColor());
-            if (leaderCell == null) {
-                throw new IllegalStateException("No leader found for player: " + player);
-            }
-            LeaderType leaderType = LeaderType.getFromCharacter(leaderCell.getCharacter());
-            if (player.getTeamColor() == firstPlayerTeamColor) {
-                pbvCurrentPlayer.setPlayer(player, leaderType);
-            } else {
-                ptvOpposingPlayer.setPlayer(player, leaderType);
-            }
-        }
+        controller = new GameController(this);
+        controller.startGame(gameHistory);
     }
 
     @Override
@@ -275,6 +260,8 @@ public class DuelPlayerActivity extends BaseActivity implements
 
     //endregion
 
+    //region UI STATE METHODS
+
     private void showCardDescriptionNotification(@NonNull CharacterCard characterCard) {
         if (cnvCardInfo.getCharacterCard() == characterCard) {
             cnvCardInfo.setCharacterCard(null);
@@ -325,4 +312,94 @@ public class DuelPlayerActivity extends BaseActivity implements
         bdvBoard.requestLayout();
         pbvCurrentPlayer.requestLayout();
     }
+
+    private void setBtnNextPhaseEnabled(boolean enabled, boolean highlight) {
+        ButtonUtils.setEnabled(btnNextPhase, enabled);
+        hlvNextPhase.setVisibility(highlight ? View.VISIBLE : View.GONE);
+        if (highlight) {
+            hlvNextPhase.startAnimation();
+        } else {
+            hlvNextPhase.stopAnimation();
+        }
+    }
+
+    private LeaderType getPlayerLeaderType(@NonNull Player player, @NonNull Board board) {
+        Cell leaderCell = Objects.requireNonNull(
+                BoardQuery.findLeaderCell(board, player.getTeamColor()),
+                "No leader found for player: " + player
+        );
+        return LeaderType.getFromCharacter(leaderCell.getCharacter());
+    }
+
+    private void applyPlayerChange(@NonNull Player currentPlayer,
+                                   @NonNull Player opposingPlayer,
+                                   @NonNull Board board) {
+        bdvBoard.setOrientation(currentPlayer.getTeamColor() == TeamColor.Black ?
+                BoardOrientation.Default : BoardOrientation.Rotated);
+
+        pbvCurrentPlayer.setPlayer(currentPlayer, getPlayerLeaderType(currentPlayer, board));
+        ptvOpposingPlayer.setPlayer(opposingPlayer, getPlayerLeaderType(opposingPlayer, board));
+    }
+
+    //endregion
+
+    //region INTERACTION METHODS
+
+    private void clearInteractionUI() {
+        bdvBoard.clearTargets();
+        ButtonUtils.setEnabled(btnUndoLastAction, false);
+        setBtnNextPhaseEnabled(false, false);
+    }
+
+    //endregion
+
+    //region GAME CONTROLLER METHODS
+
+    @Override
+    public void onGameStarted(@NonNull Game game) {
+        runOnUiThread(() -> {
+            GameContext gameContext = controller.getCurrentContext();
+            applyPlayerChange(
+                    gameContext.getCurrentPlayer(),
+                    gameContext.getOpposingPlayer(),
+                    gameContext.getBoard()
+            );
+
+            bdvBoard.setBoard(game.getBoard());
+            ccsvCardSelector.applyGameModeParams(gameContext.getGameMode());
+            ccsvCardSelector.setCards(gameContext.getAvailableCharacterCards());
+        });
+    }
+
+    @Override
+    public void onGameEnded(@NonNull Player winner) {
+        // TODO - show game end
+    }
+
+    @Override
+    public void onActionUndone(@NonNull Game game) {
+        // TODO - reload board
+    }
+
+    @Override
+    public void onInteractionRequired(@NonNull InteractionRequest request) {
+        // TODO
+    }
+
+    @Override
+    public void onPhaseChanged(@NonNull GamePhase phase, @NonNull GameController.InteractionCompletion completion) {
+        // TODO - add phase view
+    }
+
+    @Override
+    public void onFeedback(@NonNull InteractionFeedback feedback, @NonNull GameController.InteractionCompletion completion) {
+        runOnUiThread(() -> bdvBoard.animateFeedback(feedback, completion::complete));
+    }
+
+    @Override
+    public void onInteractionCleared() {
+        runOnUiThread(this::clearInteractionUI);
+    }
+
+    //enregion
 }

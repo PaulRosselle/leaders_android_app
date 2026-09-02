@@ -15,7 +15,7 @@ import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 import com.leaders.app.utilities.CharacterCardUtils;
 import com.leaders.app.views.character.CharacterCardPortraitGroupView;
-import com.leaders.app.views.character.CharacterHighlightView;
+import com.leaders.app.views.character.HighlightView;
 import com.leaders.app.views.character.CharacterView;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.PlayableCharacter;
@@ -47,7 +47,7 @@ public final class CharacterEditorView extends ConstraintLayout {
 
     private CharacterView selectedNewCharacter;
     private List<CharacterView> newCharacterViews;
-    private CharacterHighlightView newCharacterHighlight;
+    private HighlightView newCharacterHighlight;
 
     private Group grpEditCharacter;
     private CharacterView crvSwitchColor;
@@ -70,7 +70,7 @@ public final class CharacterEditorView extends ConstraintLayout {
 
         selectedNewCharacter = null;
         newCharacterViews = new ArrayList<>();
-        newCharacterHighlight = new CharacterHighlightView(getContext());
+        newCharacterHighlight = new HighlightView(getContext());
         addView(newCharacterHighlight, getCharacterHighlightLayoutParam());
 
         grpEditCharacter = findViewById(R.id.grpEditCharacter_vwCharacterEditor);

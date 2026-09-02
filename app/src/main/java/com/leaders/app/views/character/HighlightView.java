@@ -12,11 +12,11 @@ import androidx.appcompat.widget.AppCompatImageView;
 
 import com.leaders.R;
 
-public final class CharacterHighlightView extends AppCompatImageView {
+public final class HighlightView extends AppCompatImageView {
     private static final int HIGHLIGHT_ANIMATION_DURATION = 800;
     private final ObjectAnimator animator;
 
-    public CharacterHighlightView(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public HighlightView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         setImageResource(R.drawable.character_highlight);
 
@@ -27,7 +27,7 @@ public final class CharacterHighlightView extends AppCompatImageView {
         animator.setRepeatMode(ValueAnimator.RESTART);
     }
 
-    public CharacterHighlightView(@NonNull Context context) {
+    public HighlightView(@NonNull Context context) {
         this(context, null);
     }
 

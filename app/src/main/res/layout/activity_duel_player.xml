@@ -205,8 +205,8 @@
         app:strokeWidth="1dp"
         tools:ignore="SpeakableTextPresentCheck" />
 
-    <ImageView
-        android:id="@+id/imvNextPhase_actDuelPlayer"
+    <com.leaders.app.views.character.HighlightView
+        android:id="@+id/hlvNextPhase_actDuelPlayer"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginLeft="-1dp"
@@ -219,8 +219,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/btnNextPhase_actDuelPlayer"
         app:layout_constraintLeft_toLeftOf="@+id/btnNextPhase_actDuelPlayer"
         app:layout_constraintRight_toRightOf="@+id/btnNextPhase_actDuelPlayer"
-        app:layout_constraintTop_toTopOf="@+id/btnNextPhase_actDuelPlayer"
-        app:srcCompat="@drawable/character_highlight" />
+        app:layout_constraintTop_toTopOf="@+id/btnNextPhase_actDuelPlayer" />
 
     <com.leaders.app.views.character.CharacterNotificationView
         android:id="@+id/cnvCardInfo_actDuelPlayer"

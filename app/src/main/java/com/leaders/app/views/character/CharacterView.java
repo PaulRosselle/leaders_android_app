@@ -109,7 +109,7 @@ public final class CharacterView extends AppCompatImageView {
     public void setAsPlayableTarget(@NonNull InteractionTarget target) {
         this.target = target;
         // There is no visual feedback within the characterView for the moment
-        // since playable characters must be highlighted using a CharacterHighlightView
+        // since playable characters must be highlighted using a HighlightView
     }
 
     public void setAsTarget(@NonNull InteractionTarget target) {
