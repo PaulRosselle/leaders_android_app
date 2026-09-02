@@ -378,13 +378,15 @@ public final class DuelPlayerActivity extends BaseActivity implements
         }
     }
 
-    private void applyPlayerChange(@NonNull Player currentPlayer,
-                                   @NonNull Player opposingPlayer,
-                                   @NonNull Board board) {
+    private void applyPlayerChange(@NonNull GameContext gameContext) {
+        Player currentPlayer = gameContext.getCurrentPlayer();
+
         bdvBoard.setOrientation(currentPlayer.getTeamColor() == TeamColor.Black ?
                 BoardOrientation.Default : BoardOrientation.Rotated);
 
+        Board board = gameContext.getBoard();
         pbvCurrentPlayer.setPlayer(currentPlayer, getPlayerLeaderType(currentPlayer, board));
+        Player opposingPlayer = gameContext.getOpposingPlayer();
         ptvOpposingPlayer.setPlayer(opposingPlayer, getPlayerLeaderType(opposingPlayer, board));
     }
 
@@ -456,6 +458,8 @@ public final class DuelPlayerActivity extends BaseActivity implements
             setNewCharacterVisible(request.getContext().getCharacter(), true);
         }
 
+        applyPlayerChange(gameContext);
+
         applyPhaseChange(gameContext.getGamePhase(), false);
     }
 
@@ -513,11 +517,9 @@ public final class DuelPlayerActivity extends BaseActivity implements
         runOnUiThread(() -> {
             GameContext gameContext = controller.getCurrentContext();
 
-            applyPlayerChange(
-                    gameContext.getCurrentPlayer(),
-                    gameContext.getOpposingPlayer(),
-                    gameContext.getBoard()
-            );
+            clearInteractionUI(gameContext);
+
+            applyPlayerChange(gameContext);
 
             applyPhaseChange(phase, true);
         });
