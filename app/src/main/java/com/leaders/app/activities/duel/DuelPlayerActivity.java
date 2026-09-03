@@ -43,6 +43,7 @@ import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.interactions.InteractionType;
+import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.puzzlelogic.serializers.SerializationContext;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
@@ -376,16 +377,24 @@ public final class DuelPlayerActivity extends BaseActivity implements
         } else {
             bdvBoard.stopPlayableCharactersShineAnimation();
         }
+
+        if (request.getLegalTargets().stream()
+                .anyMatch(target -> target.getCategory() == TargetCategory.RecruitmentDestination)) {
+            bdvBoard.startRecruitmentCellsAnimation();
+        } else {
+            bdvBoard.stopRecruitmentCellsAnimation();
+        }
     }
 
     private void highlightSelectableCards(@NonNull GameContext gameContext,
                                           @NonNull InteractionRequest request) {
         GamePhase gamePhase = gameContext.getGamePhase();
-        boolean targetIsSelectableCard = gamePhase.getPhaseType() == GamePhaseType.Recruitment ||
-                gamePhase.getPhaseType() == GamePhaseType.Banishment;
-        boolean targetRequested = request.getRequestType() != InteractionType.NoTargetExpected;
 
-        if (targetIsSelectableCard && targetRequested) {
+        boolean isValidPhase = gamePhase.getPhaseType() == GamePhaseType.Recruitment ||
+                gamePhase.getPhaseType() == GamePhaseType.Banishment;
+        boolean selectableCardRequest = request.getRequestType() == InteractionType.SelectableCharacterCardExpected;
+
+        if (isValidPhase && selectableCardRequest) {
             ccsvCardSelector.startShineAnimation();
         } else {
             ccsvCardSelector.stopShineAnimation();

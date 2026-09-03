@@ -3,6 +3,8 @@ package com.leaders.app.views.board;
 import android.content.Context;
 import android.graphics.Point;
 import android.util.AttributeSet;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -87,5 +89,17 @@ public final class CellView extends AppCompatImageView {
     @Nullable
     public InteractionTarget getTarget() {
         return target;
+    }
+
+    public void playHighlight() {
+        animate().scaleX(0.85f).scaleY(0.85f).alpha(0.7f)
+                .setDuration(300)
+                .setInterpolator(new AccelerateInterpolator())
+                .withEndAction(() -> animate()
+                        .scaleX(1f).scaleY(1f).alpha(1f)
+                        .setDuration(300)
+                        .setInterpolator(new DecelerateInterpolator())
+                        .start()
+                ).start();
     }
 }

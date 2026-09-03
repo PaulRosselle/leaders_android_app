@@ -23,6 +23,7 @@ import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.interactions.InteractionContext;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionTarget;
+import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
 
 import java.util.List;
@@ -47,7 +48,13 @@ public class PlayableBoardView extends BoardView {
     private static final int CHARACTER_SHINE_CYCLE_PAUSE = 1600;
     private static final int CHARACTER_SHINE_ANIMATION_INTERVAL = 1200;
     @Nullable
-    private ValueAnimator shineAnimator;
+    private ValueAnimator characterShineAnimator;
+
+
+    private static final int RECRUITMENT_CELL_HIGHLIGHT_CYCLE_PAUSE = 1200;
+    private static final int RECRUITMENT_CELL_HIGHLIGHT_ANIMATION_INTERVAL = 800;
+    @Nullable
+    private ValueAnimator recruitmentCellAnimator;
 
     private OnTargetClickListener onTargetClickListener;
 
@@ -133,10 +140,11 @@ public class PlayableBoardView extends BoardView {
 
     //region ANIMATION METHODS
 
-    private List<CharacterDisplay> getShineDisplays() {
+    private List<CharacterDisplay> getShineCharacterDisplays() {
         final int compareFactor = orientation == BoardOrientation.Rotated ? -1 : 1;
 
         return characterDisplayMap.entrySet().stream()
+                .filter(entry -> entry.getValue().isHighlighted())
                 .sorted((entry1, entry2) -> {
                     Position pos1 = entry1.getKey();
                     Position pos2 = entry2.getKey();
@@ -148,7 +156,6 @@ public class PlayableBoardView extends BoardView {
 
                     return Integer.compare(pos1.getY(), pos2.getY()) * compareFactor;
                 })
-                .filter(entry -> entry.getValue().isHighlighted())
                 .map(Map.Entry::getValue)
                 .collect(Collectors.toList());
     }
@@ -156,7 +163,7 @@ public class PlayableBoardView extends BoardView {
     public void startPlayableCharactersShineAnimation() {
         stopPlayableCharactersShineAnimation();
 
-        List<CharacterDisplay> displays = getShineDisplays();
+        List<CharacterDisplay> displays = getShineCharacterDisplays();
 
         if (displays.isEmpty()) {
             return;
@@ -167,12 +174,12 @@ public class PlayableBoardView extends BoardView {
         final int pauseDuration = CHARACTER_SHINE_CYCLE_PAUSE / 2;
         final int[] lastIndex = {-1};
 
-        shineAnimator = ValueAnimator.ofInt(0, cycleDuration);
-        shineAnimator.setDuration(cycleDuration);
-        shineAnimator.setRepeatCount(ValueAnimator.INFINITE);
-        shineAnimator.setInterpolator(new LinearInterpolator());
+        characterShineAnimator = ValueAnimator.ofInt(0, cycleDuration);
+        characterShineAnimator.setDuration(cycleDuration);
+        characterShineAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        characterShineAnimator.setInterpolator(new LinearInterpolator());
 
-        shineAnimator.addUpdateListener(animation -> {
+        characterShineAnimator.addUpdateListener(animation -> {
             long elapsed = animation.getCurrentPlayTime() % cycleDuration;
             // The animation pauses for a moment after a full cycle
             if (elapsed < pauseDuration || elapsed >= animationDuration + pauseDuration) {
@@ -187,13 +194,13 @@ public class PlayableBoardView extends BoardView {
             }
         });
 
-        shineAnimator.start();
+        characterShineAnimator.start();
     }
 
     public void stopPlayableCharactersShineAnimation() {
-        if (shineAnimator != null) {
-            shineAnimator.cancel();
-            shineAnimator = null;
+        if (characterShineAnimator != null) {
+            characterShineAnimator.cancel();
+            characterShineAnimator = null;
         }
     }
 
@@ -256,6 +263,71 @@ public class PlayableBoardView extends BoardView {
         return false;
     }
 
+    public List<CellView> getRecruitmentCellViews() {
+        final int compareFactor = orientation == BoardOrientation.Rotated ? -1 : 1;
+
+        return cellViewsMap.entrySet().stream()
+                .filter(entry -> entry.getValue().getTarget() != null &&
+                        entry.getValue().getTarget().getCategory() == TargetCategory.RecruitmentDestination)
+                .sorted((entry1, entry2) -> {
+                    Position pos1 = entry1.getKey();
+                    Position pos2 = entry2.getKey();
+
+                    int compareX = Integer.compare(pos1.getX(), pos2.getX());
+                    if (compareX != 0) {
+                        return compareX * compareFactor;
+                    }
+
+                    return Integer.compare(pos1.getY(), pos2.getY()) * compareFactor;
+                })
+                .map(Map.Entry::getValue)
+                .collect(Collectors.toList());
+    }
+
+    public void startRecruitmentCellsAnimation() {
+        stopRecruitmentCellsAnimation();
+
+        List<CellView> recruitmentCellViews = getRecruitmentCellViews();
+
+        if (recruitmentCellViews.isEmpty()) {
+            return;
+        }
+
+        final int animationDuration = RECRUITMENT_CELL_HIGHLIGHT_ANIMATION_INTERVAL * recruitmentCellViews.size();
+        final int cycleDuration = animationDuration + RECRUITMENT_CELL_HIGHLIGHT_CYCLE_PAUSE;
+        final int pauseDuration = RECRUITMENT_CELL_HIGHLIGHT_CYCLE_PAUSE / 2;
+        final int[] lastIndex = {-1};
+
+        recruitmentCellAnimator = ValueAnimator.ofInt(0, cycleDuration);
+        recruitmentCellAnimator.setDuration(cycleDuration);
+        recruitmentCellAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        recruitmentCellAnimator.setInterpolator(new LinearInterpolator());
+
+        recruitmentCellAnimator.addUpdateListener(animation -> {
+            long elapsed = animation.getCurrentPlayTime() % cycleDuration;
+            // The animation pauses for a moment after a full cycle
+            if (elapsed < pauseDuration || elapsed >= animationDuration + pauseDuration) {
+                lastIndex[0] = -1;
+                return;
+            }
+
+            int index = (int) ((elapsed - pauseDuration) / RECRUITMENT_CELL_HIGHLIGHT_ANIMATION_INTERVAL);
+            if (index != lastIndex[0]) {
+                lastIndex[0] = index;
+                recruitmentCellViews.get(index).playHighlight();
+            }
+        });
+
+        recruitmentCellAnimator.start();
+    }
+
+    public void stopRecruitmentCellsAnimation() {
+        if (recruitmentCellAnimator != null) {
+            recruitmentCellAnimator.cancel();
+            recruitmentCellAnimator = null;
+        }
+    }
+
     //endregion
 
     //region CELL AND CHARACTER CLICK LISTENERS
@@ -314,6 +386,7 @@ public class PlayableBoardView extends BoardView {
     @Override
     protected void onDetachedFromWindow() {
         stopPlayableCharactersShineAnimation();
+        stopRecruitmentCellsAnimation();
         super.onDetachedFromWindow();
     }
 }
