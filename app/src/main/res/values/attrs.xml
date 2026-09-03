@@ -16,6 +16,10 @@
         <attr name="colorTint" format="reference"/>
     </declare-styleable>
 
+    <declare-styleable name="ReadOnlyBoardView">
+        <attr name="position_visible" format="boolean"/>
+    </declare-styleable>
+
     <declare-styleable name="CharacterView">
         <attr name="teamColor" format="enum">
             <enum name="Black" value="0" />
