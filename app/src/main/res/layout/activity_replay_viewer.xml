@@ -182,6 +182,7 @@
         app:layout_constraintTop_toTopOf="@id/gdlRoot_actReplayViewer" />
 
     <com.leaders.app.views.replay.ReplayControlsView
+        android:id="@+id/rcvControls_actReplayViewer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
