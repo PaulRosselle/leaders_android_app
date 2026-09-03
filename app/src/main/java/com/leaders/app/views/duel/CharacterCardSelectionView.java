@@ -1,5 +1,6 @@
 package com.leaders.app.views.duel;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.transition.Fade;
 import android.transition.Transition;
@@ -7,6 +8,7 @@ import android.transition.TransitionManager;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.LinearInterpolator;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Toast;
@@ -19,6 +21,7 @@ import com.leaders.R;
 import com.leaders.app.utilities.CharacterCardUtils;
 import com.leaders.app.views.character.CharacterCardPortraitGroupView;
 import com.leaders.app.views.character.CharacterCardPortraitView;
+import com.leaders.app.views.decoration.FrameShineView;
 import com.leaders.gamelogic.entities.SelectableCharacterCard;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterCardSelectionStatus;
@@ -41,6 +44,12 @@ public class CharacterCardSelectionView extends ConstraintLayout {
 
     private final LinearLayout llyPortraits;
     private final ScrollView scvPortraits;
+    private final FrameShineView fsvShineEffect;
+
+    private static final int SHINE_CYCLE_PAUSE = 2000;
+    private static final int SHINE_ANIMATION_INTERVAL = FrameShineView.SHINE_ANIMATION_DURATION;
+    @Nullable
+    private ValueAnimator shineAnimator;
 
     private int portraitsPerGroup;
     private int portraitSpacing;
@@ -61,6 +70,7 @@ public class CharacterCardSelectionView extends ConstraintLayout {
 
         llyPortraits = findViewById(R.id.llyPortraits_vwCharacterCardSelection);
         scvPortraits = findViewById(R.id.scvPortraits_vwCharacterCardSelection);
+        fsvShineEffect = findViewById(R.id.fsvShineEffect_vwCharacterCardSelection);
 
         applyGameModeParams(GameMode.Discovery);
     }
@@ -332,5 +342,51 @@ public class CharacterCardSelectionView extends ConstraintLayout {
 
     public void setPortraitsVisible(boolean visible) {
         scvPortraits.setVisibility(visible ? VISIBLE : GONE);
+    }
+
+    public void startShineAnimation() {
+        stopShineAnimation();
+
+        final int cycleDuration = SHINE_ANIMATION_INTERVAL + SHINE_CYCLE_PAUSE;
+        final int pauseDuration = SHINE_CYCLE_PAUSE / 2;
+        final boolean[] animationStarted = {false};
+
+        shineAnimator = ValueAnimator.ofInt(0, cycleDuration);
+        shineAnimator.setDuration(cycleDuration);
+        shineAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        shineAnimator.setInterpolator(new LinearInterpolator());
+
+        shineAnimator.addUpdateListener(animation -> {
+            long elapsed = animation.getCurrentPlayTime() % cycleDuration;
+
+            // Pause before and after the shine animation
+            if (elapsed < pauseDuration || elapsed >= SHINE_ANIMATION_INTERVAL + pauseDuration) {
+                animationStarted[0] = false;
+                return;
+            }
+
+            if (!animationStarted[0]) {
+                animationStarted[0] = true;
+                fsvShineEffect.playShine();
+            }
+        });
+
+        shineAnimator.start();
+    }
+
+
+    public void stopShineAnimation() {
+        if (shineAnimator != null) {
+            fsvShineEffect.stopShine();
+            shineAnimator.cancel();
+            shineAnimator = null;
+        }
+    }
+
+
+    @Override
+    protected void onDetachedFromWindow() {
+        stopShineAnimation();
+        super.onDetachedFromWindow();
     }
 }
