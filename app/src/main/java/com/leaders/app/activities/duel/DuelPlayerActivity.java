@@ -14,10 +14,12 @@ import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.controllers.GameController;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.BoardOrientation;
+import com.leaders.app.enums.EndGameType;
 import com.leaders.app.enums.LeaderType;
 import com.leaders.app.utilities.ButtonUtils;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.views.ActionsMenuView;
+import com.leaders.app.views.EndGameView;
 import com.leaders.app.views.board.PlayableBoardView;
 import com.leaders.app.views.character.CharacterCardPortraitView;
 import com.leaders.app.views.character.CharacterDisplay;
@@ -51,6 +53,7 @@ import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.List;
 import java.util.Objects;
 
 public final class DuelPlayerActivity extends BaseActivity implements
@@ -69,6 +72,8 @@ public final class DuelPlayerActivity extends BaseActivity implements
     private MaterialButton btnActions;
     private ActionsMenuView amvActions;
     private View vwDialogBg;
+
+    private EndGameView egvEndGame;
 
     private CharacterDisplay chdNewCharacter;
 
@@ -111,6 +116,8 @@ public final class DuelPlayerActivity extends BaseActivity implements
         amvActions.addActionButton(R.drawable.icon_position, R.string.board_coordinates, 0, this::onDisplayCellPositionClick);
         vwDialogBg = findViewById(R.id.vwDialogBg_actDuelPlayer);
 
+        egvEndGame = findViewById(R.id.egvEndGame_actDuelPlayer);
+
         btnCards = findViewById(R.id.btnCards_actDuelPlayer);
         btnUndoLastAction = findViewById(R.id.btnUndoLastAction_actDuelPlayer);
         btnNextPhase = findViewById(R.id.btnNextPhase_actDuelPlayer);
@@ -137,6 +144,8 @@ public final class DuelPlayerActivity extends BaseActivity implements
 
         btnActions.setOnClickListener(this::onActionsClick);
         vwDialogBg.setOnClickListener(this::vwDialogBgClick);
+
+        egvEndGame.setOnClickListener(view -> egvEndGame.hide());
 
         btnCards.setOnClickListener(this::onCardsClick);
         btnUndoLastAction.setOnClickListener(this::onUndoLastActionClick);
@@ -346,6 +355,28 @@ public final class DuelPlayerActivity extends BaseActivity implements
         pbvCurrentPlayer.requestLayout();
     }
 
+    private void showEndGame(@NonNull GameContext gameContext, @NonNull Player winner) {
+        TeamColor winnerColor = winner.getTeamColor();
+        Cell leaderCell = Objects.requireNonNull(
+                BoardQuery.findLeaderCell(gameContext.getBoard(), winnerColor),
+                "No leader found for team: " + winnerColor
+        );
+        String loserName = "";
+        for (Player player : List.of(gameContext.getCurrentPlayer(), gameContext.getOpposingPlayer())) {
+            if (player.getTeamColor() != winnerColor) {
+                loserName = player.getName();
+            }
+        }
+
+        egvEndGame.update(
+                EndGameType.Victory,
+                LeaderType.getFromCharacter(leaderCell.getCharacter()),
+                getString(R.string.duel_over),
+                String.format(getString(R.string.player_defeated_player), winner.getName(), loserName)
+        );
+        egvEndGame.show();
+    }
+
     private void setBtnNextPhaseEnabled(boolean enabled, boolean highlight) {
         ButtonUtils.setEnabled(btnNextPhase, enabled);
         hlvNextPhase.setVisibility(highlight ? View.VISIBLE : View.GONE);
@@ -505,7 +536,11 @@ public final class DuelPlayerActivity extends BaseActivity implements
 
     @Override
     public void onGameEnded(@NonNull Player winner) {
-        // TODO - handle game end
+        GameContext gameContext = controller.getCurrentContext();
+
+        clearInteractionUI(gameContext);
+        ButtonUtils.setEnabled(btnCards, true);
+        showEndGame(gameContext, winner);
     }
 
     @Override

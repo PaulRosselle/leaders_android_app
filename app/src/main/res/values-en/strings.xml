@@ -162,5 +162,7 @@
     <string name="default_player_name">player %s</string>
     <string name="player_turn_consonant">%s\'s turn</string>
     <string name="player_turn_vowel">%s\'s turn</string>
+    <string name="player_defeated_player">%s defeated %s!</string>
+    <string name="duel_over">duel over</string>
 
 </resources>
