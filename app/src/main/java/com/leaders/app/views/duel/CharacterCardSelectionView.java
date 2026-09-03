@@ -19,6 +19,7 @@ import com.leaders.R;
 import com.leaders.app.utilities.CharacterCardUtils;
 import com.leaders.app.views.character.CharacterCardPortraitGroupView;
 import com.leaders.app.views.character.CharacterCardPortraitView;
+import com.leaders.app.views.decoration.FrameShineView;
 import com.leaders.gamelogic.entities.SelectableCharacterCard;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterCardSelectionStatus;
@@ -41,6 +42,7 @@ public class CharacterCardSelectionView extends ConstraintLayout {
 
     private final LinearLayout llyPortraits;
     private final ScrollView scvPortraits;
+    private final FrameShineView fsvShineEffect;
 
     private int portraitsPerGroup;
     private int portraitSpacing;
@@ -61,6 +63,7 @@ public class CharacterCardSelectionView extends ConstraintLayout {
 
         llyPortraits = findViewById(R.id.llyPortraits_vwCharacterCardSelection);
         scvPortraits = findViewById(R.id.scvPortraits_vwCharacterCardSelection);
+        fsvShineEffect = findViewById(R.id.fsvShineEffect_vwCharacterCardSelection);
 
         applyGameModeParams(GameMode.Discovery);
     }
@@ -332,5 +335,21 @@ public class CharacterCardSelectionView extends ConstraintLayout {
 
     public void setPortraitsVisible(boolean visible) {
         scvPortraits.setVisibility(visible ? VISIBLE : GONE);
+    }
+
+    public void startShineAnimation() {
+        // TODO - start loop
+    }
+
+    public void stopShineAnimation() {
+        // TODO - end loop
+    }
+
+
+    @Override
+    protected void onDetachedFromWindow() {
+        // TODO - end loop and free the animator
+
+        super.onDetachedFromWindow();
     }
 }
