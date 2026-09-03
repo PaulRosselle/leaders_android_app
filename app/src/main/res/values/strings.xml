@@ -164,4 +164,6 @@
     <string name="default_player_name">joueur %s</string>
     <string name="player_turn_consonant">Au tour de %s</string>
     <string name="player_turn_vowel">Au tour d\'%s</string>
+    <string name="player_defeated_player">%s a vaincu %s !</string>
+    <string name="duel_over">fin du duel</string>
 </resources>
