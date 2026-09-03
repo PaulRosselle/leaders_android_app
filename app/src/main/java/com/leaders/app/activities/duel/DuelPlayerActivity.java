@@ -378,6 +378,20 @@ public final class DuelPlayerActivity extends BaseActivity implements
         }
     }
 
+    private void highlightSelectableCards(@NonNull GameContext gameContext,
+                                          @NonNull InteractionRequest request) {
+        GamePhase gamePhase = gameContext.getGamePhase();
+        boolean targetIsSelectableCard = gamePhase.getPhaseType() == GamePhaseType.Recruitment ||
+                gamePhase.getPhaseType() == GamePhaseType.Banishment;
+        boolean targetRequested = request.getRequestType() != InteractionType.NoTargetExpected;
+
+        if (targetIsSelectableCard && targetRequested) {
+            ccsvCardSelector.startShineAnimation();
+        } else {
+            ccsvCardSelector.stopShineAnimation();
+        }
+    }
+
     private void applyPlayerChange(@NonNull GameContext gameContext) {
         Player currentPlayer = gameContext.getCurrentPlayer();
 
@@ -448,6 +462,7 @@ public final class DuelPlayerActivity extends BaseActivity implements
     private void updateInteractionUI(@NonNull GameContext gameContext,
                                      @NonNull InteractionRequest request) {
         highlightPlayableCharacters(gameContext, request);
+        highlightSelectableCards(gameContext, request);
 
         ButtonUtils.setEnabled(btnUndoLastAction, controller.canUndoLastAction());
         setBtnNextPhaseEnabled(controller.canEndPhaseAction(), request.getLegalTargets().isEmpty());

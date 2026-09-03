@@ -18,9 +18,9 @@ import androidx.annotation.NonNull;
 
 public class FrameShineView extends View {
 
-    private static final int SHINE_ANIMATION_DURATION = 1800;
+    public static final int SHINE_ANIMATION_DURATION = 1800;
     private static final float SHINE_ANGLE = -25f;
-    private static final float SHINE_PATTERN_RATIO = 1.8f;
+    private static final float SHINE_PATTERN_RATIO = 2f;
 
     private final Paint shinePaint;
     private final Matrix shineMatrix;
@@ -138,7 +138,7 @@ public class FrameShineView extends View {
         shineAnimator = ValueAnimator.ofFloat(-1f, 1f);
         shineAnimator.setDuration(SHINE_ANIMATION_DURATION);
 
-        shineAnimator.setInterpolator(new AccelerateInterpolator(1.1f));
+        shineAnimator.setInterpolator(new AccelerateInterpolator());
 
         shineAnimator.addUpdateListener(animation -> {
             shinePosition = (float) animation.getAnimatedValue();
@@ -208,13 +208,13 @@ public class FrameShineView extends View {
     private static int[] getShineColors() {
         int transparent = Color.TRANSPARENT;
 
-        int diffuseVeryLow = Color.argb(4, 255, 255, 255);
-        int diffuseLow = Color.argb(8, 255, 255, 255);
-        int diffuseMedium = Color.argb(14, 255, 255, 255);
+        int diffuseVeryLow = Color.argb(2, 255, 120, 60);
+        int diffuseLow = Color.argb(4, 255, 200, 120);
+        int diffuseMedium = Color.argb(8, 255, 255, 255);
 
-        int highlightSoft = Color.argb(18, 255, 255, 255);
-        int highlightMedium = Color.argb(28, 255, 255, 255);
-        int highlightBright = Color.argb(45, 255, 255, 255);
+        int highlightSoft = Color.argb(10, 255, 120, 60);
+        int highlightMedium = Color.argb(18, 255, 200, 120);
+        int highlightBright = Color.argb(24, 255, 255, 255);
 
         return new int[] {
                 transparent,
