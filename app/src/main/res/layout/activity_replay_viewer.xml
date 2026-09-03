@@ -60,7 +60,7 @@
         tools:ignore="SpeakableTextPresentCheck" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnReplayActions_actReplayViewer"
+        android:id="@+id/btnActions_actReplayViewer"
         android:layout_width="@dimen/round_button_size"
         android:layout_height="@dimen/round_button_size"
         android:layout_marginEnd="8dp"
@@ -81,7 +81,7 @@
         app:layout_constraintVertical_bias="0.0"
         tools:ignore="SpeakableTextPresentCheck" />
 
-    <com.leaders.app.views.board.PlayableBoardView
+    <com.leaders.app.views.board.ReadOnlyBoardView
         android:id="@+id/bdvBoard_actReplayViewer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -92,7 +92,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnBack_actReplayViewer"
-        app:layout_constraintVertical_bias="0.135" />
+        app:layout_constraintVertical_bias="0.135"
+        app:position_visible="false" />
 
     <com.leaders.app.views.duel.PlayerTopView
         android:id="@+id/ptvTopPlayer_actReplayViewer"
@@ -121,7 +122,7 @@
         app:layout_constraintVertical_bias="0.63" />
 
     <TextView
-        android:id="@+id/txvPlayerTurn_actReplayViewer"
+        android:id="@+id/txvReplayName_actReplayViewer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/futura"
@@ -129,7 +130,7 @@
         android:textColor="@color/app_golden"
         android:textSize="@dimen/default_text_font_size"
         app:layout_constraintBottom_toBottomOf="@+id/btnBack_actReplayViewer"
-        app:layout_constraintEnd_toStartOf="@+id/btnReplayActions_actReplayViewer"
+        app:layout_constraintEnd_toStartOf="@+id/btnActions_actReplayViewer"
         app:layout_constraintStart_toEndOf="@+id/btnBack_actReplayViewer"
         app:layout_constraintTop_toTopOf="@id/gdlRoot_actReplayViewer"
         tools:text="RalzMaw vs The World" />
@@ -165,21 +166,11 @@
         android:layout_height="wrap_content"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/btnReplayActions_actReplayViewer"
+        app:layout_constraintEnd_toEndOf="@+id/btnActions_actReplayViewer"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnReplayActions_actReplayViewer"
+        app:layout_constraintTop_toBottomOf="@+id/btnActions_actReplayViewer"
         app:layout_constraintVertical_bias="0.0" />
-
-    <com.leaders.app.views.EndGameView
-        android:id="@+id/egvEndGame_actReplayViewer"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/gdlRoot_actReplayViewer" />
 
     <com.leaders.app.views.replay.ReplayControlsView
         android:id="@+id/rcvControls_actReplayViewer"
