@@ -2,18 +2,15 @@ package com.leaders.app.views.replay;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 
-import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 import com.leaders.app.entities.ReplaySave;
 import com.leaders.app.utilities.GameModeUtils;
+import com.leaders.app.views.selector.SelectorView;
 import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.enums.TeamColor;
 
@@ -21,53 +18,21 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Locale;
 
-@SuppressLint("ViewConstructor") // Cannot be added through the XML editor
-public class ReplaySelectorView extends ConstraintLayout {
-    public interface OnReplayClickListener {
-        void onReplayClick(@NonNull ReplaySelectorView rsvSender);
-    }
-
-    public interface OnReplayLongClickListener {
-        boolean onReplayLongClick(@NonNull ReplaySelectorView rsvSender);
-    }
-
-    private MaterialButton btnMain;
-    private ImageView imvChecked;
+@SuppressLint("ViewConstructor")
+public final class ReplaySelectorView extends SelectorView<ReplaySave> {
     private TextView txvName;
     private TextView txvDate;
     private TextView txvGameMode;
     private TextView txvWhitePlayer;
     private TextView txvBlackPlayer;
 
-    private boolean checkboxVisible;
-    private boolean isChecked;
-
-    private final ReplaySave replaySave;
-
-    @Nullable
-    private OnReplayClickListener onReplayClickListener;
-    @Nullable
-    private OnReplayLongClickListener onReplayLongClickListener;
-
-    public ReplaySelectorView(@NonNull Context context, @NonNull ReplaySave replaySave) {
-        super(context);
-
-        this.replaySave = replaySave;
-
-        inflate(context, R.layout.view_replay_selector, this);
-
-        initViews();
-        initListeners();
-        loadReplaySave();
-
-        // We apply the default selection behavior
-        setCheckboxVisible(false);
-        setChecked(false);
+    ReplaySelectorView(@NonNull Context context, @NonNull ReplaySave item) {
+        super(context, item);
     }
 
-    private void initViews() {
-        imvChecked = findViewById(R.id.imvChecked_vwReplaySelector);
-        btnMain = findViewById(R.id.btnMain_vwReplaySelector);
+    protected void initViews() {
+        super.initViews();
+
         txvName = findViewById(R.id.txvName_vwReplaySelector);
         txvDate = findViewById(R.id.txvDate_vwReplaySave);
         txvGameMode = findViewById(R.id.txvGameMode_vwReplaySelector);
@@ -75,73 +40,66 @@ public class ReplaySelectorView extends ConstraintLayout {
         txvBlackPlayer = findViewById(R.id.txvBlackPlayer_vwReplaySelector);
     }
 
-    private void initListeners() {
-        btnMain.setOnClickListener(v -> {
-            if (onReplayClickListener != null) {
-                onReplayClickListener.onReplayClick(this);
-            }
-        });
-        btnMain.setOnLongClickListener(v -> {
-            if (onReplayLongClickListener != null) {
-                return onReplayLongClickListener.onReplayLongClick(this);
-            }
-            return false;
-        });
+    @Override
+    protected void initDatas() {
+        super.initDatas();
+
+        ReplaySave replaySave = getItem();
+        // NAME
+        txvName.setText(replaySave.getName());
+        // DATE
+        DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(Locale.getDefault());
+        txvDate.setText(formatter.format(replaySave.getDate()));
+        // GAME MODE
+        txvGameMode.setText(GameModeUtils.getName(getContext(), replaySave.getGameMode()));
+        // PLAYERS
+        txvWhitePlayer.setText(getPlayerName(TeamColor.White));
+        txvBlackPlayer.setText(getPlayerName(TeamColor.Black));
+    }
+
+    @Override
+    protected int getLayoutResId() {
+        return R.layout.view_replay_selector;
+    }
+
+    @Override
+    protected int getBtnMainResId() {
+        return R.id.btnMain_vwReplaySelector;
+    }
+
+    @Override
+    protected int getImvCheckedResId() {
+        return R.id.imvChecked_vwReplaySelector;
     }
 
     private String getPlayerName(@NonNull TeamColor teamColor) {
-        for (Player player : replaySave.getPlayers()) {
+        for (Player player : getItem().getPlayers()) {
             if (player.getTeamColor() == teamColor) {
                 return player.getName();
             }
         }
+
         throw new IllegalStateException("No player found for team: " + teamColor);
     }
 
-    private void loadReplaySave() {
-        // NAME
-        txvName.setText(replaySave.getName());
-        // DATE
-        DateTimeFormatter formatter = DateTimeFormatter
-                .ofLocalizedDate(FormatStyle.SHORT).withLocale(Locale.getDefault());
-        txvDate.setText(formatter.format(replaySave.getDate()));
-        // GAME MODE
-        txvGameMode.setText(GameModeUtils.getName(getContext(), replaySave.getGameMode()));
-        // WHITE PLAYER
-        txvWhitePlayer.setText(getPlayerName(TeamColor.White));
-        // BLACK PLAYER
-        txvBlackPlayer.setText(getPlayerName(TeamColor.Black));
+    @Override
+    protected void updateCheckboxVisibleState() {
+        imvChecked.setVisibility(isCheckboxVisible() ? VISIBLE : INVISIBLE);
     }
 
-    public void setCheckboxVisible(boolean checkboxVisible) {
-        this.checkboxVisible = checkboxVisible;
-        updateCheckboxVisibleState();
-    }
-
-    public void setChecked(boolean isChecked) {
-        this.isChecked = isChecked;
-        updateCheckedState();
-    }
-
-    public boolean isChecked() {
-        return isChecked;
-    }
-
-    private void updateCheckboxVisibleState() {
-        imvChecked.setVisibility(checkboxVisible ? VISIBLE : INVISIBLE);
-    }
-
-    private void updateCheckedState() {
-        imvChecked.setImageResource(isChecked ? R.drawable.checked_box : R.drawable.unchecked_box);
+    @Override
+    protected void updateCheckedState() {
+        imvChecked.setImageResource(isChecked() ? R.drawable.checked_box : R.drawable.unchecked_box);
 
         int strokeWidth = getResources().getDimensionPixelSize(R.dimen.default_stroke_width);
-        int bgColorId = R.color.darker_background;
+        int backgroundColorId = R.color.darker_background;
         int strokeColorId = R.color.font;
         int mainTextColorId = R.color.font;
         int secondaryTextColorId = R.color.darker_font;
-        if (isChecked) {
+
+        if (isChecked()) {
             strokeWidth *= 2;
-            bgColorId = R.color.ultra_dark_background;
+            backgroundColorId = R.color.ultra_dark_background;
             strokeColorId = R.color.white;
             mainTextColorId = R.color.white;
             secondaryTextColorId = R.color.light_gray;
@@ -151,7 +109,7 @@ public class ReplaySelectorView extends ConstraintLayout {
         int secondaryTextColor = getResources().getColor(secondaryTextColorId, getContext().getTheme());
 
         btnMain.setStrokeWidth(strokeWidth);
-        btnMain.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), bgColorId));
+        btnMain.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), backgroundColorId));
         btnMain.setStrokeColor(ContextCompat.getColorStateList(getContext(), strokeColorId));
 
         txvName.setTextColor(mainTextColor);
@@ -162,15 +120,8 @@ public class ReplaySelectorView extends ConstraintLayout {
         txvBlackPlayer.setTextColor(secondaryTextColor);
     }
 
-    public void setOnReplayClickListener(@Nullable OnReplayClickListener onReplayClickListener) {
-        this.onReplayClickListener = onReplayClickListener;
-    }
-
-    public void setOnReplayLongClickListener(@Nullable OnReplayLongClickListener onReplayLongClickListener) {
-        this.onReplayLongClickListener = onReplayLongClickListener;
-    }
-
+    @NonNull
     public ReplaySave getReplaySave() {
-        return replaySave;
+        return getItem();
     }
 }
