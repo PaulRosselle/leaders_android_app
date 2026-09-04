@@ -6,12 +6,11 @@
     android:layout_height="match_parent"
     android:background="@color/background"
     tools:theme="@style/Theme.LeadersAndroidApp"
-    tools:context=".app.activities.puzzle.PuzzleSelectionActivity"
+    tools:context=".app.activities.replay.ReplaySelectionActivity"
     tools:ignore="SpUsage">
 
-
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/gdlRoot_actPuzzleSelection"
+        android:id="@+id/gdlRoot_actReplaySelection"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -29,7 +28,7 @@
 
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnBack_actPuzzleSelection"
+        android:id="@+id/btnBack_actReplaySelection"
         android:layout_width="@dimen/round_button_size"
         android:layout_height="@dimen/round_button_size"
         android:layout_marginStart="8dp"
@@ -46,12 +45,12 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actPuzzleSelection"
+        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actReplaySelection"
         app:layout_constraintVertical_bias="0.0"
         tools:ignore="SpeakableTextPresentCheck" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnPuzzleActions_actPuzzleSelection"
+        android:id="@+id/btnActions_actReplaySelection"
         android:layout_width="@dimen/round_button_size"
         android:layout_height="@dimen/round_button_size"
         android:layout_marginEnd="8dp"
@@ -68,90 +67,41 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actPuzzleSelection"
+        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actReplaySelection"
         app:layout_constraintVertical_bias="0.0"
         tools:ignore="SpeakableTextPresentCheck" />
 
     <TextView
-        android:id="@+id/txvTitle_actPuzzleSelection"
+        android:id="@+id/txvTitle_actReplaySelection"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/bourbon_test_regular"
-        android:text="@string/title_puzzles_selection"
+        android:text="ReplayS"
         android:textAllCaps="false"
         android:textColor="@color/app_golden"
         android:textSize="@dimen/title_font_size"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actPuzzleSelection"
+        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actReplaySelection"
         app:layout_constraintVertical_bias="0.0" />
 
-    <com.google.android.material.button.MaterialButtonToggleGroup
-        android:id="@+id/mbtgPuzzlesCategory_actPuzzleSelection"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnBack_actPuzzleSelection"
-        app:layout_constraintVertical_bias="0.0"
-        app:singleSelection="true"
-        app:selectionRequired="true">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnOfficial_actPuzzleSelection"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:fontFamily="@font/bobby_jones_regular"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:text="@string/official_puzzles"
-            android:textColor="@color/font"
-            android:textSize="@dimen/default_text_font_size"
-            app:backgroundTint="@color/toggle_button_tint"
-            app:cornerRadius="8dp"
-            app:strokeColor="@color/font"
-            app:strokeWidth="@dimen/default_stroke_width" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnCustom_actPuzzleSelection"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:fontFamily="@font/bobby_jones_regular"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:text="@string/custom"
-            android:textColor="@color/font"
-            android:textSize="@dimen/default_text_font_size"
-            app:backgroundTint="@color/toggle_button_tint"
-            app:cornerRadius="8dp"
-            app:strokeColor="@color/font"
-            app:strokeWidth="@dimen/default_stroke_width" />
-
-    </com.google.android.material.button.MaterialButtonToggleGroup>
-
     <com.leaders.app.views.decoration.OrnateFrameView
-        android:id="@+id/ofvPuzzles_actPuzzleSelection"
+        android:id="@+id/ofvReplays_actReplaySelection"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="24dp"
         android:background="@color/darker_background"
-        app:layout_constraintBottom_toTopOf="@id/btnPlay_actPuzzleSelection"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/mbtgPuzzlesCategory_actPuzzleSelection">
+        app:layout_constraintTop_toBottomOf="@id/btnBack_actReplaySelection">
 
         <ScrollView
-            android:id="@+id/scvPuzzles_actPuzzleSelection"
+            android:id="@+id/scvReplays_actReplaySelection"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="8dp"
@@ -164,8 +114,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <com.leaders.app.views.puzzle.PuzzleSelectorGroupView
-                android:id="@+id/psgvPuzzles_actPuzzleSelection"
+            <com.leaders.app.views.replay.ReplaySelectorGroupView
+                android:id="@+id/rsgvReplays_actReplaySelection"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical" />
@@ -173,41 +123,9 @@
 
     </com.leaders.app.views.decoration.OrnateFrameView>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnPlay_actPuzzleSelection"
-        android:layout_width="250dp"
-        android:layout_height="@dimen/round_button_size"
-        android:layout_marginBottom="16dp"
-        android:backgroundTint="@color/darker_background"
-        android:fontFamily="@font/bobby_jones_condensed"
-        android:includeFontPadding="false"
-        android:insetTop="0dp"
-        android:insetBottom="0dp"
-        android:padding="0dp"
-        android:paddingStart="38dp"
-        android:paddingEnd="8dp"
-        android:text="@string/play"
-        android:textColor="@color/font"
-        android:textSize="24dp"
-        app:cornerRadius="8dp"
-        app:icon="@drawable/icon_arrow_head"
-        app:iconGravity="end"
-        app:iconPadding="0dp"
-        app:iconSize="24dp"
-        app:iconTint="@color/font"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintDimensionRatio=""
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0"
-        app:strokeColor="@color/font"
-        app:strokeWidth="@dimen/default_stroke_width"
-        tools:ignore="SpeakableTextPresentCheck" />
-
 
     <View
-        android:id="@+id/vwDialogBg_actPuzzleSelection"
+        android:id="@+id/vwDialogBg_actReplaySelection"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/transparent_black"
@@ -219,7 +137,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.leaders.app.views.ActionsMenuView
-        android:id="@+id/amvPuzzleActions_actPuzzleSelection"
+        android:id="@+id/amvActions_actReplaySelection"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="12dp"
@@ -228,7 +146,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnPuzzleActions_actPuzzleSelection"
+        app:layout_constraintTop_toBottomOf="@+id/btnActions_actReplaySelection"
         app:layout_constraintVertical_bias="0.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
