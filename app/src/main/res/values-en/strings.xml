@@ -164,5 +164,10 @@
     <string name="player_turn_vowel">%s\'s turn</string>
     <string name="player_defeated_player">%s defeated %s!</string>
     <string name="duel_over">duel over</string>
+    <string name="puzzle_author">Puzzle author</string>
+    <string name="save_puzzle">Save puzzle</string>
+    <string name="save_game">Save game</string>
+    <string name="game_name">Game name</string>
+    <string name="game_date">Game date</string>
 
 </resources>

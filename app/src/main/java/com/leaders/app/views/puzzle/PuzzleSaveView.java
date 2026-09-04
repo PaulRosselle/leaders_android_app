@@ -59,10 +59,10 @@ public class PuzzleSaveView extends ConstraintLayout {
     }
 
     public void setOnBtnCancelClick(@NonNull OnClickListener onBtnCancelClick) {
-        (findViewById(R.id.btnCancel_vwPuzzleSave)).setOnClickListener(onBtnCancelClick);
+        (findViewById(R.id.txvCancel_vwPuzzleSave)).setOnClickListener(onBtnCancelClick);
     }
 
     public void setOnBtnSaveClick(@NonNull OnClickListener onBtnSaveClick) {
-        (findViewById(R.id.btnSave_vwPuzzleSave)).setOnClickListener(onBtnSaveClick);
+        (findViewById(R.id.txvSave_vwPuzzleSave)).setOnClickListener(onBtnSaveClick);
     }
 }
