@@ -103,7 +103,7 @@
         android:fontFamily="@font/bukhari_script"
         android:foreground="@drawable/round_rect_stroke"
         android:foregroundTint="@color/darker_font"
-        android:hint="Paul"
+        android:hint="@string/anonymous_author"
         android:importantForAutofill="no"
         android:inputType="text"
         android:paddingStart="8dp"
