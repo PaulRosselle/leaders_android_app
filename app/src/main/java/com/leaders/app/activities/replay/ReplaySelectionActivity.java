@@ -1,15 +1,18 @@
 package com.leaders.app.activities.replay;
 
+import android.content.Intent;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.entities.ReplaySave;
 import com.leaders.app.enums.ActivityType;
+import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.replay.ReplaySelectorGroupView;
@@ -17,6 +20,51 @@ import com.leaders.app.views.replay.ReplaySelectorGroupView;
 import java.util.List;
 
 public class ReplaySelectionActivity extends BaseActivity {
+    private enum ReplaySelectionAction {
+        Edit,
+        Remove,
+        Import,
+        Export,
+        SelectAll,
+        UnselectAll;
+
+        private int getIconResId() {
+            switch (this) {
+                case Edit: return R.drawable.icon_edit;
+                case Remove: return R.drawable.icon_remove;
+                case Import: return R.drawable.icon_import;
+                case Export: return R.drawable.icon_export;
+                case SelectAll: return R.drawable.icon_select_all;
+                case UnselectAll: return R.drawable.icon_unselect_all;
+                default: throw new IllegalStateException("No icon found for replay selection action: " + this);
+            }
+        }
+
+        private int getTextResId() {
+            switch (this) {
+                case Edit: return R.string.edit_puzzle;
+                case Remove: return R.string.remove;
+                case Import: return R.string.import_puzzle;
+                case Export: return R.string.export_puzzle;
+                case SelectAll: return R.string.select_all;
+                case UnselectAll: return R.string.unselect_all;
+                default: throw new IllegalStateException("No text found for replay selection action: " + this);
+            }
+        }
+
+        private View.OnClickListener getOnClickListener(ReplaySelectionActivity activity) {
+            switch (this) {
+                case Edit: return activity::onEditPuzzleClick;
+                case Remove: return activity::onRemoveClick;
+                case Import: return activity::onImportClick;
+                case Export: return activity::onExportClick;
+                case SelectAll: return activity::onSelectAllClick;
+                case UnselectAll: return activity::onUnselectAllClick;
+                default: throw new IllegalStateException("No click listener found for replay selection action: " + this);
+            }
+        }
+    }
+
     private ReplaySelectorGroupView rsgvReplays;
 
     private MaterialButton btnActions;
@@ -36,7 +84,14 @@ public class ReplaySelectionActivity extends BaseActivity {
 
         btnActions = findViewById(R.id.btnActions_actReplaySelection);
         amvActions = findViewById(R.id.amvActions_actReplaySelection);
-        // TODO - actions menu buttons
+        for (ReplaySelectionAction action : ReplaySelectionAction.values()) {
+            amvActions.addActionButton(
+                    action.getIconResId(),
+                    action.getTextResId(),
+                    action.ordinal(),
+                    action.getOnClickListener(this)
+            );
+        }
         vwDialogBg = findViewById(R.id.vwDialogBg_actReplaySelection);
     }
 
@@ -56,7 +111,6 @@ public class ReplaySelectionActivity extends BaseActivity {
 
         replaySaves = JsonUtils.loadReplays(this);
         rsgvReplays.setReplays(replaySaves);
-        // TODO
     }
 
     @Override
@@ -101,22 +155,100 @@ public class ReplaySelectionActivity extends BaseActivity {
     //region VIEWS LISTENER METHODS
 
     private void onReplaySelectionChange() {
-        // TODO - start a replay (if single selection)
+        // A click on a replay outside of selection mode starts the ReplayViewer
+        List<ReplaySave> selectedReplays = rsgvReplays.getSelectedReplays();
+        if (!rsgvReplays.isSingleSelection() || selectedReplays.size() != 1) {
+            return;
+        }
+
+        Intent intent = ActivityType.ReplayViewer.getIntent(this);
+
+        ReplaySave replaySave = selectedReplays.get(0);
+        intent.putExtra(ExtraUtils.EXTRA_REPLAY_INDEX, replaySaves.indexOf(replaySave));
+
+        goToActivity(intent);
     }
 
     private void onActionsClick(View v) {
-        // TODO - show amvActions
+        int replaysCount = replaySaves.size();
+        int selectedReplaysCount = rsgvReplays.getSelectedReplays().size();
+
+        // Before showing the actions menu, we must update the available actions based on the replays selection
+        amvActions.setButtonEnabled(ReplaySelectionAction.Edit.ordinal(),
+                selectedReplaysCount == 1);
+        amvActions.setButtonEnabled(ReplaySelectionAction.Remove.ordinal(),
+                selectedReplaysCount > 0);
+        amvActions.setButtonEnabled(ReplaySelectionAction.Export.ordinal(),
+                selectedReplaysCount > 0);
+        amvActions.setButtonEnabled(ReplaySelectionAction.SelectAll.ordinal(),
+                selectedReplaysCount < replaysCount);
+        amvActions.setButtonEnabled(ReplaySelectionAction.UnselectAll.ordinal(),
+                selectedReplaysCount > 0);
+
+        setActionsVisible(true);
     }
 
     private void onDialogBgClick(View v) {
-        // TODO - hide vwDialogBg and amvActions
+        setActionsVisible(false);
     }
 
     //endregion
 
     //region ACTIONS METHODS
 
-    // TODO - add methods for subelements of amvActions
+    private void onEditPuzzleClick(View v) {
+        // TODO
+    }
+
+    private void onRemoveClick(View v) {
+        List<ReplaySave> selectedReplays = rsgvReplays.getSelectedReplays();
+
+        String dialogTitle;
+        if (selectedReplays.size() == 1) {
+            dialogTitle = String.format(getString(R.string.remove_selected_puzzle), selectedReplays.get(0).getName());
+        } else {
+            dialogTitle = getString(R.string.remove_selected_replays);
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.alert_dialog_theme);
+        builder.setTitle(dialogTitle);
+        builder.setMessage(getString(R.string.warning_removal_cannot_be_undone));
+        builder.setPositiveButton(R.string.confirm, (dialog, which) -> {
+            for (ReplaySave replaySave : selectedReplays) {
+                replaySaves.remove(replaySave);
+            }
+            JsonUtils.saveReplays(this, replaySaves);
+            rsgvReplays.setReplays(replaySaves);
+        });
+        builder.setNegativeButton(R.string.cancel, null);
+        builder.show();
+
+        setActionsVisible(false);
+    }
+
+    private void onImportClick(View v) {
+        // TODO
+    }
+
+    private void onExportClick(View v) {
+        // TODO
+    }
+
+    private void onSelectAllClick(View v) {
+        rsgvReplays.selectAllReplays();
+        setActionsVisible(false);
+    }
+
+    private void onUnselectAllClick(View v) {
+        rsgvReplays.clearReplaySelection();
+        setActionsVisible(false);
+    }
+
+
+    private void setActionsVisible(boolean visible) {
+        amvActions.setVisibility(visible ? View.VISIBLE : View.GONE);
+        vwDialogBg.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
 
     //endregion
 }

@@ -123,9 +123,15 @@
 
     <TextView
         android:id="@+id/txvReplayName_actReplayViewer"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:autoSizeMaxTextSize="@dimen/default_text_font_size"
+        android:autoSizeMinTextSize="14dp"
+        android:autoSizeStepGranularity="2dp"
+        android:autoSizeTextType="uniform"
         android:fontFamily="@font/futura"
+        android:singleLine="true"
+        android:textAlignment="center"
         android:textAllCaps="true"
         android:textColor="@color/app_golden"
         android:textSize="@dimen/default_text_font_size"
@@ -133,7 +139,7 @@
         app:layout_constraintEnd_toStartOf="@+id/btnActions_actReplayViewer"
         app:layout_constraintStart_toEndOf="@+id/btnBack_actReplayViewer"
         app:layout_constraintTop_toTopOf="@id/gdlRoot_actReplayViewer"
-        tools:text="RalzMaw vs The World" />
+        tools:text="Black Player vs White Player" />
 
     <com.leaders.app.views.character.CharacterNotificationView
         android:id="@+id/cnvCardInfo_actReplayViewer"

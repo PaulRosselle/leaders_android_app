@@ -1,5 +1,6 @@
 package com.leaders.app.activities.replay;
 
+import android.content.Intent;
 import android.view.View;
 import android.widget.TextView;
 
@@ -13,30 +14,16 @@ import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.entities.ReplaySave;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.LeaderType;
+import com.leaders.app.utilities.ExtraUtils;
+import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.board.ReadOnlyBoardView;
 import com.leaders.app.views.character.CharacterNotificationView;
 import com.leaders.app.views.duel.PlayerBottomView;
 import com.leaders.app.views.duel.PlayerTopView;
 import com.leaders.app.views.replay.ReplayControlsView;
-import com.leaders.gamelogic.actions.IGameAction;
-import com.leaders.gamelogic.actions.RecruitmentAction;
-import com.leaders.gamelogic.actions.RecruitmentActionMotion;
-import com.leaders.gamelogic.entities.Character;
-import com.leaders.gamelogic.entities.GameConfig;
-import com.leaders.gamelogic.entities.GameHistory;
-import com.leaders.gamelogic.entities.Player;
-import com.leaders.gamelogic.entities.Position;
-import com.leaders.gamelogic.enums.CharacterType;
-import com.leaders.gamelogic.enums.GameMode;
-import com.leaders.gamelogic.enums.RecruitmentMotionType;
-import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.factories.GameFactory;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class ReplayViewerActivity extends BaseActivity {
@@ -53,7 +40,8 @@ public class ReplayViewerActivity extends BaseActivity {
     private View vwDialogBg;
 
 
-    private ReplaySave replay;
+    private List<ReplaySave> replaySaves;
+    private ReplaySave replaySave;
 
 
     //region BASE ACTIVITY OVERRIDEN METHODS
@@ -94,15 +82,18 @@ public class ReplayViewerActivity extends BaseActivity {
     protected void initDatas() {
         super.initDatas();
 
-        // TODO - get replay from save
-        ReplaySave loadedReplay = new ReplaySave(
-                "RalzMaw vs The World",
-                LocalDate.now(),
-                getTestGameHistory()
-        );
+        replaySaves = JsonUtils.loadReplays(this);
+
+        Intent intent = getIntent();
+        int replayIndex = intent.getIntExtra(ExtraUtils.EXTRA_REPLAY_INDEX, -1);
+        if (replayIndex < 0 || replayIndex >= replaySaves.size()) {
+            throw new IllegalArgumentException("Invalid replay viewer intent: replay index missing");
+        }
+
+        ReplaySave intentReplaySave = replaySaves.get(replayIndex);
 
         bdvBoard.post(() -> {
-            loadReplay(loadedReplay);
+            loadReplay(intentReplaySave);
             setupBoardAndPlayers();
         });
     }
@@ -169,54 +160,10 @@ public class ReplayViewerActivity extends BaseActivity {
         pbvBottomPlayer.setLayoutParams(playerViewParams);
     }
 
-    // TODO - remove
-    private RecruitmentActionMotion getTestCharacter(@NonNull CharacterType characterType,
-                                                     @NonNull TeamColor teamColor,
-                                                     int x, int y) {
-        return new RecruitmentActionMotion(
-                RecruitmentMotionType.Add,
-                Character.create(characterType, teamColor),
-                new Position(x, y)
-        );
-    }
-
-    // TODO - remove
-    private GameHistory getTestGameHistory() {
-        // The black player represents the human player (official puzzles convention)
-        Player playerBlack = new Player(TeamColor.Black, "the world");
-        Player playerWhite = new Player(TeamColor.White, "Ralzmaw");
-
-        // The default game history is initialized each leader at their starting position
-
-        List<IGameAction> initialActions = new ArrayList<>();
-        initialActions.add(new RecruitmentAction(Arrays.asList(
-                getTestCharacter(CharacterType.LeaderKing, TeamColor.White, 1, 1),
-                getTestCharacter(CharacterType.Wanderer, TeamColor.White, 1, 2),
-                getTestCharacter(CharacterType.Brewmaster, TeamColor.White, 1, 3),
-                getTestCharacter(CharacterType.Bruiser, TeamColor.White, 2, 1),
-                getTestCharacter(CharacterType.ClawLauncher, TeamColor.White, 2, 3),
-                getTestCharacter(CharacterType.Acrobat, TeamColor.Black, 2, 2),
-                getTestCharacter(CharacterType.Protector, TeamColor.Black, 3, 2),
-                getTestCharacter(CharacterType.RoyalGuard, TeamColor.Black, 3, 3),
-                getTestCharacter(CharacterType.Manipulator, TeamColor.Black, 3, 4),
-                getTestCharacter(CharacterType.LeaderQueen, TeamColor.Black, 4, 3)
-        )));
-
-        GameConfig gameConfig =new GameConfig(
-                List.of(playerBlack, playerWhite),
-                playerWhite,
-                GameMode.Strategist,
-                Collections.emptyList(),
-                initialActions
-        );
-
-        return new GameHistory(gameConfig, new ArrayList<>());
-    }
-
     //region UI UPDATE METHODS
 
     private void loadReplay(@NonNull ReplaySave replay) {
-        this.replay = replay;
+        this.replaySave = replay;
 
         txvReplayName.setText(replay.getName());
         ptvTopPlayer.setPlayer(replay.getPlayers().get(1), LeaderType.King);

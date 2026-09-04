@@ -97,7 +97,7 @@
     <string name="invalid_lbe_url_character">Invalid character in LBE url: %s</string>
     <string name="invalid_lbe_url_position">Invalid position in LBE url: %s</string>
     <string name="invalid_lbe_url_not_found">LBE url not found</string>
-    <string name="remove_selected_puzzles">Remove selected puzzles ?</string>
+    <string name="remove_selected_puzzles">Remove selected puzzles?</string>
     <string name="remove_selected_puzzle">Remove \"%s\" ?</string>
     <string name="warning_removal_cannot_be_undone">⚠ Puzzle removal can\'t be undone ⚠</string>
     <string name="confirm">Confirm</string>
@@ -173,5 +173,6 @@
     <string name="saved_replay">Saved replay!</string>
     <string name="discovery_mode_name">Discovery mode</string>
     <string name="strategist_mode_name">Strategist mode</string>
+    <string name="remove_selected_replays">Remove selected replays?</string>
 
 </resources>

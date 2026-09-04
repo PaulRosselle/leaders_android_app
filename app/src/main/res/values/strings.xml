@@ -175,4 +175,5 @@
     <string name="saved_replay">Replay sauvegardé !</string>
     <string name="discovery_mode_name">Mode découverte</string>
     <string name="strategist_mode_name">Mode stratège</string>
+    <string name="remove_selected_replays">Supprimer les replays sélectionnés ?</string>
 </resources>
