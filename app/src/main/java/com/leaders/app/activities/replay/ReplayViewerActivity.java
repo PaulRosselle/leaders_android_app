@@ -1,6 +1,8 @@
 package com.leaders.app.activities.replay;
 
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.TextView;
 
@@ -177,7 +179,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
         ptvTopPlayer.setPlayer(replaySave.getPlayers().get(1), LeaderType.King);
         pbvBottomPlayer.setPlayer(replaySave.getPlayers().get(0), LeaderType.Queen);
 
-        rcvControls.loadReplay(replaySave);
+        bdvBoard.post(() -> rcvControls.loadReplay(replaySave));
     }
 
     //endregion
@@ -213,7 +215,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
 
     @Override
     public void onReplayLoaded(@NonNull Board board) {
-        bdvBoard.post(() -> bdvBoard.setBoard(board));
+        bdvBoard.setBoard(board);
     }
 
     @Override
