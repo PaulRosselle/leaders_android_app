@@ -197,11 +197,19 @@ public class ReplaySelectionActivity extends BaseActivity {
     }
 
     private void onSelectAllClick(View v) {
-        // TODO
+        rsgvReplays.selectAllReplays();
+        setActionsVisible(false);
     }
 
     private void onUnselectAllClick(View v) {
-        // TODO
+        rsgvReplays.clearReplaySelection();
+        setActionsVisible(false);
+    }
+
+
+    private void setActionsVisible(boolean visible) {
+        amvActions.setVisibility(visible ? View.VISIBLE : View.GONE);
+        vwDialogBg.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     //endregion
