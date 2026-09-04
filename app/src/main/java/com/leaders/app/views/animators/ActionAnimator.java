@@ -1,7 +1,5 @@
 package com.leaders.app.views.animators;
 
-import android.view.View;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 

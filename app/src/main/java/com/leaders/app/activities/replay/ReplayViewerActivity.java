@@ -17,16 +17,22 @@ import com.leaders.app.enums.LeaderType;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.views.ActionsMenuView;
+import com.leaders.app.views.animators.CharacterActionAnimator;
+import com.leaders.app.views.animators.RecruitmentActionAnimator;
 import com.leaders.app.views.board.ReadOnlyBoardView;
 import com.leaders.app.views.character.CharacterNotificationView;
 import com.leaders.app.views.duel.PlayerBottomView;
 import com.leaders.app.views.duel.PlayerTopView;
 import com.leaders.app.views.replay.ReplayControlsView;
+import com.leaders.gamelogic.actions.CharacterAction;
+import com.leaders.gamelogic.actions.IGameAction;
+import com.leaders.gamelogic.actions.RecruitmentAction;
+import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.factories.GameFactory;
 
 import java.util.List;
 
-public class ReplayViewerActivity extends BaseActivity {
+public class ReplayViewerActivity extends BaseActivity implements ReplayControlsView.ReplayControlsListener {
     private ReadOnlyBoardView bdvBoard;
     private ReplayControlsView rcvControls;
 
@@ -68,6 +74,8 @@ public class ReplayViewerActivity extends BaseActivity {
     @Override
     protected void initListeners() {
         super.initListeners();
+
+        rcvControls.setControlsListener(this);
 
         bdvBoard.setOnCharacterLongClickListener(this::onCharacterLongClick);
         // TODO - replay control listener
@@ -162,19 +170,14 @@ public class ReplayViewerActivity extends BaseActivity {
 
     //region UI UPDATE METHODS
 
-    private void loadReplay(@NonNull ReplaySave replay) {
-        this.replaySave = replay;
+    private void loadReplay(@NonNull ReplaySave replaySave) {
+        this.replaySave = replaySave;
 
-        txvReplayName.setText(replay.getName());
-        ptvTopPlayer.setPlayer(replay.getPlayers().get(1), LeaderType.King);
-        pbvBottomPlayer.setPlayer(replay.getPlayers().get(0), LeaderType.Queen);
-        bdvBoard.setBoard(GameFactory.create(replay.getPuzzleGameHistory()).getBoard());
+        txvReplayName.setText(replaySave.getName());
+        ptvTopPlayer.setPlayer(replaySave.getPlayers().get(1), LeaderType.King);
+        pbvBottomPlayer.setPlayer(replaySave.getPlayers().get(0), LeaderType.Queen);
 
-        updateControls();
-    }
-
-    private void updateControls() {
-        // TODO - call a dedicated method within rcvControls
+        rcvControls.loadReplay(replaySave);
     }
 
     //endregion
@@ -208,7 +211,23 @@ public class ReplayViewerActivity extends BaseActivity {
 
     //region REPLAY CONTROL METHODS
 
-    // TODO - add methods from ReplayControlsView listener
+    @Override
+    public void onReplayLoaded(@NonNull Board board) {
+        bdvBoard.post(() -> bdvBoard.setBoard(board));
+    }
+
+    @Override
+    public void onActionPlayed(@NonNull IGameAction action, @NonNull Runnable onActionEnd) {
+        switch (action.getActionType()) {
+            case CharacterAction:
+                CharacterActionAnimator.animate(bdvBoard, (CharacterAction) action, onActionEnd);
+                break;
+            case Recruitment:
+                RecruitmentActionAnimator.animate(bdvBoard, (RecruitmentAction) action, onActionEnd);
+                break;
+            default: throw new IllegalStateException("Action animation not handled for: " + action.getActionType());
+        }
+    }
 
     //endregion
 }
