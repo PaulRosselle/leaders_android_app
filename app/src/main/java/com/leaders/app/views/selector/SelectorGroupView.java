@@ -109,6 +109,10 @@ public abstract class SelectorGroupView<T, V extends SelectorView<T>> extends Li
         return false;
     }
 
+    public boolean isSingleSelection() {
+        return singleSelection;
+    }
+
     @Nullable
     private Integer getClosestSelectedIndex(int refIndex) {
         int closestIndex = Integer.MAX_VALUE;

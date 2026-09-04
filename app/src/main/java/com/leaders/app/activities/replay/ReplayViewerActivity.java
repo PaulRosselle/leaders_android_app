@@ -71,6 +71,7 @@ public class ReplayViewerActivity extends BaseActivity {
 
         btnActions = findViewById(R.id.btnActions_actReplayViewer);
         amvActions = findViewById(R.id.amvActions_actDuelPlayer);
+        // TODO - actions menu buttons
         cnvCardInfo = findViewById(R.id.cnvCardInfo_actReplayViewer);
         vwDialogBg = findViewById(R.id.vwDialogBg_actReplayViewer);
     }
@@ -84,7 +85,6 @@ public class ReplayViewerActivity extends BaseActivity {
         // TODO - replay control listener
 
         btnActions.setOnClickListener(this::onActionsClick);
-        // TODO - actions listeners
         cnvCardInfo.setOnClickListener(this::onCardInfoClick);
         vwDialogBg.setOnClickListener(this::onDialogBgClick);
     }

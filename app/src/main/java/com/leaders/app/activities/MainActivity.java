@@ -141,11 +141,7 @@ public final class MainActivity extends BaseActivity {
     }
 
     private void onReplayClick(View v) {
-        showNotImplementedDialog("v0.6.0",
-                List.of("Game \"media\" player",
-                        "Local multiplayer game save",
-                        "Game saves import/export")
-        );
+        goToActivity(ActivityType.ReplaySelection);
     }
 
     private void onRulesClick(View v) {
