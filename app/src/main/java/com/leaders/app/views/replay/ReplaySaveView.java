@@ -83,6 +83,10 @@ public class ReplaySaveView extends ConstraintLayout {
         edtDate.setText(formatter.format(date));
     }
 
+    public LocalDate getDate() {
+        return date;
+    }
+
     private String getFormattedText(EditText editText) {
         return getFormattedText(editText.getText().toString());
     }

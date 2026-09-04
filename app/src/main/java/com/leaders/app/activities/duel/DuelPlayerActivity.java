@@ -12,6 +12,7 @@ import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.controllers.GameController;
+import com.leaders.app.entities.ReplaySave;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.BoardOrientation;
 import com.leaders.app.enums.EndGameType;
@@ -29,6 +30,7 @@ import com.leaders.app.views.character.CharacterView;
 import com.leaders.app.views.duel.CharacterCardSelectionView;
 import com.leaders.app.views.duel.PlayerBottomView;
 import com.leaders.app.views.duel.PlayerTopView;
+import com.leaders.app.views.replay.ReplaySaveView;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
@@ -53,6 +55,7 @@ import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
@@ -60,6 +63,35 @@ public final class DuelPlayerActivity extends BaseActivity implements
         PlayableBoardView.OnTargetClickListener,
         CharacterCardSelectionView.OnCardSelectedListener,
         GameController.Listener {
+
+    private enum DuelAction {
+        SaveAsReplay,
+        DisplayCellPositions;
+
+        private int getIconResId() {
+            switch (this) {
+                case SaveAsReplay: return R.drawable.icon_save;
+                case DisplayCellPositions: return R.drawable.icon_position;
+                default: throw new IllegalStateException("No icon found for puzzle action: " + this);
+            }
+        }
+
+        private int getTextResId() {
+            switch (this) {
+                case SaveAsReplay: return R.string.save;
+                case DisplayCellPositions: return R.string.board_coordinates;
+                default: throw new IllegalStateException("No text found for puzzle action: " + this);
+            }
+        }
+
+        private View.OnClickListener getOnClickListener(@NonNull DuelPlayerActivity activity) {
+            switch (this) {
+                case SaveAsReplay: return activity::onSaveAsReplay;
+                case DisplayCellPositions: return activity::onDisplayCellPosition;
+                default: throw new IllegalStateException("No click listener found for puzzle action: " + this);
+            }
+        }
+    }
 
     private PlayableBoardView bdvBoard;
     private CharacterCardSelectionView ccsvCardSelector;
@@ -71,6 +103,7 @@ public final class DuelPlayerActivity extends BaseActivity implements
 
     private MaterialButton btnActions;
     private ActionsMenuView amvActions;
+    private ReplaySaveView rsvReplaySave;
     private View vwDialogBg;
 
     private EndGameView egvEndGame;
@@ -113,7 +146,11 @@ public final class DuelPlayerActivity extends BaseActivity implements
 
         btnActions = findViewById(R.id.btnActions_actDuelPlayer);
         amvActions = findViewById(R.id.amvActions_actDuelPlayer);
-        amvActions.addActionButton(R.drawable.icon_position, R.string.board_coordinates, 0, this::onDisplayCellPositionClick);
+        for (DuelAction action : DuelAction.values()) {
+            amvActions.addActionButton(action.getIconResId(), action.getTextResId(),
+                    action.ordinal(), action.getOnClickListener(this));
+        }
+        rsvReplaySave = findViewById(R.id.rsvReplaySave_actDuelPlayer);
         vwDialogBg = findViewById(R.id.vwDialogBg_actDuelPlayer);
 
         egvEndGame = findViewById(R.id.egvEndGame_actDuelPlayer);
@@ -143,6 +180,8 @@ public final class DuelPlayerActivity extends BaseActivity implements
         cnvCardInfo.setOnClickListener(v -> cnvCardInfo.hide());
 
         btnActions.setOnClickListener(this::onActionsClick);
+        rsvReplaySave.setOnSaveClick(this::onSaveAsReplayConfirmed);
+        rsvReplaySave.setOnCancelClick(this::onSaveAsReplayCancelled);
         vwDialogBg.setOnClickListener(this::vwDialogBgClick);
 
         egvEndGame.setOnClickListener(view -> egvEndGame.hide());
@@ -258,10 +297,46 @@ public final class DuelPlayerActivity extends BaseActivity implements
     //region ACTIONS METHODS
 
     private void vwDialogBgClick(View v) {
-        setActionsMenuVisible(false);
+        if (rsvReplaySave.getVisibility() == View.VISIBLE) {
+            setReplaySaveVisible(false);
+        }
+        if (amvActions.getVisibility() == View.VISIBLE) {
+            setActionsMenuVisible(false);
+        }
     }
 
-    private void onDisplayCellPositionClick(View v) {
+    private void onSaveAsReplay(View v) {
+        GameContext gameContext = controller.getCurrentContext();
+
+        rsvReplaySave.setDefaultName(String.format("%s vs %s",
+                gameContext.getCurrentPlayer().getName(),
+                gameContext.getOpposingPlayer().getName())
+        );
+        rsvReplaySave.setName("");
+        rsvReplaySave.setDate(LocalDate.now());
+
+        amvActions.setVisibility(View.GONE);
+        setReplaySaveVisible(true);
+    }
+
+    private void onSaveAsReplayCancelled(View v) {
+        setReplaySaveVisible(false);
+    }
+
+    private void onSaveAsReplayConfirmed(View v) {
+        ReplaySave replaySave = new ReplaySave(
+                rsvReplaySave.getName(),
+                rsvReplaySave.getDate(),
+                controller.getHistory()
+        );
+
+        // TODO - save as Json
+        // TODO - inform the user when the replay is saved
+
+        setReplaySaveVisible(false);
+    }
+
+    private void onDisplayCellPosition(View v) {
         bdvBoard.setCellPositionVisible(!bdvBoard.isCellPositionVisible());
 
         setActionsMenuVisible(false);
@@ -269,6 +344,11 @@ public final class DuelPlayerActivity extends BaseActivity implements
 
     private void setActionsMenuVisible(boolean visible) {
         amvActions.setVisibility(visible ? View.VISIBLE : View.GONE);
+        vwDialogBg.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
+    private void setReplaySaveVisible(boolean visible) {
+        rsvReplaySave.setVisibility(visible ? View.VISIBLE : View.GONE);
         vwDialogBg.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
