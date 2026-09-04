@@ -171,5 +171,7 @@
     <string name="game_name">Game name</string>
     <string name="game_date">Game date</string>
     <string name="saved_replay">Saved replay!</string>
+    <string name="discovery_mode_name">Discovery mode</string>
+    <string name="strategist_mode_name">Strategist mode</string>
 
 </resources>

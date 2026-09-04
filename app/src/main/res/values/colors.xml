@@ -5,6 +5,7 @@
     <color name="transparent_golden">#33BA7A44</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="light_gray">#939393</color>
     <color name="font">#EBDFC7</color>
     <color name="darker_font">#857F73</color>
     <color name="background">#1C1E20</color>

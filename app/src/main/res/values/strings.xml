@@ -173,4 +173,6 @@
     <string name="game_name">Nom de la partie</string>
     <string name="game_date">date de la partie</string>
     <string name="saved_replay">Replay sauvegardé !</string>
+    <string name="discovery_mode_name">Mode découverte</string>
+    <string name="strategist_mode_name">Mode stratège</string>
 </resources>

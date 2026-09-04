@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:ignore="SpUsage"
+    tools:theme="@style/Base.Theme.LeadersAndroidApp">
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnMain_vwReplaySelector"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:backgroundTint="@color/black"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        app:cornerRadius="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:strokeColor="@color/font"
+        app:strokeWidth="@dimen/default_stroke_width" />
+
+    <TextView
+        android:id="@+id/txvName_vwReplaySelector"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="2dp"
+        android:fontFamily="@font/bobby_jones_condensed"
+        android:includeFontPadding="false"
+        android:textAllCaps="false"
+        android:textColor="@color/font"
+        android:textSize="@dimen/default_text_font_size"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/imvChecked_vwReplaySelector"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        tools:text="Test puzzle" />
+
+    <TextView
+        android:id="@+id/txvGameMode_vwReplaySelector"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:fontFamily="@font/bobby_jones_condensed"
+        android:includeFontPadding="false"
+        android:textAllCaps="false"
+        android:textColor="@color/darker_font"
+        android:textSize="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/txvDate_vwReplaySelector"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/txvWhitePlayer_vwReplaySelector"
+        app:layout_constraintVertical_bias="0.0"
+        tools:text="mode stratège" />
+
+    <ImageView
+        android:id="@+id/imvWhite_vwReplaySelector"
+        android:layout_width="@dimen/default_text_font_size"
+        android:layout_height="@dimen/default_text_font_size"
+        app:layout_constraintBottom_toBottomOf="@+id/txvWhitePlayer_vwReplaySelector"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/txvName_vwReplaySelector"
+        app:layout_constraintTop_toTopOf="@+id/txvWhitePlayer_vwReplaySelector"
+        app:srcCompat="@drawable/character_piece_empty_w" />
+
+    <TextView
+        android:id="@+id/txvWhitePlayer_vwReplaySelector"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="4dp"
+        android:fontFamily="@font/bobby_jones_condensed"
+        android:includeFontPadding="false"
+        android:textAllCaps="false"
+        android:textColor="@color/darker_font"
+        android:textSize="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/imvChecked_vwReplaySelector"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/txvName_vwReplaySelector"
+        app:layout_constraintTop_toBottomOf="@+id/txvName_vwReplaySelector"
+        app:layout_constraintVertical_bias="0.0"
+        tools:text="White player name" />
+
+    <ImageView
+        android:id="@+id/imvBlack_vwReplaySelector"
+        android:layout_width="@dimen/default_text_font_size"
+        android:layout_height="@dimen/default_text_font_size"
+        app:layout_constraintBottom_toBottomOf="@+id/txvBlackPlayer_vwReplaySelector"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/txvName_vwReplaySelector"
+        app:layout_constraintTop_toTopOf="@+id/txvBlackPlayer_vwReplaySelector"
+        app:srcCompat="@drawable/character_piece_empty_b" />
+
+    <TextView
+        android:id="@+id/txvBlackPlayer_vwReplaySelector"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="4dp"
+        android:fontFamily="@font/bobby_jones_condensed"
+        android:includeFontPadding="false"
+        android:textAllCaps="false"
+        android:textColor="@color/darker_font"
+        android:textSize="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/imvChecked_vwReplaySelector"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/txvName_vwReplaySelector"
+        app:layout_constraintTop_toBottomOf="@+id/txvWhitePlayer_vwReplaySelector"
+        tools:text="black player name" />
+
+    <TextView
+        android:id="@+id/txvDate_vwReplaySelector"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:fontFamily="@font/bobby_jones_condensed"
+        android:includeFontPadding="false"
+        android:textAllCaps="false"
+        android:textColor="@color/font"
+        android:textSize="@dimen/default_text_font_size"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/imvChecked_vwReplaySelector"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/txvName_vwReplaySelector"
+        app:layout_constraintVertical_bias="0.0"
+        tools:text="31/12/2026" />
+
+
+    <ImageView
+        android:id="@+id/imvChecked_vwReplaySelector"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="8dp"
+        android:contentDescription="@string/checkbox"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/btnMain_vwReplaySelector"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/unchecked_box"
+        app:tint="@color/font"
+        tools:visibility="visible" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
