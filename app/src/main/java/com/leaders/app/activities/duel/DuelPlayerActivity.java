@@ -3,6 +3,7 @@ package com.leaders.app.activities.duel;
 import android.animation.LayoutTransition;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,6 +20,7 @@ import com.leaders.app.enums.EndGameType;
 import com.leaders.app.enums.LeaderType;
 import com.leaders.app.utilities.ButtonUtils;
 import com.leaders.app.utilities.ExtraUtils;
+import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.EndGameView;
 import com.leaders.app.views.board.PlayableBoardView;
@@ -78,7 +80,7 @@ public final class DuelPlayerActivity extends BaseActivity implements
 
         private int getTextResId() {
             switch (this) {
-                case SaveAsReplay: return R.string.save;
+                case SaveAsReplay: return R.string.record_game;
                 case DisplayCellPositions: return R.string.board_coordinates;
                 default: throw new IllegalStateException("No text found for puzzle action: " + this);
             }
@@ -324,14 +326,17 @@ public final class DuelPlayerActivity extends BaseActivity implements
     }
 
     private void onSaveAsReplayConfirmed(View v) {
-        ReplaySave replaySave = new ReplaySave(
+        ReplaySave newReplay = new ReplaySave(
                 rsvReplaySave.getName(),
                 rsvReplaySave.getDate(),
                 controller.getHistory()
         );
 
-        // TODO - save as Json
-        // TODO - inform the user when the replay is saved
+        List<ReplaySave> replays = JsonUtils.loadReplays(this);
+        replays.add(newReplay);
+        JsonUtils.saveReplays(this, replays);
+
+        Toast.makeText(this, R.string.saved_replay, Toast.LENGTH_SHORT).show();
 
         setReplaySaveVisible(false);
     }
