@@ -31,6 +31,9 @@ public final class PuzzleSelectorGroupView extends LinearLayout {
 
     public void setPuzzles(@NonNull List<? extends PuzzleSave> puzzleSaves) {
         removeAllViews();
+
+        clearPuzzleSelection();
+
         for (PuzzleSave puzzleSave : puzzleSaves) {
             PuzzleSelectorView psvPuzzle = new PuzzleSelectorView(getContext(), puzzleSave);
             psvPuzzle.setOnPuzzleClickListener(this::onPuzzleClick);
