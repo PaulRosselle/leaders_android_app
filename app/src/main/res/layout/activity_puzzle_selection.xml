@@ -143,9 +143,9 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="24dp"
         android:background="@color/darker_background"
-        app:layout_constraintBottom_toTopOf="@id/btnPlay_actPuzzleSelection"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/mbtgPuzzlesCategory_actPuzzleSelection">
@@ -172,38 +172,6 @@
         </ScrollView>
 
     </com.leaders.app.views.decoration.OrnateFrameView>
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnPlay_actPuzzleSelection"
-        android:layout_width="250dp"
-        android:layout_height="@dimen/round_button_size"
-        android:layout_marginBottom="16dp"
-        android:backgroundTint="@color/darker_background"
-        android:fontFamily="@font/bobby_jones_condensed"
-        android:includeFontPadding="false"
-        android:insetTop="0dp"
-        android:insetBottom="0dp"
-        android:padding="0dp"
-        android:paddingStart="38dp"
-        android:paddingEnd="8dp"
-        android:text="@string/play"
-        android:textColor="@color/font"
-        android:textSize="24dp"
-        app:cornerRadius="8dp"
-        app:icon="@drawable/icon_arrow_head"
-        app:iconGravity="end"
-        app:iconPadding="0dp"
-        app:iconSize="24dp"
-        app:iconTint="@color/font"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintDimensionRatio=""
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0"
-        app:strokeColor="@color/font"
-        app:strokeWidth="@dimen/default_stroke_width"
-        tools:ignore="SpeakableTextPresentCheck" />
 
 
     <View

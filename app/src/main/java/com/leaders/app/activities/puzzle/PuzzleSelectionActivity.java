@@ -19,7 +19,6 @@ import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.PuzzleSource;
-import com.leaders.app.utilities.ButtonUtils;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.utilities.PuzzleExportUtils;
@@ -89,7 +88,6 @@ public final class PuzzleSelectionActivity extends BaseActivity {
 
     private View vwDialogBg;
     private MaterialButton btnPuzzleActions;
-    private MaterialButton btnPlay;
     private ActionsMenuView amvPuzzleActions;
     private MaterialButtonToggleGroup mbtgPuzzlesCategory;
     private PuzzleSelectorGroupView psgvPuzzles;
@@ -103,7 +101,6 @@ public final class PuzzleSelectionActivity extends BaseActivity {
         super.initViews();
 
         vwDialogBg = findViewById(R.id.vwDialogBg_actPuzzleSelection);
-        btnPlay = findViewById(R.id.btnPlay_actPuzzleSelection);
         btnPuzzleActions = findViewById(R.id.btnPuzzleActions_actPuzzleSelection);
         amvPuzzleActions = findViewById(R.id.amvPuzzleActions_actPuzzleSelection);
         mbtgPuzzlesCategory = findViewById(R.id.mbtgPuzzlesCategory_actPuzzleSelection);
@@ -122,8 +119,6 @@ public final class PuzzleSelectionActivity extends BaseActivity {
     @Override
     protected void initListeners() {
         super.initListeners();
-
-        btnPlay.setOnClickListener(this::onPlayClick);
 
         vwDialogBg.setOnClickListener(this::hidePuzzleActions);
         btnPuzzleActions.setOnClickListener(this::btnPuzzleActionsClick);
@@ -209,14 +204,10 @@ public final class PuzzleSelectionActivity extends BaseActivity {
     }
 
     private void onPuzzleSelectionChange() {
-        // A single puzzle must be selected
-        ButtonUtils.setEnabled(btnPlay, psgvPuzzles.getSelectedPuzzles().size() == 1);
-    }
-
-    private void onPlayClick(View v) {
+        // A click on a puzzle outside of selection mode starts the PuzzlePlayer
         List<PuzzleSave> selectedPuzzles = psgvPuzzles.getSelectedPuzzles();
-        if (selectedPuzzles.isEmpty()) {
-            throw new IllegalStateException("Cannot start the player without a selected puzzle");
+        if (!psgvPuzzles.isSingleSelection() || selectedPuzzles.size() != 1) {
+            return;
         }
 
         Intent intent = ActivityType.PuzzlePlayer.getIntent(this);
@@ -230,6 +221,7 @@ public final class PuzzleSelectionActivity extends BaseActivity {
 
         goToActivity(intent);
     }
+
 
     //region PUZZLE ACTIONS METHODS
 
