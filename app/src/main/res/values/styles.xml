@@ -25,4 +25,14 @@
     <style name="alert_dialog_buttons_theme" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
         <item name="android:textColor">@color/app_golden</item>
     </style>
+
+    <style name="date_picker_dialog_theme"
+        parent="Theme.AppCompat.Dialog.Alert">
+        <item name="android:background">@color/darker_background</item>
+
+        <item name="android:textColor">@color/app_golden</item>
+        <item name="android:textColorPrimary">@color/font</item>
+
+        <item name="colorAccent">@color/app_golden</item>
+    </style>
 </resources>
