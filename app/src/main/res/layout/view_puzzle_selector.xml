@@ -71,7 +71,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/unchecked_box"
-        app:tint="@color/font" />
+        app:tint="@color/white" />
 
     <ImageView
         android:id="@+id/imvPuzzleSolved_vwPuzzleSelector"

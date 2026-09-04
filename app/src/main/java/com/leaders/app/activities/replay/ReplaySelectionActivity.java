@@ -32,7 +32,7 @@ public class ReplaySelectionActivity extends BaseActivity {
     protected void initViews() {
         super.initViews();
 
-        rsgvReplays = findViewById(R.id.rsgvPuzzles_actPuzzleSelection);
+        rsgvReplays = findViewById(R.id.rsgvReplays_actReplaySelection);
 
         btnActions = findViewById(R.id.btnActions_actReplaySelection);
         amvActions = findViewById(R.id.amvActions_actReplaySelection);

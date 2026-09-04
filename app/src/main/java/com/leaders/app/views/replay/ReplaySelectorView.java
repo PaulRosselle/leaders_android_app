@@ -34,7 +34,7 @@ public final class ReplaySelectorView extends SelectorView<ReplaySave> {
         super.initViews();
 
         txvName = findViewById(R.id.txvName_vwReplaySelector);
-        txvDate = findViewById(R.id.txvDate_vwReplaySave);
+        txvDate = findViewById(R.id.txvDate_vwReplaySelector);
         txvGameMode = findViewById(R.id.txvGameMode_vwReplaySelector);
         txvWhitePlayer = findViewById(R.id.txvWhitePlayer_vwReplaySelector);
         txvBlackPlayer = findViewById(R.id.txvBlackPlayer_vwReplaySelector);
@@ -84,7 +84,7 @@ public final class ReplaySelectorView extends SelectorView<ReplaySave> {
 
     @Override
     protected void updateCheckboxVisibleState() {
-        imvChecked.setVisibility(isCheckboxVisible() ? VISIBLE : INVISIBLE);
+        imvChecked.setVisibility(isCheckboxVisible() ? VISIBLE : GONE);
     }
 
     @Override
