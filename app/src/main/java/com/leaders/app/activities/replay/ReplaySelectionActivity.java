@@ -170,11 +170,26 @@ public class ReplaySelectionActivity extends BaseActivity {
     }
 
     private void onActionsClick(View v) {
-        // TODO - show amvActions
+        int replaysCount = replaySaves.size();
+        int selectedReplaysCount = rsgvReplays.getSelectedReplays().size();
+
+        // Before showing the actions menu, we must update the available actions based on the replays selection
+        amvActions.setButtonEnabled(ReplaySelectionAction.Edit.ordinal(),
+                selectedReplaysCount == 1);
+        amvActions.setButtonEnabled(ReplaySelectionAction.Remove.ordinal(),
+                selectedReplaysCount > 0);
+        amvActions.setButtonEnabled(ReplaySelectionAction.Export.ordinal(),
+                selectedReplaysCount > 0);
+        amvActions.setButtonEnabled(ReplaySelectionAction.SelectAll.ordinal(),
+                selectedReplaysCount < replaysCount);
+        amvActions.setButtonEnabled(ReplaySelectionAction.UnselectAll.ordinal(),
+                selectedReplaysCount > 0);
+
+        setActionsVisible(true);
     }
 
     private void onDialogBgClick(View v) {
-        // TODO - hide vwDialogBg and amvActions
+        setActionsVisible(false);
     }
 
     //endregion
