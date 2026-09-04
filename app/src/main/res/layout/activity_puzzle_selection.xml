@@ -165,7 +165,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <com.leaders.app.views.puzzle.PuzzleSelectorGroupView
-                android:id="@+id/psgvPuzzles_actPuzzleSelection"
+                android:id="@+id/rsgvPuzzles_actPuzzleSelection"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical" />

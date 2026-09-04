@@ -104,7 +104,7 @@ public final class PuzzleSelectionActivity extends BaseActivity {
         btnPuzzleActions = findViewById(R.id.btnPuzzleActions_actPuzzleSelection);
         amvPuzzleActions = findViewById(R.id.amvPuzzleActions_actPuzzleSelection);
         mbtgPuzzlesCategory = findViewById(R.id.mbtgPuzzlesCategory_actPuzzleSelection);
-        psgvPuzzles = findViewById(R.id.psgvPuzzles_actPuzzleSelection);
+        psgvPuzzles = findViewById(R.id.rsgvPuzzles_actPuzzleSelection);
 
         for (PuzzleSelectionAction action : PuzzleSelectionAction.values()) {
             amvPuzzleActions.addActionButton(
