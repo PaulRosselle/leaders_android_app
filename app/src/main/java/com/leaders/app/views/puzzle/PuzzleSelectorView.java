@@ -2,7 +2,6 @@ package com.leaders.app.views.puzzle;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -16,12 +15,9 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
-import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
 import com.leaders.puzzlelogic.entities.PuzzleSave;
-import com.leaders.puzzlelogic.enums.PuzzleLifetime;
 
-import org.json.JSONObject;
-
+@SuppressLint("ViewConstructor") // Cannot be added through the XML editor
 public final class PuzzleSelectorView extends ConstraintLayout {
     public interface OnPuzzleClickListener {
         void onPuzzleClick(@NonNull PuzzleSelectorView psvSender);
@@ -34,10 +30,13 @@ public final class PuzzleSelectorView extends ConstraintLayout {
     private MaterialButton btnMain;
     private ImageView imvSolved;
     private ImageView imvChecked;
-    private boolean checkboxVisible;
-    private boolean isChecked;
     private TextView txvName;
     private TextView txvAuthor;
+
+
+    private boolean checkboxVisible;
+    private boolean isChecked;
+
     private final PuzzleSave puzzleSave;
     private final String puzzleSolvedToast;
 
@@ -48,13 +47,8 @@ public final class PuzzleSelectorView extends ConstraintLayout {
     private OnPuzzleLongClickListener onPuzzleLongClickListener;
 
 
-    public PuzzleSelectorView(@NonNull Context context, @Nullable AttributeSet attrs) {
-        // Dummy constructor to allow instanciation in editor
-        this(context, new CustomPuzzleSave("TEST", "Paul", PuzzleLifetime.ActionsPhase, new JSONObject(), false));
-    }
-
     public PuzzleSelectorView(@NonNull Context context, @NonNull PuzzleSave puzzleSave) {
-        super(context, null);
+        super(context);
         this.puzzleSave = puzzleSave;
         puzzleSolvedToast = String.format(context.getString(
                 puzzleSave.isSolved() ? R.string.puzzle_solved_format : R.string.puzzle_unsolved_format),
