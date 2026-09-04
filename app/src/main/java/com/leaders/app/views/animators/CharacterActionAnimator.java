@@ -252,8 +252,8 @@ public final class CharacterActionAnimator {
         float pushedDestX = pushedDestCell.getX();
         float pushedDestY = pushedDestCell.getY();
 
-        setupForMovement(pushedCharacter, pushedDestX, pushedDestY, false);
-        setupForMovement(pushingCharacter, pushingDestX, pushingDestY, true);
+        setupForMovement(pushedCharacter, pushedDestX, pushedDestY);
+        setupForMovement(pushingCharacter, pushingDestX, pushingDestY);
 
         int totalDuration = ActionAnimator.getAnimationDuration(DURATION_PUSH);
 
@@ -381,7 +381,7 @@ public final class CharacterActionAnimator {
             float destX = destCellView.getX();
             float destY = destCellView.getY();
 
-            setupForMovement(characterDisplay, destX, destY, true);
+            setupForMovement(characterDisplay, destX, destY);
 
             CharacterView characterView = characterDisplay.getCharacterView();
 
@@ -469,7 +469,7 @@ public final class CharacterActionAnimator {
         CellView destCell = boardView.getCellView(destPos);
 
         // The source CharacterDisplay remains at its position throughout the entire animation.
-        setupForMovement(sourceCharacter, destCell.getX(), destCell.getY(), false);
+        setupForMovement(sourceCharacter, destCell.getX(), destCell.getY());
 
         // Temporarily use the same CharacterDisplay for the transformation.
         // The new character will be injected in the middle of the animation.
@@ -599,7 +599,7 @@ public final class CharacterActionAnimator {
             float destX = destCell.getX();
             float destY = destCell.getY();
 
-            setupForMovement(characterDisplay, destX, destY, true);
+            setupForMovement(characterDisplay, destX, destY);
 
             CharacterView characterView = characterDisplay.getCharacterView();
 
@@ -672,7 +672,7 @@ public final class CharacterActionAnimator {
         float x = destCellView.getX();
         float y = destCellView.getY();
 
-        setupForMovement(characterDisplay, x, y, false);
+        setupForMovement(characterDisplay, x, y);
 
         characterDisplay.getCharacterView().animate().x(x).y(y)
                 .setDuration(ActionAnimator.getAnimationDuration(DURATION_MOVE))
@@ -688,12 +688,10 @@ public final class CharacterActionAnimator {
     }
 
     private static void setupForMovement(@NonNull CharacterDisplay characterDisplay,
-                                         float destX, float destY, boolean bringToFront) {
+                                         float destX, float destY) {
         characterDisplay.stopHighlightAnimation();
         characterDisplay.setIsHighlighted(false, true);
-        if (bringToFront) {
-            characterDisplay.bringToFront();
-        }
+        characterDisplay.bringToFront();
 
         // Since we're animating the movement of the characterView alone,
         // we place all other views directly at the destination
