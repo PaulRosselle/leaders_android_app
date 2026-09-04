@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.leaders.R;
+import com.leaders.app.entities.ReplaySave;
 import com.leaders.app.entities.crash.CrashLog;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
 import com.leaders.puzzlelogic.entities.OfficialPuzzleSave;
@@ -37,6 +38,7 @@ public final class JsonUtils {
     private static final String CRASH_LOG_FILENAME = "crash_log.json";
     private static final String CUSTOM_PUZZLES_FILENAME = "custom_puzzles.json";
     private static final String SOLVED_OFFICIAL_PUZZLES_FILENAME = "solved_official_puzzles.json";
+    private static final String REPLAYS_FILENAME = "replays.json";
 
     private JsonUtils(){
         throw new AssertionError("Cannot instantiate utility class");
@@ -333,6 +335,49 @@ public final class JsonUtils {
             joCustomPuzzles.put("puzzles", jaPuzzles);
 
             updateJsonFile(joCustomPuzzles, outputStream);
+        } catch (JSONException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    //endregion
+
+
+
+    //region PUZZLE SAVE METHODS
+
+    public static List<ReplaySave> loadReplays(@NonNull Context context) {
+        if (!fileExists(context, REPLAYS_FILENAME)) {
+            return new ArrayList<>();
+        }
+
+        try {
+            JSONObject joReplays = openJsonFile(context, REPLAYS_FILENAME);
+
+            JSONArray jaReplays = joReplays.getJSONArray("replays");
+
+            List<ReplaySave> replays = new ArrayList<>();
+            for (int i = 0; i < jaReplays.length(); i++) {
+                replays.add(ReplaySave.getFromJson(jaReplays.getJSONObject(i)));
+            }
+
+            return replays;
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void saveReplays(@NonNull Context context, @NonNull List<ReplaySave> replays) {
+        try {
+            JSONArray jaReplays = new JSONArray();
+            for (ReplaySave replay : replays) {
+                jaReplays.put(replay.getAsJsonObject());
+            }
+
+            JSONObject joReplays = new JSONObject();
+            joReplays.put("replays", jaReplays);
+
+            saveJsonFile(context, REPLAYS_FILENAME, joReplays);
         } catch (JSONException | IOException e) {
             throw new RuntimeException(e);
         }

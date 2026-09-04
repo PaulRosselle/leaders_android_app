@@ -168,7 +168,9 @@
     <string name="duel_over">fin du duel</string>
     <string name="puzzle_author">Auteur du puzzle</string>
     <string name="save_puzzle">Sauvegarder le puzzle</string>
-    <string name="save_game">Sauvegarder la partie</string>
+    <string name="save_game">Enregistrer la partie</string>
+    <string name="record_game">Enregistrer la partie</string>
     <string name="game_name">Nom de la partie</string>
     <string name="game_date">date de la partie</string>
+    <string name="saved_replay">Replay sauvegardé !</string>
 </resources>

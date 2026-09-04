@@ -167,7 +167,9 @@
     <string name="puzzle_author">Puzzle author</string>
     <string name="save_puzzle">Save puzzle</string>
     <string name="save_game">Save game</string>
+    <string name="record_game">Save as replay</string>
     <string name="game_name">Game name</string>
     <string name="game_date">Game date</string>
+    <string name="saved_replay">Saved replay!</string>
 
 </resources>

@@ -245,9 +245,17 @@ public final class GameController implements IGameFlowListener {
     @NonNull
     public GameContext getCurrentContext() {
         if (gameHandler == null) {
-            throw new IllegalStateException("Game has not been started");
+            throw new IllegalStateException("No game in progress");
         }
 
         return gameHandler.getCurrentContext();
+    }
+
+    public GameHistory getHistory() {
+        if (gameHandler == null) {
+            throw new IllegalStateException("No game in progress");
+        }
+
+        return new GameHistory(gameHandler.getCurrentHistory());
     }
 }
