@@ -17,6 +17,51 @@ import com.leaders.app.views.replay.ReplaySelectorGroupView;
 import java.util.List;
 
 public class ReplaySelectionActivity extends BaseActivity {
+    private enum ReplaySelectionAction {
+        Edit,
+        Remove,
+        Import,
+        Export,
+        SelectAll,
+        UnselectAll;
+
+        private int getIconResId() {
+            switch (this) {
+                case Edit: return R.drawable.icon_edit;
+                case Remove: return R.drawable.icon_remove;
+                case Import: return R.drawable.icon_import;
+                case Export: return R.drawable.icon_export;
+                case SelectAll: return R.drawable.icon_select_all;
+                case UnselectAll: return R.drawable.icon_unselect_all;
+                default: throw new IllegalStateException("No icon found for replay selection action: " + this);
+            }
+        }
+
+        private int getTextResId() {
+            switch (this) {
+                case Edit: return R.string.edit_puzzle;
+                case Remove: return R.string.remove;
+                case Import: return R.string.import_puzzle;
+                case Export: return R.string.export_puzzle;
+                case SelectAll: return R.string.select_all;
+                case UnselectAll: return R.string.unselect_all;
+                default: throw new IllegalStateException("No text found for replay selection action: " + this);
+            }
+        }
+
+        private View.OnClickListener getOnClickListener(ReplaySelectionActivity activity) {
+            switch (this) {
+                case Edit: return activity::onEditPuzzleClick;
+                case Remove: return activity::onRemoveClick;
+                case Import: return activity::onImportClick;
+                case Export: return activity::onExportClick;
+                case SelectAll: return activity::onSelectAllClick;
+                case UnselectAll: return activity::onUnselectAllClick;
+                default: throw new IllegalStateException("No click listener found for replay selection action: " + this);
+            }
+        }
+    }
+
     private ReplaySelectorGroupView rsgvReplays;
 
     private MaterialButton btnActions;
@@ -36,7 +81,14 @@ public class ReplaySelectionActivity extends BaseActivity {
 
         btnActions = findViewById(R.id.btnActions_actReplaySelection);
         amvActions = findViewById(R.id.amvActions_actReplaySelection);
-        // TODO - actions menu buttons
+        for (ReplaySelectionAction action : ReplaySelectionAction.values()) {
+            amvActions.addActionButton(
+                    action.getIconResId(),
+                    action.getTextResId(),
+                    action.ordinal(),
+                    action.getOnClickListener(this)
+            );
+        }
         vwDialogBg = findViewById(R.id.vwDialogBg_actReplaySelection);
     }
 
@@ -56,7 +108,6 @@ public class ReplaySelectionActivity extends BaseActivity {
 
         replaySaves = JsonUtils.loadReplays(this);
         rsgvReplays.setReplays(replaySaves);
-        // TODO
     }
 
     @Override
@@ -116,7 +167,29 @@ public class ReplaySelectionActivity extends BaseActivity {
 
     //region ACTIONS METHODS
 
-    // TODO - add methods for subelements of amvActions
+    private void onEditPuzzleClick(View v) {
+        // TODO
+    }
+
+    private void onRemoveClick(View v) {
+        // TODO
+    }
+
+    private void onImportClick(View v) {
+        // TODO
+    }
+
+    private void onExportClick(View v) {
+        // TODO
+    }
+
+    private void onSelectAllClick(View v) {
+        // TODO
+    }
+
+    private void onUnselectAllClick(View v) {
+        // TODO
+    }
 
     //endregion
 }
