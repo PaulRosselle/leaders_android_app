@@ -5,6 +5,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
@@ -185,7 +186,29 @@ public class ReplaySelectionActivity extends BaseActivity {
     }
 
     private void onRemoveClick(View v) {
-        // TODO
+        List<ReplaySave> selectedReplays = rsgvReplays.getSelectedReplays();
+
+        String dialogTitle;
+        if (selectedReplays.size() == 1) {
+            dialogTitle = String.format(getString(R.string.remove_selected_puzzle), selectedReplays.get(0).getName());
+        } else {
+            dialogTitle = getString(R.string.remove_selected_replays);
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.alert_dialog_theme);
+        builder.setTitle(dialogTitle);
+        builder.setMessage(getString(R.string.warning_removal_cannot_be_undone));
+        builder.setPositiveButton(R.string.confirm, (dialog, which) -> {
+            for (ReplaySave replaySave : selectedReplays) {
+                replaySaves.remove(replaySave);
+            }
+            JsonUtils.saveReplays(this, replaySaves);
+            rsgvReplays.setReplays(replaySaves);
+        });
+        builder.setNegativeButton(R.string.cancel, null);
+        builder.show();
+
+        setActionsVisible(false);
     }
 
     private void onImportClick(View v) {

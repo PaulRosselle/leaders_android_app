@@ -270,8 +270,7 @@ public final class PuzzleSelectionActivity extends BaseActivity {
 
         String dialogTitle;
         if (selectedPuzzles.size() == 1) {
-            String puzzleName = selectedPuzzles.get(0).getName();
-            dialogTitle = String.format(getString(R.string.remove_selected_puzzle), puzzleName);
+            dialogTitle = String.format(getString(R.string.remove_selected_puzzle), selectedPuzzles.get(0).getName());
         } else {
             dialogTitle = getString(R.string.remove_selected_puzzles);
         }
@@ -282,8 +281,8 @@ public final class PuzzleSelectionActivity extends BaseActivity {
         builder.setPositiveButton(R.string.confirm, (dialog, which) -> {
             for (PuzzleSave puzzleSave : selectedPuzzles) {
                 customPuzzleSaves.remove((CustomPuzzleSave) puzzleSave);
-                JsonUtils.saveCustomPuzzles(this, customPuzzleSaves);
             }
+            JsonUtils.saveCustomPuzzles(this, customPuzzleSaves);
             psgvPuzzles.setPuzzles(customPuzzleSaves);
         });
         builder.setNegativeButton(R.string.cancel, null);
