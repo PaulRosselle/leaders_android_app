@@ -59,7 +59,7 @@
         android:gravity="start"
         android:importantForAutofill="no"
         android:inputType="text"
-        android:maxLength="25"
+        android:maxLength="30"
         android:paddingStart="8dp"
         android:paddingEnd="8dp"
         android:textColor="@color/font"

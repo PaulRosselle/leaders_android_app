@@ -1,5 +1,6 @@
 package com.leaders.app.activities.replay;
 
+import android.content.Intent;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -10,6 +11,7 @@ import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.entities.ReplaySave;
 import com.leaders.app.enums.ActivityType;
+import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.replay.ReplaySelectorGroupView;
@@ -152,7 +154,18 @@ public class ReplaySelectionActivity extends BaseActivity {
     //region VIEWS LISTENER METHODS
 
     private void onReplaySelectionChange() {
-        // TODO - start a replay (if single selection)
+        // A click on a replay outside of selection mode starts the ReplayViewer
+        List<ReplaySave> selectedReplays = rsgvReplays.getSelectedReplays();
+        if (!rsgvReplays.isSingleSelection() || selectedReplays.size() != 1) {
+            return;
+        }
+
+        Intent intent = ActivityType.ReplayViewer.getIntent(this);
+
+        ReplaySave replaySave = selectedReplays.get(0);
+        intent.putExtra(ExtraUtils.EXTRA_REPLAY_INDEX, replaySaves.indexOf(replaySave));
+
+        goToActivity(intent);
     }
 
     private void onActionsClick(View v) {
