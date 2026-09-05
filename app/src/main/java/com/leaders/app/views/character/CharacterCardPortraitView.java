@@ -119,6 +119,10 @@ public final class CharacterCardPortraitView extends AppCompatImageView {
     }
 
     private int getPortraitHexagonalDrawableId() {
+        if (useBannedDisplay) {
+            return getPortraitHexagonalBannedDrawableId();
+        }
+
         switch (portraitCard) {
             case Acrobat: return R.drawable.card_hex_portrait_acrobat;
             case Archer: return R.drawable.card_hex_portrait_archer;
@@ -138,6 +142,30 @@ public final class CharacterCardPortraitView extends AppCompatImageView {
             case RoyalGuard: return R.drawable.card_hex_portrait_royal_guard;
             case Vizier: return R.drawable.card_hex_portrait_vizier;
             case Wanderer: return R.drawable.card_hex_portrait_wanderer;
+            default: throw new IllegalArgumentException("No portrait drawable for card: " + portraitCard);
+        }
+    }
+
+    private int getPortraitHexagonalBannedDrawableId() {
+        switch (portraitCard) {
+            case Acrobat: return R.drawable.card_hex_portrait_banned_acrobat;
+            case Archer: return R.drawable.card_hex_portrait_banned_archer;
+            case Assassin: return R.drawable.card_hex_portrait_banned_assassin;
+            case Brewmaster: return R.drawable.card_hex_portrait_banned_brewmaster;
+            case Bruiser: return R.drawable.card_hex_portrait_banned_bruiser;
+            case ClawLauncher: return R.drawable.card_hex_portrait_banned_claw_launcher;
+            case HermitAndCub: return R.drawable.card_hex_portrait_banned_hermit_and_cub;
+            case Illusionist: return R.drawable.card_hex_portrait_banned_illusionist;
+            case Jailer: return R.drawable.card_hex_portrait_banned_jailer;
+            case LeaderKing: return R.drawable.card_hex_portrait_banned_leader_king;
+            case LeaderQueen: return R.drawable.card_hex_portrait_banned_leader_queen;
+            case Manipulator: return R.drawable.card_hex_portrait_banned_manipulator;
+            case Nemesis: return R.drawable.card_hex_portrait_banned_nemesis;
+            case Protector: return R.drawable.card_hex_portrait_banned_protector;
+            case Rider: return R.drawable.card_hex_portrait_banned_rider;
+            case RoyalGuard: return R.drawable.card_hex_portrait_banned_royal_guard;
+            case Vizier: return R.drawable.card_hex_portrait_banned_vizier;
+            case Wanderer: return R.drawable.card_hex_portrait_banned_wanderer;
             default: throw new IllegalArgumentException("No portrait drawable for card: " + portraitCard);
         }
     }
