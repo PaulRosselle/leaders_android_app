@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,6 +19,7 @@ import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
+import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.factories.GameActionHandlerFactory;
 import com.leaders.gamelogic.factories.GameFactory;
 import com.leaders.gamelogic.handlers.GameActionHandler;
@@ -28,7 +30,10 @@ import com.leaders.gamelogic.historyentries.segments.Turn;
 import com.leaders.gamelogic.historyentries.segments.TurnPhase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class ReplayControlsView extends ConstraintLayout {
     public interface ReplayControlsListener {
@@ -40,7 +45,13 @@ public class ReplayControlsView extends ConstraintLayout {
     private enum ActionPlayMode {
         Paused,
         Playing,
-        SingleAction
+        SingleAction,
+        SingleTurn
+    }
+
+    private enum ActionPlayDirection {
+        Forward,
+        Backward
     }
 
     private static final int NO_ACTION_INDEX = -1;
@@ -49,9 +60,12 @@ public class ReplayControlsView extends ConstraintLayout {
     private final MaterialButton btnPlayPause;
     private final MaterialButton btnNextAction;
     private final MaterialButton btnPreviousAction;
+    private final MaterialButton btnNextTurn;
+    private final MaterialButton btnPreviousTurn;
 
     @NonNull
     private final List<IGameAction> actions;
+    private final List<TeamColor> actionsTeamColors;
     private int lastActionIndex;
     private Integer pendingJumpActionIndex;
     private Game game;
@@ -59,7 +73,8 @@ public class ReplayControlsView extends ConstraintLayout {
 
     @NonNull
     private ActionPlayMode playMode;
-    private boolean actionIsRunning;
+    private ActionPlayDirection playDirection;
+    private boolean actionInProgress;
 
 
     @Nullable
@@ -69,6 +84,7 @@ public class ReplayControlsView extends ConstraintLayout {
         super(context, attrs);
 
         actions = new ArrayList<>();
+        actionsTeamColors = new ArrayList<>();
 
         inflate(context, R.layout.view_replay_controls, this);
 
@@ -76,11 +92,13 @@ public class ReplayControlsView extends ConstraintLayout {
         btnPlayPause = findViewById(R.id.btnPlayPause_vwReplayControls);
         btnNextAction = findViewById(R.id.btnNextAction_vwReplayControls);
         btnPreviousAction = findViewById(R.id.btnPreviousAction_vwReplayControls);
+        btnNextTurn = findViewById(R.id.btnNextTurn_vwReplayControls);
+        btnPreviousTurn = findViewById(R.id.btnPreviousTurn_vwReplayControls);
 
         initListeners();
 
         doPause();
-        actionIsRunning = false;
+        actionInProgress = false;
         lastActionIndex = NO_ACTION_INDEX;
         pendingJumpActionIndex = null;
     }
@@ -89,6 +107,13 @@ public class ReplayControlsView extends ConstraintLayout {
         btnPlayPause.setOnClickListener(this::onPlayPauseClick);
         btnNextAction.setOnClickListener(this::onNextActionClick);
         btnPreviousAction.setOnClickListener(this::onPreviousActionClick);
+        btnNextTurn.setOnClickListener(this::onNextTurnClick);
+        btnPreviousTurn.setOnClickListener(this::onPreviousTurnClick);
+
+        btnNextAction.setOnLongClickListener(this::onButtonLongClick);
+        btnPreviousAction.setOnLongClickListener(this::onButtonLongClick);
+        btnNextTurn.setOnLongClickListener(this::onButtonLongClick);
+        btnPreviousTurn.setOnLongClickListener(this::onButtonLongClick);
 
         skbReplay.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -133,20 +158,21 @@ public class ReplayControlsView extends ConstraintLayout {
     private void resetReplay() {
         lastActionIndex = NO_ACTION_INDEX;
         doPause();
-        actionIsRunning = false;
+        actionInProgress = false;
         pendingJumpActionIndex = null;
     }
 
     private void loadActions(@NonNull GameHistory gameHistory) {
         actions.clear();
+        actionsTeamColors.clear();
 
         for (IHistoryEntry historyEntry : gameHistory.getEntries()) {
             if (historyEntry instanceof Turn) {
                 for (TurnPhase phase : ((Turn) historyEntry).getSubPhasesInOrder()) {
-                    addPhaseActions(phase);
+                    addPhaseActions(phase, historyEntry.getTeamColor());
                 }
             } else if (historyEntry instanceof BanishmentPhase) {
-                addPhaseActions((BanishmentPhase) historyEntry);
+                addPhaseActions((BanishmentPhase) historyEntry, historyEntry.getTeamColor());
             }
         }
 
@@ -154,10 +180,11 @@ public class ReplayControlsView extends ConstraintLayout {
         skbReplay.setMax(actions.size());
     }
 
-    private void addPhaseActions(IPhase phase) {
+    private void addPhaseActions(@NonNull IPhase phase, @NonNull TeamColor teamColor) {
         for (IGameAction action : phase.getActions()) {
             if (GameActionUtils.isAnimatable(action)) {
                 actions.add(action);
+                actionsTeamColors.add(teamColor);
             }
         }
     }
@@ -177,21 +204,46 @@ public class ReplayControlsView extends ConstraintLayout {
     }
 
     private void onPreviousActionClick(View v) {
-        if (actionIsRunning) {
-            return;
-        }
-
         playMode = ActionPlayMode.SingleAction;
         playPreviousAction();
     }
 
     private void onNextActionClick(View v) {
-        if (actionIsRunning) {
-            return;
-        }
-
         playMode = ActionPlayMode.SingleAction;
+        if (!actionInProgress) {
+            playNextAction();
+        } else {
+            playDirection = ActionPlayDirection.Forward;
+        }
+    }
+
+    private void onPreviousTurnClick(View v) {
+        playMode = ActionPlayMode.SingleTurn;
+        if (!actionInProgress) {
+            playPreviousAction();
+        } else {
+            playDirection = ActionPlayDirection.Backward;
+        }
+    }
+
+    private void onNextTurnClick(View v) {
+        playMode = ActionPlayMode.SingleTurn;
         playNextAction();
+    }
+
+    private boolean onButtonLongClick(View v) {
+        Map<View, Integer> buttonToasts = new HashMap<>();
+
+        buttonToasts.put(btnPreviousAction, R.string.rewind_previous_action);
+        buttonToasts.put(btnPreviousTurn, R.string.rewind_until_previous_turn);
+        buttonToasts.put(btnNextAction, R.string.play_next_action);
+        buttonToasts.put(btnNextTurn, R.string.play_until_next_turn);
+
+        int buttonToast = Objects.requireNonNull(buttonToasts.get(v), "Button not found");
+
+        Toast.makeText(getContext(), buttonToast, Toast.LENGTH_SHORT).show();
+
+        return true;
     }
 
     //endregion
@@ -202,11 +254,13 @@ public class ReplayControlsView extends ConstraintLayout {
         }
 
         playMode = ActionPlayMode.Playing;
+        playDirection = ActionPlayDirection.Forward;
         playNextAction();
     }
 
     private void doPause() {
         playMode = ActionPlayMode.Paused;
+        playDirection = null;
         updateControlsState();
     }
 
@@ -221,6 +275,14 @@ public class ReplayControlsView extends ConstraintLayout {
                 enabledBackgroundColor, disabledBackgroundColor
         );
         ButtonUtils.setEnabled(btnPreviousAction, hasPreviousAction(),
+                enabledStrokeColor, disabledStrokeColor,
+                enabledBackgroundColor, disabledBackgroundColor
+        );
+        ButtonUtils.setEnabled(btnNextTurn, hasNextAction(),
+                enabledStrokeColor, disabledStrokeColor,
+                enabledBackgroundColor, disabledBackgroundColor
+        );
+        ButtonUtils.setEnabled(btnPreviousTurn, hasPreviousAction(),
                 enabledStrokeColor, disabledStrokeColor,
                 enabledBackgroundColor, disabledBackgroundColor
         );
@@ -245,12 +307,23 @@ public class ReplayControlsView extends ConstraintLayout {
         return lastActionIndex >= 0;
     }
 
+    private boolean isTurnEnd() {
+        return !hasNextAction() ||
+                (lastActionIndex == NO_ACTION_INDEX ||
+                        actionsTeamColors.get(lastActionIndex) != actionsTeamColors.get(lastActionIndex + 1));
+    }
+
+    private boolean isTurnStart() {
+        return !hasPreviousAction() ||
+                actionsTeamColors.get(lastActionIndex) != actionsTeamColors.get(lastActionIndex - 1);
+    }
+
     private void doOnActionEnd() {
-        if (!actionIsRunning) {
+        if (!actionInProgress) {
             return;
         }
 
-        actionIsRunning = false;
+        actionInProgress = false;
 
         if (pendingJumpActionIndex != null) {
             int jumpActionIndex = pendingJumpActionIndex;
@@ -261,9 +334,25 @@ public class ReplayControlsView extends ConstraintLayout {
             return;
         }
 
-        if (playMode == ActionPlayMode.Playing) {
-            playNextAction();
-        } else if (playMode == ActionPlayMode.SingleAction) {
+        boolean keepPlaying;
+        boolean mustPause;
+
+        boolean playForward = playDirection == ActionPlayDirection.Forward;
+        if (playMode == ActionPlayMode.SingleTurn) {
+            keepPlaying = (!playForward && !isTurnStart()) || (playForward && !isTurnEnd());
+            mustPause = !keepPlaying;
+        } else {
+            keepPlaying = playMode == ActionPlayMode.Playing;
+            mustPause = playMode == ActionPlayMode.SingleAction;
+        }
+
+        if (keepPlaying) {
+            if (playForward) {
+                playNextAction();
+            } else {
+                playPreviousAction();
+            }
+        } else if (mustPause) {
             doPause();
         }
     }
@@ -271,7 +360,7 @@ public class ReplayControlsView extends ConstraintLayout {
     //region ACTION PLAYER METHODS
 
     private void playNextAction() {
-        if (actionIsRunning) {
+        if (actionInProgress) {
             return;
         }
 
@@ -281,7 +370,8 @@ public class ReplayControlsView extends ConstraintLayout {
         }
         int nextActionIndex = lastActionIndex + 1;
 
-        actionIsRunning = true;
+        actionInProgress = true;
+        playDirection = ActionPlayDirection.Forward;
 
         IGameAction actionToPlay = actions.get(nextActionIndex);
         GameActionHandlerFactory.create(game, actionToPlay).doAction();
@@ -294,7 +384,7 @@ public class ReplayControlsView extends ConstraintLayout {
     }
 
     private void playPreviousAction() {
-        if (actionIsRunning) {
+        if (actionInProgress) {
             return;
         }
 
@@ -305,7 +395,8 @@ public class ReplayControlsView extends ConstraintLayout {
 
         int previousActionIndex = lastActionIndex - 1;
 
-        actionIsRunning = true;
+        actionInProgress = true;
+        playDirection = ActionPlayDirection.Backward;
 
         IGameAction actionToReverse = actions.get(lastActionIndex);
         GameActionHandlerFactory.create(game, actionToReverse).undoAction();
@@ -325,7 +416,7 @@ public class ReplayControlsView extends ConstraintLayout {
     }
 
     private void jumpToAction(int jumpActionIndex) {
-        if (actionIsRunning) {
+        if (actionInProgress) {
             pendingJumpActionIndex = jumpActionIndex;
             return;
         }
