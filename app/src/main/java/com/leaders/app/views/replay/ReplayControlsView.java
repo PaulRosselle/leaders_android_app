@@ -202,8 +202,6 @@ public class ReplayControlsView extends ConstraintLayout {
         }
 
         playMode = ActionPlayMode.Playing;
-        updateControlsState();
-
         playNextAction();
     }
 
