@@ -48,14 +48,14 @@
         </attr>
     </declare-styleable>
 
-    <declare-styleable name="CharacterCardPortraitView">
+    <declare-styleable name="PortraitView">
         <attr name="displayMode" format="enum">
             <enum name="Default" value="0"/>
             <enum name="Hexagonal" value="1"/>
         </attr>
     </declare-styleable>
 
-    <declare-styleable name="CharacterCardPortraitGroupView">
+    <declare-styleable name="PortraitGroupView">
         <attr name="maxGroupSize" format="integer"/>
     </declare-styleable>
 

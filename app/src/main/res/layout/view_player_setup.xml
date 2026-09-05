@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:background="@drawable/round_rect_gloden_outline_bg">
 
-    <com.leaders.app.views.character.CharacterCardPortraitView
+    <com.leaders.app.views.character.PortraitView
         android:id="@+id/ccpvLeader_vwPlayerSetup"
         android:layout_width="wrap_content"
         android:layout_height="66dp"

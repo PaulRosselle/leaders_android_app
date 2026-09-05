@@ -24,7 +24,7 @@ import com.leaders.app.utilities.TeamColorUtils;
 import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.EndGameView;
 import com.leaders.app.views.board.PlayableBoardView;
-import com.leaders.app.views.character.CharacterCardPortraitView;
+import com.leaders.app.views.character.PortraitView;
 import com.leaders.app.views.character.CharacterDisplay;
 import com.leaders.app.views.character.HighlightView;
 import com.leaders.app.views.character.CharacterNotificationView;
@@ -282,7 +282,7 @@ public final class DuelPlayerActivity extends BaseActivity implements
     }
 
     private boolean onPortraitLongClick(View v) {
-        showCardDescriptionNotification(((CharacterCardPortraitView) v).getPortraitCard());
+        showCardDescriptionNotification(((PortraitView) v).getPortraitCard());
         return true;
     }
 

@@ -23,7 +23,7 @@ import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.utilities.TeamColorUtils;
 import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.board.ReadOnlyBoardView;
-import com.leaders.app.views.character.CharacterCardPortraitView;
+import com.leaders.app.views.character.PortraitView;
 import com.leaders.app.views.character.CharacterNotificationView;
 import com.leaders.app.views.character.CharacterView;
 import com.leaders.app.views.duel.PlayerBottomView;
@@ -360,7 +360,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
     }
 
     private boolean onPortraitLongClick(View v) {
-        showCardDescriptionNotification(((CharacterCardPortraitView) v).getPortraitCard());
+        showCardDescriptionNotification(((PortraitView) v).getPortraitCard());
 
         return true;
     }

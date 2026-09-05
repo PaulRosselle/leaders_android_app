@@ -15,8 +15,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.leaders.R;
 import com.leaders.app.utilities.CharacterCardUtils;
-import com.leaders.app.views.character.CharacterCardPortraitGroupView;
-import com.leaders.app.views.character.CharacterCardPortraitView;
+import com.leaders.app.views.character.PortraitGroupView;
+import com.leaders.app.views.character.PortraitView;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.GameMode;
@@ -60,12 +60,12 @@ public class RecruitableCardsView extends ConstraintLayout {
             for (int i = 0; i < portraitsInLineCount; i++) {
                 portraitsCards.add(recruitableCards.remove(0));
             }
-            CharacterCardPortraitGroupView ptvPortraits = CharacterCardPortraitGroupView.createFromCards(
+            PortraitGroupView ptvPortraits = PortraitGroupView.createFromCards(
                     context, portraitsCards, PORTRAITS_PER_GROUP
             );
             ptvPortraits.setPortraitsLongClickListener(onPortraitLongClickListener);
-            for (CharacterCardPortraitView portraitView : ptvPortraits.getPortraits()) {
-                portraitView.setDisplayMode(CharacterCardPortraitView.DisplayMode.Hexagonal);
+            for (PortraitView portraitView : ptvPortraits.getPortraits()) {
+                portraitView.setDisplayMode(PortraitView.DisplayMode.Hexagonal);
                 if (!availableCards.contains(portraitView.getPortraitCard())) {
                     portraitView.setAlpha(0.5f);
                 }
@@ -117,7 +117,7 @@ public class RecruitableCardsView extends ConstraintLayout {
     public void setOnCardPortraitLongClick(@Nullable OnLongClickListener onLongClickListener) {
         this.onPortraitLongClickListener = onLongClickListener;
         for (int i = 0; i < llyPortraits.getChildCount(); i++) {
-            ((CharacterCardPortraitGroupView) llyPortraits.getChildAt(i))
+            ((PortraitGroupView) llyPortraits.getChildAt(i))
                     .setPortraitsLongClickListener(onLongClickListener);
         }
     }

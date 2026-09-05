@@ -40,7 +40,7 @@ import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
 import com.leaders.puzzlelogic.serializers.SerializationContext;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
 import com.leaders.puzzlelogic.utilities.PuzzleEditionUtils;
-import com.leaders.app.views.character.CharacterCardPortraitView;
+import com.leaders.app.views.character.PortraitView;
 import com.leaders.app.views.puzzle.CharacterEditorView;
 import com.leaders.app.views.character.CharacterNotificationView;
 import com.leaders.app.views.character.CharacterView;
@@ -499,7 +499,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
         }
 
         // Some characters addition are restricted must be prevented here
-        CharacterCard portraitCard = ((CharacterCardPortraitView) v).getPortraitCard();
+        CharacterCard portraitCard = ((PortraitView) v).getPortraitCard();
         List<TeamColor> addableColors = new ArrayList<>();
         String errors = PuzzleEditionUtils.getCardAdditionErrors(this, board, portraitCard, addableColors);
         if (!errors.isEmpty()) {
@@ -531,7 +531,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
     }
 
     private boolean onCardPortraitLongClick(View v) {
-        showCardDescriptionNotification(((CharacterCardPortraitView) v).getPortraitCard());
+        showCardDescriptionNotification(((PortraitView) v).getPortraitCard());
         return true;
     }
 

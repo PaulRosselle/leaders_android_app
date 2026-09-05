@@ -16,7 +16,7 @@ import com.leaders.gamelogic.interactions.InteractionTarget;
 
 import java.util.Objects;
 
-public final class CharacterCardPortraitView extends AppCompatImageView {
+public final class PortraitView extends AppCompatImageView {
     public enum DisplayMode {
         Default,
         Hexagonal
@@ -31,7 +31,7 @@ public final class CharacterCardPortraitView extends AppCompatImageView {
     @Nullable
     private InteractionTarget target;
 
-    public CharacterCardPortraitView(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public PortraitView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
         target = null;
@@ -39,8 +39,8 @@ public final class CharacterCardPortraitView extends AppCompatImageView {
 
         setAdjustViewBounds(true);
 
-        try (TypedArray customAttrs = context.obtainStyledAttributes(attrs, R.styleable.CharacterCardPortraitView)) {
-            int displayModeOrd = customAttrs.getInteger(R.styleable.CharacterCardPortraitView_displayMode, DisplayMode.Default.ordinal());
+        try (TypedArray customAttrs = context.obtainStyledAttributes(attrs, R.styleable.PortraitView)) {
+            int displayModeOrd = customAttrs.getInteger(R.styleable.PortraitView_displayMode, DisplayMode.Default.ordinal());
             displayMode = DisplayMode.values()[displayModeOrd];
         }
 

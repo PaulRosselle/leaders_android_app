@@ -19,8 +19,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.leaders.R;
 import com.leaders.app.utilities.CharacterCardUtils;
-import com.leaders.app.views.character.CharacterCardPortraitGroupView;
-import com.leaders.app.views.character.CharacterCardPortraitView;
+import com.leaders.app.views.character.PortraitGroupView;
+import com.leaders.app.views.character.PortraitView;
 import com.leaders.app.views.decoration.FrameShineView;
 import com.leaders.gamelogic.entities.SelectableCharacterCard;
 import com.leaders.gamelogic.enums.CharacterCard;
@@ -141,7 +141,7 @@ public class CharacterCardSelectionView extends ConstraintLayout {
                 groupTargets.add(target);
             }
 
-            CharacterCardPortraitGroupView portraitsGroupView = CharacterCardPortraitGroupView.createFromTargets(
+            PortraitGroupView portraitsGroupView = PortraitGroupView.createFromTargets(
                     getContext(), groupTargets, portraitsPerGroup
             );
             initPortraitsGroup(portraitsGroupView);
@@ -184,7 +184,7 @@ public class CharacterCardSelectionView extends ConstraintLayout {
                 groupCards.add(sortedSelectableCards.get(groupIdx));
             }
 
-            CharacterCardPortraitGroupView portraitsGroupView = CharacterCardPortraitGroupView.createFromSelectableCards(
+            PortraitGroupView portraitsGroupView = PortraitGroupView.createFromSelectableCards(
                     getContext(), groupCards, portraitsPerGroup
             );
             initPortraitsGroup(portraitsGroupView);
@@ -194,7 +194,7 @@ public class CharacterCardSelectionView extends ConstraintLayout {
         updatePortraitsScrollView();
     }
 
-    private void initPortraitsGroup(@NonNull CharacterCardPortraitGroupView portraitsGroupView) {
+    private void initPortraitsGroup(@NonNull PortraitGroupView portraitsGroupView) {
         portraitsGroupView.setPortraitsClickListener(this::onPortraitClick);
         portraitsGroupView.setPortraitsLongClickListener(onPortraitLongClickListener);
         portraitsGroupView.setPortraitSpacing(portraitSpacing);
@@ -203,7 +203,7 @@ public class CharacterCardSelectionView extends ConstraintLayout {
     }
 
     private void onPortraitClick(View v) {
-        CharacterCardPortraitView portraitView = (CharacterCardPortraitView) v;
+        PortraitView portraitView = (PortraitView) v;
 
         InteractionTarget target = portraitView.getTarget();
         if (target == null) {
@@ -258,8 +258,8 @@ public class CharacterCardSelectionView extends ConstraintLayout {
     private void onBanishableCardSelected(@NonNull InteractionTarget target) {
         selectedTarget = target;
         for (int i = 0; i < llyPortraits.getChildCount(); i++) {
-            CharacterCardPortraitGroupView groupView = (CharacterCardPortraitGroupView) llyPortraits.getChildAt(i);
-            for (CharacterCardPortraitView portraitView : groupView.getPortraits()) {
+            PortraitGroupView groupView = (PortraitGroupView) llyPortraits.getChildAt(i);
+            for (PortraitView portraitView : groupView.getPortraits()) {
                 if (selectedTarget == portraitView.getTarget()) {
                     portraitView.setUseBannedDisplay(true);
                 } else {
