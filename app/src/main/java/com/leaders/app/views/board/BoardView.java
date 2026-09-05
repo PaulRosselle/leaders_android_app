@@ -154,6 +154,8 @@ public abstract class BoardView extends ConstraintLayout {
             CellView cellView = getCellView(entry.getKey());
             entry.getValue().setPosition(cellView.getX(), cellView.getY());
         }
+
+        setCellPositionVisible(isCellPositionVisible);
     }
 
     public final void setBoard(@NonNull Board board) {
@@ -244,17 +246,15 @@ public abstract class BoardView extends ConstraintLayout {
         return Objects.requireNonNull(characterDisplayMap.get(position), "No CharacterDisplay found at Position:" + position);
     }
 
-    protected int getCellPositionResId() {
-        return R.drawable.cell_positions;
+    private int getCellPositionResId() {
+        return orientation == BoardOrientation.Rotated ?
+                R.drawable.cell_positions_rotated : R.drawable.cell_positions;
     }
 
     public final void setCellPositionVisible(boolean visible) {
         isCellPositionVisible = visible;
         if (visible) {
-            imvBoard.setForeground(ContextCompat.getDrawable(getContext(),
-                    orientation == BoardOrientation.Rotated ?
-                            R.drawable.cell_positions_rotated : R.drawable.cell_positions)
-            );
+            imvBoard.setForeground(ContextCompat.getDrawable(getContext(), getCellPositionResId()));
         } else {
             imvBoard.setForeground(null);
         }
