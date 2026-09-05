@@ -676,6 +676,7 @@ public final class CharacterActionAnimator {
 
         characterDisplay.getCharacterView().animate().x(x).y(y)
                 .setDuration(ActionAnimator.getAnimationDuration(DURATION_MOVE))
+                .setInterpolator(new AccelerateDecelerateInterpolator())
                 .withEndAction(() -> {
                     // Realign the whole display at the destination position
                     characterDisplay.setPosition(x, y);
