@@ -22,6 +22,7 @@ import com.leaders.app.enums.ActivityType;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.views.ActionsMenuView;
+import com.leaders.app.views.replay.ReplaySaveView;
 import com.leaders.app.views.replay.ReplaySelectorGroupView;
 
 import java.util.List;
@@ -76,6 +77,7 @@ public class ReplaySelectionActivity extends BaseActivity {
 
     private MaterialButton btnActions;
     private ActionsMenuView amvActions;
+    private ReplaySaveView rsvSave;
     private View vwDialogBg;
 
     private List<ReplaySave> replaySaves;
@@ -103,6 +105,7 @@ public class ReplaySelectionActivity extends BaseActivity {
                     action.getOnClickListener(this)
             );
         }
+        rsvSave = findViewById(R.id.rsvSave_actReplaySelection);
         vwDialogBg = findViewById(R.id.vwDialogBg_actReplaySelection);
     }
 
@@ -113,6 +116,8 @@ public class ReplaySelectionActivity extends BaseActivity {
         rsgvReplays.setSelectionChangeListener(this::onReplaySelectionChange);
 
         btnActions.setOnClickListener(this::onActionsClick);
+        rsvSave.setOnSaveClick(this::onSaveConfirmClick);
+        rsvSave.setOnCancelClick(this::onSaveCancelClick);
         vwDialogBg.setOnClickListener(this::onDialogBgClick);
     }
 
@@ -216,7 +221,12 @@ public class ReplaySelectionActivity extends BaseActivity {
     }
 
     private void onDialogBgClick(View v) {
-        setActionsVisible(false);
+        if (rsvSave.getVisibility() == View.VISIBLE) {
+            setReplaySaveVisible(false);
+        }
+        if (amvActions.getVisibility() == View.VISIBLE) {
+            setActionsVisible(false);
+        }
     }
 
     //endregion
@@ -224,7 +234,21 @@ public class ReplaySelectionActivity extends BaseActivity {
     //region ACTIONS METHODS
 
     private void onEditPuzzleClick(View v) {
-        // TODO
+        List<ReplaySave> selectedReplays = rsgvReplays.getSelectedReplays();
+
+        if (selectedReplays.size() != 1) {
+            throw new IllegalStateException("Impossible to start edition without a replay selected");
+        }
+
+        ReplaySave selectedReplay = selectedReplays.get(0);
+
+        amvActions.setVisibility(View.GONE);
+
+        rsvSave.setName(selectedReplay.getName());
+        rsvSave.setDefaultName(selectedReplay.getName());
+        rsvSave.setDate(selectedReplay.getDate());
+
+        setReplaySaveVisible(true);
     }
 
     private void onRemoveClick(View v) {
@@ -275,9 +299,42 @@ public class ReplaySelectionActivity extends BaseActivity {
         setActionsVisible(false);
     }
 
+    private void onSaveCancelClick(View v) {
+        setReplaySaveVisible(false);
+    }
+
+    private void onSaveConfirmClick(View v) {
+        List<ReplaySave> selectedReplays = rsgvReplays.getSelectedReplays();
+
+        if (selectedReplays.size() != 1) {
+            throw new IllegalStateException("Impossible to start edition without a replay selected");
+        }
+
+        // We update the replay save
+        ReplaySave selectedReplay = selectedReplays.get(0);
+
+        selectedReplay.setName(rsvSave.getName());
+        selectedReplay.setDate(rsvSave.getDate());
+
+        // Then we save it into the json file
+        JsonUtils.saveReplays(this, replaySaves);
+
+        // Finally we update the displayed replays
+        rsgvReplays.setReplays(replaySaves);
+
+        Toast.makeText(this, R.string.saved_replay, Toast.LENGTH_SHORT).show();
+
+        setReplaySaveVisible(false);
+    }
+
 
     private void setActionsVisible(boolean visible) {
         amvActions.setVisibility(visible ? View.VISIBLE : View.GONE);
+        vwDialogBg.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
+    private void setReplaySaveVisible(boolean visible) {
+        rsvSave.setVisibility(visible ? View.VISIBLE : View.GONE);
         vwDialogBg.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 

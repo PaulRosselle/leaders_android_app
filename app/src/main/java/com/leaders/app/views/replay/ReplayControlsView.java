@@ -140,7 +140,7 @@ public class ReplayControlsView extends ConstraintLayout {
     }
 
     public void loadReplay(@NonNull ReplaySave replaySave) {
-        GameHistory gameHistory = replaySave.getPuzzleGameHistory();
+        GameHistory gameHistory = replaySave.getReplayGameHistory();
 
         loadActions(gameHistory);
         // Replays are loaded at the beginning of the game
