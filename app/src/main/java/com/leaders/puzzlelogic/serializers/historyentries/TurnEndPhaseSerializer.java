@@ -2,10 +2,8 @@ package com.leaders.puzzlelogic.serializers.historyentries;
 
 import androidx.annotation.NonNull;
 
-import com.leaders.gamelogic.actions.BanishmentAction;
 import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.actions.IGameAction;
-import com.leaders.gamelogic.actions.RecruitmentAction;
 import com.leaders.gamelogic.actions.TransitionAction;
 import com.leaders.gamelogic.actions.WarningAction;
 import com.leaders.gamelogic.enums.GameActionType;
@@ -13,9 +11,7 @@ import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.historyentries.segments.TurnEndPhase;
 import com.leaders.puzzlelogic.serializers.IJsonSerializer;
 import com.leaders.puzzlelogic.serializers.SerializationContext;
-import com.leaders.puzzlelogic.serializers.actions.BanishmentActionSerializer;
 import com.leaders.puzzlelogic.serializers.actions.CharacterActionSerializer;
-import com.leaders.puzzlelogic.serializers.actions.RecruitmentActionSerializer;
 import com.leaders.puzzlelogic.serializers.actions.TransitionActionSerializer;
 import com.leaders.puzzlelogic.serializers.actions.WarningActionSerializer;
 
@@ -28,10 +24,7 @@ public final class TurnEndPhaseSerializer implements IJsonSerializer<TurnEndPhas
     @Override
     public TurnEndPhase getFromJson(@NonNull JSONObject jsonObject,
                                     @NonNull SerializationContext srlContext) throws JSONException {
-        TransitionActionSerializer transitionActionSerializer =
-                new TransitionActionSerializer();
-        CharacterActionSerializer characterActionSerializer =
-                new CharacterActionSerializer();
+        TransitionActionSerializer transitionActionSerializer = new TransitionActionSerializer();
 
         TransitionAction startAction = null;
         if (jsonObject.has("start_action") && !jsonObject.isNull("start_action")) {
@@ -80,10 +73,7 @@ public final class TurnEndPhaseSerializer implements IJsonSerializer<TurnEndPhas
     @NonNull
     @Override
     public JSONObject getAsJson(@NonNull TurnEndPhase object) throws JSONException {
-        TransitionActionSerializer transitionActionSerializer =
-                new TransitionActionSerializer();
-        CharacterActionSerializer characterActionSerializer =
-                new CharacterActionSerializer();
+        TransitionActionSerializer transitionActionSerializer = new TransitionActionSerializer();
 
         JSONObject jsonObject = new JSONObject();
 

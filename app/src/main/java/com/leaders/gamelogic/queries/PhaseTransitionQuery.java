@@ -184,7 +184,7 @@ public final class PhaseTransitionQuery {
         for (int i = history.getEntries().size() - 1; i >= 0; i--) {
             IHistoryEntry entry = history.getEntries().get(i);
             if (entry instanceof Turn) {
-                entry.getTeamColor();
+                return entry.getTeamColor();
             }
         }
 
