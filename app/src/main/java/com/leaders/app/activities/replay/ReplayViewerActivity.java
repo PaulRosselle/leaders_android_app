@@ -252,7 +252,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
     }
 
     private LeaderType getPlayerLeaderType(@NonNull TeamColor teamColor) {
-        for (IGameAction action : replaySave.getPuzzleGameHistory().getConfig().getInitialPlacements()) {
+        for (IGameAction action : replaySave.getReplayGameHistory().getConfig().getInitialPlacements()) {
             if (action.getActionType() != GameActionType.Recruitment) {
                 continue;
             }

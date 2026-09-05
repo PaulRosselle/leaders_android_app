@@ -72,7 +72,7 @@ public class ReplaySave {
         return joPuzzleSave;
     }
 
-    public final GameHistory getPuzzleGameHistory() {
+    public final GameHistory getReplayGameHistory() {
         try {
             return (new GameHistorySerializer()).getFromJson(datas, new SerializationContext());
         } catch (JSONException e) {

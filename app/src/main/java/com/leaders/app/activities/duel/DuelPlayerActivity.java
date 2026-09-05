@@ -15,7 +15,6 @@ import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.controllers.GameController;
 import com.leaders.app.entities.ReplaySave;
 import com.leaders.app.enums.ActivityType;
-import com.leaders.app.enums.BoardOrientation;
 import com.leaders.app.enums.EndGameType;
 import com.leaders.app.enums.LeaderType;
 import com.leaders.app.utilities.ButtonUtils;
