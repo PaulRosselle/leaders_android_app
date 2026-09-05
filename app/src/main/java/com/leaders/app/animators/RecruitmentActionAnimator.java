@@ -1,10 +1,11 @@
-package com.leaders.app.views.animators;
+package com.leaders.app.animators;
 
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.leaders.app.enums.AnimationSpeed;
 import com.leaders.app.views.board.BoardView;
 import com.leaders.app.views.board.CellView;
 import com.leaders.app.views.character.CharacterDisplay;
@@ -15,21 +16,21 @@ import com.leaders.gamelogic.entities.Position;
 
 import java.util.List;
 
-public class RecruitmentActionAnimator {
+public final class RecruitmentActionAnimator extends ActionAnimator<RecruitmentAction> {
     private static final int DURATION_ADD = 200;
     private static final int DURATION_REMOVE = 200;
 
-    private RecruitmentActionAnimator(){
-        throw new AssertionError("Cannot instantiate an animator class");
+    public RecruitmentActionAnimator(@NonNull AnimationSpeed speed) {
+        super(speed);
     }
 
-    public static void animate(@NonNull BoardView boardView,
+    public void animate(@NonNull BoardView boardView,
                                @NonNull RecruitmentAction action,
                                @Nullable Runnable onAnimationEnd) {
         animate(boardView, action.getMotions(), onAnimationEnd);
     }
 
-    public static void animate(@NonNull BoardView boardView,
+    public void animate(@NonNull BoardView boardView,
                                @NonNull List<RecruitmentActionMotion> motions,
                                @Nullable Runnable onAnimationEnd) {
         if (motions.isEmpty()) {
@@ -42,7 +43,7 @@ public class RecruitmentActionAnimator {
         animateMotionSequence(boardView, motions, 0, onAnimationEnd);
     }
 
-    public static void animate(@NonNull BoardView boardView,
+    public void animate(@NonNull BoardView boardView,
                                @NonNull RecruitmentActionMotion motion,
                                @Nullable Runnable onAnimationEnd) {
         switch (motion.getMotionType()) {
@@ -52,7 +53,7 @@ public class RecruitmentActionAnimator {
         }
     }
 
-    private static void animateMotionSequence(@NonNull BoardView boardView,
+    private void animateMotionSequence(@NonNull BoardView boardView,
                                               @NonNull List<RecruitmentActionMotion> motions,
                                               int index, @Nullable Runnable onAnimationEnd) {
         if (index >= motions.size()) {
@@ -68,7 +69,7 @@ public class RecruitmentActionAnimator {
         );
     }
 
-    private static void animateAddCharacter(@NonNull BoardView boardView,
+    private void animateAddCharacter(@NonNull BoardView boardView,
                                             @NonNull RecruitmentActionMotion motion,
                                             @Nullable Runnable onAnimationEnd) {
 
@@ -84,16 +85,16 @@ public class RecruitmentActionAnimator {
         characterView.setAlpha(0f);
         characterView.setVisibility(View.VISIBLE);
 
-        ActionAnimator.animateFadeIn(characterDisplay, DURATION_ADD, onAnimationEnd);
+        animateFadeIn(characterDisplay, DURATION_ADD, onAnimationEnd);
     }
 
-    private static void animateRemoveCharacter(@NonNull BoardView boardView,
+    private void animateRemoveCharacter(@NonNull BoardView boardView,
                                                @NonNull RecruitmentActionMotion motion,
                                                @Nullable Runnable onAnimationEnd) {
         final Position removePos = motion.getPosition();
 
         CharacterDisplay characterDisplay = boardView.getCharacterDisplay(removePos);
-        ActionAnimator.animateFadeOut(characterDisplay, DURATION_REMOVE, () -> {
+        animateFadeOut(characterDisplay, DURATION_REMOVE, () -> {
             boardView.releaseCharacterDisplay(removePos);
 
             if (onAnimationEnd != null) {

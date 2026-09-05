@@ -1,6 +1,5 @@
 package com.leaders.app.activities.replay;
 
-import android.animation.LayoutTransition;
 import android.content.Intent;
 import android.view.View;
 import android.widget.TextView;
@@ -14,6 +13,7 @@ import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.entities.ReplaySave;
 import com.leaders.app.enums.ActivityType;
+import com.leaders.app.enums.AnimationSpeed;
 import com.leaders.app.enums.LeaderType;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.GameActionUtils;
@@ -24,6 +24,7 @@ import com.leaders.app.views.character.CharacterNotificationView;
 import com.leaders.app.views.duel.PlayerBottomView;
 import com.leaders.app.views.duel.PlayerTopView;
 import com.leaders.app.views.replay.ReplayControlsView;
+import com.leaders.app.views.settings.AnimationSpeedView;
 import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.entities.Board;
 
@@ -40,11 +41,13 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
     private MaterialButton btnActions;
     private ActionsMenuView amvActions;
     private CharacterNotificationView cnvCardInfo;
+    private AnimationSpeedView asvAnimationSpeed;
     private View vwDialogBg;
-
 
     private List<ReplaySave> replaySaves;
     private ReplaySave replaySave;
+
+    private AnimationSpeed animationSpeed;
 
 
     //region BASE ACTIVITY OVERRIDEN METHODS
@@ -61,12 +64,13 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
         pbvBottomPlayer = findViewById(R.id.pbvBottomPlayer_actReplayViewer);
 
         btnActions = findViewById(R.id.btnActions_actReplayViewer);
-        amvActions = findViewById(R.id.amvActions_actDuelPlayer);
-        // TODO - actions menu buttons
+        amvActions = findViewById(R.id.amvActions_actReplayViewer);
+        amvActions.addActionButton(R.drawable.icon_speed, R.string.animation_speed, 0, this::onAnimationSpeedClick);
         cnvCardInfo = findViewById(R.id.cnvCardInfo_actReplayViewer);
+        asvAnimationSpeed = findViewById(R.id.asvAnimationSpeed_actReplayViewer);
+        asvAnimationSpeed.setAvailableSpeeds(AnimationSpeed.getAllSpeedsWithMultiplier());
         vwDialogBg = findViewById(R.id.vwDialogBg_actReplayViewer);
     }
-
 
     @Override
     protected void initListeners() {
@@ -75,17 +79,19 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
         rcvControls.setControlsListener(this);
 
         bdvBoard.setOnCharacterLongClickListener(this::onCharacterLongClick);
-        // TODO - replay control listener
 
         btnActions.setOnClickListener(this::onActionsClick);
+        asvAnimationSpeed.setChangeListener(this::onAnimationSpeedChange);
+        asvAnimationSpeed.setOnClickListener(this::onAsvAnimationBgClick);
         cnvCardInfo.setOnClickListener(this::onCardInfoClick);
         vwDialogBg.setOnClickListener(this::onDialogBgClick);
     }
 
-
     @Override
     protected void initDatas() {
         super.initDatas();
+
+        animationSpeed = AnimationSpeed.Normal;
 
         replaySaves = JsonUtils.loadReplays(this);
 
@@ -187,7 +193,8 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
     }
 
     private void onActionsClick(View v) {
-        // TODO - show amvActions
+        rcvControls.doPause();
+        setActionsVisible(true);
     }
 
     private void onCardInfoClick(View v) {
@@ -195,14 +202,39 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
     }
 
     private void onDialogBgClick(View v) {
-        // TODO - hide vwDialogBg and amvActions
+        if (asvAnimationSpeed.getVisibility() == View.VISIBLE) {
+            setAnimationSpeedVisible(false);
+        } else {
+            setActionsVisible(false);
+        }
+    }
+
+    private void onAsvAnimationBgClick(View v) {
+        // Dummy on click listener to prevent a "onDialogBgClick"
+    }
+
+    private void onAnimationSpeedChange(@NonNull AnimationSpeed speed) {
+        animationSpeed = speed;
     }
 
     //endregion
 
     //region ACTIONS METHODS
 
-    // TODO - add methods for subelements of amvActions
+    private void onAnimationSpeedClick(View v) {
+        amvActions.setVisibility(View.GONE);
+        setAnimationSpeedVisible(true);
+    }
+
+    private void setAnimationSpeedVisible(boolean visible) {
+        asvAnimationSpeed.setVisibility(visible ? View.VISIBLE : View.GONE);
+        vwDialogBg.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
+    private void setActionsVisible(boolean visible) {
+        amvActions.setVisibility(visible ? View.VISIBLE : View.GONE);
+        vwDialogBg.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
 
     //endregion
 
@@ -226,7 +258,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
             actionToPlay = action;
         }
 
-        GameActionUtils.animate(bdvBoard, actionToPlay, onActionEnd);
+        GameActionUtils.animate(bdvBoard, actionToPlay, onActionEnd, animationSpeed);
     }
 
     //endregion

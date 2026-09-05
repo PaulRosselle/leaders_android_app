@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/round_rect"
     tools:ignore="SpUsage">
 
     <TextView
@@ -47,7 +46,7 @@
         android:id="@+id/skbSpeed_vwAnimationSpeed"
         style="@android:style/Widget.DeviceDefault.Light.SeekBar"
         android:layout_width="0dp"
-        android:layout_height="@dimen/seekbar_thumb_size"
+        android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
