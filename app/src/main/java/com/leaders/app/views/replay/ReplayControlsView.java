@@ -12,6 +12,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 import com.leaders.app.entities.ReplaySave;
+import com.leaders.app.utilities.ButtonUtils;
 import com.leaders.app.utilities.GameActionUtils;
 import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.entities.Board;
@@ -109,6 +110,10 @@ public class ReplayControlsView extends ConstraintLayout {
         });
     }
 
+    public void setControlsListener(@Nullable ReplayControlsListener controlsListener) {
+        this.controlsListener = controlsListener;
+    }
+
     public void loadReplay(@NonNull ReplaySave replaySave) {
         GameHistory gameHistory = replaySave.getPuzzleGameHistory();
 
@@ -123,10 +128,6 @@ public class ReplayControlsView extends ConstraintLayout {
             throw new IllegalStateException("Listener required during replay loading");
         }
         controlsListener.onReplayLoaded(game.getBoard());
-    }
-
-    public void setControlsListener(@Nullable ReplayControlsListener controlsListener) {
-        this.controlsListener = controlsListener;
     }
 
     private void resetReplay() {
@@ -161,11 +162,11 @@ public class ReplayControlsView extends ConstraintLayout {
         }
     }
 
-
     private GameHistory getStartHistory(@NonNull GameHistory gameHistory) {
         return new GameHistory(gameHistory.getConfig(), new ArrayList<>());
     }
 
+    //region VIEW LISTENER METHODS
 
     private void onPlayPauseClick(View v) {
         if (playMode == ActionPlayMode.Playing) {
@@ -173,28 +174,6 @@ public class ReplayControlsView extends ConstraintLayout {
         } else {
             doPlay();
         }
-    }
-
-    private void doPlay() {
-        if (!hasNextAction()) {
-            jumpToAction(NO_ACTION_INDEX);
-        }
-
-        playMode = ActionPlayMode.Playing;
-        btnPlayPause.setIconResource(R.drawable.icon_pause);
-
-        playNextAction();
-    }
-
-    // TODO - make public ? Can be useful
-    private void doPause() {
-        playMode = ActionPlayMode.Paused;
-        // TODO - use "restart" icon if lastActionIndex == actions.size() -1
-        btnPlayPause.setIconResource(R.drawable.icon_play);
-    }
-
-    private boolean hasNextAction() {
-        return lastActionIndex < actions.size() - 1;
     }
 
     private void onPreviousActionClick(View v) {
@@ -213,6 +192,59 @@ public class ReplayControlsView extends ConstraintLayout {
 
         playMode = ActionPlayMode.SingleAction;
         playNextAction();
+    }
+
+    //endregion
+
+    private void doPlay() {
+        if (!hasNextAction()) {
+            jumpToAction(NO_ACTION_INDEX);
+        }
+
+        playMode = ActionPlayMode.Playing;
+        updateControlsState();
+
+        playNextAction();
+    }
+
+    private void doPause() {
+        playMode = ActionPlayMode.Paused;
+        updateControlsState();
+    }
+
+    private void updateControlsState() {
+        int enabledStrokeColor = R.color.font;
+        int disabledStrokeColor = R.color.darker_font;
+        int enabledBackgroundColor = R.color.ultra_dark_background;
+        int disabledBackgroundColor = R.color.darker_background;
+
+        ButtonUtils.setEnabled(btnNextAction, hasNextAction(),
+                enabledStrokeColor, disabledStrokeColor,
+                enabledBackgroundColor, disabledBackgroundColor
+        );
+        ButtonUtils.setEnabled(btnPreviousAction, hasPreviousAction(),
+                enabledStrokeColor, disabledStrokeColor,
+                enabledBackgroundColor, disabledBackgroundColor
+        );
+
+
+        int playPauseResId;
+        if (playMode == ActionPlayMode.Playing) {
+            playPauseResId = R.drawable.icon_pause;
+        } else if (hasNextAction()) {
+            playPauseResId = R.drawable.icon_play;
+        } else {
+            playPauseResId = R.drawable.icon_restart;
+        }
+        btnPlayPause.setIconResource(playPauseResId);
+    }
+
+    private boolean hasNextAction() {
+        return lastActionIndex < actions.size() - 1;
+    }
+
+    private boolean hasPreviousAction() {
+        return lastActionIndex >= 0;
     }
 
     private void doOnActionEnd() {
@@ -238,21 +270,18 @@ public class ReplayControlsView extends ConstraintLayout {
         }
     }
 
-    private int getNextActionIndex() {
-        return hasNextAction() ? lastActionIndex + 1 : NO_ACTION_INDEX;
-    }
-
+    //region ACTION PLAYER METHODS
 
     private void playNextAction() {
         if (actionIsRunning) {
             return;
         }
 
-        int nextActionIndex = getNextActionIndex();
-        if (nextActionIndex == NO_ACTION_INDEX) {
+        if (!hasNextAction()) {
             doPause();
             return;
         }
+        int nextActionIndex = lastActionIndex + 1;
 
         actionIsRunning = true;
 
@@ -271,7 +300,11 @@ public class ReplayControlsView extends ConstraintLayout {
             return;
         }
 
-        // TODO - comment
+        if (!hasPreviousAction()) {
+            doPause();
+            return;
+        }
+
         int previousActionIndex = lastActionIndex - 1;
 
         actionIsRunning = true;
@@ -289,6 +322,8 @@ public class ReplayControlsView extends ConstraintLayout {
     private void setLastActionIndex(int lastActionIndex) {
         this.lastActionIndex = lastActionIndex;
         skbReplay.setProgress(lastActionIndex + 1);
+
+        updateControlsState();
     }
 
     private void jumpToAction(int jumpActionIndex) {
@@ -307,16 +342,16 @@ public class ReplayControlsView extends ConstraintLayout {
 
         Game jumpGame = GameFactory.create(startHistory);
 
-        for (int i = 0; i <= jumpActionIndex; i++) {
-            IGameAction action = actions.get(i);
-            GameActionHandler handler = GameActionHandlerFactory.create(jumpGame, action);
-            handler.doAction();
+        if (jumpActionIndex != NO_ACTION_INDEX) {
+            for (int i = 0; i <= jumpActionIndex; i++) {
+                IGameAction action = actions.get(i);
+                GameActionHandler handler = GameActionHandlerFactory.create(jumpGame, action);
+                handler.doAction();
+            }
         }
 
         game = jumpGame;
-        lastActionIndex = jumpActionIndex;
-
-        skbReplay.setProgress(lastActionIndex + 1);
+        setLastActionIndex(jumpActionIndex);
 
         if (controlsListener == null) {
             throw new IllegalStateException("Listener required during replay jump");
@@ -324,4 +359,6 @@ public class ReplayControlsView extends ConstraintLayout {
 
         controlsListener.onReplayLoaded(game.getBoard());
     }
+
+    //endregion
 }
