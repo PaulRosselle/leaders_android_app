@@ -23,6 +23,7 @@ import com.leaders.app.utilities.TeamColorUtils;
 import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.board.ReadOnlyBoardView;
 import com.leaders.app.views.character.CharacterNotificationView;
+import com.leaders.app.views.character.CharacterView;
 import com.leaders.app.views.duel.PlayerBottomView;
 import com.leaders.app.views.duel.PlayerTopView;
 import com.leaders.app.views.replay.ReplayControlsView;
@@ -32,11 +33,14 @@ import com.leaders.gamelogic.actions.RecruitmentAction;
 import com.leaders.gamelogic.actions.RecruitmentActionMotion;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Player;
+import com.leaders.gamelogic.enums.CharacterCard;
+import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.GameActionType;
 import com.leaders.gamelogic.enums.RecruitmentMotionType;
 import com.leaders.gamelogic.enums.TeamColor;
 
 import java.util.List;
+import java.util.Objects;
 
 public class ReplayViewerActivity extends BaseActivity implements ReplayControlsView.ReplayControlsListener {
     private enum ReplayViewerAction {
@@ -276,13 +280,29 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
         pbvBottomPlayer.setPlayer(bottomPlayer, getPlayerLeaderType(bottomPlayer.getTeamColor()));
     }
 
+    private void showCardDescriptionNotification(@NonNull CharacterCard characterCard) {
+        if (cnvCardInfo.getCharacterCard() == characterCard) {
+            cnvCardInfo.setCharacterCard(null);
+            cnvCardInfo.hide();
+        } else {
+            cnvCardInfo.setCharacterCard(characterCard);
+            if (cnvCardInfo.getVisibility() != View.VISIBLE) {
+                cnvCardInfo.show();
+            }
+        }
+    }
+
+
     //endregion
 
     //region VIEWS LISTENER METHODS
 
     private boolean onCharacterLongClick(View v) {
-        // TODO - show CharacterNotificationView
-        return false;
+        CharacterType characterType = Objects.requireNonNull(((CharacterView) v).getCharacterType(),
+                "An empty character piece is not authorized in the puzzle editor");
+        showCardDescriptionNotification(characterType.getCharacterCard());
+
+        return true;
     }
 
     private void onActionsClick(View v) {
@@ -291,7 +311,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
     }
 
     private void onCardInfoClick(View v) {
-        // TODO - hide cnvCardInfo
+        cnvCardInfo.hide();
     }
 
     private void onDialogBgClick(View v) {
