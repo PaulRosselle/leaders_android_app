@@ -12,6 +12,7 @@ import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.entities.ReplaySave;
+import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.AnimationSpeed;
 import com.leaders.app.enums.LeaderType;
@@ -84,7 +85,6 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
     private AnimationSpeedView asvAnimationSpeed;
     private View vwDialogBg;
 
-    private List<ReplaySave> replaySaves;
     private ReplaySave replaySave;
 
     private AnimationSpeed animationSpeed;
@@ -142,7 +142,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
         animationSpeed = AnimationSpeed.Normal;
         playerPerspective = TeamColor.Black;
 
-        replaySaves = JsonUtils.loadReplays(this);
+        List<ReplaySave> replaySaves = JsonUtils.loadReplays(this);
 
         Intent intent = getIntent();
         int replayIndex = intent.getIntExtra(ExtraUtils.EXTRA_REPLAY_INDEX, -1);
@@ -193,6 +193,11 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
     @Override
     public ActivityType getActivityType() {
         return ActivityType.ReplayViewer;
+    }
+
+    @Override
+    protected void doOnBackPressed() {
+        goToActivity(ActivityType.ReplaySelection, ActivityTransitionType.SlideLeft);
     }
 
     //endregion
@@ -315,7 +320,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
     }
 
     private void onChangeBoardOrientationClick(View v) {
-        // TODO
+        setPlayerPerspective(playerPerspective.getOpposite());
         setActionsVisible(false);
     }
 
