@@ -25,6 +25,9 @@ public class RecruitableCardsView extends ConstraintLayout {
 
     private final LinearLayout llyPortraits;
 
+    private OnLongClickListener onPortraitLongClickListener;
+
+
     public RecruitableCardsView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
@@ -53,8 +56,7 @@ public class RecruitableCardsView extends ConstraintLayout {
             CharacterCardPortraitGroupView ptvPortraits = CharacterCardPortraitGroupView.createFromCards(
                     context, portraitsCards, PORTRAITS_PER_GROUP
             );
-            ptvPortraits.setClickable(false);
-            ptvPortraits.setLongClickable(false);
+            ptvPortraits.setPortraitsLongClickListener(onPortraitLongClickListener);
             for (CharacterCardPortraitView portraitView : ptvPortraits.getPortraits()) {
                 portraitView.setDisplayMode(CharacterCardPortraitView.DisplayMode.Hexagonal);
                 if (!availableCards.contains(portraitView.getPortraitCard())) {
@@ -77,15 +79,11 @@ public class RecruitableCardsView extends ConstraintLayout {
         return layoutParams;
     }
 
-    public void setOnCardPortraitClick(@Nullable OnClickListener onClickListener) {
-        for (int i = 0; i < llyPortraits.getChildCount(); i++) {
-            ((CharacterCardPortraitGroupView) llyPortraits.getChildAt(i)).setPortraitsClickListener(onClickListener);
-        }
-    }
-
     public void setOnCardPortraitLongClick(@Nullable OnLongClickListener onLongClickListener) {
+        this.onPortraitLongClickListener = onLongClickListener;
         for (int i = 0; i < llyPortraits.getChildCount(); i++) {
-            ((CharacterCardPortraitGroupView) llyPortraits.getChildAt(i)).setPortraitsLongClickListener(onLongClickListener);
+            ((CharacterCardPortraitGroupView) llyPortraits.getChildAt(i))
+                    .setPortraitsLongClickListener(onLongClickListener);
         }
     }
 }

@@ -120,8 +120,24 @@ public final class CharacterCardPortraitView extends AppCompatImageView {
 
     private int getPortraitHexagonalDrawableId() {
         switch (portraitCard) {
+            case Acrobat: return R.drawable.card_hex_portrait_acrobat;
+            case Archer: return R.drawable.card_hex_portrait_archer;
+            case Assassin: return R.drawable.card_hex_portrait_assassin;
+            case Brewmaster: return R.drawable.card_hex_portrait_brewmaster;
+            case Bruiser: return R.drawable.card_hex_portrait_bruiser;
+            case ClawLauncher: return R.drawable.card_hex_portrait_claw_launcher;
+            case HermitAndCub: return R.drawable.card_hex_portrait_hermit_and_cub;
+            case Illusionist: return R.drawable.card_hex_portrait_illusionist;
+            case Jailer: return R.drawable.card_hex_portrait_jailer;
             case LeaderKing: return R.drawable.card_hex_portrait_leader_king;
             case LeaderQueen: return R.drawable.card_hex_portrait_leader_queen;
+            case Manipulator: return R.drawable.card_hex_portrait_manipulator;
+            case Nemesis: return R.drawable.card_hex_portrait_nemesis;
+            case Protector: return R.drawable.card_hex_portrait_protector;
+            case Rider: return R.drawable.card_hex_portrait_rider;
+            case RoyalGuard: return R.drawable.card_hex_portrait_royal_guard;
+            case Vizier: return R.drawable.card_hex_portrait_vizier;
+            case Wanderer: return R.drawable.card_hex_portrait_wanderer;
             default: throw new IllegalArgumentException("No portrait drawable for card: " + portraitCard);
         }
     }
