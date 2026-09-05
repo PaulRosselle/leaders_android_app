@@ -18,6 +18,7 @@ import com.leaders.app.enums.LeaderType;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.GameActionUtils;
 import com.leaders.app.utilities.JsonUtils;
+import com.leaders.app.utilities.TeamColorUtils;
 import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.board.ReadOnlyBoardView;
 import com.leaders.app.views.character.CharacterNotificationView;
@@ -26,11 +27,50 @@ import com.leaders.app.views.duel.PlayerTopView;
 import com.leaders.app.views.replay.ReplayControlsView;
 import com.leaders.app.views.settings.AnimationSpeedView;
 import com.leaders.gamelogic.actions.IGameAction;
+import com.leaders.gamelogic.actions.RecruitmentAction;
+import com.leaders.gamelogic.actions.RecruitmentActionMotion;
 import com.leaders.gamelogic.entities.Board;
+import com.leaders.gamelogic.entities.Player;
+import com.leaders.gamelogic.enums.GameActionType;
+import com.leaders.gamelogic.enums.RecruitmentMotionType;
+import com.leaders.gamelogic.enums.TeamColor;
 
 import java.util.List;
 
 public class ReplayViewerActivity extends BaseActivity implements ReplayControlsView.ReplayControlsListener {
+    private enum ReplayViewerAction {
+        ChangeAnimationSpeed,
+        ChangePlayerPerspective,
+        DisplayCellPositions;
+
+        private int getIconResId() {
+            switch (this) {
+                case ChangeAnimationSpeed: return R.drawable.icon_speed;
+                case ChangePlayerPerspective: return R.drawable.icon_swap;
+                case DisplayCellPositions: return R.drawable.icon_position;
+                default: throw new IllegalStateException("No icon found for replay viewer action: " + this);
+            }
+        }
+
+        private int getTextResId() {
+            switch (this) {
+                case ChangeAnimationSpeed: return R.string.animation_speed;
+                case ChangePlayerPerspective: return R.string.switch_side;
+                case DisplayCellPositions: return R.string.board_coordinates;
+                default: throw new IllegalStateException("No text found for replay viewer action: " + this);
+            }
+        }
+
+        private View.OnClickListener getOnClickListener(ReplayViewerActivity activity) {
+            switch (this) {
+                case ChangeAnimationSpeed: return activity::onChangeAnimationSpeedClick;
+                case ChangePlayerPerspective: return activity::onChangeBoardOrientationClick;
+                case DisplayCellPositions: return activity::onDisplayCellPositionsClick;
+                default: throw new IllegalStateException("No click listener found for replay viewer action: " + this);
+            }
+        }
+    }
+
     private ReadOnlyBoardView bdvBoard;
     private ReplayControlsView rcvControls;
 
@@ -48,6 +88,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
     private ReplaySave replaySave;
 
     private AnimationSpeed animationSpeed;
+    private TeamColor playerPerspective;
 
 
     //region BASE ACTIVITY OVERRIDEN METHODS
@@ -65,7 +106,14 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
 
         btnActions = findViewById(R.id.btnActions_actReplayViewer);
         amvActions = findViewById(R.id.amvActions_actReplayViewer);
-        amvActions.addActionButton(R.drawable.icon_speed, R.string.animation_speed, 0, this::onAnimationSpeedClick);
+        for (ReplayViewerAction action : ReplayViewerAction.values()) {
+            amvActions.addActionButton(
+                    action.getIconResId(),
+                    action.getTextResId(),
+                    action.ordinal(),
+                    action.getOnClickListener(this)
+            );
+        }
         cnvCardInfo = findViewById(R.id.cnvCardInfo_actReplayViewer);
         asvAnimationSpeed = findViewById(R.id.asvAnimationSpeed_actReplayViewer);
         asvAnimationSpeed.setAvailableSpeeds(AnimationSpeed.getAllSpeedsWithMultiplier());
@@ -92,6 +140,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
         super.initDatas();
 
         animationSpeed = AnimationSpeed.Normal;
+        playerPerspective = TeamColor.Black;
 
         replaySaves = JsonUtils.loadReplays(this);
 
@@ -177,10 +226,49 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
         this.replaySave = replaySave;
 
         txvReplayName.setText(replaySave.getName());
-        ptvTopPlayer.setPlayer(replaySave.getPlayers().get(1), LeaderType.King);
-        pbvBottomPlayer.setPlayer(replaySave.getPlayers().get(0), LeaderType.Queen);
+        setPlayerPerspective(playerPerspective);
 
         bdvBoard.post(() -> rcvControls.loadReplay(replaySave));
+    }
+
+    @NonNull
+    private Player getPlayerFromTeam(@NonNull TeamColor teamColor) {
+        for (Player player : replaySave.getPlayers()) {
+            if (player.getTeamColor() == teamColor) {
+                return player;
+            }
+        }
+
+        throw new IllegalStateException("No player found for team " + teamColor);
+    }
+
+    private LeaderType getPlayerLeaderType(@NonNull TeamColor teamColor) {
+        for (IGameAction action : replaySave.getPuzzleGameHistory().getConfig().getInitialPlacements()) {
+            if (action.getActionType() != GameActionType.Recruitment) {
+                continue;
+            }
+
+            for (RecruitmentActionMotion motion : ((RecruitmentAction) action).getMotions()) {
+                if (motion.getMotionType() == RecruitmentMotionType.Add &&
+                        motion.getCharacter().getCharacterType().getCharacterCard().isLeader() &&
+                        motion.getCharacter().getTeamColor() == teamColor) {
+                    return LeaderType.getFromCharacterType(motion.getCharacter().getCharacterType());
+                }
+            }
+        }
+
+        throw new IllegalStateException("No leader found for team " + teamColor);
+    }
+
+    private void setPlayerPerspective(@NonNull TeamColor playerPerspective) {
+        this.playerPerspective = playerPerspective;
+        bdvBoard.setOrientation(TeamColorUtils.getOrientation(playerPerspective));
+
+        Player bottomPlayer = getPlayerFromTeam(playerPerspective);
+        Player topPlayer = getPlayerFromTeam(playerPerspective.getOpposite());
+
+        ptvTopPlayer.setPlayer(topPlayer, getPlayerLeaderType(topPlayer.getTeamColor()));
+        pbvBottomPlayer.setPlayer(bottomPlayer, getPlayerLeaderType(bottomPlayer.getTeamColor()));
     }
 
     //endregion
@@ -221,9 +309,19 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
 
     //region ACTIONS METHODS
 
-    private void onAnimationSpeedClick(View v) {
+    private void onChangeAnimationSpeedClick(View v) {
         amvActions.setVisibility(View.GONE);
         setAnimationSpeedVisible(true);
+    }
+
+    private void onChangeBoardOrientationClick(View v) {
+        // TODO
+        setActionsVisible(false);
+    }
+
+    private void onDisplayCellPositionsClick(View v) {
+        bdvBoard.setCellPositionVisible(!bdvBoard.isCellPositionVisible());
+        setActionsVisible(false);
     }
 
     private void setAnimationSpeedVisible(boolean visible) {

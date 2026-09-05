@@ -382,11 +382,6 @@ public class PlayableBoardView extends BoardView {
     //endregion
 
     @Override
-    protected int getCellPositionResId() {
-        return orientation == BoardOrientation.Rotated ? R.drawable.cell_positions_rotated : R.drawable.cell_positions;
-    }
-
-    @Override
     protected void onDetachedFromWindow() {
         stopPlayableCharactersShineAnimation();
         stopRecruitmentCellsAnimation();
