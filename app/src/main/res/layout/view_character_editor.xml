@@ -29,34 +29,34 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-    </com.leaders.app.views.decoration.OrnateFrameView>
-
-    <ScrollView
-        android:id="@+id/scvPortraits_vwCharacterEditor"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="4dp"
-        android:layout_marginBottom="6dp"
-        android:clickable="false"
-        android:fadeScrollbars="false"
-        android:longClickable="false"
-        android:scrollbarThumbVertical="@color/transparent_golden"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0">
-
-        <LinearLayout
-            android:id="@+id/llyPortraits_vwCharacterEditor"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+        <ScrollView
+            android:id="@+id/scvPortraits_vwCharacterEditor"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="6dp"
             android:clickable="false"
+            android:fadeScrollbars="false"
             android:longClickable="false"
-            android:orientation="vertical" />
-    </ScrollView>
+            android:scrollbarThumbVertical="@color/transparent_golden"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0">
+
+            <LinearLayout
+                android:id="@+id/llyPortraits_vwCharacterEditor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="false"
+                android:longClickable="false"
+                android:orientation="vertical" />
+        </ScrollView>
+
+    </com.leaders.app.views.decoration.OrnateFrameView>
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/grpEditCharacter_vwCharacterEditor"

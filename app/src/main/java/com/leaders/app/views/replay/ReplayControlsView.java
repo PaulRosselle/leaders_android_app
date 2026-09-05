@@ -155,6 +155,10 @@ public class ReplayControlsView extends ConstraintLayout {
         controlsListener.onReplayLoaded(game.getBoard());
     }
 
+    public Game getReplayGame() {
+        return new Game(game);
+    }
+
     private void resetReplay() {
         lastActionIndex = NO_ACTION_INDEX;
         doPause();

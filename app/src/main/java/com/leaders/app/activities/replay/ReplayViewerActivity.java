@@ -1,5 +1,6 @@
 package com.leaders.app.activities.replay;
 
+import android.animation.LayoutTransition;
 import android.content.Intent;
 import android.view.View;
 import android.widget.TextView;
@@ -22,10 +23,12 @@ import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.utilities.TeamColorUtils;
 import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.board.ReadOnlyBoardView;
+import com.leaders.app.views.character.CharacterCardPortraitView;
 import com.leaders.app.views.character.CharacterNotificationView;
 import com.leaders.app.views.character.CharacterView;
 import com.leaders.app.views.duel.PlayerBottomView;
 import com.leaders.app.views.duel.PlayerTopView;
+import com.leaders.app.views.replay.RecruitableCardsView;
 import com.leaders.app.views.replay.ReplayControlsView;
 import com.leaders.app.views.settings.AnimationSpeedView;
 import com.leaders.gamelogic.actions.IGameAction;
@@ -46,13 +49,15 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
     private enum ReplayViewerAction {
         ChangeAnimationSpeed,
         ChangePlayerPerspective,
-        DisplayCellPositions;
+        DisplayCellPositions,
+        ShowRecruitableCards;
 
         private int getIconResId() {
             switch (this) {
                 case ChangeAnimationSpeed: return R.drawable.icon_speed;
                 case ChangePlayerPerspective: return R.drawable.icon_swap;
                 case DisplayCellPositions: return R.drawable.icon_position;
+                case ShowRecruitableCards: return R.drawable.icon_cards;
                 default: throw new IllegalStateException("No icon found for replay viewer action: " + this);
             }
         }
@@ -62,6 +67,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
                 case ChangeAnimationSpeed: return R.string.animation_speed;
                 case ChangePlayerPerspective: return R.string.switch_side;
                 case DisplayCellPositions: return R.string.board_coordinates;
+                case ShowRecruitableCards: return R.string.recruitable_cards;
                 default: throw new IllegalStateException("No text found for replay viewer action: " + this);
             }
         }
@@ -71,6 +77,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
                 case ChangeAnimationSpeed: return activity::onChangeAnimationSpeedClick;
                 case ChangePlayerPerspective: return activity::onChangeBoardOrientationClick;
                 case DisplayCellPositions: return activity::onDisplayCellPositionsClick;
+                case ShowRecruitableCards: return activity::onShowRecruitableCardsClick;
                 default: throw new IllegalStateException("No click listener found for replay viewer action: " + this);
             }
         }
@@ -78,6 +85,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
 
     private ReadOnlyBoardView bdvBoard;
     private ReplayControlsView rcvControls;
+    private RecruitableCardsView rtvRecruitableCards;
 
     private TextView txvReplayName;
     private PlayerTopView ptvTopPlayer;
@@ -93,6 +101,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
 
     private AnimationSpeed animationSpeed;
     private TeamColor playerPerspective;
+    private boolean showRecruitableCards;
 
 
     //region BASE ACTIVITY OVERRIDEN METHODS
@@ -103,6 +112,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
 
         bdvBoard = findViewById(R.id.bdvBoard_actReplayViewer);
         rcvControls = findViewById(R.id.rcvControls_actReplayViewer);
+        rtvRecruitableCards = findViewById(R.id.rtvRecruitableCards_actReplayViewer);
 
         txvReplayName = findViewById(R.id.txvReplayName_actReplayViewer);
         ptvTopPlayer = findViewById(R.id.ptvTopPlayer_actReplayViewer);
@@ -129,6 +139,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
         super.initListeners();
 
         rcvControls.setControlsListener(this);
+        rtvRecruitableCards.setOnCardPortraitLongClick(this::onPortraitLongClick);
 
         bdvBoard.setOnCharacterLongClickListener(this::onCharacterLongClick);
 
@@ -145,6 +156,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
 
         animationSpeed = AnimationSpeed.Normal;
         playerPerspective = TeamColor.Black;
+        showRecruitableCards = false;
 
         List<ReplaySave> replaySaves = JsonUtils.loadReplays(this);
 
@@ -158,7 +170,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
 
         bdvBoard.post(() -> {
             loadReplay(intentReplaySave);
-            setupBoardAndPlayers();
+            realignBoardView(false, false);
         });
     }
 
@@ -206,27 +218,45 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
 
     //endregion
 
-    public void setupBoardAndPlayers() {
+    public void realignBoardView(boolean alignBottom, boolean animate) {
+        if (animate) {
+            bdvBoard.getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
+            pbvBottomPlayer.getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
+        }
+
         ConstraintLayout.LayoutParams boardParams = (ConstraintLayout.LayoutParams) bdvBoard.getLayoutParams();
         ConstraintLayout.LayoutParams playerViewParams = (ConstraintLayout.LayoutParams) pbvBottomPlayer.getLayoutParams();
 
-        // When recruiting, every view is aligned on top of each other
-        boardParams.verticalBias = 0f;
-        playerViewParams.verticalBias = 0f;
+        if (alignBottom) {
+            boardParams.verticalBias = 0f;
+            playerViewParams.verticalBias = 0f;
 
-        float dpRatio = getResources().getDisplayMetrics().density;
-        int boardHeight = bdvBoard.getMeasuredHeight();
-        float playerHeaderHeight = boardHeight * (72f / 1177f);
+            float dpRatio = getResources().getDisplayMetrics().density;
+            int boardHeight = bdvBoard.getMeasuredHeight();
+            float playerHeaderHeight = boardHeight * (72f / 1177f);
 
-        int boardMargin = 16;
-        int playerViewMargin = boardMargin + 8;
+            int boardMargin = 16;
+            int playerViewMargin = boardMargin + 8;
 
-        boardParams.topMargin = (int) (playerHeaderHeight + boardMargin * dpRatio);
-        playerViewParams.topMargin = (int) (boardHeight - pbvBottomPlayer.getMeasuredHeight() +
-                playerHeaderHeight * 2 + playerViewMargin * dpRatio);
+            boardParams.topMargin = (int) (playerHeaderHeight + boardMargin * dpRatio);
+            playerViewParams.topMargin = (int) (boardHeight - pbvBottomPlayer.getMeasuredHeight() +
+                    playerHeaderHeight * 2 + playerViewMargin * dpRatio);
 
-        bdvBoard.setLayoutParams(boardParams);
-        pbvBottomPlayer.setLayoutParams(playerViewParams);
+            bdvBoard.setLayoutParams(boardParams);
+            pbvBottomPlayer.setLayoutParams(playerViewParams);
+
+        } else {
+            boardParams.verticalBias = 0.5f;
+            playerViewParams.verticalBias = 1f;
+            boardParams.topMargin = 0;
+            playerViewParams.topMargin = 0;
+        }
+
+        if (animate) {
+            // The requestLayout calls start the layout transition animation
+            bdvBoard.requestLayout();
+            pbvBottomPlayer.requestLayout();
+        }
     }
 
     //region UI UPDATE METHODS
@@ -237,7 +267,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
         txvReplayName.setText(replaySave.getName());
         setPlayerPerspective(playerPerspective);
 
-        bdvBoard.post(() -> rcvControls.loadReplay(replaySave));
+        rcvControls.loadReplay(replaySave);
     }
 
     @NonNull
@@ -292,6 +322,30 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
         }
     }
 
+    private void updateRecruitableCards() {
+        if (!showRecruitableCards) {
+            return;
+        }
+
+        rtvRecruitableCards.updateRecruitableCards(
+                rcvControls.getReplayGame(),
+                replaySave.getGameMode()
+        );
+    }
+
+    private void setShowRecruitableCards(boolean showRecruitableCards) {
+        this.showRecruitableCards = showRecruitableCards;
+
+        realignBoardView(showRecruitableCards, true);
+
+        if (showRecruitableCards) {
+            rtvRecruitableCards.show(true);
+            updateRecruitableCards();
+        } else {
+            rtvRecruitableCards.hide();
+        }
+    }
+
 
     //endregion
 
@@ -301,6 +355,12 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
         CharacterType characterType = Objects.requireNonNull(((CharacterView) v).getCharacterType(),
                 "An empty character piece is not authorized in the puzzle editor");
         showCardDescriptionNotification(characterType.getCharacterCard());
+
+        return true;
+    }
+
+    private boolean onPortraitLongClick(View v) {
+        showCardDescriptionNotification(((CharacterCardPortraitView) v).getPortraitCard());
 
         return true;
     }
@@ -349,6 +409,11 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
         setActionsVisible(false);
     }
 
+    private void onShowRecruitableCardsClick(View v) {
+        setShowRecruitableCards(!showRecruitableCards);
+        setActionsVisible(false);
+    }
+
     private void setAnimationSpeedVisible(boolean visible) {
         asvAnimationSpeed.setVisibility(visible ? View.VISIBLE : View.GONE);
         vwDialogBg.setVisibility(visible ? View.VISIBLE : View.GONE);
@@ -366,6 +431,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
     @Override
     public void onReplayLoaded(@NonNull Board board) {
         bdvBoard.setBoard(board);
+        updateRecruitableCards();
     }
 
     @Override
@@ -382,6 +448,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
         }
 
         GameActionUtils.animate(bdvBoard, actionToPlay, onActionEnd, animationSpeed);
+        updateRecruitableCards();
     }
 
     //endregion

@@ -23,15 +23,19 @@ public class SelectableCardsQuery {
     @NonNull
     public static List<CharacterCard> getAvailableCards(@NonNull Game game,
                                                         @NonNull GameHistory gameHistory) {
+        return getAvailableCards(game, gameHistory.getConfig().getGameMode());
+    }
+
+    @NonNull
+    public static List<CharacterCard> getAvailableCards(@NonNull Game game,
+                                                        @NonNull GameMode gameMode) {
         // The recruitment is restricted to a pool of 3 randomly chosen cards in Discovery mode
-        if (gameHistory.getConfig().getGameMode() == GameMode.Discovery) {
+        if (gameMode == GameMode.Discovery) {
             return game.getRecruitableCards().stream().limit(3).collect(Collectors.toList());
         }
         // By default, all recruitable cards are returned
         return game.getRecruitableCards();
     }
-
-
 
     public static List<SelectableCharacterCard> getSelectableCards(@NonNull Game game,
                                                                    @NonNull GameHistory gameHistory) {
