@@ -10,9 +10,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.leaders.R;
+import com.leaders.app.enums.AnimationSpeed;
 import com.leaders.app.enums.BoardOrientation;
-import com.leaders.app.views.animators.CharacterActionAnimator;
-import com.leaders.app.views.animators.RecruitmentActionAnimator;
+import com.leaders.app.animators.CharacterActionAnimator;
+import com.leaders.app.animators.RecruitmentActionAnimator;
 import com.leaders.app.views.character.CharacterDisplay;
 import com.leaders.app.views.character.CharacterView;
 import com.leaders.gamelogic.entities.Board;
@@ -241,10 +242,12 @@ public class PlayableBoardView extends BoardView {
                                 @Nullable Runnable onAnimationEnd) {
         switch (feedback.getFeedbackType()) {
             case CharacterAction:
-                CharacterActionAnimator.animate(this, feedback.getCharacterActionMotions(), onAnimationEnd);
+                new CharacterActionAnimator(AnimationSpeed.Normal)
+                        .animate(this, feedback.getCharacterActionMotions(), onAnimationEnd);
                 break;
             case RecruitmentAction:
-                RecruitmentActionAnimator.animate(this, feedback.getRecruitmentActionMotions(), onAnimationEnd);
+                new RecruitmentActionAnimator(AnimationSpeed.Normal)
+                        .animate(this, feedback.getRecruitmentActionMotions(), onAnimationEnd);
                 break;
             default:
                 throw new IllegalArgumentException(

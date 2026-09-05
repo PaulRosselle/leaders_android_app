@@ -16,6 +16,7 @@ import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
+import com.leaders.app.enums.AnimationSpeed;
 import com.leaders.app.enums.PuzzleSource;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.JsonUtils;
@@ -23,7 +24,7 @@ import com.leaders.app.utilities.PuzzleExportUtils;
 import com.leaders.app.utilities.PuzzleImportUtils;
 import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.board.CellView;
-import com.leaders.app.views.animators.CharacterActionAnimator;
+import com.leaders.app.animators.CharacterActionAnimator;
 import com.leaders.app.views.character.CharacterDisplay;
 import com.leaders.app.views.puzzle.PuzzleSaveView;
 import com.leaders.gamelogic.actions.CharacterActionMotion;
@@ -334,7 +335,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
                 List.of(new CharacterActionTarget(character, null, position))
         );
 
-        CharacterActionAnimator.animate(bdvBoard, actionMotion, () -> {
+        new CharacterActionAnimator(AnimationSpeed.Normal).animate(bdvBoard, actionMotion, () -> {
             board.getCell(position).setCharacter(character);
 
             // If there are still characters to add, we continue in AddingCharacter mode
@@ -365,7 +366,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
                 new CharacterActionTarget(character, null, destCharacter.getPosition())
         ));
 
-        CharacterActionAnimator.animate(bdvBoard, motion, () -> {
+        new CharacterActionAnimator(AnimationSpeed.Normal).animate(bdvBoard, motion, () -> {
             board.getCell(destCharacter.getPosition()).setCharacter(character);
             applyDefaultEditorState();
         });
@@ -383,7 +384,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
                 ))
         );
 
-        CharacterActionAnimator.animate(bdvBoard, actionMotion, () -> {
+        new CharacterActionAnimator(AnimationSpeed.Normal).animate(bdvBoard, actionMotion, () -> {
             board.getCell(selectedBoardCharacter.getPosition()).setCharacter(null);
             board.getCell(position).setCharacter(selectedBoardCharacter.getCharacter());
             applyDefaultEditorState();
@@ -404,7 +405,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
                 )
         );
 
-        CharacterActionAnimator.animate(bdvBoard, actionMotion, () -> {
+        new CharacterActionAnimator(AnimationSpeed.Normal).animate(bdvBoard, actionMotion, () -> {
             board.getCell(selectedBoardCharacter.getPosition()).setCharacter(destCharacter.getCharacter());
             board.getCell(destCharacter.getPosition()).setCharacter(selectedBoardCharacter.getCharacter());
             applyDefaultEditorState();
@@ -479,7 +480,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
                 List.of(new CharacterActionTarget(character, position, null))
         );
 
-        CharacterActionAnimator.animate(bdvBoard, actionMotion, () -> {
+        new CharacterActionAnimator(AnimationSpeed.Normal).animate(bdvBoard, actionMotion, () -> {
             board.getCell(position).setCharacter(null);
             applyDefaultEditorState();
         });

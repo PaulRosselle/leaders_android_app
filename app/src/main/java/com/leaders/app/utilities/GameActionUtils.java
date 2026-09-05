@@ -3,8 +3,9 @@ package com.leaders.app.utilities;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.leaders.app.views.animators.CharacterActionAnimator;
-import com.leaders.app.views.animators.RecruitmentActionAnimator;
+import com.leaders.app.animators.CharacterActionAnimator;
+import com.leaders.app.animators.RecruitmentActionAnimator;
+import com.leaders.app.enums.AnimationSpeed;
 import com.leaders.app.views.board.BoardView;
 import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.actions.CharacterActionMotion;
@@ -160,17 +161,17 @@ public final class GameActionUtils {
         return new WarningAction(action.getWarningType(), action.getTeamColor(), -action.getCountChange());
     }
 
-    public static void animate(@NonNull BoardView boardView,
-                               @NonNull IGameAction action,
-                               @Nullable Runnable onAnimationEnd) {
+    public static void animate(@NonNull BoardView boardView, @NonNull IGameAction action,
+                               @Nullable Runnable onAnimationEnd, @NonNull AnimationSpeed speed) {
         switch (action.getActionType()) {
             case CharacterAction:
-                CharacterActionAnimator.animate(boardView, (CharacterAction) action, onAnimationEnd);
+                new CharacterActionAnimator(speed).animate(boardView, (CharacterAction) action, onAnimationEnd);
                 break;
             case Recruitment:
-                RecruitmentActionAnimator.animate(boardView, (RecruitmentAction) action, onAnimationEnd);
+                new RecruitmentActionAnimator(speed).animate(boardView, (RecruitmentAction) action, onAnimationEnd);
                 break;
-            default: throw new IllegalStateException("Action animation not handled for: " + action.getActionType());
+            default:
+                throw new IllegalStateException("Action animation not handled for: " + action.getActionType());
         }
     }
 }

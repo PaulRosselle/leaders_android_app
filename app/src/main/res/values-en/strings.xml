@@ -178,5 +178,12 @@
     <string name="rewind_previous_action">Rewind previous action</string>
     <string name="play_until_next_turn">Play until next turn</string>
     <string name="rewind_until_previous_turn">Rewind until previous turn</string>
+    <string name="animation_speed">Animation speed</string>
+    <string name="normal_speed">Normal</string>
+    <string name="slow_speed">Slow</string>
+    <string name="very_slow_speed">Very slow</string>
+    <string name="fast_speed">Fast</string>
+    <string name="very_fast_speed">Very fast</string>
+    <string name="no_animation_speed">No animation</string>
 
 </resources>

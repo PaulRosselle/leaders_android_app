@@ -258,7 +258,7 @@ public class ReplayControlsView extends ConstraintLayout {
         playNextAction();
     }
 
-    private void doPause() {
+    public void doPause() {
         playMode = ActionPlayMode.Paused;
         playDirection = null;
         updateControlsState();
