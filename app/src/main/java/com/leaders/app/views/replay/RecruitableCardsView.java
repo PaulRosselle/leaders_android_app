@@ -1,8 +1,13 @@
 package com.leaders.app.views.replay;
 
 import android.content.Context;
+import android.transition.Fade;
+import android.transition.Transition;
+import android.transition.TransitionManager;
 import android.util.AttributeSet;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,6 +28,7 @@ import java.util.List;
 public class RecruitableCardsView extends ConstraintLayout {
     private static final int PORTRAITS_PER_GROUP = 8;
 
+    private final ScrollView scvPortraits;
     private final LinearLayout llyPortraits;
 
     private OnLongClickListener onPortraitLongClickListener;
@@ -33,6 +39,7 @@ public class RecruitableCardsView extends ConstraintLayout {
 
         inflate(context, R.layout.view_recruitable_cards, this);
 
+        scvPortraits = findViewById(R.id.scvPortraits_vwRecruitableCards);
         llyPortraits = findViewById(R.id.llyPortraits_vwRecruitableCards);
     }
 
@@ -66,6 +73,8 @@ public class RecruitableCardsView extends ConstraintLayout {
 
             llyPortraits.addView(ptvPortraits, getPortraitsGroupLayoutParams());
         }
+
+        updatePortraitsScrollView();
     }
 
     private LinearLayout.LayoutParams getPortraitsGroupLayoutParams() {
@@ -79,11 +88,53 @@ public class RecruitableCardsView extends ConstraintLayout {
         return layoutParams;
     }
 
+    private void updatePortraitsScrollView() {
+        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) scvPortraits.getLayoutParams();
+
+        int availableHeight = scvPortraits.getMeasuredHeight();
+        if (availableHeight <= 0) {
+            scvPortraits.post(this::updatePortraitsScrollView);
+            return;
+        }
+
+        int portraitsHeight = llyPortraits.getMeasuredHeight();
+
+        if (portraitsHeight <= availableHeight) {
+            // The whole portraits linear layout fits on screen.
+            // Let the ScrollView have its natural width and center it.
+            params.height = ConstraintLayout.LayoutParams.WRAP_CONTENT;
+
+        } else {
+            // The portraits linear layout is wider than the screen.
+            // Make the ScrollView fill the available width so it can scroll.
+            params.height = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT;
+
+        }
+
+        scvPortraits.setLayoutParams(params);
+    }
+
     public void setOnCardPortraitLongClick(@Nullable OnLongClickListener onLongClickListener) {
         this.onPortraitLongClickListener = onLongClickListener;
         for (int i = 0; i < llyPortraits.getChildCount(); i++) {
             ((CharacterCardPortraitGroupView) llyPortraits.getChildAt(i))
                     .setPortraitsLongClickListener(onLongClickListener);
         }
+    }
+
+    public void show(boolean animate) {
+        // We use a fading animation for the visibility change
+        if (animate) {
+            Transition transition = new Fade();
+            transition.setDuration(400);
+            transition.addTarget(this);
+            TransitionManager.beginDelayedTransition((ViewGroup) this.getParent(), transition);
+        }
+        setVisibility(VISIBLE);
+    }
+
+    public void hide() {
+        // Hiding the view is always instantaneous
+        setVisibility(GONE);
     }
 }

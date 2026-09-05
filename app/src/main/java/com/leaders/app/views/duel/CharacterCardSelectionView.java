@@ -148,6 +148,7 @@ public class CharacterCardSelectionView extends ConstraintLayout {
         }
 
         scvPortraits.setVisibility(VISIBLE);
+        updatePortraitsScrollView();
     }
 
 
@@ -190,6 +191,7 @@ public class CharacterCardSelectionView extends ConstraintLayout {
         }
 
         scvPortraits.setVisibility(VISIBLE);
+        updatePortraitsScrollView();
     }
 
     private void initPortraitsGroup(@NonNull CharacterCardPortraitGroupView portraitsGroupView) {
@@ -296,6 +298,32 @@ public class CharacterCardSelectionView extends ConstraintLayout {
         String cardName = getContext().getString(CharacterCardUtils.getNameId(selectedCard.getCharacterCard()));
 
         Toast.makeText(getContext(), String.format(messageFormat, cardName), Toast.LENGTH_SHORT).show();
+    }
+
+    private void updatePortraitsScrollView() {
+        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) scvPortraits.getLayoutParams();
+
+        int availableHeight = scvPortraits.getMeasuredHeight();
+        if (availableHeight <= 0) {
+            scvPortraits.post(this::updatePortraitsScrollView);
+            return;
+        }
+
+        int portraitsHeight = llyPortraits.getMeasuredHeight();
+
+        if (portraitsHeight <= availableHeight) {
+            // The whole portraits linear layout fits on screen.
+            // Let the ScrollView have its natural width and center it.
+            params.height = ConstraintLayout.LayoutParams.WRAP_CONTENT;
+
+        } else {
+            // The portraits linear layout is wider than the screen.
+            // Make the ScrollView fill the available width so it can scroll.
+            params.height = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT;
+
+        }
+
+        scvPortraits.setLayoutParams(params);
     }
 
     private LinearLayout.LayoutParams getPortraitsGroupLP() {

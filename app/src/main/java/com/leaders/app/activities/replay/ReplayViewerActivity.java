@@ -1,5 +1,6 @@
 package com.leaders.app.activities.replay;
 
+import android.animation.LayoutTransition;
 import android.content.Intent;
 import android.view.View;
 import android.widget.TextView;
@@ -100,6 +101,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
 
     private AnimationSpeed animationSpeed;
     private TeamColor playerPerspective;
+    private boolean showRecruitableCards;
 
 
     //region BASE ACTIVITY OVERRIDEN METHODS
@@ -154,6 +156,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
 
         animationSpeed = AnimationSpeed.Normal;
         playerPerspective = TeamColor.Black;
+        showRecruitableCards = false;
 
         List<ReplaySave> replaySaves = JsonUtils.loadReplays(this);
 
@@ -167,7 +170,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
 
         bdvBoard.post(() -> {
             loadReplay(intentReplaySave);
-            setupBoardAndPlayers();
+            realignBoardView(false, false);
         });
     }
 
@@ -215,27 +218,45 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
 
     //endregion
 
-    public void setupBoardAndPlayers() {
+    public void realignBoardView(boolean alignBottom, boolean animate) {
+        if (animate) {
+            bdvBoard.getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
+            pbvBottomPlayer.getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
+        }
+
         ConstraintLayout.LayoutParams boardParams = (ConstraintLayout.LayoutParams) bdvBoard.getLayoutParams();
         ConstraintLayout.LayoutParams playerViewParams = (ConstraintLayout.LayoutParams) pbvBottomPlayer.getLayoutParams();
 
-        // When recruiting, every view is aligned on top of each other
-        boardParams.verticalBias = 0f;
-        playerViewParams.verticalBias = 0f;
+        if (alignBottom) {
+            boardParams.verticalBias = 0f;
+            playerViewParams.verticalBias = 0f;
 
-        float dpRatio = getResources().getDisplayMetrics().density;
-        int boardHeight = bdvBoard.getMeasuredHeight();
-        float playerHeaderHeight = boardHeight * (72f / 1177f);
+            float dpRatio = getResources().getDisplayMetrics().density;
+            int boardHeight = bdvBoard.getMeasuredHeight();
+            float playerHeaderHeight = boardHeight * (72f / 1177f);
 
-        int boardMargin = 16;
-        int playerViewMargin = boardMargin + 8;
+            int boardMargin = 16;
+            int playerViewMargin = boardMargin + 8;
 
-        boardParams.topMargin = (int) (playerHeaderHeight + boardMargin * dpRatio);
-        playerViewParams.topMargin = (int) (boardHeight - pbvBottomPlayer.getMeasuredHeight() +
-                playerHeaderHeight * 2 + playerViewMargin * dpRatio);
+            boardParams.topMargin = (int) (playerHeaderHeight + boardMargin * dpRatio);
+            playerViewParams.topMargin = (int) (boardHeight - pbvBottomPlayer.getMeasuredHeight() +
+                    playerHeaderHeight * 2 + playerViewMargin * dpRatio);
 
-        bdvBoard.setLayoutParams(boardParams);
-        pbvBottomPlayer.setLayoutParams(playerViewParams);
+            bdvBoard.setLayoutParams(boardParams);
+            pbvBottomPlayer.setLayoutParams(playerViewParams);
+
+        } else {
+            boardParams.verticalBias = 0.5f;
+            playerViewParams.verticalBias = 1f;
+            boardParams.topMargin = 0;
+            playerViewParams.topMargin = 0;
+        }
+
+        if (animate) {
+            // The requestLayout calls start the layout transition animation
+            bdvBoard.requestLayout();
+            pbvBottomPlayer.requestLayout();
+        }
     }
 
     //region UI UPDATE METHODS
@@ -302,7 +323,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
     }
 
     private void updateRecruitableCards() {
-        if (rtvRecruitableCards.getVisibility() != View.VISIBLE) {
+        if (!showRecruitableCards) {
             return;
         }
 
@@ -312,10 +333,16 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
         );
     }
 
-    private void setRecruitableCardsVisible(boolean visible) {
-        rtvRecruitableCards.setVisibility(visible ? View.VISIBLE : View.GONE);
-        if (visible) {
+    private void setShowRecruitableCards(boolean showRecruitableCards) {
+        this.showRecruitableCards = showRecruitableCards;
+
+        realignBoardView(showRecruitableCards, true);
+
+        if (showRecruitableCards) {
+            rtvRecruitableCards.show(true);
             updateRecruitableCards();
+        } else {
+            rtvRecruitableCards.hide();
         }
     }
 
@@ -383,7 +410,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
     }
 
     private void onShowRecruitableCardsClick(View v) {
-        setRecruitableCardsVisible(rtvRecruitableCards.getVisibility() != View.VISIBLE);
+        setShowRecruitableCards(!showRecruitableCards);
         setActionsVisible(false);
     }
 

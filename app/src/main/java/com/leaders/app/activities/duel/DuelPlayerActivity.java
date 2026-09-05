@@ -629,7 +629,8 @@ public final class DuelPlayerActivity extends BaseActivity implements
         runOnUiThread(() -> {
             GameContext gameContext = controller.getCurrentContext();
             switch (request.getRequestType()) {
-                case NoTargetExpected: // Only require to choose a result within legalResults
+                case NoTargetExpected:
+                    clearInteractionUI(gameContext); // Only require to choose a result within legalResults
                     break;
                 case SelectableCharacterCardExpected:
                     ccsvCardSelector.applyTargets(request.getLegalTargets());
