@@ -1,5 +1,6 @@
 package com.leaders.app.views.board;
 
+import android.animation.LayoutTransition;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.ImageView;
@@ -60,6 +61,15 @@ public abstract class BoardView extends ConstraintLayout {
 
         setOrientation(BoardOrientation.Default);
         isCellPositionVisible = false;
+
+        // Allow us to control better children animations using PropertyAnimators
+        LayoutTransition boardTransition = getLayoutTransition();
+        boardTransition.disableTransitionType(LayoutTransition.APPEARING);
+        boardTransition.disableTransitionType(LayoutTransition.DISAPPEARING);
+        boardTransition.disableTransitionType(LayoutTransition.CHANGE_APPEARING);
+        boardTransition.disableTransitionType(LayoutTransition.CHANGE_DISAPPEARING);
+        boardTransition.disableTransitionType(LayoutTransition.CHANGING);
+
     }
 
     private int[] getCellViewIds() {
@@ -157,7 +167,6 @@ public abstract class BoardView extends ConstraintLayout {
                     characterDisplay = acquireCharacterDisplay(cellPosition);
                 }
 
-                characterDisplay.reset();
                 CharacterView characterView = characterDisplay.getCharacterView();
                 characterView.setVisibility(VISIBLE);
                 characterView.setCharacter(cell.getCharacter());
@@ -186,8 +195,6 @@ public abstract class BoardView extends ConstraintLayout {
     public final void releaseCharacterDisplay(@NonNull Position position) {
         CharacterDisplay characterDisplay = Objects.requireNonNull(characterDisplayMap.remove(position),
                 "CharacterDisplay to release not found");
-
-        characterDisplay.reset();
 
         characterDisplay.setOnClickListener(null);
         characterDisplay.setOnCharacterLongClickListener(null);

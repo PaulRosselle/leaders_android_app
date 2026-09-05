@@ -155,7 +155,7 @@ public final class PhaseTransitionQuery {
             if (lastTurnTeam == null) {
                 return getFirstPlayerTeam(history);
             }
-            return lastPhaseTeam.getOpposite();
+            return lastTurnTeam.getOpposite();
         }
 
         // By default, the next phase team is the same as the last one
@@ -184,7 +184,7 @@ public final class PhaseTransitionQuery {
         for (int i = history.getEntries().size() - 1; i >= 0; i--) {
             IHistoryEntry entry = history.getEntries().get(i);
             if (entry instanceof Turn) {
-                entry.getTeamColor();
+                return entry.getTeamColor();
             }
         }
 

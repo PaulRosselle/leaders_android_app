@@ -5,12 +5,15 @@ import androidx.annotation.NonNull;
 import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.actions.TransitionAction;
+import com.leaders.gamelogic.actions.WarningAction;
+import com.leaders.gamelogic.enums.GameActionType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.historyentries.segments.TurnEndPhase;
 import com.leaders.puzzlelogic.serializers.IJsonSerializer;
 import com.leaders.puzzlelogic.serializers.SerializationContext;
 import com.leaders.puzzlelogic.serializers.actions.CharacterActionSerializer;
 import com.leaders.puzzlelogic.serializers.actions.TransitionActionSerializer;
+import com.leaders.puzzlelogic.serializers.actions.WarningActionSerializer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,10 +24,7 @@ public final class TurnEndPhaseSerializer implements IJsonSerializer<TurnEndPhas
     @Override
     public TurnEndPhase getFromJson(@NonNull JSONObject jsonObject,
                                     @NonNull SerializationContext srlContext) throws JSONException {
-        TransitionActionSerializer transitionActionSerializer =
-                new TransitionActionSerializer();
-        CharacterActionSerializer characterActionSerializer =
-                new CharacterActionSerializer();
+        TransitionActionSerializer transitionActionSerializer = new TransitionActionSerializer();
 
         TransitionAction startAction = null;
         if (jsonObject.has("start_action") && !jsonObject.isNull("start_action")) {
@@ -52,11 +52,18 @@ public final class TurnEndPhaseSerializer implements IJsonSerializer<TurnEndPhas
 
         JSONArray jaActions = jsonObject.getJSONArray("actions");
         for (int i = 0; i < jaActions.length(); i++) {
-            CharacterAction action =
-                    characterActionSerializer.getFromJson(
-                            jaActions.getJSONObject(i),
-                            srlContext
-                    );
+            JSONObject actionJson = jaActions.getJSONObject(i);
+            GameActionType actionType = GameActionType.valueOf(actionJson.getString("type"));
+            IGameAction action;
+            switch (actionType) {
+                case CharacterAction:
+                    action = new CharacterActionSerializer().getFromJson(actionJson, srlContext);
+                    break;
+                case Warning:
+                    action = new WarningActionSerializer().getFromJson(actionJson, srlContext);
+                    break;
+                default: throw new JSONException("Unsupported game action type: " + actionType);
+            }
             phase.getActions().add(action);
         }
 
@@ -66,10 +73,7 @@ public final class TurnEndPhaseSerializer implements IJsonSerializer<TurnEndPhas
     @NonNull
     @Override
     public JSONObject getAsJson(@NonNull TurnEndPhase object) throws JSONException {
-        TransitionActionSerializer transitionActionSerializer =
-                new TransitionActionSerializer();
-        CharacterActionSerializer characterActionSerializer =
-                new CharacterActionSerializer();
+        TransitionActionSerializer transitionActionSerializer = new TransitionActionSerializer();
 
         JSONObject jsonObject = new JSONObject();
 
@@ -91,11 +95,16 @@ public final class TurnEndPhaseSerializer implements IJsonSerializer<TurnEndPhas
 
         JSONArray jaActions = new JSONArray();
         for (IGameAction action : object.getActions()) {
-            jaActions.put(
-                    characterActionSerializer.getAsJson(
-                            (CharacterAction) action
-                    )
-            );
+            JSONObject actionJson;
+            switch (action.getActionType()) {
+                case CharacterAction: actionJson = new CharacterActionSerializer().getAsJson((CharacterAction) action);
+                    break;
+                case Warning: actionJson = new WarningActionSerializer().getAsJson((WarningAction) action);
+                    break;
+                default: throw new JSONException("Unsupported game action type: " + action.getActionType());
+            }
+            actionJson.put("type", action.getActionType().name());
+            jaActions.put(actionJson);
         }
 
         jsonObject.put("actions", jaActions);

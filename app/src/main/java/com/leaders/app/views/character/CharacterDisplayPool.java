@@ -1,6 +1,7 @@
 package com.leaders.app.views.character;
 
 import android.content.Context;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -32,11 +33,13 @@ public final class CharacterDisplayPool {
         if (available.isEmpty()) {
             throw new IllegalStateException("Character acquirements should never exceed the pool size");
         }
-        return available.remove(available.size() - 1);
+        CharacterDisplay acquiredDisplay = available.remove(available.size() - 1);
+        acquiredDisplay.reset();
+        return acquiredDisplay;
     }
 
     public void release(@NonNull CharacterDisplay display) {
-        display.reset();
+        display.setVisibility(View.GONE);
         available.add(display);
     }
 }

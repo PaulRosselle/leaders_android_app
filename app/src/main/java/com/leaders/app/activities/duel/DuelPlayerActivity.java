@@ -128,14 +128,6 @@ public final class DuelPlayerActivity extends BaseActivity implements
         super.initViews();
 
         bdvBoard = findViewById(R.id.bdvBoard_actDuelPlayer);
-        // Since we're animating a translation on the board,
-        // we must disable transitions able to affect children views
-        LayoutTransition boardTransition = bdvBoard.getLayoutTransition();
-        boardTransition.disableTransitionType(LayoutTransition.APPEARING);
-        boardTransition.disableTransitionType(LayoutTransition.DISAPPEARING);
-        boardTransition.disableTransitionType(LayoutTransition.CHANGE_APPEARING);
-        boardTransition.disableTransitionType(LayoutTransition.CHANGE_DISAPPEARING);
-        boardTransition.enableTransitionType(LayoutTransition.CHANGING);
 
         ccsvCardSelector = findViewById(R.id.ccsvCardSelector_actDuelPlayer);
         chdNewCharacter = new CharacterDisplay(this, ccsvCardSelector);

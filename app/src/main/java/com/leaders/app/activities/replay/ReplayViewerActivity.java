@@ -1,8 +1,7 @@
 package com.leaders.app.activities.replay;
 
+import android.animation.LayoutTransition;
 import android.content.Intent;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.View;
 import android.widget.TextView;
 
@@ -17,20 +16,16 @@ import com.leaders.app.entities.ReplaySave;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.LeaderType;
 import com.leaders.app.utilities.ExtraUtils;
+import com.leaders.app.utilities.GameActionUtils;
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.views.ActionsMenuView;
-import com.leaders.app.views.animators.CharacterActionAnimator;
-import com.leaders.app.views.animators.RecruitmentActionAnimator;
 import com.leaders.app.views.board.ReadOnlyBoardView;
 import com.leaders.app.views.character.CharacterNotificationView;
 import com.leaders.app.views.duel.PlayerBottomView;
 import com.leaders.app.views.duel.PlayerTopView;
 import com.leaders.app.views.replay.ReplayControlsView;
-import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.actions.IGameAction;
-import com.leaders.gamelogic.actions.RecruitmentAction;
 import com.leaders.gamelogic.entities.Board;
-import com.leaders.gamelogic.factories.GameFactory;
 
 import java.util.List;
 
@@ -219,16 +214,19 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
     }
 
     @Override
-    public void onActionPlayed(@NonNull IGameAction action, @NonNull Runnable onActionEnd) {
-        switch (action.getActionType()) {
-            case CharacterAction:
-                CharacterActionAnimator.animate(bdvBoard, (CharacterAction) action, onActionEnd);
-                break;
-            case Recruitment:
-                RecruitmentActionAnimator.animate(bdvBoard, (RecruitmentAction) action, onActionEnd);
-                break;
-            default: throw new IllegalStateException("Action animation not handled for: " + action.getActionType());
+    public void onActionPlayed(@NonNull IGameAction action, boolean playInReverse, @NonNull Runnable onActionEnd) {
+        if (!GameActionUtils.isAnimatable(action)) {
+            return;
         }
+
+        IGameAction actionToPlay;
+        if (playInReverse && GameActionUtils.isReversible(action)) {
+            actionToPlay = GameActionUtils.reverse(action);
+        } else {
+            actionToPlay = action;
+        }
+
+        GameActionUtils.animate(bdvBoard, actionToPlay, onActionEnd);
     }
 
     //endregion
