@@ -185,5 +185,6 @@
     <string name="fast_speed">Fast</string>
     <string name="very_fast_speed">Very fast</string>
     <string name="no_animation_speed">No animation</string>
+    <string name="switch_side">Switch sides</string>
 
 </resources>

@@ -21,6 +21,7 @@ import com.leaders.app.enums.LeaderType;
 import com.leaders.app.utilities.ButtonUtils;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.JsonUtils;
+import com.leaders.app.utilities.TeamColorUtils;
 import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.EndGameView;
 import com.leaders.app.views.board.PlayableBoardView;
@@ -512,8 +513,7 @@ public final class DuelPlayerActivity extends BaseActivity implements
     private void applyPlayerChange(@NonNull GameContext gameContext) {
         Player currentPlayer = gameContext.getCurrentPlayer();
 
-        bdvBoard.setOrientation(currentPlayer.getTeamColor() == TeamColor.Black ?
-                BoardOrientation.Default : BoardOrientation.Rotated);
+        bdvBoard.setOrientation(TeamColorUtils.getOrientation(currentPlayer.getTeamColor()));
 
         Board board = gameContext.getBoard();
         pbvCurrentPlayer.setPlayer(currentPlayer, getPlayerLeaderType(currentPlayer, board));

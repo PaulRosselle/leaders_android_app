@@ -64,12 +64,13 @@ public abstract class BoardView extends ConstraintLayout {
 
         // Allow us to control better children animations using PropertyAnimators
         LayoutTransition boardTransition = getLayoutTransition();
-        boardTransition.disableTransitionType(LayoutTransition.APPEARING);
-        boardTransition.disableTransitionType(LayoutTransition.DISAPPEARING);
-        boardTransition.disableTransitionType(LayoutTransition.CHANGE_APPEARING);
-        boardTransition.disableTransitionType(LayoutTransition.CHANGE_DISAPPEARING);
-        boardTransition.disableTransitionType(LayoutTransition.CHANGING);
-
+        if (boardTransition != null) {
+            boardTransition.disableTransitionType(LayoutTransition.APPEARING);
+            boardTransition.disableTransitionType(LayoutTransition.DISAPPEARING);
+            boardTransition.disableTransitionType(LayoutTransition.CHANGE_APPEARING);
+            boardTransition.disableTransitionType(LayoutTransition.CHANGE_DISAPPEARING);
+            boardTransition.disableTransitionType(LayoutTransition.CHANGING);
+        }
     }
 
     private int[] getCellViewIds() {
@@ -250,7 +251,10 @@ public abstract class BoardView extends ConstraintLayout {
     public final void setCellPositionVisible(boolean visible) {
         isCellPositionVisible = visible;
         if (visible) {
-            imvBoard.setForeground(ContextCompat.getDrawable(getContext(), getCellPositionResId()));
+            imvBoard.setForeground(ContextCompat.getDrawable(getContext(),
+                    orientation == BoardOrientation.Rotated ?
+                            R.drawable.cell_positions_rotated : R.drawable.cell_positions)
+            );
         } else {
             imvBoard.setForeground(null);
         }
