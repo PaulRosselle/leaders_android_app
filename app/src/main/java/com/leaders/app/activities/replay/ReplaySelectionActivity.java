@@ -80,6 +80,8 @@ public class ReplaySelectionActivity extends BaseActivity {
 
     private List<ReplaySave> replaySaves;
 
+    private ActivityResultLauncher<String> importPuzzleFileSelector;
+
     private ActivityResultLauncher<Uri> exportPuzzleDirectorySelector;
 
 
@@ -117,6 +119,14 @@ public class ReplaySelectionActivity extends BaseActivity {
     @Override
     protected void initDatas() {
         super.initDatas();
+
+        importPuzzleFileSelector = registerForActivityResult(
+                new ActivityResultContracts.GetContent(),
+                uri -> {
+                    if (uri != null) {
+                        importFromFile(uri);
+                    }
+                });
 
         exportPuzzleDirectorySelector = registerForActivityResult(
                 new ActivityResultContracts.OpenDocumentTree(),
@@ -244,7 +254,9 @@ public class ReplaySelectionActivity extends BaseActivity {
     }
 
     private void onImportClick(View v) {
-        // TODO
+        selectImportFile();
+
+        setActionsVisible(false);
     }
 
     private void onExportClick(View v) {
@@ -272,6 +284,30 @@ public class ReplaySelectionActivity extends BaseActivity {
     //endregion
 
     //region IMPORT/EXPORT METHODS
+
+    private void selectImportFile() {
+        importPuzzleFileSelector.launch("application/json");
+    }
+
+    private void importFromFile(@NonNull Uri uri) {
+        try {
+            // First we try to load the replays from the file
+            List<ReplaySave> importedReplays = JsonUtils.loadReplaysFromFile(this, uri);
+
+            if (!importedReplays.isEmpty()) {
+                // Then we save the new custom replays list
+                replaySaves.addAll(importedReplays);
+                JsonUtils.saveReplays(this, replaySaves);
+
+                // Finally we display the new replays and inform the user that the import was successful
+                rsgvReplays.setReplays(replaySaves);
+
+                Toast.makeText(this, R.string.import_successful, Toast.LENGTH_SHORT).show();
+            }
+        } catch (IllegalArgumentException e) {
+            Toast.makeText(this, R.string.error_import_file_loading, Toast.LENGTH_SHORT).show();
+        }
+    }
 
     private void selectExportFile() {
         exportPuzzleDirectorySelector.launch(null);
