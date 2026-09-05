@@ -157,7 +157,6 @@ public abstract class BoardView extends ConstraintLayout {
                     characterDisplay = acquireCharacterDisplay(cellPosition);
                 }
 
-                characterDisplay.reset();
                 CharacterView characterView = characterDisplay.getCharacterView();
                 characterView.setVisibility(VISIBLE);
                 characterView.setCharacter(cell.getCharacter());
@@ -186,8 +185,6 @@ public abstract class BoardView extends ConstraintLayout {
     public final void releaseCharacterDisplay(@NonNull Position position) {
         CharacterDisplay characterDisplay = Objects.requireNonNull(characterDisplayMap.remove(position),
                 "CharacterDisplay to release not found");
-
-        characterDisplay.reset();
 
         characterDisplay.setOnClickListener(null);
         characterDisplay.setOnCharacterLongClickListener(null);

@@ -12,11 +12,11 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 import com.leaders.app.entities.ReplaySave;
+import com.leaders.app.utilities.GameActionUtils;
 import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
-import com.leaders.gamelogic.enums.GameActionType;
 import com.leaders.gamelogic.factories.GameActionHandlerFactory;
 import com.leaders.gamelogic.factories.GameFactory;
 import com.leaders.gamelogic.handlers.GameActionHandler;
@@ -33,7 +33,7 @@ public class ReplayControlsView extends ConstraintLayout {
     public interface ReplayControlsListener {
 
         void onReplayLoaded(@NonNull Board board);
-        void onActionPlayed(@NonNull IGameAction action, @NonNull Runnable onActionEnd);
+        void onActionPlayed(@NonNull IGameAction action, boolean playInReverse, @NonNull Runnable onActionEnd);
     }
 
     private enum ActionPlayMode {
@@ -155,18 +155,12 @@ public class ReplayControlsView extends ConstraintLayout {
 
     private void addPhaseActions(IPhase phase) {
         for (IGameAction action : phase.getActions()) {
-            if (isPlayable(action)) {
+            if (GameActionUtils.isAnimatable(action)) {
                 actions.add(action);
             }
         }
     }
 
-    private boolean isPlayable(IGameAction action) {
-        return List.of(
-                GameActionType.CharacterAction,
-                GameActionType.Recruitment
-        ).contains(action.getActionType());
-    }
 
     private GameHistory getStartHistory(@NonNull GameHistory gameHistory) {
         return new GameHistory(gameHistory.getConfig(), new ArrayList<>());
@@ -208,7 +202,8 @@ public class ReplayControlsView extends ConstraintLayout {
             return;
         }
 
-        // TODO - play only the previous action
+        playMode = ActionPlayMode.SingleAction;
+        playPreviousAction();
     }
 
     private void onNextActionClick(View v) {
@@ -216,7 +211,8 @@ public class ReplayControlsView extends ConstraintLayout {
             return;
         }
 
-        // TODO - play only the next action
+        playMode = ActionPlayMode.SingleAction;
+        playNextAction();
     }
 
     private void doOnActionEnd() {
@@ -242,32 +238,57 @@ public class ReplayControlsView extends ConstraintLayout {
         }
     }
 
-    private int getNextPlayableActionIndex() {
+    private int getNextActionIndex() {
         return hasNextAction() ? lastActionIndex + 1 : NO_ACTION_INDEX;
     }
+
 
     private void playNextAction() {
         if (actionIsRunning) {
             return;
         }
 
-        int nextPlayableActionIndex = getNextPlayableActionIndex();
-        if (nextPlayableActionIndex == NO_ACTION_INDEX) {
+        int nextActionIndex = getNextActionIndex();
+        if (nextActionIndex == NO_ACTION_INDEX) {
             doPause();
             return;
         }
 
         actionIsRunning = true;
 
-        IGameAction actionToPlay = actions.get(nextPlayableActionIndex);
+        IGameAction actionToPlay = actions.get(nextActionIndex);
         GameActionHandlerFactory.create(game, actionToPlay).doAction();
-        lastActionIndex = nextPlayableActionIndex;
-        skbReplay.setProgress(lastActionIndex + 1);
+        setLastActionIndex(nextActionIndex);
 
         if (controlsListener == null) {
             throw new IllegalStateException("Listener required to play actions");
         }
-        controlsListener.onActionPlayed(actionToPlay, this::doOnActionEnd);
+        controlsListener.onActionPlayed(actionToPlay, false, this::doOnActionEnd);
+    }
+
+    private void playPreviousAction() {
+        if (actionIsRunning) {
+            return;
+        }
+
+        // TODO - comment
+        int previousActionIndex = lastActionIndex - 1;
+
+        actionIsRunning = true;
+
+        IGameAction actionToReverse = actions.get(lastActionIndex);
+        GameActionHandlerFactory.create(game, actionToReverse).undoAction();
+        setLastActionIndex(previousActionIndex);
+
+        if (controlsListener == null) {
+            throw new IllegalStateException("Listener required to play actions");
+        }
+        controlsListener.onActionPlayed(actionToReverse, true, this::doOnActionEnd);
+    }
+
+    private void setLastActionIndex(int lastActionIndex) {
+        this.lastActionIndex = lastActionIndex;
+        skbReplay.setProgress(lastActionIndex + 1);
     }
 
     private void jumpToAction(int jumpActionIndex) {

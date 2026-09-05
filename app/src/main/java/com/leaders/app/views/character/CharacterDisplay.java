@@ -73,9 +73,22 @@ public final class CharacterDisplay {
     public void reset() {
         characterView.clearTarget();
 
-        setIsHighlighted(false, false);
-
+        characterView.setScaleX(1f);
+        characterView.setScaleY(1f);
+        characterView.setAlpha(1f);
         characterView.setVisibility(View.GONE);
+
+        highlightView.stopAnimation();
+        highlightView.setVisibility(View.GONE);
+
+        shineView.stopShine();
+        shineView.setVisibility(View.GONE);
+    }
+
+    public void setVisibility(int visibility) {
+        for (ViewType viewType : ViewType.values()) {
+            getCharacterViewFromType(viewType).setVisibility(visibility);
+        }
     }
 
     public void setPosition(float x, float y) {
