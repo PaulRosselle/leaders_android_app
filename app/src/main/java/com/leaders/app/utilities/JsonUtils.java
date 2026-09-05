@@ -369,18 +369,37 @@ public final class JsonUtils {
 
     public static void saveReplays(@NonNull Context context, @NonNull List<ReplaySave> replays) {
         try {
-            JSONArray jaReplays = new JSONArray();
-            for (ReplaySave replay : replays) {
-                jaReplays.put(replay.getAsJsonObject());
-            }
-
-            JSONObject joReplays = new JSONObject();
-            joReplays.put("replays", jaReplays);
-
-            saveJsonFile(context, REPLAYS_FILENAME, joReplays);
+            saveJsonFile(context, REPLAYS_FILENAME, getReplaysAsJson(replays));
         } catch (JSONException | IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static void saveReplaysToFile(@NonNull Context context,
+                                         @NonNull List<ReplaySave> replays,
+                                         @NonNull Uri uri) {
+        try (OutputStream outputStream = context.getContentResolver().openOutputStream(uri)) {
+            if (outputStream == null) {
+                throw new IllegalArgumentException("Cannot get valid outputStream stream from Uri");
+            }
+
+            updateJsonFile(getReplaysAsJson(replays), outputStream);
+        } catch (JSONException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static JSONObject getReplaysAsJson(@NonNull List<ReplaySave> replays) throws JSONException {
+        JSONObject joReplays = new JSONObject();
+
+        JSONArray jaReplays = new JSONArray();
+        for (ReplaySave replay : replays) {
+            jaReplays.put(replay.getAsJsonObject());
+        }
+
+        joReplays.put("replays", jaReplays);
+
+        return joReplays;
     }
 
     //endregion

@@ -1,11 +1,18 @@
 package com.leaders.app.activities.replay;
 
 import android.content.Intent;
+import android.net.Uri;
+import android.text.InputType;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.documentfile.provider.DocumentFile;
 
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
@@ -73,6 +80,8 @@ public class ReplaySelectionActivity extends BaseActivity {
 
     private List<ReplaySave> replaySaves;
 
+    private ActivityResultLauncher<Uri> exportPuzzleDirectorySelector;
+
 
     //region BASE ACTIVITY OVERRIDEN METHODS
 
@@ -108,6 +117,14 @@ public class ReplaySelectionActivity extends BaseActivity {
     @Override
     protected void initDatas() {
         super.initDatas();
+
+        exportPuzzleDirectorySelector = registerForActivityResult(
+                new ActivityResultContracts.OpenDocumentTree(),
+                uri -> {
+                    if (uri != null) {
+                        exportToFile(uri);
+                    }
+                });
 
         replaySaves = JsonUtils.loadReplays(this);
         rsgvReplays.setReplays(replaySaves);
@@ -231,7 +248,9 @@ public class ReplaySelectionActivity extends BaseActivity {
     }
 
     private void onExportClick(View v) {
-        // TODO
+        selectExportFile();
+
+        setActionsVisible(false);
     }
 
     private void onSelectAllClick(View v) {
@@ -248,6 +267,52 @@ public class ReplaySelectionActivity extends BaseActivity {
     private void setActionsVisible(boolean visible) {
         amvActions.setVisibility(visible ? View.VISIBLE : View.GONE);
         vwDialogBg.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
+    //endregion
+
+    //region IMPORT/EXPORT METHODS
+
+    private void selectExportFile() {
+        exportPuzzleDirectorySelector.launch(null);
+    }
+
+    private void exportToFile(@NonNull Uri directoryUri) {
+        // Now that the user has chosen a directory to export the replays we can set up
+        // an alertDialog with an editText so the user can input the file name
+        DocumentFile fileDirectory = DocumentFile.fromTreeUri(this, directoryUri);
+
+        if (fileDirectory == null || !fileDirectory.canWrite()) {
+            Toast.makeText(this, R.string.error_export_file_writing, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.alert_dialog_theme);
+
+        builder.setTitle(R.string.choose_file_name);
+
+        final EditText edtFileName = new EditText(this);
+        edtFileName.setInputType(InputType.TYPE_TEXT_VARIATION_URI);
+        builder.setView(edtFileName);
+
+        builder.setPositiveButton(R.string.confirm, (dialog, which) -> {
+            // If the file already exists, it will be renamed with an incremented value at the end
+            String fileName = edtFileName.getText().toString();
+
+            DocumentFile file = fileDirectory.createFile("application/json", fileName);
+
+            if (file == null) {
+                Toast.makeText(this, R.string.error_export_file_creation, Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            JsonUtils.saveReplaysToFile(this, rsgvReplays.getSelectedReplays(), file.getUri());
+
+            Toast.makeText(this, R.string.export_successful, Toast.LENGTH_SHORT).show();
+        });
+
+        builder.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.cancel());
+        builder.show();
     }
 
     //endregion
