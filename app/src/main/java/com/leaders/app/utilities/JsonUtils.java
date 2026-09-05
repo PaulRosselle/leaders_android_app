@@ -244,7 +244,6 @@ public final class JsonUtils {
         }
     }
 
-
     public static List<CustomPuzzleSave> loadCustomPuzzlesFromFile(@NonNull Context context,
                                                                    @NonNull Uri uri) throws IllegalArgumentException {
         try (InputStream inputStream = context.getContentResolver().openInputStream(uri)) {
@@ -352,19 +351,34 @@ public final class JsonUtils {
         }
 
         try {
-            JSONObject joReplays = openJsonFile(context, REPLAYS_FILENAME);
-
-            JSONArray jaReplays = joReplays.getJSONArray("replays");
-
-            List<ReplaySave> replays = new ArrayList<>();
-            for (int i = 0; i < jaReplays.length(); i++) {
-                replays.add(ReplaySave.getFromJson(jaReplays.getJSONObject(i)));
-            }
-
-            return replays;
+            return getReplaysFromJson(openJsonFile(context, REPLAYS_FILENAME));
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static List<ReplaySave> loadReplaysFromFile(@NonNull Context context,
+                                                       @NonNull Uri uri) throws IllegalArgumentException {
+        try (InputStream inputStream = context.getContentResolver().openInputStream(uri)) {
+            if (inputStream == null) {
+                throw new IllegalArgumentException("Cannot get valid input stream from Uri");
+            }
+
+            return getReplaysFromJson(openJsonFile(inputStream));
+        } catch (IOException | JSONException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    private static List<ReplaySave> getReplaysFromJson(@NonNull JSONObject joReplays) throws JSONException {
+        JSONArray jaReplays = joReplays.getJSONArray("replays");
+
+        List<ReplaySave> replays = new ArrayList<>();
+        for (int i = 0; i < jaReplays.length(); i++) {
+            replays.add(ReplaySave.getFromJson(jaReplays.getJSONObject(i)));
+        }
+
+        return replays;
     }
 
     public static void saveReplays(@NonNull Context context, @NonNull List<ReplaySave> replays) {
