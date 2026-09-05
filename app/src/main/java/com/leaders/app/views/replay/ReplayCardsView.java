@@ -25,7 +25,7 @@ import com.leaders.gamelogic.queries.SelectableCardsQuery;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RecruitableCardsView extends ConstraintLayout {
+public class ReplayCardsView extends ConstraintLayout {
     private static final int PORTRAITS_PER_GROUP = 8;
 
     private final ScrollView scvPortraits;
@@ -34,7 +34,7 @@ public class RecruitableCardsView extends ConstraintLayout {
     private OnLongClickListener onPortraitLongClickListener;
 
 
-    public RecruitableCardsView(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public ReplayCardsView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
         inflate(context, R.layout.view_recruitable_cards, this);
@@ -43,7 +43,7 @@ public class RecruitableCardsView extends ConstraintLayout {
         llyPortraits = findViewById(R.id.llyPortraits_vwRecruitableCards);
     }
 
-    public void updateRecruitableCards(@NonNull Game game, @NonNull GameMode gameMode) {
+    public void updatePortraits(@NonNull Game game, @NonNull GameMode gameMode) {
         llyPortraits.removeAllViews();
 
         List<CharacterCard> availableCards = SelectableCardsQuery.getAvailableCards(game, gameMode);

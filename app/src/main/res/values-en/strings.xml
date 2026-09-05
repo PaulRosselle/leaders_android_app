@@ -186,6 +186,6 @@
     <string name="very_fast_speed">Very fast</string>
     <string name="no_animation_speed">No animation</string>
     <string name="switch_side">Switch sides</string>
-    <string name="recruitable_cards">Recruitable cards</string>
+    <string name="character_cards">Character cards</string>
 
 </resources>

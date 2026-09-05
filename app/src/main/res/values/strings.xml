@@ -188,5 +188,5 @@
     <string name="very_fast_speed">Très rapide</string>
     <string name="no_animation_speed">Pas d\'animation</string>
     <string name="switch_side">Changer de camp</string>
-    <string name="recruitable_cards">Cartes recrutables</string>
+    <string name="character_cards">Cartes de personnages</string>
 </resources>
