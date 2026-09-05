@@ -176,7 +176,7 @@
     <string name="remove_selected_replays">Remove selected replays?</string>
     <string name="play_next_action">Play next action</string>
     <string name="rewind_previous_action">Rewind previous action</string>
-    <string name="rewind_until_next_turn">Play until next turn</string>
-    <string name="play_until_previous_turn">Rewind until previous turn</string>
+    <string name="play_until_next_turn">Play until next turn</string>
+    <string name="rewind_until_previous_turn">Rewind until previous turn</string>
 
 </resources>

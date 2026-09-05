@@ -235,9 +235,9 @@ public class ReplayControlsView extends ConstraintLayout {
         Map<View, Integer> buttonToasts = new HashMap<>();
 
         buttonToasts.put(btnPreviousAction, R.string.rewind_previous_action);
-        buttonToasts.put(btnPreviousTurn, R.string.rewind_until_next_turn);
+        buttonToasts.put(btnPreviousTurn, R.string.rewind_until_previous_turn);
         buttonToasts.put(btnNextAction, R.string.play_next_action);
-        buttonToasts.put(btnNextTurn, R.string.play_until_previous_turn);
+        buttonToasts.put(btnNextTurn, R.string.play_until_next_turn);
 
         int buttonToast = Objects.requireNonNull(buttonToasts.get(v), "Button not found");
 

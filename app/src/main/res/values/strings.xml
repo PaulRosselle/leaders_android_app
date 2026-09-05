@@ -178,6 +178,6 @@
     <string name="remove_selected_replays">Supprimer les replays sélectionnés ?</string>
     <string name="play_next_action">Jouer l\'action suivante</string>
     <string name="rewind_previous_action">Jouer l\'action précédente</string>
-    <string name="rewind_until_next_turn">Avancer jusqu\'au tour suivant</string>
-    <string name="play_until_previous_turn">Revenir jusqu\'au tour précédent</string>
+    <string name="play_until_next_turn">Avancer jusqu\'au tour suivant</string>
+    <string name="rewind_until_previous_turn">Revenir jusqu\'au tour précédent</string>
 </resources>
