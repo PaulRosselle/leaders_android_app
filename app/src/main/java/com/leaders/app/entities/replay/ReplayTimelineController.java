@@ -63,7 +63,7 @@ public final class ReplayTimelineController {
     }
 
     public List<WarningAction> getWarningActions(int actionIndex) {
-        if (!isAtTurnEnd(actionIndex)) {
+        if (isOutOfBounds(actionIndex) || !isAtTurnEnd(actionIndex)) {
             return Collections.emptyList();
         }
 
@@ -94,13 +94,15 @@ public final class ReplayTimelineController {
     }
 
     public void jumpTo(int actionIndex) {
-        if (actionIndex < START_INDEX || actionIndex >= timeline.getActionCount()) {
-            throw new IllegalArgumentException(
-                    "Invalid action index: " + actionIndex
-            );
+        if (isOutOfBounds(actionIndex)) {
+            throw new IllegalArgumentException("Invalid action index: " + actionIndex);
         }
 
         currentActionIndex = actionIndex;
+    }
+
+    public boolean isOutOfBounds(int actionIndex) {
+        return actionIndex < START_INDEX || actionIndex >= timeline.getActionCount();
     }
 
     public boolean isAtTurnEnd(int actionIndex) {
@@ -108,7 +110,7 @@ public final class ReplayTimelineController {
             return false;
         }
 
-        if (actionIndex >= timeline.getActionCount()) {
+        if (actionIndex >= timeline.getActionCount() - 1) {
             return true;
         }
 

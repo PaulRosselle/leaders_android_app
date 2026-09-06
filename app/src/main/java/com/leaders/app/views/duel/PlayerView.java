@@ -74,11 +74,14 @@ public abstract class PlayerView extends ConstraintLayout {
     }
 
     public void setWarningVisible(boolean visible) {
+        boolean wasVisible = imvWarning.getVisibility() == View.VISIBLE;
+
         imvWarning.setVisibility(visible ? View.VISIBLE : View.GONE);
-        if (visible) {
-            startAnimaton();
-        } else {
+
+        if (!visible) {
             stopAnimation();
+        } else if (!wasVisible) {
+            startAnimaton();
         }
     }
 
