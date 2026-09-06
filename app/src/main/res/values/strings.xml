@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name" translatable="false">Leaders</string>
-    <string name="app_version" translatable="false">v0.6.0</string>
+    <string name="app_version" translatable="false">v0.7.0</string>
     <string name="rules">règles</string>
     <string name="settings">options</string>
     <string name="puzzles">puzzles</string>
@@ -191,4 +191,11 @@
     <string name="character_cards">Cartes de personnages</string>
     <string name="barrage_warning_title">Avertissement reçu : Barrage</string>
     <string name="barrage_warning_message">Recevoir deux avertissements de ce type d\'affilé met fin à la partie.</string>
+    <string name="rules_chapter_intro">i.\t\t\t but du jeu</string>
+    <string name="rules_chapter_win_the_game">ii.\t\t\t gagner la partie</string>
+    <string name="rules_chapter_turn">iii.\t\t tour de jeu</string>
+    <string name="rules_chapter_characters">v.\t\t personnages</string>
+    <string name="rules_chapter_game_modes">vi.\t\t modes de jeu</string>
+    <string name="rules_chapter_barrage">vii.\t règle de barrage</string>
+    <string name="rules_chapter_faq">viii.\t f.a.q</string>
 </resources>

@@ -189,5 +189,12 @@
     <string name="character_cards">Character cards</string>
     <string name="barrage_warning_title">Warning received: Barrage</string>
     <string name="barrage_warning_message">Receiving two consecutive warnings of this type ends the game.</string>
+    <string name="rules_chapter_intro">i.\t\t\t but du jeu</string>
+    <string name="rules_chapter_win_the_game">ii.\t\t\t win the game</string>
+    <string name="rules_chapter_turn">iii.\t\t game turn</string>
+    <string name="rules_chapter_characters">v.\t\t characters</string>
+    <string name="rules_chapter_game_modes">vi.\t\t game modes</string>
+    <string name="rules_chapter_barrage">vii.\t barrage rules</string>
+    <string name="rules_chapter_faq">viii.\t f.a.q</string>
 
 </resources>
