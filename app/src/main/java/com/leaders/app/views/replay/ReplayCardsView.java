@@ -31,15 +31,18 @@ import java.util.Set;
 
 public class ReplayCardsView extends ConstraintLayout {
     private static final int GROUP_MARGIN_TOP = 4;
+    private static final int DISCOVERY_PORTRAITS_GROUP_COUNT = 1;
     private static final int DISCOVERY_PORTRAITS_PER_GROUP = 3;
     private static final int DISCOVERY_PORTRAIT_SPACING = 32;
+    private static final int STRATEGIST_PORTRAITS_GROUP_COUNT = 2;
     private static final int STRATEGIST_PORTRAITS_PER_GROUP = 8;
     private static final int STRATEGIST_PORTRAIT_SPACING = 2;
     private static final float RECRUITED_PORTRAIT_ALPHA = 0.4f;
 
-
     private final ScrollView scvPortraits;
     private final LinearLayout llyPortraits;
+
+    private final List<PortraitView> portraitViews;
 
     private OnLongClickListener onPortraitLongClickListener;
 
@@ -47,41 +50,74 @@ public class ReplayCardsView extends ConstraintLayout {
     public ReplayCardsView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
+        portraitViews = new ArrayList<>();
+
         inflate(context, R.layout.view_recruitable_cards, this);
 
         scvPortraits = findViewById(R.id.scvPortraits_vwRecruitableCards);
         llyPortraits = findViewById(R.id.llyPortraits_vwRecruitableCards);
     }
 
-    public void updatePortraits(@NonNull Game game, @NonNull GameMode gameMode) {
+    public void initPortraits(@NonNull GameMode gameMode) {
         List<PortraitGroupView> portraitGroups;
         switch (gameMode) {
-            case Discovery: portraitGroups = getDiscoveryPortraitGroups(game); break;
-            case Strategist: portraitGroups = getStrategistPortraitGroups(game); break;
+            case Discovery: portraitGroups = getDiscoveryPortraitGroups(); break;
+            case Strategist: portraitGroups = getStrategistPortraitGroups(); break;
             default: throw new IllegalStateException("No portrait update possible for game mode: " + gameMode);
         }
 
         llyPortraits.removeAllViews();
+        portraitViews.clear();
 
         for (PortraitGroupView pgvGroup : portraitGroups) {
             pgvGroup.setDisplayMode(PortraitView.DisplayMode.Hexagonal);
             llyPortraits.addView(pgvGroup, getPortraitsGroupLayoutParams());
+            portraitViews.addAll(pgvGroup.getPortraits());
         }
 
         updatePortraitsScrollView();
     }
 
-    private List<PortraitGroupView> getDiscoveryPortraitGroups(@NonNull Game game) {
-        List<CharacterCard> availableCards = SelectableCardsQuery.getAvailableCards(game, GameMode.Discovery);
+    public void updatePortraits(@NonNull Game game, @NonNull GameMode gameMode) {
+        switch (gameMode) {
+            case Discovery: updateDiscoveryPortraits(game); break;
+            case Strategist: updateStrategistPortraits(game); break;
+            default: throw new IllegalStateException("No portrait update possible for game mode: " + gameMode);
+        }
+    }
 
+    private List<PortraitGroupView> getDiscoveryPortraitGroups() {
         return getPortraitGroups(
-                availableCards,
+                DISCOVERY_PORTRAITS_GROUP_COUNT,
                 DISCOVERY_PORTRAITS_PER_GROUP,
                 DISCOVERY_PORTRAIT_SPACING
         );
     }
 
-    private List<PortraitGroupView> getStrategistPortraitGroups(@NonNull Game game) {
+    private List<PortraitGroupView> getStrategistPortraitGroups() {
+        return getPortraitGroups(
+                STRATEGIST_PORTRAITS_GROUP_COUNT,
+                STRATEGIST_PORTRAITS_PER_GROUP,
+                STRATEGIST_PORTRAIT_SPACING
+        );
+    }
+
+    private void updateDiscoveryPortraits(@NonNull Game game) {
+        List<CharacterCard> portraitsCards = SelectableCardsQuery.getAvailableCards(game, GameMode.Discovery);
+
+        if (portraitsCards.size() != portraitViews.size()) {
+            throw new IllegalStateException("Portraits count not matching cards count");
+        }
+
+        CharacterCardUtils.sort(getContext(), portraitsCards);
+
+        for (int i = 0; i < portraitViews.size(); i++) {
+            PortraitView ptvPortrait = portraitViews.get(i);
+            ptvPortrait.setPortraitCard(portraitsCards.get(i));
+        }
+    }
+
+    private void updateStrategistPortraits(@NonNull Game game) {
         List<CharacterCard> availableCards = SelectableCardsQuery.getAvailableCards(game, GameMode.Strategist);
         List<CharacterCard> recruitedCards = getRecruitedCards(game);
         List<CharacterCard> bannedCards = getBannedCards(game);
@@ -91,43 +127,41 @@ public class ReplayCardsView extends ConstraintLayout {
         portraitsCards.addAll(recruitedCards);
         portraitsCards.addAll(bannedCards);
 
-        List<PortraitGroupView> portraitGroups = getPortraitGroups(
-                portraitsCards,
-                STRATEGIST_PORTRAITS_PER_GROUP,
-                STRATEGIST_PORTRAIT_SPACING
-        );
-
-        for (PortraitGroupView pgvGroup : portraitGroups) {
-            for (PortraitView ptvPortrait : pgvGroup.getPortraits()) {
-                CharacterCard portraitCard = ptvPortrait.getPortraitCard();
-                if (bannedCards.contains(portraitCard)) {
-                    ptvPortrait.setUseBannedDisplay(true);
-                } else if (recruitedCards.contains(portraitCard)) {
-                    ptvPortrait.setAlpha(RECRUITED_PORTRAIT_ALPHA);
-                }
-            }
+        if (portraitsCards.size() != portraitViews.size()) {
+            throw new IllegalStateException(
+                    "Portraits count (" + portraitViews.size() +
+                            ") not matching cards count (" + portraitsCards.size() + ")");
         }
-        return portraitGroups;
+
+        CharacterCardUtils.sort(getContext(), portraitsCards);
+
+        for (int i = 0; i < portraitViews.size(); i++) {
+            PortraitView ptvPortrait = portraitViews.get(i);
+            CharacterCard portraitCard = portraitsCards.get(i);
+
+            ptvPortrait.setPortraitCard(portraitCard);
+
+            ptvPortrait.setUseBannedDisplay(bannedCards.contains(portraitCard));
+            ptvPortrait.setAlpha(recruitedCards.contains(portraitCard) ? RECRUITED_PORTRAIT_ALPHA : 1f);
+        }
     }
 
-    private List<PortraitGroupView> getPortraitGroups(@NonNull List<CharacterCard> portraitCards,
+    private List<PortraitGroupView> getPortraitGroups(int portraitsGroupCount,
                                                       int portraitsPerGroup,
                                                       int portraitsSpacing) {
         List<PortraitGroupView> portraitGroups = new ArrayList<>();
 
-        CharacterCardUtils.sort(getContext(), portraitCards);
-
-        while (!portraitCards.isEmpty()) {
-            // We add cards line per line within multiple "PortraitGroupView".
-            // For each group, an array is alimented
-            int portraitsInLineCount = Math.min(portraitsPerGroup, portraitCards.size());
+        for (int i = 0; i < portraitsGroupCount; i++) {
+            // We fill out every portrait as Nemesis just for initialization
             ArrayList<CharacterCard> portraitsCards = new ArrayList<>();
-            for (int i = 0; i < portraitsInLineCount; i++) {
-                portraitsCards.add(portraitCards.remove(0));
+            for (int j = 0; j < portraitsPerGroup; j++) {
+                portraitsCards.add(CharacterCard.Nemesis);
             }
+
             PortraitGroupView pgvGroup = PortraitGroupView.createFromCards(
                     getContext(), portraitsCards, portraitsPerGroup
             );
+
             pgvGroup.setPortraitsLongClickListener(onPortraitLongClickListener);
             pgvGroup.setPortraitSpacing(portraitsSpacing);
 

@@ -37,7 +37,7 @@ import com.leaders.gamelogic.actions.BanishmentAction;
 import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.actions.RecruitmentAction;
 import com.leaders.gamelogic.actions.RecruitmentActionMotion;
-import com.leaders.gamelogic.entities.Board;
+import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
@@ -271,6 +271,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
 
         txvReplayName.setText(replaySave.getName());
         setPlayerPerspective(playerPerspective);
+        ravCards.initPortraits(replaySave.getGameMode());
 
         rcvControls.loadReplay(replaySave);
     }
@@ -331,7 +332,6 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
         if (showCards) {
             ravCards.updatePortraits(rcvControls.getReplayGame(), replaySave.getGameMode());
         }
-
     }
 
     private void setShowCards(boolean showCards) {
@@ -430,8 +430,9 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
     //region REPLAY CONTROL METHODS
 
     @Override
-    public void onReplayLoaded(@NonNull Board board) {
-        bdvBoard.setBoard(board);
+    public void onReplayLoaded(@NonNull Game game) {
+        bdvBoard.setBoard(game.getBoard());
+        ravCards.updatePortraits(game, replaySave.getGameMode());
         updateCards();
     }
 
