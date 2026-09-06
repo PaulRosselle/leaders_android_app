@@ -26,6 +26,11 @@ public final class PlayerTopView extends PlayerView {
     }
 
     @Override
+    protected int getImvWarningResId() {
+        return R.id.imvWarning_vwPlayerTop;
+    }
+
+    @Override
     protected int getTxvPlayerNameResId() {
         return R.id.txvPlayerName_vwPlayerTop;
     }

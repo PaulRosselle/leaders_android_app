@@ -13,25 +13,17 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 import com.leaders.app.entities.ReplaySave;
+import com.leaders.app.entities.replay.ReplayTimelineController;
 import com.leaders.app.utilities.ButtonUtils;
-import com.leaders.app.utilities.GameActionUtils;
 import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
-import com.leaders.gamelogic.enums.GameActionType;
-import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.factories.GameActionHandlerFactory;
 import com.leaders.gamelogic.factories.GameFactory;
 import com.leaders.gamelogic.handlers.GameActionHandler;
-import com.leaders.gamelogic.historyentries.IHistoryEntry;
-import com.leaders.gamelogic.historyentries.IPhase;
-import com.leaders.gamelogic.historyentries.segments.BanishmentPhase;
-import com.leaders.gamelogic.historyentries.segments.Turn;
-import com.leaders.gamelogic.historyentries.segments.TurnPhase;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -63,16 +55,16 @@ public class ReplayControlsView extends ConstraintLayout {
     private final MaterialButton btnNextTurn;
     private final MaterialButton btnPreviousTurn;
 
-    @NonNull
-    private final List<IGameAction> actions;
-    private final List<TeamColor> actionsTeamColors;
-    private int lastActionIndex;
-    private Integer pendingJumpActionIndex;
+    private ReplayTimelineController timelineController;
+
     private Game game;
     private GameHistory startHistory;
 
+    @Nullable
+    private Integer pendingJumpActionIndex;
     @NonNull
     private ActionPlayMode playMode;
+    @Nullable
     private ActionPlayDirection playDirection;
     private boolean actionInProgress;
 
@@ -82,9 +74,6 @@ public class ReplayControlsView extends ConstraintLayout {
 
     public ReplayControlsView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-
-        actions = new ArrayList<>();
-        actionsTeamColors = new ArrayList<>();
 
         inflate(context, R.layout.view_replay_controls, this);
 
@@ -97,9 +86,9 @@ public class ReplayControlsView extends ConstraintLayout {
 
         initListeners();
 
-        doPause();
+        playMode = ActionPlayMode.Paused;
+        playDirection = null;
         actionInProgress = false;
-        lastActionIndex = NO_ACTION_INDEX;
         pendingJumpActionIndex = null;
     }
 
@@ -139,11 +128,43 @@ public class ReplayControlsView extends ConstraintLayout {
         this.controlsListener = controlsListener;
     }
 
+
+    @NonNull
+    private ReplayTimelineController getTimelineController() {
+        if (timelineController == null) {
+            throw new IllegalStateException("No replay loaded");
+        }
+
+        return timelineController;
+    }
+
+    @NonNull
+    private Game getGame() {
+        if (game == null) {
+            throw new IllegalStateException("No replay loaded");
+        }
+
+        return game;
+    }
+
+    @NonNull
+    private GameHistory getStartHistory() {
+        if (startHistory == null) {
+            throw new IllegalStateException("No replay loaded");
+        }
+
+        return startHistory;
+    }
+
+    public Game getReplayGame() {
+        return getGame();
+    }
+
     public void loadReplay(@NonNull ReplaySave replaySave) {
         GameHistory gameHistory = replaySave.getReplayGameHistory();
 
-        loadActions(gameHistory);
-        // Replays are loaded at the beginning of the game
+        timelineController = new ReplayTimelineController(gameHistory);
+
         startHistory = getStartHistory(gameHistory);
         game = GameFactory.create(startHistory);
 
@@ -155,42 +176,18 @@ public class ReplayControlsView extends ConstraintLayout {
         controlsListener.onReplayLoaded(getReplayGame());
     }
 
-    public Game getReplayGame() {
-        return new Game(game);
-    }
-
     private void resetReplay() {
-        lastActionIndex = NO_ACTION_INDEX;
-        doPause();
+        getTimelineController().reset();
+
+        playMode = ActionPlayMode.Paused;
+        playDirection = null;
         actionInProgress = false;
         pendingJumpActionIndex = null;
-    }
-
-    private void loadActions(@NonNull GameHistory gameHistory) {
-        actions.clear();
-        actionsTeamColors.clear();
-
-        for (IHistoryEntry historyEntry : gameHistory.getEntries()) {
-            if (historyEntry instanceof Turn) {
-                for (TurnPhase phase : ((Turn) historyEntry).getSubPhasesInOrder()) {
-                    addPhaseActions(phase, historyEntry.getTeamColor());
-                }
-            } else if (historyEntry instanceof BanishmentPhase) {
-                addPhaseActions((BanishmentPhase) historyEntry, historyEntry.getTeamColor());
-            }
-        }
 
         skbReplay.setProgress(0);
-        skbReplay.setMax(actions.size());
-    }
+        skbReplay.setMax(timelineController.getActionCount());
 
-    private void addPhaseActions(@NonNull IPhase phase, @NonNull TeamColor teamColor) {
-        for (IGameAction action : phase.getActions()) {
-            if (GameActionUtils.isAnimatable(action)) {
-                actions.add(action);
-                actionsTeamColors.add(teamColor);
-            }
-        }
+        updateControlsState();
     }
 
     private GameHistory getStartHistory(@NonNull GameHistory gameHistory) {
@@ -253,40 +250,51 @@ public class ReplayControlsView extends ConstraintLayout {
     //endregion
 
     private void doPlay() {
-        if (!hasNextAction()) {
-            jumpToAction(NO_ACTION_INDEX);
+
+        ReplayTimelineController controller = getTimelineController();
+
+        if (!controller.hasNextAction()) {
+            controller.reset();
+            jumpToAction(NO_ACTION_INDEX); // TODO - revoir
         }
 
         playMode = ActionPlayMode.Playing;
         playDirection = ActionPlayDirection.Forward;
+
         playNextAction();
     }
 
     public void doPause() {
         playMode = ActionPlayMode.Paused;
         playDirection = null;
+
         updateControlsState();
     }
 
     private void updateControlsState() {
+        ReplayTimelineController controller = getTimelineController();
+
+        boolean hasNextAction = controller.hasNextAction();
+        boolean hasPreviousAction = controller.hasPreviousAction();
+
         int enabledStrokeColor = R.color.font;
         int disabledStrokeColor = R.color.darker_font;
         int enabledBackgroundColor = R.color.ultra_dark_background;
         int disabledBackgroundColor = R.color.darker_background;
 
-        ButtonUtils.setEnabled(btnNextAction, hasNextAction(),
+        ButtonUtils.setEnabled(btnNextAction, hasNextAction,
                 enabledStrokeColor, disabledStrokeColor,
                 enabledBackgroundColor, disabledBackgroundColor
         );
-        ButtonUtils.setEnabled(btnPreviousAction, hasPreviousAction(),
+        ButtonUtils.setEnabled(btnPreviousAction, hasPreviousAction,
                 enabledStrokeColor, disabledStrokeColor,
                 enabledBackgroundColor, disabledBackgroundColor
         );
-        ButtonUtils.setEnabled(btnNextTurn, hasNextAction(),
+        ButtonUtils.setEnabled(btnNextTurn, hasNextAction,
                 enabledStrokeColor, disabledStrokeColor,
                 enabledBackgroundColor, disabledBackgroundColor
         );
-        ButtonUtils.setEnabled(btnPreviousTurn, hasPreviousAction(),
+        ButtonUtils.setEnabled(btnPreviousTurn, hasPreviousAction,
                 enabledStrokeColor, disabledStrokeColor,
                 enabledBackgroundColor, disabledBackgroundColor
         );
@@ -295,7 +303,7 @@ public class ReplayControlsView extends ConstraintLayout {
         int playPauseResId;
         if (playMode == ActionPlayMode.Playing) {
             playPauseResId = R.drawable.icon_pause;
-        } else if (hasNextAction()) {
+        } else if (hasNextAction) {
             playPauseResId = R.drawable.icon_play;
         } else {
             playPauseResId = R.drawable.icon_restart;
@@ -303,24 +311,12 @@ public class ReplayControlsView extends ConstraintLayout {
         btnPlayPause.setIconResource(playPauseResId);
     }
 
-    private boolean hasNextAction() {
-        return lastActionIndex < actions.size() - 1;
-    }
+    private void notifyTimelinePositionChanged() {
+        ReplayTimelineController controller = getTimelineController();
 
-    private boolean hasPreviousAction() {
-        return lastActionIndex >= 0;
-    }
+        skbReplay.setProgress(controller.getCurrentActionIndex() + 1);
 
-    private boolean isTurnEnd() {
-        return !hasNextAction() ||
-                (lastActionIndex == NO_ACTION_INDEX ||
-                        actionsTeamColors.get(lastActionIndex) != actionsTeamColors.get(lastActionIndex + 1));
-    }
-
-    private boolean isTurnStart() {
-        return !hasPreviousAction() ||
-                (lastActionIndex > 0 &&
-                        actionsTeamColors.get(lastActionIndex) != actionsTeamColors.get(lastActionIndex - 1));
+        updateControlsState();
     }
 
     private void doOnActionEnd() {
@@ -339,16 +335,18 @@ public class ReplayControlsView extends ConstraintLayout {
             return;
         }
 
-        boolean keepPlaying;
+        ReplayTimelineController controller = getTimelineController();
+
         boolean mustPause;
+        boolean keepPlaying;
 
         boolean playForward = playDirection == ActionPlayDirection.Forward;
         if (playMode == ActionPlayMode.SingleTurn) {
-            keepPlaying = (!playForward && !isTurnStart()) || (playForward && !isTurnEnd());
-            mustPause = !keepPlaying;
+            mustPause = playForward ? controller.isAtTurnEnd() : controller.isAtTurnStart();
+            keepPlaying = !mustPause;
         } else {
             keepPlaying = playMode == ActionPlayMode.Playing;
-            mustPause = playMode == ActionPlayMode.SingleAction;
+            mustPause = !keepPlaying && playMode == ActionPlayMode.SingleAction;
         }
 
         if (keepPlaying) {
@@ -369,18 +367,21 @@ public class ReplayControlsView extends ConstraintLayout {
             return;
         }
 
-        if (!hasNextAction()) {
+        ReplayTimelineController controller = getTimelineController();
+
+        if (!controller.hasNextAction()) {
             doPause();
             return;
         }
-        int nextActionIndex = lastActionIndex + 1;
 
         actionInProgress = true;
         playDirection = ActionPlayDirection.Forward;
 
-        IGameAction actionToPlay = actions.get(nextActionIndex);
+        IGameAction actionToPlay = controller.moveToNextAction();
         GameActionHandlerFactory.create(game, actionToPlay).doAction();
-        setLastActionIndex(nextActionIndex);
+
+        // TODO - handle warnings
+        notifyTimelinePositionChanged();
 
         if (controlsListener == null) {
             throw new IllegalStateException("Listener required to play actions");
@@ -393,31 +394,26 @@ public class ReplayControlsView extends ConstraintLayout {
             return;
         }
 
-        if (!hasPreviousAction()) {
+        ReplayTimelineController controller = getTimelineController();
+
+        if (!controller.hasPreviousAction()) {
             doPause();
             return;
         }
 
-        int previousActionIndex = lastActionIndex - 1;
-
         actionInProgress = true;
         playDirection = ActionPlayDirection.Backward;
 
-        IGameAction actionToReverse = actions.get(lastActionIndex);
+        IGameAction actionToReverse = controller.moveToPreviousAction();
         GameActionHandlerFactory.create(game, actionToReverse).undoAction();
-        setLastActionIndex(previousActionIndex);
+
+        // TODO - handle warnings
+        notifyTimelinePositionChanged();
 
         if (controlsListener == null) {
             throw new IllegalStateException("Listener required to play actions");
         }
         controlsListener.onActionPlayed(actionToReverse, true, this::doOnActionEnd);
-    }
-
-    private void setLastActionIndex(int lastActionIndex) {
-        this.lastActionIndex = lastActionIndex;
-        skbReplay.setProgress(lastActionIndex + 1);
-
-        updateControlsState();
     }
 
     private void jumpToAction(int jumpActionIndex) {
@@ -430,22 +426,27 @@ public class ReplayControlsView extends ConstraintLayout {
     }
 
     private void doJumpToAction(int jumpActionIndex) {
-        if (jumpActionIndex == lastActionIndex) {
+        ReplayTimelineController controller = getTimelineController();
+
+        if (jumpActionIndex == controller.getCurrentActionIndex()) {
             return;
         }
 
         Game jumpGame = GameFactory.create(startHistory);
 
-        if (jumpActionIndex != NO_ACTION_INDEX) {
-            for (int i = 0; i <= jumpActionIndex; i++) {
-                IGameAction action = actions.get(i);
-                GameActionHandler handler = GameActionHandlerFactory.create(jumpGame, action);
-                handler.doAction();
-            }
+        for (int i = 0; i <= jumpActionIndex; i++) {
+            IGameAction action = controller.getAction(i);
+
+            GameActionHandler handler = GameActionHandlerFactory.create(jumpGame, action);
+
+            handler.doAction();
+            // TODO - handle warnings
         }
 
         game = jumpGame;
-        setLastActionIndex(jumpActionIndex);
+
+        controller.jumpTo(jumpActionIndex);
+        notifyTimelinePositionChanged();
 
         if (controlsListener == null) {
             throw new IllegalStateException("Listener required during replay jump");

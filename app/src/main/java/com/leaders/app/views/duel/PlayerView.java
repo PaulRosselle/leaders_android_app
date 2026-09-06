@@ -1,7 +1,11 @@
 package com.leaders.app.views.duel;
 
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.View;
+import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -13,8 +17,12 @@ import com.leaders.app.enums.LeaderType;
 import com.leaders.gamelogic.entities.Player;
 
 public abstract class PlayerView extends ConstraintLayout {
-    protected ImageView imvLeader;
-    protected TextView txvName;
+    private static final int WARNING_ANIMATION_DURATION = 800;
+
+    private final ImageView imvLeader;
+    private final ImageView imvWarning;
+    private final TextView txvName;
+    private final ObjectAnimator animator;
 
     public PlayerView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -22,12 +30,20 @@ public abstract class PlayerView extends ConstraintLayout {
         inflate(context, getLayoutResId(), this);
 
         imvLeader = findViewById(getImvLeaderResId());
+        imvWarning = findViewById(getImvWarningResId());
         txvName = findViewById(getTxvPlayerNameResId());
+
+        animator = ObjectAnimator.ofFloat(imvWarning, ALPHA, 1f, 0.5f, 1f);
+        animator.setDuration(WARNING_ANIMATION_DURATION);
+        animator.setInterpolator(new LinearInterpolator());
+        animator.setRepeatCount(ValueAnimator.INFINITE);
+        animator.setRepeatMode(ValueAnimator.RESTART);
     }
 
     protected abstract int getLayoutResId();
 
     protected abstract int getImvLeaderResId();
+    protected abstract int getImvWarningResId();
 
     protected abstract int getTxvPlayerNameResId();
 
@@ -39,5 +55,26 @@ public abstract class PlayerView extends ConstraintLayout {
         txvName.setText(player.getName());
         imvLeader.setImageResource(getLeaderResId(leaderType));
         imvLeader.setBackgroundResource(getBackgroundResId(player));
+    }
+
+    public void setWarningVisible(boolean visible) {
+        imvWarning.setVisibility(visible ? View.VISIBLE : View.GONE);
+        if (visible) {
+            startAnimaton();
+        } else {
+            stopAnimation();
+        }
+    }
+
+    private void startAnimaton() {
+        if (animator.isStarted()) {
+            stopAnimation();
+        }
+        animator.start();
+    }
+
+    public void stopAnimation() {
+        animator.cancel();
+        imvWarning.setAlpha(1f);
     }
 }
