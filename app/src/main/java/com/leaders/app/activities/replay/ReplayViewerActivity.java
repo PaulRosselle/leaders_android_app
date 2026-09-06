@@ -438,7 +438,13 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
 
     @Override
     public void onActionPlayed(@NonNull IGameAction action, boolean playInReverse, @NonNull Runnable onActionEnd) {
-        if (GameActionUtils.isAnimatable(action)) {
+        if (!GameActionUtils.isAnimatable(action)) {
+            return;
+        }
+
+        if (action instanceof BanishmentAction) {
+            animateBanishment((BanishmentAction) action, playInReverse, onActionEnd);
+        } else {
             IGameAction actionToPlay;
             if (playInReverse && GameActionUtils.isReversible(action)) {
                 actionToPlay = GameActionUtils.reverse(action);
@@ -447,11 +453,6 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
             }
 
             GameActionUtils.animate(bdvBoard, actionToPlay, onActionEnd, animationSpeed);
-
-        } else if (action instanceof BanishmentAction) {
-            animateBanishment((BanishmentAction) action, playInReverse, onActionEnd);
-        } else {
-            throw new IllegalStateException("Action type \"" + action.getActionType() + "\" not handled by the replay viewer");
         }
 
         updateCards();

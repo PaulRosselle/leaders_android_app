@@ -186,7 +186,7 @@ public class ReplayControlsView extends ConstraintLayout {
 
     private void addPhaseActions(@NonNull IPhase phase, @NonNull TeamColor teamColor) {
         for (IGameAction action : phase.getActions()) {
-            if (GameActionUtils.isAnimatable(action) || action.getActionType() == GameActionType.Banishment) {
+            if (GameActionUtils.isAnimatable(action)) {
                 actions.add(action);
                 actionsTeamColors.add(teamColor);
             }

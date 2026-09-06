@@ -37,7 +37,8 @@ public final class GameActionUtils {
     public static boolean isAnimatable(@NonNull IGameAction action) {
         return List.of(
                 GameActionType.CharacterAction,
-                GameActionType.Recruitment
+                GameActionType.Recruitment,
+                GameActionType.Banishment
         ).contains(action.getActionType());
     }
 
