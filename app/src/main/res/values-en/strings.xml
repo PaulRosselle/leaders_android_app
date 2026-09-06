@@ -187,5 +187,7 @@
     <string name="no_animation_speed">No animation</string>
     <string name="switch_side">Switch sides</string>
     <string name="character_cards">Character cards</string>
+    <string name="barrage_warning_title">Warning received: Barrage</string>
+    <string name="barrage_warning_message">Receiving two consecutive warnings of this type ends the game.</string>
 
 </resources>

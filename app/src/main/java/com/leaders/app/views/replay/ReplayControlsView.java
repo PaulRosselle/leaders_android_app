@@ -16,14 +16,15 @@ import com.leaders.app.entities.ReplaySave;
 import com.leaders.app.entities.replay.ReplayTimelineController;
 import com.leaders.app.utilities.ButtonUtils;
 import com.leaders.gamelogic.actions.IGameAction;
+import com.leaders.gamelogic.actions.WarningAction;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.factories.GameActionHandlerFactory;
 import com.leaders.gamelogic.factories.GameFactory;
-import com.leaders.gamelogic.handlers.GameActionHandler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -45,8 +46,6 @@ public class ReplayControlsView extends ConstraintLayout {
         Forward,
         Backward
     }
-
-    private static final int NO_ACTION_INDEX = -1;
 
     private final SeekBar skbReplay;
     private final MaterialButton btnPlayPause;
@@ -250,12 +249,11 @@ public class ReplayControlsView extends ConstraintLayout {
     //endregion
 
     private void doPlay() {
-
         ReplayTimelineController controller = getTimelineController();
 
         if (!controller.hasNextAction()) {
             controller.reset();
-            jumpToAction(NO_ACTION_INDEX); // TODO - revoir
+            notifyTimelinePositionChanged();
         }
 
         playMode = ActionPlayMode.Playing;
@@ -380,7 +378,10 @@ public class ReplayControlsView extends ConstraintLayout {
         IGameAction actionToPlay = controller.moveToNextAction();
         GameActionHandlerFactory.create(game, actionToPlay).doAction();
 
-        // TODO - handle warnings
+        for (WarningAction warningAction : controller.getWarningActions()) {
+            GameActionHandlerFactory.create(game, warningAction).doAction();
+        }
+
         notifyTimelinePositionChanged();
 
         if (controlsListener == null) {
@@ -404,10 +405,14 @@ public class ReplayControlsView extends ConstraintLayout {
         actionInProgress = true;
         playDirection = ActionPlayDirection.Backward;
 
+        // We undo warning actions before moving to the previous one
+        for (WarningAction warningAction : controller.getWarningActions()) {
+            GameActionHandlerFactory.create(game, warningAction).undoAction();
+        }
+
         IGameAction actionToReverse = controller.moveToPreviousAction();
         GameActionHandlerFactory.create(game, actionToReverse).undoAction();
 
-        // TODO - handle warnings
         notifyTimelinePositionChanged();
 
         if (controlsListener == null) {
@@ -436,11 +441,12 @@ public class ReplayControlsView extends ConstraintLayout {
 
         for (int i = 0; i <= jumpActionIndex; i++) {
             IGameAction action = controller.getAction(i);
+            GameActionHandlerFactory.create(jumpGame, action).doAction();
 
-            GameActionHandler handler = GameActionHandlerFactory.create(jumpGame, action);
-
-            handler.doAction();
-            // TODO - handle warnings
+            List<WarningAction> warningActions = controller.getWarningActions(i);
+            for (WarningAction warningAction : warningActions) {
+                GameActionHandlerFactory.create(jumpGame, warningAction).doAction();
+            }
         }
 
         game = jumpGame;

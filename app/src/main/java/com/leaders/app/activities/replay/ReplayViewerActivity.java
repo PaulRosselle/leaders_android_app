@@ -422,6 +422,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
 
     private void onChangeBoardOrientationClick(View v) {
         setPlayerPerspective(playerPerspective.getOpposite());
+        updatePlayerWarnings();
         setActionsVisible(false);
     }
 

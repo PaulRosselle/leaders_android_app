@@ -11,13 +11,15 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.leaders.R;
 import com.leaders.app.enums.LeaderType;
 import com.leaders.gamelogic.entities.Player;
 
 public abstract class PlayerView extends ConstraintLayout {
-    private static final int WARNING_ANIMATION_DURATION = 800;
+    private static final int WARNING_ANIMATION_DURATION = 3000;
 
     private final ImageView imvLeader;
     private final ImageView imvWarning;
@@ -38,6 +40,8 @@ public abstract class PlayerView extends ConstraintLayout {
         animator.setInterpolator(new LinearInterpolator());
         animator.setRepeatCount(ValueAnimator.INFINITE);
         animator.setRepeatMode(ValueAnimator.RESTART);
+
+        imvWarning.setOnLongClickListener(this::onWarningLongClick);
     }
 
     protected abstract int getLayoutResId();
@@ -55,6 +59,18 @@ public abstract class PlayerView extends ConstraintLayout {
         txvName.setText(player.getName());
         imvLeader.setImageResource(getLeaderResId(leaderType));
         imvLeader.setBackgroundResource(getBackgroundResId(player));
+    }
+
+    public boolean onWarningLongClick(View v) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.alert_dialog_theme);
+
+        builder.setTitle(R.string.barrage_warning_title);
+        builder.setMessage(R.string.barrage_warning_message);
+        builder.setPositiveButton(R.string.ok, null);
+
+        builder.show();
+
+        return true;
     }
 
     public void setWarningVisible(boolean visible) {

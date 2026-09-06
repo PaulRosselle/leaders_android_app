@@ -3,12 +3,14 @@ package com.leaders.app.entities.replay;
 import androidx.annotation.NonNull;
 
 import com.leaders.gamelogic.actions.IGameAction;
+import com.leaders.gamelogic.actions.WarningAction;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.historyentries.IHistoryEntry;
 import com.leaders.gamelogic.historyentries.segments.BanishmentPhase;
 import com.leaders.gamelogic.historyentries.segments.Turn;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public final class ReplayTimelineController {
@@ -56,6 +58,18 @@ public final class ReplayTimelineController {
         return currentActionIndex >= 0;
     }
 
+    public List<WarningAction> getWarningActions() {
+        return getWarningActions(currentActionIndex);
+    }
+
+    public List<WarningAction> getWarningActions(int actionIndex) {
+        if (!isAtTurnEnd(actionIndex)) {
+            return Collections.emptyList();
+        }
+
+        return timeline.getSegmentForAction(actionIndex).getWarningActions();
+    }
+
     @NonNull
     public IGameAction moveToNextAction() {
         if (!hasNextAction()) {
@@ -89,16 +103,20 @@ public final class ReplayTimelineController {
         currentActionIndex = actionIndex;
     }
 
-    public boolean isAtTurnEnd() {
-        if (currentActionIndex == START_INDEX) {
+    public boolean isAtTurnEnd(int actionIndex) {
+        if (actionIndex == START_INDEX) {
             return false;
         }
 
-        if (!hasNextAction()) {
+        if (actionIndex >= timeline.getActionCount()) {
             return true;
         }
 
-        return !isSameSegment(currentActionIndex, currentActionIndex + 1);
+        return !isSameSegment(actionIndex, actionIndex + 1);
+    }
+
+    public boolean isAtTurnEnd() {
+        return isAtTurnEnd(currentActionIndex);
     }
 
     public boolean isAtTurnStart() {
