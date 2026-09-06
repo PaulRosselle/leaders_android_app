@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="rules_chapter_names">
+        <item>@string/rules_chapter_res_intro</item>
+        <item>@string/rules_chapter_res_win_the_game</item>
+        <item>@string/rules_chapter_res_turn</item>
+        <item>@string/rules_chapter_res_characters</item>
+        <item>@string/rules_chapter_res_game_modes</item>
+        <item>@string/rules_chapter_res_barrage</item>
+        <item>@string/rules_chapter_res_faq</item>
+    </string-array>
+</resources>

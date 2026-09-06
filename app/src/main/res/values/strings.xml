@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name" translatable="false">Leaders</string>
-    <string name="app_version" translatable="false">v0.6.0</string>
+    <string name="app_version" translatable="false">v0.7.0</string>
     <string name="rules">règles</string>
     <string name="settings">options</string>
     <string name="puzzles">puzzles</string>
@@ -191,4 +191,25 @@
     <string name="character_cards">Cartes de personnages</string>
     <string name="barrage_warning_title">Avertissement reçu : Barrage</string>
     <string name="barrage_warning_message">Recevoir deux avertissements de ce type d\'affilé met fin à la partie.</string>
+    <string name="rules_chapter_res_intro">I.\t\t\t\t but du jeu</string>
+    <string name="rules_chapter_res_win_the_game">II.\t\t\t gagner la partie</string>
+    <string name="rules_chapter_res_turn">III.\t\t tour de jeu</string>
+    <string name="rules_chapter_res_characters">IV.\t\t personnages</string>
+    <string name="rules_chapter_res_game_modes">V.\t\t\t modes de jeu</string>
+    <string name="rules_chapter_res_barrage">VI.\t règle de barrage</string>
+    <string name="rules_chapter_res_faq">VII.\t f.a.q</string>
+    <string name="rules_chapter_intro">but du jeu</string>
+    <string name="rules_chapter_win_the_game">gagner la partie</string>
+    <string name="rules_chapter_turn">tour de jeu</string>
+    <string name="rules_chapter_characters">personnages</string>
+    <string name="rules_chapter_game_modes">modes de jeu</string>
+    <string name="rules_chapter_barrage">règle de barrage</string>
+    <string name="rules_chapter_faq">f.a.q</string>
+    <string name="rules_chapter_number_intro" translatable="false">I.</string>
+    <string name="rules_chapter_number_win_the_game" translatable="false">II.</string>
+    <string name="rules_chapter_number_turn" translatable="false">III.</string>
+    <string name="rules_chapter_number_characters" translatable="false">IV.</string>
+    <string name="rules_chapter_number_game_modes" translatable="false">V.</string>
+    <string name="rules_chapter_number_barrage" translatable="false">VI.</string>
+    <string name="rules_chapter_number_faq" translatable="false">VII.</string>
 </resources>
