@@ -44,6 +44,7 @@ import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.GameActionType;
 import com.leaders.gamelogic.enums.RecruitmentMotionType;
 import com.leaders.gamelogic.enums.TeamColor;
+import com.leaders.gamelogic.enums.WarningType;
 
 import java.util.List;
 import java.util.Objects;
@@ -329,9 +330,28 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
     }
 
     private void updateCards() {
+        updateCards(rcvControls.getReplayGame());
+    }
+
+
+    private void updateCards(@NonNull Game game) {
         if (showCards) {
-            ravCards.updatePortraits(rcvControls.getReplayGame(), replaySave.getGameMode());
+            ravCards.updatePortraits(game, replaySave.getGameMode());
         }
+    }
+
+
+    private void updatePlayerWarnings() {
+        updatePlayerWarnings(rcvControls.getReplayGame());
+    }
+
+    private void updatePlayerWarnings(@NonNull Game game) {
+        ptvTopPlayer.setWarningVisible(
+                game.getPlayerWarningCount(playerPerspective.getOpposite(), WarningType.Barrage) > 0
+        );
+        pbvBottomPlayer.setWarningVisible(
+                game.getPlayerWarningCount(playerPerspective, WarningType.Barrage) > 0
+        );
     }
 
     private void setShowCards(boolean showCards) {
@@ -402,6 +422,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
 
     private void onChangeBoardOrientationClick(View v) {
         setPlayerPerspective(playerPerspective.getOpposite());
+        updatePlayerWarnings();
         setActionsVisible(false);
     }
 
@@ -432,8 +453,8 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
     @Override
     public void onReplayLoaded(@NonNull Game game) {
         bdvBoard.setBoard(game.getBoard());
-        ravCards.updatePortraits(game, replaySave.getGameMode());
-        updateCards();
+        updateCards(game);
+        updatePlayerWarnings(game);
     }
 
     @Override
@@ -456,6 +477,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
         }
 
         updateCards();
+        updatePlayerWarnings();
     }
 
     //endregion

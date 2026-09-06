@@ -189,4 +189,6 @@
     <string name="no_animation_speed">Pas d\'animation</string>
     <string name="switch_side">Changer de camp</string>
     <string name="character_cards">Cartes de personnages</string>
+    <string name="barrage_warning_title">Avertissement reçu : Barrage</string>
+    <string name="barrage_warning_message">Recevoir deux avertissements de ce type d\'affilé met fin à la partie.</string>
 </resources>

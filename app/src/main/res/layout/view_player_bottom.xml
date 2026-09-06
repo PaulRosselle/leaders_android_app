@@ -37,6 +37,21 @@
         app:layout_constraintVertical_bias="0.0"
         app:srcCompat="@drawable/player_bottom_king" />
 
+    <ImageView
+        android:id="@+id/imvWarning_actPlayerBottom"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:importantForAccessibility="no"
+        android:scaleType="fitStart"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/player_bottom_warning" />
+
     <TextView
         android:id="@+id/txvPlayerName_vwPlayerBottom"
         android:layout_width="wrap_content"

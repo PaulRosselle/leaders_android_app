@@ -41,6 +41,7 @@ import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.Player;
+import com.leaders.gamelogic.entities.PlayerWarningState;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.GamePhaseType;
@@ -514,10 +515,16 @@ public final class DuelPlayerActivity extends BaseActivity implements
 
         bdvBoard.setOrientation(TeamColorUtils.getOrientation(currentPlayer.getTeamColor()));
 
+        List<PlayerWarningState> warningStates = gameContext.getPlayerWarningStates();
+
         Board board = gameContext.getBoard();
         pbvCurrentPlayer.setPlayer(currentPlayer, getPlayerLeaderType(currentPlayer, board));
+        pbvCurrentPlayer.setWarningVisible(playerHasWarnings(currentPlayer, warningStates));
+
         Player opposingPlayer = gameContext.getOpposingPlayer();
+
         ptvOpposingPlayer.setPlayer(opposingPlayer, getPlayerLeaderType(opposingPlayer, board));
+        ptvOpposingPlayer.setWarningVisible(playerHasWarnings(opposingPlayer, warningStates));
     }
 
     private boolean isPlayerNameFirstCharVowel(@NonNull String playerName) {
@@ -558,6 +565,18 @@ public final class DuelPlayerActivity extends BaseActivity implements
         } else {
             chdNewCharacter.stopHighlightAnimation();
         }
+    }
+
+    private boolean playerHasWarnings(@NonNull Player player,
+                                      @NonNull List<PlayerWarningState> warningStates) {
+        for (PlayerWarningState warningState : warningStates) {
+            if (warningState.getPlayerTeamColor() == player.getTeamColor() &&
+                    warningState.getWarningCount() > 0) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     //endregion
