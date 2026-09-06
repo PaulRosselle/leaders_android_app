@@ -439,7 +439,7 @@ public class ReplayControlsView extends ConstraintLayout {
 
         Game jumpGame = GameFactory.create(startHistory);
 
-        for (int i = 0; i <= jumpActionIndex; i++) {
+        for (int i = 0; i < jumpActionIndex; i++) {
             IGameAction action = controller.getAction(i);
             GameActionHandlerFactory.create(jumpGame, action).doAction();
 
