@@ -189,12 +189,18 @@
     <string name="character_cards">Character cards</string>
     <string name="barrage_warning_title">Warning received: Barrage</string>
     <string name="barrage_warning_message">Receiving two consecutive warnings of this type ends the game.</string>
-    <string name="rules_chapter_intro">i.\t\t\t but du jeu</string>
-    <string name="rules_chapter_win_the_game">ii.\t\t\t win the game</string>
-    <string name="rules_chapter_turn">iii.\t\t game turn</string>
-    <string name="rules_chapter_characters">v.\t\t characters</string>
-    <string name="rules_chapter_game_modes">vi.\t\t game modes</string>
-    <string name="rules_chapter_barrage">vii.\t barrage rules</string>
-    <string name="rules_chapter_faq">viii.\t f.a.q</string>
-
+    <string name="rules_chapter_res_intro">I.\t\t\t\t introduction</string>
+    <string name="rules_chapter_res_win_the_game">II.\t\t\t win the game</string>
+    <string name="rules_chapter_res_turn">III.\t\t game turn</string>
+    <string name="rules_chapter_res_characters">IV.\t\t characters</string>
+    <string name="rules_chapter_res_game_modes">V.\t\t\t game modes</string>
+    <string name="rules_chapter_res_barrage">VI.\t barrage rules</string>
+    <string name="rules_chapter_res_faq">VII.\t f.a.q</string>
+    <string name="rules_chapter_intro">introduction</string>
+    <string name="rules_chapter_win_the_game">win the game</string>
+    <string name="rules_chapter_turn">game turn</string>
+    <string name="rules_chapter_characters">characters</string>
+    <string name="rules_chapter_game_modes">game modes</string>
+    <string name="rules_chapter_barrage">barrage rules</string>
+    <string name="rules_chapter_faq">f.a.q</string>
 </resources>
