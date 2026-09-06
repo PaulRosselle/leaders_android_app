@@ -26,6 +26,7 @@ public final class PortraitGroupView extends LinearLayout {
     private OnClickListener onPortraitClickListener;
     private OnLongClickListener onPortraitLongClickListener;
     private int portraitSpacing;
+    private PortraitView.DisplayMode displayMode;
 
 
     public PortraitGroupView(Context context, @Nullable AttributeSet attrs) {
@@ -34,6 +35,7 @@ public final class PortraitGroupView extends LinearLayout {
         onPortraitClickListener = null;
         onPortraitLongClickListener = null;
         portraitSpacing = PORTRAIT_DEFAULT_MARGIN;
+        displayMode = PortraitView.DisplayMode.Default;
 
         try (TypedArray customAttrs = context.obtainStyledAttributes(attrs, R.styleable.PortraitGroupView)) {
             int groupSize = customAttrs.getInteger(R.styleable.PortraitGroupView_maxGroupSize, 6);
@@ -60,6 +62,7 @@ public final class PortraitGroupView extends LinearLayout {
             } else {
                 portraitView.setVisibility(INVISIBLE);
             }
+            portraitView.setDisplayMode(displayMode);
 
             addView(portraitView, getPortraitLayoutParams());
             portraitViews.add(portraitView);
@@ -84,6 +87,13 @@ public final class PortraitGroupView extends LinearLayout {
         this.portraitSpacing = portraitSpacing;
         for (PortraitView ptvPortrait : portraitViews) {
             ptvPortrait.setLayoutParams(getPortraitLayoutParams());
+        }
+    }
+
+    public void setDisplayMode(@NonNull PortraitView.DisplayMode displayMode) {
+        this.displayMode = displayMode;
+        for (PortraitView ptvPortrait : portraitViews) {
+            ptvPortrait.setDisplayMode(displayMode);
         }
     }
 

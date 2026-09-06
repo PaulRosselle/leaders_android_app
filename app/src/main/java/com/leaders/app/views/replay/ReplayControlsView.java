@@ -19,6 +19,7 @@ import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
+import com.leaders.gamelogic.enums.GameActionType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.factories.GameActionHandlerFactory;
 import com.leaders.gamelogic.factories.GameFactory;
@@ -186,7 +187,7 @@ public class ReplayControlsView extends ConstraintLayout {
 
     private void addPhaseActions(@NonNull IPhase phase, @NonNull TeamColor teamColor) {
         for (IGameAction action : phase.getActions()) {
-            if (GameActionUtils.isAnimatable(action)) {
+            if (GameActionUtils.isAnimatable(action) || action.getActionType() == GameActionType.Banishment) {
                 actions.add(action);
                 actionsTeamColors.add(teamColor);
             }
@@ -319,7 +320,8 @@ public class ReplayControlsView extends ConstraintLayout {
 
     private boolean isTurnStart() {
         return !hasPreviousAction() ||
-                actionsTeamColors.get(lastActionIndex) != actionsTeamColors.get(lastActionIndex - 1);
+                (lastActionIndex > 0 &&
+                        actionsTeamColors.get(lastActionIndex) != actionsTeamColors.get(lastActionIndex - 1));
     }
 
     private void doOnActionEnd() {

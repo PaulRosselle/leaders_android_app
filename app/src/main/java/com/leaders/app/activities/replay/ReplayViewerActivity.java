@@ -12,6 +12,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
+import com.leaders.app.animators.BanishmentActionAnimator;
 import com.leaders.app.entities.ReplaySave;
 import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
@@ -28,9 +29,11 @@ import com.leaders.app.views.character.CharacterNotificationView;
 import com.leaders.app.views.character.CharacterView;
 import com.leaders.app.views.duel.PlayerBottomView;
 import com.leaders.app.views.duel.PlayerTopView;
+import com.leaders.app.views.duel.PlayerView;
 import com.leaders.app.views.replay.ReplayCardsView;
 import com.leaders.app.views.replay.ReplayControlsView;
 import com.leaders.app.views.settings.AnimationSpeedView;
+import com.leaders.gamelogic.actions.BanishmentAction;
 import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.actions.RecruitmentAction;
 import com.leaders.gamelogic.actions.RecruitmentActionMotion;
@@ -90,6 +93,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
     private TextView txvReplayName;
     private PlayerTopView ptvTopPlayer;
     private PlayerBottomView pbvBottomPlayer;
+    private PortraitView ptvBannedPortrait;
 
     private MaterialButton btnActions;
     private ActionsMenuView amvActions;
@@ -117,6 +121,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
         txvReplayName = findViewById(R.id.txvReplayName_actReplayViewer);
         ptvTopPlayer = findViewById(R.id.ptvTopPlayer_actReplayViewer);
         pbvBottomPlayer = findViewById(R.id.pbvBottomPlayer_actReplayViewer);
+        ptvBannedPortrait = findViewById(R.id.ptvBannedPortrait_actReplayViewer);
 
         btnActions = findViewById(R.id.btnActions_actReplayViewer);
         amvActions = findViewById(R.id.amvActions_actReplayViewer);
@@ -432,19 +437,69 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
 
     @Override
     public void onActionPlayed(@NonNull IGameAction action, boolean playInReverse, @NonNull Runnable onActionEnd) {
-        if (!GameActionUtils.isAnimatable(action)) {
-            return;
-        }
+        if (GameActionUtils.isAnimatable(action)) {
+            IGameAction actionToPlay;
+            if (playInReverse && GameActionUtils.isReversible(action)) {
+                actionToPlay = GameActionUtils.reverse(action);
+            } else {
+                actionToPlay = action;
+            }
 
-        IGameAction actionToPlay;
-        if (playInReverse && GameActionUtils.isReversible(action)) {
-            actionToPlay = GameActionUtils.reverse(action);
+            GameActionUtils.animate(bdvBoard, actionToPlay, onActionEnd, animationSpeed);
+
+        } else if (action instanceof BanishmentAction) {
+            animateBanishment((BanishmentAction) action, playInReverse, onActionEnd);
         } else {
-            actionToPlay = action;
+            throw new IllegalStateException("Action type \"" + action.getActionType() + "\" not handled by the replay viewer");
         }
 
-        GameActionUtils.animate(bdvBoard, actionToPlay, onActionEnd, animationSpeed);
         updateCards();
+    }
+
+    //endregion
+
+    //region BANISHMENT ANIMATION METHODS
+
+    private void animateBanishment(@NonNull BanishmentAction action,
+                                   boolean playInReverse,
+                                   @NonNull Runnable onActionEnd) {
+        if (ptvBannedPortrait.getWidth() <= 0 || ptvBannedPortrait.getHeight() <= 0) {
+            throw new IllegalStateException("Cannot animate banishment: banned portrait has not been measured yet");
+        }
+
+        PlayerView playerBanView = playerPerspective == action.getTeamColor() ? pbvBottomPlayer : ptvTopPlayer;
+
+        int[] boardLocation = new int[2];
+        int[] playerLocation = new int[2];
+
+        bdvBoard.getLocationOnScreen(boardLocation);
+        playerBanView.getLocationOnScreen(playerLocation);
+
+        float portraitWidth = ptvBannedPortrait.getWidth();
+        float portraitHeight = ptvBannedPortrait.getHeight();
+
+        float[] boardPosition = offsetToViewCenter(boardLocation, bdvBoard, portraitWidth, portraitHeight);
+        float[] playerPosition = offsetToViewCenter(playerLocation, playerBanView, portraitWidth, portraitHeight);
+
+        new BanishmentActionAnimator(animationSpeed).animate(
+                getBanishmentMotionType(playInReverse),
+                ptvBannedPortrait, boardPosition, playerPosition,
+                action.getCharacterCard(), onActionEnd
+        );
+    }
+
+    private BanishmentActionAnimator.BanishmentMotionType getBanishmentMotionType(boolean isReversedBan) {
+        return isReversedBan ?
+                BanishmentActionAnimator.BanishmentMotionType.Unban :
+                BanishmentActionAnimator.BanishmentMotionType.Ban;
+    }
+
+    private float[] offsetToViewCenter(@NonNull int[] basePosition, @NonNull View offsetView,
+                                       float viewWidth, float viewHeight) {
+        return new float[]{
+                basePosition[0] + offsetView.getWidth() / 2f - viewWidth / 2f,
+                basePosition[1] + offsetView.getHeight() / 2f - viewHeight / 2f
+        };
     }
 
     //endregion

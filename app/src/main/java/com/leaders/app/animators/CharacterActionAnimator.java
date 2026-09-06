@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public final class CharacterActionAnimator extends ActionAnimator<CharacterAction> {
+public final class CharacterActionAnimator extends ActionAnimator {
     private static final int DURATION_ADD = 200;
     private static final int DURATION_REMOVE = 200;
     private static final int DURATION_MOVE = 400;
@@ -46,7 +46,6 @@ public final class CharacterActionAnimator extends ActionAnimator<CharacterActio
         super(speed);
     }
 
-    @Override
     public void animate(@NonNull BoardView boardView, 
                         @NonNull CharacterAction action,
                         @Nullable Runnable onAnimationEnd) {
@@ -135,8 +134,8 @@ public final class CharacterActionAnimator extends ActionAnimator<CharacterActio
     }
 
     private void animateMoveCharacter(@NonNull BoardView boardView,
-                                             @NonNull List<CharacterActionTarget> targets,
-                                             @Nullable Runnable onAnimationEnd) {
+                                      @NonNull List<CharacterActionTarget> targets,
+                                      @Nullable Runnable onAnimationEnd) {
         List<Position> originPositions = new ArrayList<>();
         List<Position> destinationPositions = new ArrayList<>();
 
@@ -162,8 +161,8 @@ public final class CharacterActionAnimator extends ActionAnimator<CharacterActio
     }
 
     private void animateTeleportCharacter(@NonNull BoardView boardView,
-                                                 @NonNull List<CharacterActionTarget> targets,
-                                                 @Nullable Runnable onAnimationEnd) {
+                                          @NonNull List<CharacterActionTarget> targets,
+                                          @Nullable Runnable onAnimationEnd) {
         int respawnDelay = DURATION_TELEPORT / 6;
         int fadingDuration = DURATION_TELEPORT / 2 - respawnDelay;
 
@@ -215,8 +214,8 @@ public final class CharacterActionAnimator extends ActionAnimator<CharacterActio
     }
 
     private void animatePushCharacter(@NonNull BoardView boardView,
-                                             @NonNull List<CharacterActionTarget> targets,
-                                             @Nullable Runnable onAnimationEnd) {
+                                      @NonNull List<CharacterActionTarget> targets,
+                                      @Nullable Runnable onAnimationEnd) {
         if (targets.size() != 2) {
             throw new IllegalArgumentException("Invalid push motion : expected exactly 2 targets");
         }
@@ -346,14 +345,14 @@ public final class CharacterActionAnimator extends ActionAnimator<CharacterActio
     }
 
     private void animateSwapCharacter(@NonNull BoardView boardView,
-                                             @NonNull List<CharacterActionTarget> targets,
-                                             @Nullable Runnable onAnimationEnd) {
+                                      @NonNull List<CharacterActionTarget> targets,
+                                      @Nullable Runnable onAnimationEnd) {
         animateMoveCharacter(boardView, targets, onAnimationEnd);
     }
 
     private void animateJumpCharacter(@NonNull BoardView boardView,
-                                             @NonNull List<CharacterActionTarget> targets,
-                                             @Nullable Runnable onAnimationEnd) {
+                                      @NonNull List<CharacterActionTarget> targets,
+                                      @Nullable Runnable onAnimationEnd) {
         List<Position> originPositions = new ArrayList<>();
         List<Position> destinationPositions = new ArrayList<>();
 
@@ -428,8 +427,8 @@ public final class CharacterActionAnimator extends ActionAnimator<CharacterActio
     }
 
     private void animateRemoveCharacter(@NonNull BoardView boardView,
-                                               @NonNull List<CharacterActionTarget> targets,
-                                               @Nullable Runnable onAnimationEnd) {
+                                        @NonNull List<CharacterActionTarget> targets,
+                                        @Nullable Runnable onAnimationEnd) {
         AtomicInteger remaining = new AtomicInteger(targets.size());
         Runnable onTargetAnimationEnd = () -> {
             if (remaining.decrementAndGet() == 0) {
@@ -453,8 +452,8 @@ public final class CharacterActionAnimator extends ActionAnimator<CharacterActio
     }
 
     private void animateTransformCharacter(@NonNull BoardView boardView,
-                                                  @NonNull List<CharacterActionTarget> targets,
-                                                  @Nullable Runnable onAnimationEnd) {
+                                           @NonNull List<CharacterActionTarget> targets,
+                                           @Nullable Runnable onAnimationEnd) {
         if (targets.size() != 2) {
             throw new IllegalArgumentException("Invalid transform motion : expected exactly 2 targets");
         }
@@ -569,8 +568,8 @@ public final class CharacterActionAnimator extends ActionAnimator<CharacterActio
     }
 
     private void animateFlyCharacter(@NonNull BoardView boardView,
-                                            @NonNull List<CharacterActionTarget> targets,
-                                            @Nullable Runnable onAnimationEnd) {
+                                     @NonNull List<CharacterActionTarget> targets,
+                                     @Nullable Runnable onAnimationEnd) {
         List<Position> originPositions = new ArrayList<>();
         List<Position> destinationPositions = new ArrayList<>();
 
@@ -671,8 +670,8 @@ public final class CharacterActionAnimator extends ActionAnimator<CharacterActio
     }
 
     private void animateMove(@NonNull CharacterDisplay characterDisplay,
-                                    @NonNull CellView destCellView,
-                                    @Nullable Runnable onAnimationEnd) {
+                             @NonNull CellView destCellView,
+                             @Nullable Runnable onAnimationEnd) {
         float x = destCellView.getX();
         float y = destCellView.getY();
 
@@ -693,7 +692,7 @@ public final class CharacterActionAnimator extends ActionAnimator<CharacterActio
     }
 
     private void setupForMovement(@NonNull CharacterDisplay characterDisplay,
-                                         float destX, float destY) {
+                                  float destX, float destY) {
         characterDisplay.stopHighlightAnimation();
         characterDisplay.setIsHighlighted(false, true);
         characterDisplay.bringToFront();
