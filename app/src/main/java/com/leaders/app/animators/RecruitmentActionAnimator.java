@@ -16,7 +16,7 @@ import com.leaders.gamelogic.entities.Position;
 
 import java.util.List;
 
-public final class RecruitmentActionAnimator extends ActionAnimator<RecruitmentAction> {
+public final class RecruitmentActionAnimator extends ActionAnimator {
     private static final int DURATION_ADD = 200;
     private static final int DURATION_REMOVE = 200;
 
@@ -25,14 +25,14 @@ public final class RecruitmentActionAnimator extends ActionAnimator<RecruitmentA
     }
 
     public void animate(@NonNull BoardView boardView,
-                               @NonNull RecruitmentAction action,
-                               @Nullable Runnable onAnimationEnd) {
+                        @NonNull RecruitmentAction action,
+                        @Nullable Runnable onAnimationEnd) {
         animate(boardView, action.getMotions(), onAnimationEnd);
     }
 
     public void animate(@NonNull BoardView boardView,
-                               @NonNull List<RecruitmentActionMotion> motions,
-                               @Nullable Runnable onAnimationEnd) {
+                        @NonNull List<RecruitmentActionMotion> motions,
+                        @Nullable Runnable onAnimationEnd) {
         if (motions.isEmpty()) {
             if (onAnimationEnd != null) {
                 onAnimationEnd.run();
@@ -44,8 +44,8 @@ public final class RecruitmentActionAnimator extends ActionAnimator<RecruitmentA
     }
 
     public void animate(@NonNull BoardView boardView,
-                               @NonNull RecruitmentActionMotion motion,
-                               @Nullable Runnable onAnimationEnd) {
+                        @NonNull RecruitmentActionMotion motion,
+                        @Nullable Runnable onAnimationEnd) {
         switch (motion.getMotionType()) {
             case Add: animateAddCharacter(boardView, motion, onAnimationEnd); break;
             case Remove: animateRemoveCharacter(boardView, motion, onAnimationEnd); break;
@@ -54,8 +54,8 @@ public final class RecruitmentActionAnimator extends ActionAnimator<RecruitmentA
     }
 
     private void animateMotionSequence(@NonNull BoardView boardView,
-                                              @NonNull List<RecruitmentActionMotion> motions,
-                                              int index, @Nullable Runnable onAnimationEnd) {
+                                       @NonNull List<RecruitmentActionMotion> motions,
+                                       int index, @Nullable Runnable onAnimationEnd) {
         if (index >= motions.size()) {
             if (onAnimationEnd != null) {
                 onAnimationEnd.run();
@@ -70,8 +70,8 @@ public final class RecruitmentActionAnimator extends ActionAnimator<RecruitmentA
     }
 
     private void animateAddCharacter(@NonNull BoardView boardView,
-                                            @NonNull RecruitmentActionMotion motion,
-                                            @Nullable Runnable onAnimationEnd) {
+                                     @NonNull RecruitmentActionMotion motion,
+                                     @Nullable Runnable onAnimationEnd) {
 
         Position addPos = motion.getPosition();
 
@@ -89,8 +89,8 @@ public final class RecruitmentActionAnimator extends ActionAnimator<RecruitmentA
     }
 
     private void animateRemoveCharacter(@NonNull BoardView boardView,
-                                               @NonNull RecruitmentActionMotion motion,
-                                               @Nullable Runnable onAnimationEnd) {
+                                        @NonNull RecruitmentActionMotion motion,
+                                        @Nullable Runnable onAnimationEnd) {
         final Position removePos = motion.getPosition();
 
         CharacterDisplay characterDisplay = boardView.getCharacterDisplay(removePos);

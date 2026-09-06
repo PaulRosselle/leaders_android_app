@@ -16,9 +16,9 @@ import com.leaders.app.entities.ReplaySave;
 import com.leaders.app.utilities.ButtonUtils;
 import com.leaders.app.utilities.GameActionUtils;
 import com.leaders.gamelogic.actions.IGameAction;
-import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
+import com.leaders.gamelogic.enums.GameActionType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.factories.GameActionHandlerFactory;
 import com.leaders.gamelogic.factories.GameFactory;
@@ -38,7 +38,7 @@ import java.util.Objects;
 public class ReplayControlsView extends ConstraintLayout {
     public interface ReplayControlsListener {
 
-        void onReplayLoaded(@NonNull Board board);
+        void onReplayLoaded(@NonNull Game game);
         void onActionPlayed(@NonNull IGameAction action, boolean playInReverse, @NonNull Runnable onActionEnd);
     }
 
@@ -152,7 +152,7 @@ public class ReplayControlsView extends ConstraintLayout {
         if (controlsListener == null) {
             throw new IllegalStateException("Listener required during replay loading");
         }
-        controlsListener.onReplayLoaded(game.getBoard());
+        controlsListener.onReplayLoaded(getReplayGame());
     }
 
     public Game getReplayGame() {
@@ -319,7 +319,8 @@ public class ReplayControlsView extends ConstraintLayout {
 
     private boolean isTurnStart() {
         return !hasPreviousAction() ||
-                actionsTeamColors.get(lastActionIndex) != actionsTeamColors.get(lastActionIndex - 1);
+                (lastActionIndex > 0 &&
+                        actionsTeamColors.get(lastActionIndex) != actionsTeamColors.get(lastActionIndex - 1));
     }
 
     private void doOnActionEnd() {
@@ -450,7 +451,7 @@ public class ReplayControlsView extends ConstraintLayout {
             throw new IllegalStateException("Listener required during replay jump");
         }
 
-        controlsListener.onReplayLoaded(game.getBoard());
+        controlsListener.onReplayLoaded(getReplayGame());
     }
 
     //endregion

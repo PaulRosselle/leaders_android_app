@@ -18,7 +18,7 @@ import com.leaders.gamelogic.enums.CharacterCard;
 public final class CharacterNotificationView extends ConstraintLayout {
     private static final int VISIBILITY_ANIMATION_DURATION = 200;
 
-    private final CharacterCardPortraitView ptvPortrait;
+    private final PortraitView ptvPortrait;
     private final TextView txvTitle, txvInfo;
     @Nullable
     private CharacterCard characterCard;

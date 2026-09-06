@@ -94,6 +94,18 @@
         app:layout_constraintTop_toBottomOf="@+id/btnBack_actReplayViewer"
         app:position_visible="false" />
 
+    <com.leaders.app.views.character.PortraitView
+        android:id="@+id/ptvBannedPortrait_actReplayViewer"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:visibility="invisible"
+        app:displayMode="Hexagonal"
+        app:layout_constraintBottom_toTopOf="@+id/rcvControls_actReplayViewer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnBack_actReplayViewer" />
+
     <com.leaders.app.views.duel.PlayerTopView
         android:id="@+id/ptvTopPlayer_actReplayViewer"
         android:layout_width="0dp"
@@ -154,8 +166,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0" />
 
-    <com.leaders.app.views.replay.RecruitableCardsView
-        android:id="@+id/rtvRecruitableCards_actReplayViewer"
+    <com.leaders.app.views.replay.ReplayCardsView
+        android:id="@+id/ravCards_actReplayViewer"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
