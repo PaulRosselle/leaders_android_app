@@ -15,7 +15,7 @@ import java.util.List;
 
 public final class ReplayTimelineController {
 
-    private static final int START_INDEX = -1;
+    public static final int START_INDEX = -1;
 
     @NonNull
     private final ReplayTimeline timeline;
