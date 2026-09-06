@@ -252,8 +252,7 @@ public class ReplayControlsView extends ConstraintLayout {
         ReplayTimelineController controller = getTimelineController();
 
         if (!controller.hasNextAction()) {
-            controller.reset();
-            notifyTimelinePositionChanged();
+            doJumpToAction(ReplayTimelineController.START_INDEX);
         }
 
         playMode = ActionPlayMode.Playing;
@@ -437,9 +436,9 @@ public class ReplayControlsView extends ConstraintLayout {
             return;
         }
 
-        Game jumpGame = GameFactory.create(startHistory);
+        Game jumpGame = GameFactory.create(getStartHistory());
 
-        for (int i = 0; i < jumpActionIndex; i++) {
+        for (int i = 0; i <= jumpActionIndex; i++) {
             IGameAction action = controller.getAction(i);
             GameActionHandlerFactory.create(jumpGame, action).doAction();
 
