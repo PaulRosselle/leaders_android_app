@@ -145,10 +145,7 @@ public final class MainActivity extends BaseActivity {
     }
 
     private void onRulesClick(View v) {
-        showNotImplementedDialog("v0.7.0",
-                List.of("Interactive explanation of Leaders rules",
-                        "Character introduction scenarios")
-        );
+        goToActivity(ActivityType.RulesIntro);
     }
 
     private void onSettingsClick(View v) {

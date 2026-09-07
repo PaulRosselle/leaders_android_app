@@ -1,13 +1,37 @@
 package com.leaders.app.activities.rules;
 
+import android.view.View;
+
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.leaders.R;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.RulesChapter;
+import com.leaders.app.views.rules.RulesPlayButton;
+import com.leaders.app.views.rules.RulesQuestionButton;
 
-public class RulesIntroActivity extends RulesActivity {
+public final class RulesIntroActivity extends RulesActivity {
+    private RulesPlayButton btnPlay;
+    private RulesQuestionButton btnNextStep;
+
+
+    //region BASE ACTIVITY OVERRIDEN METHODS
+
+    @Override
+    protected void initViews() {
+        super.initViews();
+
+        btnPlay = findViewById(R.id.btnPlay_actRulesIntro);
+        btnNextStep = findViewById(R.id.btnNextStep_actRUlesIntro);
+    }
+
+    @Override
+    protected void initListeners() {
+        super.initListeners();
+
+        btnPlay.setOnClickListener(this::onPlayClick);
+        btnNextStep.setOnClickListener(this::onNextStepClick);
+    }
 
     @Override
     protected int getRnvNavigationResId() {
@@ -24,7 +48,7 @@ public class RulesIntroActivity extends RulesActivity {
         return R.id.gdlRoot_actRulesIntro;
     }
 
-    @Nullable
+    @NonNull
     @Override
     protected Integer getBtnBackResId() {
         return R.id.btnBack_actRulesIntro;
@@ -40,4 +64,18 @@ public class RulesIntroActivity extends RulesActivity {
     public RulesChapter getChapter() {
         return RulesChapter.Introduction;
     }
+
+    //endregion
+
+    //region VIEW LISTENER METHODS
+
+    private void onPlayClick(View v) {
+        // TODO
+    }
+
+    private void onNextStepClick(View v) {
+        // TODO
+    }
+
+    //endregion
 }

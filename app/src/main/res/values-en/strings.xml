@@ -203,4 +203,7 @@
     <string name="rules_chapter_game_modes">game modes</string>
     <string name="rules_chapter_barrage">barrage rules</string>
     <string name="rules_chapter_faq">f.a.q</string>
+    <string name="rules_intro_principle">Leaders is a two players turn by turn board game where each opponent try to capture the enemy leader.</string>
+    <string name="leaders_intro_game_start">La partie début avec un leader à chaque extrémité de la colonne centrale du plateau.</string>
+    <string name="what_is_next">Et ensuite ?</string>
 </resources>

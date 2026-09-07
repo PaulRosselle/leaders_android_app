@@ -2,6 +2,7 @@
 <resources>
     <color name="transparent">#00000000</color>
     <color name="transparent_black">#66000000</color>
+    <color name="dark_transparent_black">#AA000000</color>
     <color name="transparent_golden">#33BA7A44</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
@@ -18,6 +19,7 @@
     <color name="track_off_golden">#3E3117</color>
     <color name="app_cyan">#3ABF97</color>
     <color name="selected_cyan">#106753</color>
+    <color name="rules_button">#279775</color>
     <color name="player_black">#151617</color>
     <color name="player_white">#F7F4F0</color>
     <color name="player_name">#CF8300</color>

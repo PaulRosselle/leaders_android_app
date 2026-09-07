@@ -15,7 +15,6 @@ import androidx.core.content.res.ResourcesCompat;
 
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
-import com.leaders.app.utilities.ButtonUtils;
 
 public class RulesQuestionButton extends MaterialButton {
     public RulesQuestionButton(@NonNull Context context, @Nullable AttributeSet attrs) {
@@ -25,17 +24,22 @@ public class RulesQuestionButton extends MaterialButton {
 
         // SHAPE
         DisplayMetrics metrics = resources.getDisplayMetrics();
-        setCornerRadius((int) dpToPx(8, metrics));
-        setPaddingRelative((int) dpToPx(8, metrics), 0, (int) dpToPx(16, metrics), 0);
+        // TODO - use static int for values
+        setCornerRadius(resources.getDimensionPixelSize(R.dimen.default_corner_radius));
+        int horizontalPadding = (int) dpToPx(16, metrics);
+        int verticalPadding = (int) dpToPx(8, metrics);
+        setPaddingRelative(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding);
         setInsetTop(0);
         setInsetBottom(0);
+        setInsetLeft(0);
+        setInsetRight(0);
 
         // STROKE
         setStrokeWidth(resources.getDimensionPixelSize(R.dimen.default_stroke_width));
         setStrokeColor(ContextCompat.getColorStateList(context, R.color.font));
 
         // BACKGROUND
-        setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.selected_golden));
+        setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.rules_button));
 
         // FONT
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);

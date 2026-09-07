@@ -212,4 +212,7 @@
     <string name="rules_chapter_number_game_modes" translatable="false">V.</string>
     <string name="rules_chapter_number_barrage" translatable="false">VI.</string>
     <string name="rules_chapter_number_faq" translatable="false">VII.</string>
+    <string name="rules_intro_principle">Leaders est un jeu de plateau au tour par tour opposant deux joueurs ayant pour objectif de capturer le leaders adverse.</string>
+    <string name="leaders_intro_game_start">La partie début avec un leader à chaque extrémité de la colonne centrale du plateau.</string>
+    <string name="what_is_next">Et ensuite ?</string>
 </resources>
