@@ -34,6 +34,7 @@ public class RulesPlayButton extends MaterialButton {
 
         // ICON
         setText("");
+        setIconTint(ContextCompat.getColorStateList(context, R.color.white));
         setIconPadding(0);
         setIconGravity(ICON_GRAVITY_TEXT_START);
         setIconResource(R.drawable.icon_play);

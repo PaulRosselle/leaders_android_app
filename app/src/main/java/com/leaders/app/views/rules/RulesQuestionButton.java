@@ -42,6 +42,7 @@ public class RulesQuestionButton extends MaterialButton {
         setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.rules_button));
 
         // FONT
+        setTextColor(resources.getColor(R.color.font, context.getTheme()));
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
         setTypeface(ResourcesCompat.getFont(context, R.font.bobby_jones_condensed));
         setIncludeFontPadding(false);

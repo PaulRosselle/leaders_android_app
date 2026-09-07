@@ -11,8 +11,8 @@
     <dimen name="dialog_button_width">88dp</dimen>
     <dimen name="main_button_size">52dp</dimen>
     <dimen name="main_button_icon_size">40dp</dimen>
-    <dimen name="play_button_size">64dp</dimen>
-    <dimen name="play_button_icon_size">64dp</dimen>
+    <dimen name="play_button_size">72dp</dimen>
+    <dimen name="play_button_icon_size">48dp</dimen>
 
     <dimen name="character_action_offset_margin">23dp</dimen>
     <dimen name="character_action_inner_margin">2dp</dimen>
