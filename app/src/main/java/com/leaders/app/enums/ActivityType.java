@@ -14,6 +14,7 @@ import com.leaders.app.activities.puzzle.PuzzleSelectionActivity;
 import com.leaders.app.activities.puzzle.PuzzleSolverActivity;
 import com.leaders.app.activities.replay.ReplaySelectionActivity;
 import com.leaders.app.activities.replay.ReplayViewerActivity;
+import com.leaders.app.activities.rules.RulesIntroActivity;
 
 import java.util.NoSuchElementException;
 
@@ -29,7 +30,9 @@ public enum ActivityType {
     DuelPlayer,
     // REPLAY
     ReplaySelection,
-    ReplayViewer;
+    ReplayViewer,
+    // RULES
+    RulesIntro;
 
     @NonNull
     public Intent getIntent(@NonNull Context context) {
@@ -43,6 +46,7 @@ public enum ActivityType {
             case DuelPlayer: return new Intent(context, DuelPlayerActivity.class);
             case ReplaySelection: return new Intent(context, ReplaySelectionActivity.class);
             case ReplayViewer: return new Intent(context, ReplayViewerActivity.class);
+            case RulesIntro: return new Intent(context, RulesIntroActivity.class);
             default: throw new NoSuchElementException(String.format("No class found matching %s", this));
         }
     }
