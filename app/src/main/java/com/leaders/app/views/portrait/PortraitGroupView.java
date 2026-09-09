@@ -9,15 +9,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.leaders.R;
-import com.leaders.gamelogic.entities.SelectableCharacterCard;
-import com.leaders.gamelogic.enums.CharacterCard;
-import com.leaders.gamelogic.enums.CharacterCardSelectionStatus;
-import com.leaders.gamelogic.interactions.InteractionTarget;
+import com.leaders.app.entities.PortraitInfo;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 public final class PortraitGroupView extends LinearLayout {
     private static final int PORTRAIT_DEFAULT_MARGIN = 2;
@@ -26,16 +22,14 @@ public final class PortraitGroupView extends LinearLayout {
     private OnClickListener onPortraitClickListener;
     private OnLongClickListener onPortraitLongClickListener;
     private int portraitSpacing;
-    private PortraitView.DisplayMode displayMode;
-
 
     public PortraitGroupView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+
         portraitViews = new ArrayList<>();
         onPortraitClickListener = null;
         onPortraitLongClickListener = null;
         portraitSpacing = PORTRAIT_DEFAULT_MARGIN;
-        displayMode = PortraitView.DisplayMode.Default;
 
         try (TypedArray customAttrs = context.obtainStyledAttributes(attrs, R.styleable.PortraitGroupView)) {
             int groupSize = customAttrs.getInteger(R.styleable.PortraitGroupView_maxGroupSize, 6);
@@ -45,7 +39,13 @@ public final class PortraitGroupView extends LinearLayout {
         setOrientation(HORIZONTAL);
     }
 
-    public void setPortraits(@NonNull List<CharacterCard> portraitCards, int groupSize) {
+    public PortraitGroupView(Context context, @NonNull List<PortraitInfo> portraitInfos, int groupSize) {
+        this(context, null);
+
+        setPortraits(portraitInfos, groupSize);
+    }
+
+    public void setPortraits(@NonNull List<PortraitInfo> portraitInfos, int groupSize) {
         // The smallest value for group max size is 2 since it wouldn't make
         // sense to create a group view for less than two portraits
         groupSize = Math.max(groupSize, 2);
@@ -56,13 +56,12 @@ public final class PortraitGroupView extends LinearLayout {
         for (int i = 0; i < groupSize; i++) {
             PortraitView portraitView = new PortraitView(getContext(), null);
 
-            if (i < portraitCards.size()) {
+            if (i < portraitInfos.size()) {
                 portraitView.setVisibility(VISIBLE);
-                portraitView.setPortraitCard(portraitCards.get(i));
+                portraitView.setInfo(portraitInfos.get(i));
             } else {
                 portraitView.setVisibility(INVISIBLE);
             }
-            portraitView.setDisplayMode(displayMode);
 
             addView(portraitView, getPortraitLayoutParams());
             portraitViews.add(portraitView);
@@ -87,13 +86,6 @@ public final class PortraitGroupView extends LinearLayout {
         this.portraitSpacing = portraitSpacing;
         for (PortraitView ptvPortrait : portraitViews) {
             ptvPortrait.setLayoutParams(getPortraitLayoutParams());
-        }
-    }
-
-    public void setDisplayMode(@NonNull PortraitView.DisplayMode displayMode) {
-        this.displayMode = displayMode;
-        for (PortraitView ptvPortrait : portraitViews) {
-            ptvPortrait.setDisplayMode(displayMode);
         }
     }
 
@@ -130,57 +122,5 @@ public final class PortraitGroupView extends LinearLayout {
         for (PortraitView portraitView : portraitViews) {
             portraitView.setOnLongClickListener(onPortraitLongClickListener);
         }
-    }
-
-    public static PortraitGroupView createFromCards(@NonNull Context context,
-                                                    @NonNull List<CharacterCard> portraitCards,
-                                                    int groupSize) {
-        PortraitGroupView groupView = new PortraitGroupView(context, null);
-        groupView.setPortraits(portraitCards, groupSize);
-        return groupView;
-    }
-
-
-    public static PortraitGroupView createFromTargets(@NonNull Context context,
-                                                      @NonNull List<InteractionTarget> portraitTargets,
-                                                      int groupSize) {
-        PortraitGroupView groupView = new PortraitGroupView(context, null);
-
-        List<CharacterCard> portraitCards = new ArrayList<>();
-        for (InteractionTarget target : portraitTargets) {
-            portraitCards.add(Objects.requireNonNull(
-                            target.getChosenSelectableCharacterCard(),
-                            "Invalid portrait target: character card missing")
-                    .getCharacterCard()
-            );
-        }
-
-        groupView.setPortraits(portraitCards, groupSize);
-
-        for (int i = 0; i < portraitTargets.size(); i++) {
-            groupView.portraitViews.get(i).setTarget(portraitTargets.get(i));
-        }
-
-        return groupView;
-    }
-
-    public static PortraitGroupView createFromSelectableCards(@NonNull Context context,
-                                                              @NonNull List<SelectableCharacterCard> selectableCards,
-                                                              int groupSize) {
-        PortraitGroupView groupView = new PortraitGroupView(context, null);
-
-        List<CharacterCard> portraitCards = new ArrayList<>();
-        for (SelectableCharacterCard selectableCard : selectableCards) {
-            portraitCards.add(selectableCard.getCharacterCard());
-        }
-
-        groupView.setPortraits(portraitCards, groupSize);
-
-        for (int i = 0; i < selectableCards.size(); i++) {
-            groupView.portraitViews.get(i).setUseBannedDisplay(
-                    selectableCards.get(i).getSelectionStatus() == CharacterCardSelectionStatus.AlreadyBanned);
-        }
-
-        return groupView;
     }
 }

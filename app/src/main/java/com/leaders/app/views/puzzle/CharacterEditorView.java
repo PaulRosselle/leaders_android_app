@@ -13,6 +13,7 @@ import androidx.constraintlayout.widget.Group;
 
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
+import com.leaders.app.entities.PortraitInfo;
 import com.leaders.app.utilities.CharacterCardUtils;
 import com.leaders.app.views.portrait.PortraitGroupView;
 import com.leaders.app.views.character.HighlightView;
@@ -87,14 +88,16 @@ public final class CharacterEditorView extends ConstraintLayout {
             // We add cards line per line within multiple "PortraitGroupView".
             // For each group, an array is alimented
             int portraitsInLineCount = Math.min(PORTRAITS_PER_GROUP, allCards.size());
-            ArrayList<CharacterCard> portraitsCards = new ArrayList<>();
+            ArrayList<PortraitInfo> portraitInfos = new ArrayList<>();
             for (int i = 0; i < portraitsInLineCount; i++) {
-                portraitsCards.add(allCards.remove(0));
+                portraitInfos.add(new PortraitInfo(allCards.remove(0)));
             }
-            PortraitGroupView ptvPortraits =
-                    PortraitGroupView.createFromCards(context, portraitsCards, PORTRAITS_PER_GROUP);
+
+            PortraitGroupView ptvPortraits = new PortraitGroupView(context, portraitInfos, PORTRAITS_PER_GROUP);
+
             ptvPortraits.setClickable(false);
             ptvPortraits.setLongClickable(false);
+
             llyPortraits.addView(ptvPortraits, getPortraitsGroupLayoutParams());
         }
     }

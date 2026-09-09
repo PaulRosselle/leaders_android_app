@@ -14,6 +14,8 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.leaders.R;
+import com.leaders.app.entities.PortraitInfo;
+import com.leaders.app.enums.PortraitDisplayMode;
 import com.leaders.app.utilities.CharacterCardUtils;
 import com.leaders.app.views.portrait.PortraitGroupView;
 import com.leaders.app.views.portrait.PortraitView;
@@ -70,7 +72,6 @@ public class ReplayCardsView extends ConstraintLayout {
         portraitViews.clear();
 
         for (PortraitGroupView pgvGroup : portraitGroups) {
-            pgvGroup.setDisplayMode(PortraitView.DisplayMode.Hexagonal);
             llyPortraits.addView(pgvGroup, getPortraitsGroupLayoutParams());
             portraitViews.addAll(pgvGroup.getPortraits());
         }
@@ -153,14 +154,16 @@ public class ReplayCardsView extends ConstraintLayout {
 
         for (int i = 0; i < portraitsGroupCount; i++) {
             // We fill out every portrait as Nemesis just for initialization
-            ArrayList<CharacterCard> portraitsCards = new ArrayList<>();
+            ArrayList<PortraitInfo> portraitsInfos = new ArrayList<>();
             for (int j = 0; j < portraitsPerGroup; j++) {
-                portraitsCards.add(CharacterCard.Nemesis);
+                portraitsInfos.add(new PortraitInfo(
+                        CharacterCard.Nemesis,
+                        false,
+                        PortraitDisplayMode.Hexagonal
+                ));
             }
 
-            PortraitGroupView pgvGroup = PortraitGroupView.createFromCards(
-                    getContext(), portraitsCards, portraitsPerGroup
-            );
+            PortraitGroupView pgvGroup = new PortraitGroupView(getContext(), portraitsInfos, portraitsPerGroup);
 
             pgvGroup.setPortraitsLongClickListener(onPortraitLongClickListener);
             pgvGroup.setPortraitSpacing(portraitsSpacing);
