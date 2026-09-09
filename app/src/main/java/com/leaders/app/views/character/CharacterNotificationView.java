@@ -13,6 +13,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.leaders.R;
 import com.leaders.app.utilities.CharacterCardUtils;
+import com.leaders.app.views.portrait.PortraitView;
 import com.leaders.gamelogic.enums.CharacterCard;
 
 public final class CharacterNotificationView extends ConstraintLayout {

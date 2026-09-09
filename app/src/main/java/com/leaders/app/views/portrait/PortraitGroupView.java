@@ -1,4 +1,4 @@
-package com.leaders.app.views.character;
+package com.leaders.app.views.portrait;
 
 import android.content.Context;
 import android.content.res.TypedArray;

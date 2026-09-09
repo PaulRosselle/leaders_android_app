@@ -14,7 +14,7 @@ import androidx.constraintlayout.widget.Group;
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 import com.leaders.app.utilities.CharacterCardUtils;
-import com.leaders.app.views.character.PortraitGroupView;
+import com.leaders.app.views.portrait.PortraitGroupView;
 import com.leaders.app.views.character.HighlightView;
 import com.leaders.app.views.character.CharacterView;
 import com.leaders.gamelogic.entities.Character;

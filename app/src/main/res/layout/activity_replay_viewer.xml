@@ -94,7 +94,7 @@
         app:layout_constraintTop_toBottomOf="@+id/btnBack_actReplayViewer"
         app:position_visible="false" />
 
-    <com.leaders.app.views.character.PortraitView
+    <com.leaders.app.views.portrait.PortraitView
         android:id="@+id/ptvBannedPortrait_actReplayViewer"
         android:layout_width="100dp"
         android:layout_height="wrap_content"

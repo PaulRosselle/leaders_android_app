@@ -15,8 +15,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.leaders.R;
 import com.leaders.app.utilities.CharacterCardUtils;
-import com.leaders.app.views.character.PortraitGroupView;
-import com.leaders.app.views.character.PortraitView;
+import com.leaders.app.views.portrait.PortraitGroupView;
+import com.leaders.app.views.portrait.PortraitView;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.enums.CharacterCard;

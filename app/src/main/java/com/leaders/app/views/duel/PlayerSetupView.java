@@ -13,7 +13,7 @@ import com.leaders.R;
 import com.leaders.app.entities.PlayerSetup;
 import com.leaders.app.enums.LeaderType;
 import com.leaders.app.utilities.TeamColorUtils;
-import com.leaders.app.views.character.PortraitView;
+import com.leaders.app.views.portrait.PortraitView;
 import com.leaders.app.views.character.CharacterView;
 import com.leaders.gamelogic.enums.TeamColor;
 
