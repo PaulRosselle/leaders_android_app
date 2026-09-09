@@ -219,7 +219,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
 
     @Override
     protected void doOnBackPressed() {
-        goToActivity(ActivityType.ReplaySelection, ActivityTransitionType.SlideLeft);
+        goToActivity(ActivityType.ReplayMenu, ActivityTransitionType.SlideLeft);
     }
 
     //endregion

@@ -247,7 +247,7 @@ public final class PuzzlePlayerActivity extends BaseActivity
             goToActivity(intent, ActivityTransitionType.SlideLeft);
 
         } else {
-            goToActivity(ActivityType.PuzzleSelection, ActivityTransitionType.SlideLeft);
+            goToActivity(ActivityType.PuzzleMenu, ActivityTransitionType.SlideLeft);
         }
     }
 

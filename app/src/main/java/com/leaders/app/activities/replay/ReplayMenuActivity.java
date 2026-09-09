@@ -27,7 +27,7 @@ import com.leaders.app.views.replay.ReplaySelectorGroupView;
 
 import java.util.List;
 
-public class ReplaySelectionActivity extends BaseActivity {
+public class ReplayMenuActivity extends BaseActivity {
     private enum ReplaySelectionAction {
         Edit,
         Remove,
@@ -60,7 +60,7 @@ public class ReplaySelectionActivity extends BaseActivity {
             }
         }
 
-        private View.OnClickListener getOnClickListener(ReplaySelectionActivity activity) {
+        private View.OnClickListener getOnClickListener(ReplayMenuActivity activity) {
             switch (this) {
                 case Edit: return activity::onEditPuzzleClick;
                 case Remove: return activity::onRemoveClick;
@@ -93,10 +93,10 @@ public class ReplaySelectionActivity extends BaseActivity {
     protected void initViews() {
         super.initViews();
 
-        rsgvReplays = findViewById(R.id.rsgvReplays_actReplaySelection);
+        rsgvReplays = findViewById(R.id.rsgvReplaysactReplayMenu);
 
-        btnActions = findViewById(R.id.btnActions_actReplaySelection);
-        amvActions = findViewById(R.id.amvActions_actReplaySelection);
+        btnActions = findViewById(R.id.btnActionsactReplayMenu);
+        amvActions = findViewById(R.id.amvActionsactReplayMenu);
         for (ReplaySelectionAction action : ReplaySelectionAction.values()) {
             amvActions.addActionButton(
                     action.getIconResId(),
@@ -105,8 +105,8 @@ public class ReplaySelectionActivity extends BaseActivity {
                     action.getOnClickListener(this)
             );
         }
-        rsvSave = findViewById(R.id.rsvSave_actReplaySelection);
-        vwDialogBg = findViewById(R.id.vwDialogBg_actReplaySelection);
+        rsvSave = findViewById(R.id.rsvSaveactReplayMenu);
+        vwDialogBg = findViewById(R.id.vwDialogBgactReplayMenu);
     }
 
     @Override
@@ -147,18 +147,18 @@ public class ReplaySelectionActivity extends BaseActivity {
 
     @Override
     protected int getLayoutResId() {
-        return R.layout.activity_replay_selection;
+        return R.layout.activity_replay_menu;
     }
 
     @Override
     protected int getRootGuidelineResId() {
-        return R.id.gdlRoot_actReplaySelection;
+        return R.id.gdlRootactReplayMenu;
     }
 
     @Nullable
     @Override
     protected Integer getBtnBackResId() {
-        return R.id.btnBack_actReplaySelection;
+        return R.id.btnBackactReplayMenu;
     }
 
     @Override
@@ -179,7 +179,7 @@ public class ReplaySelectionActivity extends BaseActivity {
     @NonNull
     @Override
     public ActivityType getActivityType() {
-        return ActivityType.ReplaySelection;
+        return ActivityType.ReplayMenu;
     }
 
     //endregion
