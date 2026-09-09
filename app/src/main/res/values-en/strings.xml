@@ -209,5 +209,9 @@
     <string name="group_name_active_abilities">Active abilities</string>
     <string name="group_name_passive_abilities">Passive abilities</string>
     <string name="group_name_special_abilities">Special abilities</string>
+    <string name="character_menu_title">CharacterS</string>
+    <string name="learn_using_the_tutorial">learn using the tutorial</string>
+    <string name="test_out_characters">test out characters</string>
+    <string name="online_guide">online guide</string>
 
 </resources>

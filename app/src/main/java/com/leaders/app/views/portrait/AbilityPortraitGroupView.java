@@ -20,7 +20,7 @@ import com.leaders.gamelogic.enums.CharacterCard;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AbilityPortraitGroupView extends ConstraintLayout {
+public final class AbilityPortraitGroupView extends ConstraintLayout {
     private static final int PORTRAITS_PER_GROUP = 6;
 
     private enum GroupType {
@@ -34,6 +34,8 @@ public class AbilityPortraitGroupView extends ConstraintLayout {
 
     public AbilityPortraitGroupView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+
+        inflate(context, R.layout.view_ability_portrait_group, this);
 
         portraitGroupViews = new ArrayList<>();
 
@@ -112,13 +114,17 @@ public class AbilityPortraitGroupView extends ConstraintLayout {
     }
 
     private boolean cardMatchGroupType(@NonNull CharacterCard card, @NonNull GroupType groupType) {
+        if (card.isLeader()) {
+            return groupType == GroupType.Leaders;
+        }
+
         if (groupType == GroupType.Leaders) {
-            return card.isLeader();
+            return false;
         }
 
         AbilityType[] abilityTypes = card.getAbilityTypes();
         if (abilityTypes.length < 1) {
-            throw new IllegalStateException("Non leader cards must have an abilities");
+            throw new IllegalStateException("Non leader cards must have an ability (" + card + ")");
         }
 
         switch (groupType) {
