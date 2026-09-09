@@ -19,7 +19,7 @@ import com.leaders.gamelogic.actions.CharacterAction;
 
 import java.util.List;
 
-public class CharacterActionTimelineView extends ConstraintLayout {
+public final class CharacterActionTimelineView extends ConstraintLayout {
     public interface OnTimelineMarkerSelectListener {
         void onMarkerSelected(int markerId);
     }

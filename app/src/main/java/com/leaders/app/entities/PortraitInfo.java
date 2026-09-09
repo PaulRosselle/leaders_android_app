@@ -7,7 +7,7 @@ import com.leaders.app.enums.PortraitDisplayMode;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 
-public class PortraitInfo {
+public final class PortraitInfo {
     @NonNull
     private CharacterCard card;
     private boolean isBanned;

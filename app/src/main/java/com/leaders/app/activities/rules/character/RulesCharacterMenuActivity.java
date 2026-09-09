@@ -10,11 +10,13 @@ import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
+import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.views.portrait.AbilityPortraitGroupView;
+import com.leaders.app.views.portrait.PortraitView;
 
 import java.util.List;
 
-public class RulesCharacterMenuActivity extends BaseActivity {
+public final class RulesCharacterMenuActivity extends BaseActivity {
 
     //region BASE ACTIVITY OVERRIDEN METHODS
 
@@ -42,7 +44,7 @@ public class RulesCharacterMenuActivity extends BaseActivity {
         return R.id.gdlRoot_actRulesCharacterMenu;
     }
 
-    @Nullable
+    @NonNull
     @Override
     protected Integer getBtnBackResId() {
         return R.id.btnBack_actRulesCharacterMenu;
@@ -81,7 +83,7 @@ public class RulesCharacterMenuActivity extends BaseActivity {
     private void onPortraitClick(View v) {
         Intent intent = ActivityType.RulesCharacter.getIntent(this);
 
-        // TODO - send character data
+        intent.putExtra(ExtraUtils.EXTRA_CHARACTER_CARD, ((PortraitView) v).getPortraitCard().name());
 
         goToActivity(intent);
     }

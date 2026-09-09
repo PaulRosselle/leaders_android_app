@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-public class CharacterCardSelectionView extends ConstraintLayout {
+public final class CharacterCardSelectionView extends ConstraintLayout {
     public interface OnCardSelectedListener {
         void onRecruitmentCardSelected(@NonNull InteractionTarget target);
         void onBanishmentCardSelected();

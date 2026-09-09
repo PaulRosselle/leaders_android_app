@@ -31,7 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class ReplayCardsView extends ConstraintLayout {
+public final class ReplayCardsView extends ConstraintLayout {
     private static final int GROUP_MARGIN_TOP = 4;
     private static final int DISCOVERY_PORTRAITS_GROUP_COUNT = 1;
     private static final int DISCOVERY_PORTRAITS_PER_GROUP = 3;

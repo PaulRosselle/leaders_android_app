@@ -14,7 +14,7 @@ import org.json.JSONObject;
 import java.time.LocalDate;
 import java.util.List;
 
-public class ReplaySave {
+public final class ReplaySave {
     @NonNull
     private String name;
     @NonNull

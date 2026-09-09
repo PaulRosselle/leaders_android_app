@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class ReplayControlsView extends ConstraintLayout {
+public final class ReplayControlsView extends ConstraintLayout {
     public interface ReplayControlsListener {
 
         void onReplayLoaded(@NonNull Game game);

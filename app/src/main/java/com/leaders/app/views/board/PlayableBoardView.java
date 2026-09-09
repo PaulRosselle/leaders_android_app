@@ -34,7 +34,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class PlayableBoardView extends BoardView {
+public final class PlayableBoardView extends BoardView {
     public interface OnTargetClickListener {
         void onTargetClick(@NonNull InteractionTarget target);
         /**
