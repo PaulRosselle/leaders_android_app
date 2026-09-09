@@ -85,7 +85,7 @@ public final class RulesMenuActivity extends BaseActivity {
     }
 
     public void onCharactersClick(View v) {
-        // TODO - goTo Characters menu activity
+        goToActivity(ActivityType.RulesCharacterMenu);
     }
 
     public void onOnlineGuideClick(View v) {

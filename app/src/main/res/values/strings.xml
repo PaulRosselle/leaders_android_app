@@ -218,5 +218,9 @@
     <string name="group_name_active_abilities">Compétences actives</string>
     <string name="group_name_passive_abilities">Compétences passives</string>
     <string name="group_name_special_abilities">Compétences spéciales</string>
+    <string name="character_menu_title">PersonnageS</string>
+    <string name="learn_using_the_tutorial">apprendre avec le tutoriel</string>
+    <string name="test_out_characters">tester les personnages</string>
+    <string name="online_guide">guide en ligne</string>
 
 </resources>
