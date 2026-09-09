@@ -13,7 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.leaders.app.enums.AnimationSpeed;
-import com.leaders.app.views.character.PortraitView;
+import com.leaders.app.views.portrait.PortraitView;
 import com.leaders.gamelogic.enums.CharacterCard;
 
 public final class BanishmentActionAnimator extends ActionAnimator {

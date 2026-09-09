@@ -1,4 +1,4 @@
-package com.leaders.app.views.character;
+package com.leaders.app.views.portrait;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -9,6 +9,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
 
 import com.leaders.R;
+import com.leaders.app.entities.PortraitInfo;
+import com.leaders.app.enums.PortraitDisplayMode;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterCardSelectionStatus;
 import com.leaders.gamelogic.interactions.InteractionResultType;
@@ -17,63 +19,59 @@ import com.leaders.gamelogic.interactions.InteractionTarget;
 import java.util.Objects;
 
 public final class PortraitView extends AppCompatImageView {
-    public enum DisplayMode {
-        Default,
-        Hexagonal
-    }
-
     @NonNull
-    private CharacterCard portraitCard;
-    @NonNull
-    private DisplayMode displayMode;
-    private boolean useBannedDisplay;
-
-    @Nullable
-    private InteractionTarget target;
+    private PortraitInfo info;
 
     public PortraitView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
-        target = null;
-        useBannedDisplay = false;
-
         setAdjustViewBounds(true);
 
+        PortraitDisplayMode displayMode;
         try (TypedArray customAttrs = context.obtainStyledAttributes(attrs, R.styleable.PortraitView)) {
-            int displayModeOrd = customAttrs.getInteger(R.styleable.PortraitView_displayMode, DisplayMode.Default.ordinal());
-            displayMode = DisplayMode.values()[displayModeOrd];
+            int displayModeOrd = customAttrs.getInteger(
+                    R.styleable.PortraitView_displayMode,
+                    PortraitDisplayMode.Default.ordinal()
+            );
+            displayMode = PortraitDisplayMode.values()[displayModeOrd];
         }
 
-        portraitCard = CharacterCard.LeaderQueen;
+        info = new PortraitInfo(CharacterCard.LeaderQueen, false, displayMode);
+
         updateDisplay();
     }
 
-    public void setDisplayMode(@NonNull DisplayMode displayMode) {
-        this.displayMode = displayMode;
+    public void setInfo(@NonNull PortraitInfo info) {
+        this.info = info;
+        updateDisplay();
+    }
+
+    public void setDisplayMode(@NonNull PortraitDisplayMode displayMode) {
+        info.setDisplayMode(displayMode);
         updateDisplay();
     }
 
     public void setPortraitCard(@NonNull CharacterCard portraitCard) {
-        this.portraitCard = portraitCard;
+        info.setCard(portraitCard);
         updateDisplay();
     }
 
     private void updateDisplay() {
         int resId;
-        switch (displayMode) {
+        switch (info.getDisplayMode()) {
             case Default: resId = getPortraitDrawableId(); break;
             case Hexagonal: resId = getPortraitHexagonalDrawableId(); break;
-            default: throw new IllegalStateException("Unexpected display mode: " + displayMode);
+            default: throw new IllegalStateException("Unexpected display mode: " + info.getDisplayMode());
         }
         setImageResource(resId);
     }
 
     private int getPortraitDrawableId() {
-        if (useBannedDisplay) {
+        if (info.isBanned()) {
             return getPortraitBannedDrawableId();
         }
 
-        switch (portraitCard) {
+        switch (info.getCard()) {
             case Acrobat: return R.drawable.card_portrait_acrobat;
             case Archer: return R.drawable.card_portrait_archer;
             case Assassin: return R.drawable.card_portrait_assassin;
@@ -92,12 +90,12 @@ public final class PortraitView extends AppCompatImageView {
             case RoyalGuard: return R.drawable.card_portrait_royal_guard;
             case Vizier: return R.drawable.card_portrait_vizier;
             case Wanderer: return R.drawable.card_portrait_wanderer;
-            default: throw new IllegalArgumentException("No portrait drawable for card: " + portraitCard);
+            default: throw new IllegalArgumentException("No portrait drawable for card: " + info.getCard());
         }
     }
 
     private int getPortraitBannedDrawableId() {
-        switch (portraitCard) {
+        switch (info.getCard()) {
             case Acrobat: return R.drawable.card_portrait_banned_acrobat;
             case Archer: return R.drawable.card_portrait_banned_archer;
             case Assassin: return R.drawable.card_portrait_banned_assassin;
@@ -114,16 +112,16 @@ public final class PortraitView extends AppCompatImageView {
             case RoyalGuard: return R.drawable.card_portrait_banned_royal_guard;
             case Vizier: return R.drawable.card_portrait_banned_vizier;
             case Wanderer: return R.drawable.card_portrait_banned_wanderer;
-            default: throw new IllegalArgumentException("No portrait drawable for card: " + portraitCard);
+            default: throw new IllegalArgumentException("No portrait drawable for card: " + info.getCard());
         }
     }
 
     private int getPortraitHexagonalDrawableId() {
-        if (useBannedDisplay) {
+        if (info.isBanned()) {
             return getPortraitHexagonalBannedDrawableId();
         }
 
-        switch (portraitCard) {
+        switch (info.getCard()) {
             case Acrobat: return R.drawable.card_hex_portrait_acrobat;
             case Archer: return R.drawable.card_hex_portrait_archer;
             case Assassin: return R.drawable.card_hex_portrait_assassin;
@@ -142,12 +140,12 @@ public final class PortraitView extends AppCompatImageView {
             case RoyalGuard: return R.drawable.card_hex_portrait_royal_guard;
             case Vizier: return R.drawable.card_hex_portrait_vizier;
             case Wanderer: return R.drawable.card_hex_portrait_wanderer;
-            default: throw new IllegalArgumentException("No portrait drawable for card: " + portraitCard);
+            default: throw new IllegalArgumentException("No portrait drawable for card: " + info.getCard());
         }
     }
 
     private int getPortraitHexagonalBannedDrawableId() {
-        switch (portraitCard) {
+        switch (info.getCard()) {
             case Acrobat: return R.drawable.card_hex_portrait_banned_acrobat;
             case Archer: return R.drawable.card_hex_portrait_banned_archer;
             case Assassin: return R.drawable.card_hex_portrait_banned_assassin;
@@ -166,34 +164,26 @@ public final class PortraitView extends AppCompatImageView {
             case RoyalGuard: return R.drawable.card_hex_portrait_banned_royal_guard;
             case Vizier: return R.drawable.card_hex_portrait_banned_vizier;
             case Wanderer: return R.drawable.card_hex_portrait_banned_wanderer;
-            default: throw new IllegalArgumentException("No portrait drawable for card: " + portraitCard);
+            default: throw new IllegalArgumentException("No portrait drawable for card: " + info.getCard());
         }
     }
 
     @NonNull
     public CharacterCard getPortraitCard() {
-        return portraitCard;
+        return info.getCard();
     }
 
     @Nullable
     public InteractionTarget getTarget() {
-        return target;
+        return info.getTarget();
     }
 
     public void setTarget(@Nullable InteractionTarget target) {
-        this.target = target;
-
-        boolean isBannedTarget = target != null &&
-                target.getCategory().getResultType() == InteractionResultType.SelectableCharacterCardChosen &&
-                Objects.requireNonNull(target.getChosenSelectableCharacterCard(),
-                        "Invalid portrait target: selectable character card missing"
-                ).getSelectionStatus() == CharacterCardSelectionStatus.AlreadyBanned;
-
-        setUseBannedDisplay(isBannedTarget);
+        info.setTarget(target);
     }
 
     public void setUseBannedDisplay(boolean useBannedDisplay) {
-        this.useBannedDisplay = useBannedDisplay;
+        info.setBanned(useBannedDisplay);
         updateDisplay();
     }
 }

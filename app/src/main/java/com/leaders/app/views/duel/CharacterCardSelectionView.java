@@ -18,9 +18,11 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.leaders.R;
+import com.leaders.app.entities.PortraitInfo;
+import com.leaders.app.enums.PortraitDisplayMode;
 import com.leaders.app.utilities.CharacterCardUtils;
-import com.leaders.app.views.character.PortraitGroupView;
-import com.leaders.app.views.character.PortraitView;
+import com.leaders.app.views.portrait.PortraitGroupView;
+import com.leaders.app.views.portrait.PortraitView;
 import com.leaders.app.views.decoration.FrameShineView;
 import com.leaders.gamelogic.entities.SelectableCharacterCard;
 import com.leaders.gamelogic.enums.CharacterCard;
@@ -106,15 +108,80 @@ public class CharacterCardSelectionView extends ConstraintLayout {
     }
 
     private void updatePortraitsFromTargets() {
+        List<InteractionTarget> sortedTargets = getSortedTargets();
+
+        List<PortraitInfo> portraitInfos = new ArrayList<>();
+        for (InteractionTarget target : sortedTargets) {
+            SelectableCharacterCard selectableCard = getSelectableCardFromTarget(target);
+            portraitInfos.add(new PortraitInfo(
+                    selectableCard.getCharacterCard(),
+                    selectableCard.getSelectionStatus() == CharacterCardSelectionStatus.AlreadyBanned,
+                    PortraitDisplayMode.Default,
+                    target
+            ));
+        }
+
+        updatePortraits(portraitInfos);
+    }
+
+    private void updatePortraitsFromCards(@NonNull List<SelectableCharacterCard> selectableCards) {
+        List<SelectableCharacterCard> sortedSelectableCards = getSortedSelectableCards(selectableCards);
+
+        List<PortraitInfo> portraitInfos = new ArrayList<>();
+        for (SelectableCharacterCard selectableCard : sortedSelectableCards) {
+            portraitInfos.add(new PortraitInfo(
+                    selectableCard.getCharacterCard(),
+                    selectableCard.getSelectionStatus() == CharacterCardSelectionStatus.AlreadyBanned
+            ));
+        }
+
+        updatePortraits(portraitInfos);
+    }
+
+    private void updatePortraits(@NonNull List<PortraitInfo> portraitInfos) {
         llyPortraits.removeAllViews();
 
-        // First we order each target from their card
+        for (int start = 0; start < portraitInfos.size(); start += portraitsPerGroup) {
+            int end = Math.min(start + portraitsPerGroup, portraitInfos.size());
+
+            List<PortraitInfo> groupPortraitInfos = new ArrayList<>(end - start);
+            for (int groupIdx = start; groupIdx < end; groupIdx++) {
+                groupPortraitInfos.add(portraitInfos.get(groupIdx));
+            }
+
+            addPortraitsGroup(groupPortraitInfos);
+        }
+
+        scvPortraits.setVisibility(VISIBLE);
+        updatePortraitsScrollView();
+    }
+
+    private void addPortraitsGroup(@NonNull List<PortraitInfo> groupPortraitInfos) {
+        PortraitGroupView portraitsGroupView = new PortraitGroupView(
+                getContext(), groupPortraitInfos, portraitsPerGroup
+        );
+
+        for (PortraitView portraitView : portraitsGroupView.getPortraits()) {
+            portraitView.setAlpha(portraitView.getTarget() != null ? 1f : 0.6f);
+        }
+
+        portraitsGroupView.setPortraitsClickListener(this::onPortraitClick);
+        portraitsGroupView.setPortraitsLongClickListener(onPortraitLongClickListener);
+        portraitsGroupView.setPortraitSpacing(portraitSpacing);
+
+        llyPortraits.addView(portraitsGroupView, getPortraitsGroupLP());
+    }
+
+    private List<InteractionTarget> getSortedTargets() {
+        // Portrait targets are sorted based on their card sort order
         List<CharacterCard> allCards = new ArrayList<>(Arrays.asList(CharacterCard.values()));
         Context context = getContext();
         CharacterCardUtils.sort(context, allCards);
 
+        // Banned cards are added at the very end of the list
         List<InteractionTarget> sortedBannedTargets = new ArrayList<>();
         List<InteractionTarget> sortedTargets = new ArrayList<>();
+
         for (CharacterCard card : allCards) {
             Optional<InteractionTarget> matchingTarget = targets.stream()
                     .filter(target -> getSelectableCardFromTarget(target).getCharacterCard() == card)
@@ -130,36 +197,16 @@ public class CharacterCardSelectionView extends ConstraintLayout {
         }
         sortedTargets.addAll(sortedBannedTargets);
 
-        for (int start = 0; start < sortedTargets.size(); start += portraitsPerGroup) {
-            int end = Math.min(start + portraitsPerGroup, sortedTargets.size());
-
-            List<InteractionTarget> groupTargets = new ArrayList<>(end - start);
-
-            for (int groupIdx = start; groupIdx < end; groupIdx++) {
-                InteractionTarget target = sortedTargets.get(groupIdx);
-
-                groupTargets.add(target);
-            }
-
-            PortraitGroupView portraitsGroupView = PortraitGroupView.createFromTargets(
-                    getContext(), groupTargets, portraitsPerGroup
-            );
-            initPortraitsGroup(portraitsGroupView);
-        }
-
-        scvPortraits.setVisibility(VISIBLE);
-        updatePortraitsScrollView();
+        return sortedTargets;
     }
 
-
-    private void updatePortraitsFromCards(@NonNull List<SelectableCharacterCard> selectableCards) {
-        llyPortraits.removeAllViews();
-
-        // First we order each selectable card
+    private List<SelectableCharacterCard> getSortedSelectableCards(@NonNull List<SelectableCharacterCard> selectableCards) {
+        // Portrait selectable cards are sorted based on their card sort order
         List<CharacterCard> allCards = new ArrayList<>(Arrays.asList(CharacterCard.values()));
         Context context = getContext();
         CharacterCardUtils.sort(context, allCards);
 
+        // Banned cards are added at the very end of the list
         List<SelectableCharacterCard> sortedBannedCards = new ArrayList<>();
         List<SelectableCharacterCard> sortedSelectableCards = new ArrayList<>();
         for (CharacterCard card : allCards) {
@@ -175,31 +222,7 @@ public class CharacterCardSelectionView extends ConstraintLayout {
         }
         sortedSelectableCards.addAll(sortedBannedCards);
 
-        for (int start = 0; start < sortedSelectableCards.size(); start += portraitsPerGroup) {
-            int end = Math.min(start + portraitsPerGroup, sortedSelectableCards.size());
-
-            List<SelectableCharacterCard> groupCards = new ArrayList<>(end - start);
-
-            for (int groupIdx = start; groupIdx < end; groupIdx++) {
-                groupCards.add(sortedSelectableCards.get(groupIdx));
-            }
-
-            PortraitGroupView portraitsGroupView = PortraitGroupView.createFromSelectableCards(
-                    getContext(), groupCards, portraitsPerGroup
-            );
-            initPortraitsGroup(portraitsGroupView);
-        }
-
-        scvPortraits.setVisibility(VISIBLE);
-        updatePortraitsScrollView();
-    }
-
-    private void initPortraitsGroup(@NonNull PortraitGroupView portraitsGroupView) {
-        portraitsGroupView.setPortraitsClickListener(this::onPortraitClick);
-        portraitsGroupView.setPortraitsLongClickListener(onPortraitLongClickListener);
-        portraitsGroupView.setPortraitSpacing(portraitSpacing);
-
-        llyPortraits.addView(portraitsGroupView, getPortraitsGroupLP());
+        return sortedSelectableCards;
     }
 
     private void onPortraitClick(View v) {

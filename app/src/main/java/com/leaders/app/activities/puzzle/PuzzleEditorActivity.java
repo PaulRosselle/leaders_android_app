@@ -40,7 +40,7 @@ import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
 import com.leaders.puzzlelogic.serializers.SerializationContext;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
 import com.leaders.puzzlelogic.utilities.PuzzleEditionUtils;
-import com.leaders.app.views.character.PortraitView;
+import com.leaders.app.views.portrait.PortraitView;
 import com.leaders.app.views.puzzle.CharacterEditorView;
 import com.leaders.app.views.character.CharacterNotificationView;
 import com.leaders.app.views.character.CharacterView;
