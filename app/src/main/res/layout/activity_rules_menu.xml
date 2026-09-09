@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    tools:context=".app.activities.rules.RulesMenuActivity"
+    tools:ignore="SpUsage"
+    tools:theme="@style/Theme.LeadersAndroidApp">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gdlRoot_actRulesMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="0dp" />
+
+    <com.leaders.app.views.decoration.DecorativeBackgroundView
+        android:id="@+id/decorativeBackgroundView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="gone" />
+
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnBack_actRulesMenu"
+        android:layout_width="@dimen/round_button_size"
+        android:layout_height="@dimen/round_button_size"
+        android:layout_marginStart="8dp"
+        android:background="@color/transparent"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        app:icon="@drawable/icon_back"
+        app:iconGravity="textStart"
+        app:iconPadding="0dp"
+        app:iconSize="@dimen/round_button_icon_size"
+        app:iconTint="@color/font"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actRulesMenu"
+        app:layout_constraintVertical_bias="0.0"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <TextView
+        android:id="@+id/txvTitle_actRulesMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/bourbon_test_regular"
+        android:text="@string/game_rules"
+        android:textAllCaps="false"
+        android:textColor="@color/app_golden"
+        android:textSize="@dimen/title_font_size"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actRulesMenu"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <ImageView
+        android:id="@+id/imvBackground_actRulesMenu"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="32dp"
+        android:alpha="0.75"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txvTitle_actRulesMenu"
+        app:srcCompat="@drawable/character_artwork_vizier" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txvTitle_actRulesMenu"
+        app:layout_constraintVertical_bias="0.75">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnTutorial_actRulesMenu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="8dp"
+            android:fontFamily="@font/bobby_jones_regular"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="apprendre avec le tutoriel"
+            android:textAllCaps="true"
+            android:textColor="@color/font"
+            android:textSize="@dimen/default_text_font_size"
+            app:backgroundTint="@color/dark_transparent_black"
+            app:cornerRadius="@dimen/default_corner_radius"
+            app:strokeColor="@color/app_golden"
+            app:strokeWidth="@dimen/default_stroke_width" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCharacters_actRulesMenu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="8dp"
+            android:fontFamily="@font/bobby_jones_regular"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="tester les personnages"
+            android:textAllCaps="true"
+            android:textColor="@color/font"
+            android:textSize="@dimen/default_text_font_size"
+            app:backgroundTint="@color/dark_transparent_black"
+            app:cornerRadius="@dimen/default_corner_radius"
+            app:strokeColor="@color/app_golden"
+            app:strokeWidth="@dimen/default_stroke_width" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOnlineGuide_actRulesMenu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="8dp"
+            android:fontFamily="@font/bobby_jones_regular"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="guide en ligne"
+            android:textAllCaps="true"
+            android:textColor="@color/font"
+            android:textSize="@dimen/default_text_font_size"
+            app:backgroundTint="@color/dark_transparent_black"
+            app:cornerRadius="@dimen/default_corner_radius"
+            app:strokeColor="@color/app_golden"
+            app:strokeWidth="@dimen/default_stroke_width" />
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

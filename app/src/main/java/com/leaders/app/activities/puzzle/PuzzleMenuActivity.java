@@ -33,7 +33,7 @@ import com.leaders.puzzlelogic.enums.PuzzleCategory;
 
 import java.util.List;
 
-public final class PuzzleSelectionActivity extends BaseActivity {
+public final class PuzzleMenuActivity extends BaseActivity {
     private ActivityResultLauncher<String> importPuzzleFileSelector;
     private ActivityResultLauncher<Uri> exportPuzzleDirectorySelector;
 
@@ -72,7 +72,7 @@ public final class PuzzleSelectionActivity extends BaseActivity {
             }
         }
 
-        private View.OnClickListener getOnClickListener(PuzzleSelectionActivity activity) {
+        private View.OnClickListener getOnClickListener(PuzzleMenuActivity activity) {
             switch (this) {
                 case Add: return activity::onNewPuzzleClick;
                 case Edit: return activity::onEditPuzzleClick;
@@ -100,11 +100,11 @@ public final class PuzzleSelectionActivity extends BaseActivity {
     protected void initViews() {
         super.initViews();
 
-        vwDialogBg = findViewById(R.id.vwDialogBg_actPuzzleSelection);
-        btnPuzzleActions = findViewById(R.id.btnPuzzleActions_actPuzzleSelection);
-        amvPuzzleActions = findViewById(R.id.amvPuzzleActions_actPuzzleSelection);
-        mbtgPuzzlesCategory = findViewById(R.id.mbtgPuzzlesCategory_actPuzzleSelection);
-        psgvPuzzles = findViewById(R.id.psgvPuzzles_actPuzzleSelection);
+        vwDialogBg = findViewById(R.id.vwDialogBg_actPuzzleMenu);
+        btnPuzzleActions = findViewById(R.id.btnPuzzleActions_actPuzzleMenu);
+        amvPuzzleActions = findViewById(R.id.amvPuzzleActions_actPuzzleMenu);
+        mbtgPuzzlesCategory = findViewById(R.id.mbtgPuzzlesCategory_actPuzzleMenu);
+        psgvPuzzles = findViewById(R.id.psgvPuzzles_actPuzzleMenu);
 
         for (PuzzleSelectionAction action : PuzzleSelectionAction.values()) {
             amvPuzzleActions.addActionButton(
@@ -150,22 +150,22 @@ public final class PuzzleSelectionActivity extends BaseActivity {
         customPuzzleSaves = JsonUtils.loadCustomPuzzles(this);
 
         // This will cause "onPuzzleSelectionChange" to be called
-        ((MaterialButton) (findViewById(R.id.btnOfficial_actPuzzleSelection))).setChecked(true);
+        ((MaterialButton) (findViewById(R.id.btnOfficial_actPuzzleMenu))).setChecked(true);
     }
 
     @Override
     protected int getLayoutResId() {
-        return R.layout.activity_puzzle_selection;
+        return R.layout.activity_puzzle_menu;
     }
 
     @Override
     protected int getRootGuidelineResId() {
-        return R.id.gdlRoot_actPuzzleSelection;
+        return R.id.gdlRoot_actPuzzleMenu;
     }
 
     @Override
     protected Integer getBtnBackResId() {
-        return R.id.btnBack_actPuzzleSelection;
+        return R.id.btnBack_actPuzzleMenu;
     }
 
     @Override
@@ -186,7 +186,7 @@ public final class PuzzleSelectionActivity extends BaseActivity {
     @NonNull
     @Override
     public ActivityType getActivityType() {
-        return ActivityType.PuzzleSelection;
+        return ActivityType.PuzzleMenu;
     }
 
     private List<? extends PuzzleSave> getPuzzlesFromCategory() {
@@ -198,7 +198,7 @@ public final class PuzzleSelectionActivity extends BaseActivity {
             return;
         }
 
-        puzzlesCategory = checkedId == R.id.btnOfficial_actPuzzleSelection ?
+        puzzlesCategory = checkedId == R.id.btnOfficial_actPuzzleMenu ?
                 PuzzleCategory.Official : PuzzleCategory.Custom;
         psgvPuzzles.setPuzzles(getPuzzlesFromCategory());
     }

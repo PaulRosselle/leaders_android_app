@@ -133,7 +133,7 @@ public final class MainActivity extends BaseActivity {
     }
 
     private void onPuzzlesClick(View v) {
-        goToActivity(ActivityType.PuzzleSelection);
+        goToActivity(ActivityType.PuzzleMenu);
     }
 
     private void onPlayClick(View v) {
@@ -141,14 +141,11 @@ public final class MainActivity extends BaseActivity {
     }
 
     private void onReplayClick(View v) {
-        goToActivity(ActivityType.ReplaySelection);
+        goToActivity(ActivityType.ReplayMenu);
     }
 
     private void onRulesClick(View v) {
-        showNotImplementedDialog("v0.7.0",
-                List.of("Interactive explanation of Leaders rules",
-                        "Character introduction scenarios")
-        );
+        goToActivity(ActivityType.RulesMenu);
     }
 
     private void onSettingsClick(View v) {

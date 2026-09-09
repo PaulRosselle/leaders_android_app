@@ -212,4 +212,7 @@
     <string name="rules_chapter_number_game_modes" translatable="false">V.</string>
     <string name="rules_chapter_number_barrage" translatable="false">VI.</string>
     <string name="rules_chapter_number_faq" translatable="false">VII.</string>
+    <string name="replays">ReplayS</string>
+    <string name="game_rules">RÈglES dU jEU</string>
+
 </resources>

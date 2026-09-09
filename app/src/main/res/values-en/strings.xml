@@ -203,4 +203,7 @@
     <string name="rules_chapter_game_modes">game modes</string>
     <string name="rules_chapter_barrage">barrage rules</string>
     <string name="rules_chapter_faq">f.a.q</string>
+    <string name="replays">ReplayS</string>
+    <string name="game_rules">GamE RUlES</string>
+
 </resources>
