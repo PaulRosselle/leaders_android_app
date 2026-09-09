@@ -205,5 +205,9 @@
     <string name="rules_chapter_faq">f.a.q</string>
     <string name="replays">ReplayS</string>
     <string name="game_rules">GamE RUlES</string>
+    <string name="group_name_leaders">Leaders</string>
+    <string name="group_name_active_abilities">Active abilities</string>
+    <string name="group_name_passive_abilities">Passive abilities</string>
+    <string name="group_name_special_abilities">Special abilities</string>
 
 </resources>

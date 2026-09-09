@@ -59,4 +59,13 @@
         <attr name="maxGroupSize" format="integer"/>
     </declare-styleable>
 
+    <declare-styleable name="AbilityPortraitGroupView">
+        <attr name="groupType" format="enum">
+            <enum name="Leaders" value="0" />
+            <enum name="ActiveAbilities" value="1" />
+            <enum name="PassiveAbilities" value="2" />
+            <enum name="SpecialAbilities" value="3" />
+        </attr>
+    </declare-styleable>
+
 </resources>

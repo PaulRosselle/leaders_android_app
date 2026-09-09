@@ -214,5 +214,9 @@
     <string name="rules_chapter_number_faq" translatable="false">VII.</string>
     <string name="replays">ReplayS</string>
     <string name="game_rules">RÈglES dU jEU</string>
+    <string name="group_name_leaders">Leaders</string>
+    <string name="group_name_active_abilities">Compétences actives</string>
+    <string name="group_name_passive_abilities">Compétences passives</string>
+    <string name="group_name_special_abilities">Compétences spéciales</string>
 
 </resources>
