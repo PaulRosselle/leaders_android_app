@@ -145,7 +145,7 @@ public final class MainActivity extends BaseActivity {
     }
 
     private void onRulesClick(View v) {
-        goToActivity(ActivityType.RulesIntro);
+        goToActivity(ActivityType.RulesMenu);
     }
 
     private void onSettingsClick(View v) {

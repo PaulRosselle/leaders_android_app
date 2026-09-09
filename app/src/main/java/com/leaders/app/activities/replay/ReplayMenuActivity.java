@@ -93,10 +93,10 @@ public class ReplayMenuActivity extends BaseActivity {
     protected void initViews() {
         super.initViews();
 
-        rsgvReplays = findViewById(R.id.rsgvReplaysactReplayMenu);
+        rsgvReplays = findViewById(R.id.rsgvReplays_actReplayMenu);
 
-        btnActions = findViewById(R.id.btnActionsactReplayMenu);
-        amvActions = findViewById(R.id.amvActionsactReplayMenu);
+        btnActions = findViewById(R.id.btnActions_actReplayMenu);
+        amvActions = findViewById(R.id.amvActions_actReplayMenu);
         for (ReplaySelectionAction action : ReplaySelectionAction.values()) {
             amvActions.addActionButton(
                     action.getIconResId(),
@@ -105,8 +105,8 @@ public class ReplayMenuActivity extends BaseActivity {
                     action.getOnClickListener(this)
             );
         }
-        rsvSave = findViewById(R.id.rsvSaveactReplayMenu);
-        vwDialogBg = findViewById(R.id.vwDialogBgactReplayMenu);
+        rsvSave = findViewById(R.id.rsvSave_actReplayMenu);
+        vwDialogBg = findViewById(R.id.vwDialogBg_actReplayMenu);
     }
 
     @Override
@@ -152,13 +152,13 @@ public class ReplayMenuActivity extends BaseActivity {
 
     @Override
     protected int getRootGuidelineResId() {
-        return R.id.gdlRootactReplayMenu;
+        return R.id.gdlRoot_actReplayMenu;
     }
 
     @Nullable
     @Override
     protected Integer getBtnBackResId() {
-        return R.id.btnBackactReplayMenu;
+        return R.id.btnBack_actReplayMenu;
     }
 
     @Override

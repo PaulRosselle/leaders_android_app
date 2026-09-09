@@ -14,7 +14,7 @@ public enum RulesChapter {
     public ActivityType getActivityType() {
         // TODO - handle every Chapter activity
         switch (this) {
-            case Introduction: return ActivityType.RulesIntro;
+            case Introduction: return ActivityType.RulesMenu;
             default: throw new IllegalStateException("No name found for chapter: " + this);
         }
     }

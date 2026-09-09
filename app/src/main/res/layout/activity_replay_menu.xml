@@ -10,7 +10,7 @@
     tools:ignore="SpUsage">
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/gdlRootactReplayMenu"
+        android:id="@+id/gdlRoot_actReplayMenu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -28,7 +28,7 @@
 
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnBackactReplayMenu"
+        android:id="@+id/btnBack_actReplayMenu"
         android:layout_width="@dimen/round_button_size"
         android:layout_height="@dimen/round_button_size"
         android:layout_marginStart="8dp"
@@ -45,12 +45,12 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/gdlRootactReplayMenu"
+        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actReplayMenu"
         app:layout_constraintVertical_bias="0.0"
         tools:ignore="SpeakableTextPresentCheck" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnActionsactReplayMenu"
+        android:id="@+id/btnActions_actReplayMenu"
         android:layout_width="@dimen/round_button_size"
         android:layout_height="@dimen/round_button_size"
         android:layout_marginEnd="8dp"
@@ -67,27 +67,27 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/gdlRootactReplayMenu"
+        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actReplayMenu"
         app:layout_constraintVertical_bias="0.0"
         tools:ignore="SpeakableTextPresentCheck" />
 
     <TextView
-        android:id="@+id/txvTitleactReplayMenu"
+        android:id="@+id/txvTitle_actReplayMenu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/bourbon_test_regular"
-        android:text="ReplayS"
+        android:text="@string/replays"
         android:textAllCaps="false"
         android:textColor="@color/app_golden"
         android:textSize="@dimen/title_font_size"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/gdlRootactReplayMenu"
+        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actReplayMenu"
         app:layout_constraintVertical_bias="0.0" />
 
     <com.leaders.app.views.decoration.OrnateFrameView
-        android:id="@+id/ofvReplaysactReplayMenu"
+        android:id="@+id/ofvReplays_actReplayMenu"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
@@ -98,10 +98,10 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnBackactReplayMenu">
+        app:layout_constraintTop_toBottomOf="@id/btnBack_actReplayMenu">
 
         <ScrollView
-            android:id="@+id/scvReplaysactReplayMenu"
+            android:id="@+id/scvReplays_actReplayMenu"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="8dp"
@@ -115,7 +115,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <com.leaders.app.views.replay.ReplaySelectorGroupView
-                android:id="@+id/rsgvReplaysactReplayMenu"
+                android:id="@+id/rsgvReplays_actReplayMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical" />
@@ -125,7 +125,7 @@
 
 
     <View
-        android:id="@+id/vwDialogBgactReplayMenu"
+        android:id="@+id/vwDialogBg_actReplayMenu"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/transparent_black"
@@ -137,7 +137,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.leaders.app.views.ActionsMenuView
-        android:id="@+id/amvActionsactReplayMenu"
+        android:id="@+id/amvActions_actReplayMenu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="12dp"
@@ -146,11 +146,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnActionsactReplayMenu"
+        app:layout_constraintTop_toBottomOf="@+id/btnActions_actReplayMenu"
         app:layout_constraintVertical_bias="0.0" />
 
     <com.leaders.app.views.replay.ReplaySaveView
-        android:id="@+id/rsvSaveactReplayMenu"
+        android:id="@+id/rsvSave_actReplayMenu"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
