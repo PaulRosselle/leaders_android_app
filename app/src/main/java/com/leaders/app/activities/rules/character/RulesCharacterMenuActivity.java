@@ -1,5 +1,6 @@
 package com.leaders.app.activities.rules.character;
 
+import android.content.Intent;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -67,6 +68,7 @@ public class RulesCharacterMenuActivity extends BaseActivity {
     public ActivityType getActivityType() {
         return ActivityType.RulesCharacterMenu;
     }
+
     @Override
     protected void doOnBackPressed() {
         goToActivity(ActivityType.RulesMenu, ActivityTransitionType.SlideLeft);
@@ -77,7 +79,11 @@ public class RulesCharacterMenuActivity extends BaseActivity {
     //region VIEWS LISTENER METHODS
 
     private void onPortraitClick(View v) {
-        // TODO - open RulesCharacterActivity
+        Intent intent = ActivityType.RulesCharacter.getIntent(this);
+
+        // TODO - send character data
+
+        goToActivity(intent);
     }
 
     //endregion
