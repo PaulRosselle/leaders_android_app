@@ -8,62 +8,35 @@ import androidx.annotation.NonNull;
 
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
-import com.leaders.app.activities.BaseActivity;
+import com.leaders.app.activities.PlayableActivity;
 import com.leaders.app.controllers.GameController;
 import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.EndGameType;
-import com.leaders.app.enums.LeaderType;
-import com.leaders.app.utilities.ButtonUtils;
 import com.leaders.app.utilities.CharacterCardUtils;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.JsonUtils;
-import com.leaders.app.views.EndGameView;
-import com.leaders.app.views.board.PlayableBoardView;
-import com.leaders.app.views.character.CharacterNotificationView;
-import com.leaders.app.views.character.CharacterView;
-import com.leaders.gamelogic.entities.Cell;
-import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.enums.AbilityType;
 import com.leaders.gamelogic.enums.CharacterCard;
-import com.leaders.gamelogic.enums.CharacterType;
-import com.leaders.gamelogic.enums.TeamColor;
-import com.leaders.gamelogic.interactions.InteractionFeedback;
-import com.leaders.gamelogic.interactions.InteractionRequest;
-import com.leaders.gamelogic.interactions.InteractionTarget;
-import com.leaders.gamelogic.interactions.InteractionType;
-import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
 
 import org.json.JSONException;
 
-import java.util.Objects;
-
-public final class RulesCharacterActivity extends BaseActivity
-        implements PlayableBoardView.OnTargetClickListener, GameController.Listener {
+public final class RulesCharacterActivity extends PlayableActivity {
     private TextView txvName;
     private TextView txvDescription;
     private ImageView imvAbility;
     private ImageView imvArtwork;
 
     private MaterialButton btnReset;
-    private MaterialButton btnUndoLastAction;
-
-    private CharacterNotificationView cnvCardInfo;
-
-    private EndGameView egvEndGame;
-
-    private PlayableBoardView bdvBoard;
 
 
     private GameHistory startHistory;
     private String startHistoryHash;
-
-    private GameController controller;
 
 
     //region BASE ACTIVITY OVERRIDEN METHODS
@@ -78,13 +51,6 @@ public final class RulesCharacterActivity extends BaseActivity
         imvArtwork = findViewById(R.id.imvArtwork_actRulesCharacter);
 
         btnReset = findViewById(R.id.btnReset_actRulesCharacter);
-        btnUndoLastAction = findViewById(R.id.btnUndoLastAction_actRulesCharacter);
-
-        cnvCardInfo = findViewById(R.id.cnvCardInfo_actRulesCharacter);
-
-        bdvBoard = findViewById(R.id.bdvBoard_actRulesCharacter);
-
-        egvEndGame = findViewById(R.id.egvEndGame_actRulesCharacter);
     }
 
     @Override
@@ -95,15 +61,6 @@ public final class RulesCharacterActivity extends BaseActivity
         (findViewById(R.id.clyMain_actRulesCharacter)).setOnClickListener(this::onNonInteractiveElementClick);
 
         btnReset.setOnClickListener(this::onResetClick);
-        btnUndoLastAction.setOnClickListener(this::onUndoLastAction);
-
-        cnvCardInfo.setOnClickListener(this::onCardInfoClick);
-
-        egvEndGame.setOnClickListener(this::onEndGameClick);
-
-        // Board element listeners
-        bdvBoard.setOnTargetClickListener(this);
-        bdvBoard.setOnCharacterLongClickListener(this::onCharacterLongClick);
     }
 
     @Override
@@ -121,6 +78,26 @@ public final class RulesCharacterActivity extends BaseActivity
     }
 
     @Override
+    protected int getBoardViewId() {
+        return R.id.bdvBoard_actRulesCharacter;
+    }
+
+    @Override
+    protected int getUndoLastActionButtonId() {
+        return R.id.btnUndoLastAction_actRulesCharacter;
+    }
+
+    @Override
+    protected int getCharacterNotificationViewId() {
+        return R.id.cnvCardInfo_actRulesCharacter;
+    }
+
+    @Override
+    protected int getEndGameViewId() {
+        return R.id.egvEndGame_actRulesCharacter;
+    }
+
+    @Override
     protected int getLayoutResId() {
         return R.layout.activity_rules_character;
     }
@@ -134,16 +111,6 @@ public final class RulesCharacterActivity extends BaseActivity
     @Override
     protected Integer getBtnBackResId() {
         return R.id.btnBack_actRulesCharacter;
-    }
-
-    @Override
-    protected boolean isImmersiveActivity() {
-        return true;
-    }
-
-    @Override
-    protected boolean overrideOnBackPressed() {
-        return true;
     }
 
     @Override
@@ -216,50 +183,11 @@ public final class RulesCharacterActivity extends BaseActivity
         }
     }
 
-    //region TARGET CLICK LISTENER METHODS
-
-    @Override
-    public void onTargetClick(@NonNull InteractionTarget target) {
-        controller.selectTarget(target);
-    }
-
-    @Override
-    public void onEmptyClick() {
-        controller.cancelAction();
-    }
-
-    //endregion
-
     //region INTERACTION UI METHODS
 
-    private void clearInteractionUI() {
-        bdvBoard.clearTargets();
-        ButtonUtils.setEnabled(btnUndoLastAction, false);
-    }
-
-    private void highlightPlayableCharacters(@NonNull GameContext gameContext,
-                                             @NonNull InteractionRequest request) {
-        bdvBoard.highlightPlayableCharacters(
-                gameContext.getPlayableCharacters(),
-                request.getContext().getCharacter(),
-                gameContext.getBoard()
-        );
-
-        if (request.getRequestType() == InteractionType.PlayableCharacterExpected) {
-            bdvBoard.startPlayableCharactersShineAnimation();
-        } else {
-            bdvBoard.stopPlayableCharactersShineAnimation();
-        }
-    }
-
-    private void updateInteractionUI(@NonNull GameContext gameContext,
-                                     @NonNull InteractionRequest request) {
-
-        bdvBoard.applyTargets(request.getLegalTargets(), request.getContext(), gameContext.getBoard());
-
-        highlightPlayableCharacters(gameContext, request);
-
-        ButtonUtils.setEnabled(btnUndoLastAction, controller.canUndoLastAction() && !isStartHistory());
+    @Override
+    protected boolean canUndoLastAction() {
+        return super.canUndoLastAction() && !isStartHistory();
     }
 
     private boolean isStartHistory() {
@@ -278,18 +206,12 @@ public final class RulesCharacterActivity extends BaseActivity
     private void showEndGame(@NonNull Player winner) {
         GameContext gameContext = controller.getCurrentContext();
 
-        TeamColor winnerColor = winner.getTeamColor();
-        Cell leaderCell = Objects.requireNonNull(
-                BoardQuery.findLeaderCell(gameContext.getBoard(), winnerColor),
-                "No leader found for team: " + winnerColor
+        showEndGame(gameContext,
+                winner.getTeamColor(),
+                EndGameType.Victory,
+                R.string.victory_title,
+                R.string.victory_subtitle
         );
-
-        egvEndGame.update(EndGameType.Victory,
-                LeaderType.getFromCharacter(leaderCell.getCharacter()),
-                getString(R.string.victory_title),
-                getString(R.string.victory_subtitle)
-        );
-        egvEndGame.show();
     }
 
     //endregion
@@ -297,26 +219,8 @@ public final class RulesCharacterActivity extends BaseActivity
     //region CONTROLLER METHODS
 
     @Override
-    public void onGameStarted(@NonNull Game game) {
-        runOnUiThread(() -> {
-            clearInteractionUI();
-            bdvBoard.setBoard(game.getBoard());
-        });
-    }
-
-    @Override
     public void onGameEnded(@NonNull Player winner) {
         runOnUiThread(() -> showEndGame(winner));
-    }
-
-    @Override
-    public void onActionUndone(@NonNull Game game) {
-        runOnUiThread(() -> bdvBoard.setBoard(game.getBoard()));
-    }
-
-    @Override
-    public void onInteractionRequired(@NonNull InteractionRequest request) {
-        runOnUiThread(() -> updateInteractionUI(controller.getCurrentContext(), request));
     }
 
     @Override
@@ -324,67 +228,13 @@ public final class RulesCharacterActivity extends BaseActivity
         throw new IllegalStateException("Phase change is not supported within character demo");
     }
 
-    @Override
-    public void onFeedback(@NonNull InteractionFeedback feedback,
-                           @NonNull GameController.InteractionCompletion completion) {
-        runOnUiThread(() -> bdvBoard.animateFeedback(feedback, completion::complete));
-    }
-
-    @Override
-    public void onInteractionCleared() {
-        runOnUiThread(this::clearInteractionUI);
-    }
-
     //endregion
 
     //region VIEWS LISTENER METHODS
-
-    private void onNonInteractiveElementClick(View v) {
-        controller.cancelAction();
-    }
-
-    private void onEndGameClick(View v) {
-        egvEndGame.hide();
-    }
 
     private void onResetClick(View v) {
         controller.restartGame(new GameHistory(startHistory));
     }
 
-    private void onUndoLastAction(View v) {
-        controller.undoLastAction();
-    }
-
-    private void onCardInfoClick(View v) {
-        cnvCardInfo.hide();
-    }
-
-    private boolean onCharacterLongClick(View v) {
-        CharacterType characterType = Objects.requireNonNull(((CharacterView) v).getCharacterType(),
-                "An empty character piece is not authorized in the puzzle editor");
-        CharacterCard characterCard = characterType.getCharacterCard();
-
-        if (cnvCardInfo.getCharacterCard() == characterCard) {
-            cnvCardInfo.setCharacterCard(null);
-            cnvCardInfo.hide();
-        } else {
-            cnvCardInfo.setCharacterCard(characterCard);
-            if (cnvCardInfo.getVisibility() != View.VISIBLE) {
-                cnvCardInfo.show();
-            }
-        }
-
-        return false;
-    }
-
     //endregion
-
-    @Override
-    protected void onDestroy() {
-        if (controller != null) {
-            controller.shutdown();
-        }
-
-        super.onDestroy();
-    }
 }
