@@ -145,9 +145,9 @@
     <string name="next_puzzle">Puzzle suivant</string>
     <string name="previous_puzzle">Puzzle précédent</string>
     <string name="victory_title">ViCtOiRE</string>
-    <string name="victory_subtitle">le leader adverse a ÉtÉ neutralisÉ</string>
+    <string name="victory_subtitle">le leader adverse a ÉtÉ vaincu</string>
     <string name="defeat_title">dÉfaitE</string>
-    <string name="defeat_subtitle">votre leader a ÉtÉ neutralisÉ</string>
+    <string name="defeat_subtitle">votre leader a ÉtÉ vaincu</string>
     <string name="player_name">nom du joueur</string>
     <string name="discovery_mode_title">dÉcouverte</string>
     <string name="strategist_mode_title">stratÈge</string>

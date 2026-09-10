@@ -12,13 +12,17 @@ import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.controllers.GameController;
 import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
+import com.leaders.app.enums.EndGameType;
+import com.leaders.app.enums.LeaderType;
 import com.leaders.app.utilities.ButtonUtils;
 import com.leaders.app.utilities.CharacterCardUtils;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.JsonUtils;
+import com.leaders.app.views.EndGameView;
 import com.leaders.app.views.board.PlayableBoardView;
 import com.leaders.app.views.character.CharacterNotificationView;
 import com.leaders.app.views.character.CharacterView;
+import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.GameHistory;
@@ -27,12 +31,13 @@ import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.enums.AbilityType;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
+import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.interactions.InteractionType;
+import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
-import com.leaders.puzzlelogic.utilities.PuzzleEditionUtils;
 
 import org.json.JSONException;
 
@@ -49,6 +54,8 @@ public final class RulesCharacterActivity extends BaseActivity
     private MaterialButton btnUndoLastAction;
 
     private CharacterNotificationView cnvCardInfo;
+
+    private EndGameView egvEndGame;
 
     private PlayableBoardView bdvBoard;
 
@@ -76,6 +83,8 @@ public final class RulesCharacterActivity extends BaseActivity
         cnvCardInfo = findViewById(R.id.cnvCardInfo_actRulesCharacter);
 
         bdvBoard = findViewById(R.id.bdvBoard_actRulesCharacter);
+
+        egvEndGame = findViewById(R.id.egvEndGame_actRulesCharacter);
     }
 
     @Override
@@ -89,6 +98,8 @@ public final class RulesCharacterActivity extends BaseActivity
         btnUndoLastAction.setOnClickListener(this::onUndoLastAction);
 
         cnvCardInfo.setOnClickListener(this::onCardInfoClick);
+
+        egvEndGame.setOnClickListener(this::onEndGameClick);
 
         // Board element listeners
         bdvBoard.setOnTargetClickListener(this);
@@ -264,6 +275,23 @@ public final class RulesCharacterActivity extends BaseActivity
         }
     }
 
+    private void showEndGame(@NonNull Player winner) {
+        GameContext gameContext = controller.getCurrentContext();
+
+        TeamColor winnerColor = winner.getTeamColor();
+        Cell leaderCell = Objects.requireNonNull(
+                BoardQuery.findLeaderCell(gameContext.getBoard(), winnerColor),
+                "No leader found for team: " + winnerColor
+        );
+
+        egvEndGame.update(EndGameType.Victory,
+                LeaderType.getFromCharacter(leaderCell.getCharacter()),
+                getString(R.string.victory_title),
+                getString(R.string.victory_subtitle)
+        );
+        egvEndGame.show();
+    }
+
     //endregion
 
     //region CONTROLLER METHODS
@@ -278,7 +306,7 @@ public final class RulesCharacterActivity extends BaseActivity
 
     @Override
     public void onGameEnded(@NonNull Player winner) {
-        // TODO - show victory screen ?
+        runOnUiThread(() -> showEndGame(winner));
     }
 
     @Override
@@ -315,6 +343,10 @@ public final class RulesCharacterActivity extends BaseActivity
         controller.cancelAction();
     }
 
+    private void onEndGameClick(View v) {
+        egvEndGame.hide();
+    }
+
     private void onResetClick(View v) {
         controller.restartGame(new GameHistory(startHistory));
     }
@@ -346,4 +378,13 @@ public final class RulesCharacterActivity extends BaseActivity
     }
 
     //endregion
+
+    @Override
+    protected void onDestroy() {
+        if (controller != null) {
+            controller.shutdown();
+        }
+
+        super.onDestroy();
+    }
 }
