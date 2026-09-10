@@ -16,6 +16,8 @@ import com.leaders.app.utilities.ButtonUtils;
 import com.leaders.app.utilities.CharacterCardUtils;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.views.board.PlayableBoardView;
+import com.leaders.app.views.character.CharacterNotificationView;
+import com.leaders.app.views.character.CharacterView;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.GameHistory;
@@ -23,11 +25,17 @@ import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.enums.AbilityType;
 import com.leaders.gamelogic.enums.CharacterCard;
+import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.interactions.InteractionType;
+import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
 import com.leaders.puzzlelogic.utilities.PuzzleEditionUtils;
+
+import org.json.JSONException;
+
+import java.util.Objects;
 
 public final class RulesCharacterActivity extends BaseActivity
         implements PlayableBoardView.OnTargetClickListener, GameController.Listener {
@@ -39,10 +47,14 @@ public final class RulesCharacterActivity extends BaseActivity
     private MaterialButton btnReset;
     private MaterialButton btnUndoLastAction;
 
+    private CharacterNotificationView cnvCardInfo;
+
     private PlayableBoardView bdvBoard;
 
 
-    private GameHistory demoHistory;
+    private GameHistory startHistory;
+    private String startHistoryHash;
+
     private GameController controller;
 
 
@@ -60,9 +72,9 @@ public final class RulesCharacterActivity extends BaseActivity
         btnReset = findViewById(R.id.btnReset_actRulesCharacter);
         btnUndoLastAction = findViewById(R.id.btnUndoLastAction_actRulesCharacter);
 
-        bdvBoard = findViewById(R.id.bdvBoard_actRulesCharacter);
+        cnvCardInfo = findViewById(R.id.cnvCardInfo_actRulesCharacter);
 
-        // TODO - handle card info display
+        bdvBoard = findViewById(R.id.bdvBoard_actRulesCharacter);
     }
 
     @Override
@@ -75,8 +87,11 @@ public final class RulesCharacterActivity extends BaseActivity
         btnReset.setOnClickListener(this::onResetClick);
         btnUndoLastAction.setOnClickListener(this::onUndoLastAction);
 
+        cnvCardInfo.setOnClickListener(this::onCardInfoClick);
+
         // Board element listeners
         bdvBoard.setOnTargetClickListener(this);
+        bdvBoard.setOnCharacterLongClickListener(this::onCharacterLongClick);
     }
 
     @Override
@@ -87,10 +102,11 @@ public final class RulesCharacterActivity extends BaseActivity
         initCharacter(card);
 
         // TODO - load demo from Json
-        demoHistory = PuzzleEditionUtils.getDefaultHistory();
+        startHistory = PuzzleEditionUtils.getDefaultHistory();
+        startHistoryHash = getHistoryHash(startHistory);
 
         controller = new GameController(this);
-        controller.startGame(demoHistory);
+        controller.startGame(new GameHistory(startHistory));
     }
 
     @Override
@@ -193,12 +209,12 @@ public final class RulesCharacterActivity extends BaseActivity
 
     @Override
     public void onTargetClick(@NonNull InteractionTarget target) {
-        // TODO
+        controller.selectTarget(target);
     }
 
     @Override
     public void onEmptyClick() {
-        // TODO
+        controller.cancelAction();
     }
 
     //endregion
@@ -225,44 +241,70 @@ public final class RulesCharacterActivity extends BaseActivity
         }
     }
 
+    private void updateInteractionUI(@NonNull GameContext gameContext,
+                                     @NonNull InteractionRequest request) {
+
+        bdvBoard.applyTargets(request.getLegalTargets(), request.getContext(), gameContext.getBoard());
+
+        highlightPlayableCharacters(gameContext, request);
+
+        ButtonUtils.setEnabled(btnUndoLastAction, controller.canUndoLastAction() && !isStartHistory());
+    }
+
+    private boolean isStartHistory() {
+        return getHistoryHash(controller.getHistory()).equals(startHistoryHash);
+    }
+
+    private String getHistoryHash(@NonNull GameHistory gameHistory) {
+        GameHistorySerializer serializer = new GameHistorySerializer();
+        try {
+            return serializer.getAsJson(gameHistory).toString();
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     //endregion
 
     //region CONTROLLER METHODS
 
     @Override
     public void onGameStarted(@NonNull Game game) {
-        // TODO
+        runOnUiThread(() -> {
+            clearInteractionUI();
+            bdvBoard.setBoard(game.getBoard());
+        });
     }
 
     @Override
     public void onGameEnded(@NonNull Player winner) {
-        // TODO
+        // TODO - show victory screen ?
     }
 
     @Override
     public void onActionUndone(@NonNull Game game) {
-        // TODO
+        runOnUiThread(() -> bdvBoard.setBoard(game.getBoard()));
     }
 
     @Override
     public void onInteractionRequired(@NonNull InteractionRequest request) {
-        // TODO
+        runOnUiThread(() -> updateInteractionUI(controller.getCurrentContext(), request));
     }
 
     @Override
     public void onPhaseChanged(@NonNull GamePhase phase) {
-        // TODO
+        throw new IllegalStateException("Phase change is not supported within character demo");
     }
 
     @Override
     public void onFeedback(@NonNull InteractionFeedback feedback,
                            @NonNull GameController.InteractionCompletion completion) {
-        // TODO
+        runOnUiThread(() -> bdvBoard.animateFeedback(feedback, completion::complete));
     }
 
     @Override
     public void onInteractionCleared() {
-        // TODO
+        runOnUiThread(this::clearInteractionUI);
     }
 
     //endregion
@@ -274,11 +316,33 @@ public final class RulesCharacterActivity extends BaseActivity
     }
 
     private void onResetClick(View v) {
-        controller.restartGame(demoHistory);
+        controller.restartGame(new GameHistory(startHistory));
     }
 
     private void onUndoLastAction(View v) {
         controller.undoLastAction();
+    }
+
+    private void onCardInfoClick(View v) {
+        cnvCardInfo.hide();
+    }
+
+    private boolean onCharacterLongClick(View v) {
+        CharacterType characterType = Objects.requireNonNull(((CharacterView) v).getCharacterType(),
+                "An empty character piece is not authorized in the puzzle editor");
+        CharacterCard characterCard = characterType.getCharacterCard();
+
+        if (cnvCardInfo.getCharacterCard() == characterCard) {
+            cnvCardInfo.setCharacterCard(null);
+            cnvCardInfo.hide();
+        } else {
+            cnvCardInfo.setCharacterCard(characterCard);
+            if (cnvCardInfo.getVisibility() != View.VISIBLE) {
+                cnvCardInfo.show();
+            }
+        }
+
+        return false;
     }
 
     //endregion
