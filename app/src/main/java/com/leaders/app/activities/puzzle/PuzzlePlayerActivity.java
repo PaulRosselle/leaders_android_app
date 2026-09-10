@@ -258,12 +258,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
         int titleId = isVictory ? R.string.victory_title : R.string.defeat_title;
         int subtitleId = isVictory ? R.string.victory_subtitle : R.string.defeat_subtitle;
 
-        showEndGame(gameContext,
-                winnerColor,
-                endGameType,
-                titleId,
-                subtitleId
-        );
+        showEndGame(gameContext, winnerColor, endGameType, getString(titleId), getString(subtitleId));
     }
 
     private void saveProgress(boolean isSolved) {

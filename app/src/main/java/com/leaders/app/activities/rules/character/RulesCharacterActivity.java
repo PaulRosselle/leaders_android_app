@@ -209,8 +209,8 @@ public final class RulesCharacterActivity extends PlayableActivity {
         showEndGame(gameContext,
                 winner.getTeamColor(),
                 EndGameType.Victory,
-                R.string.victory_title,
-                R.string.victory_subtitle
+                getString(R.string.victory_title),
+                getString(R.string.victory_subtitle)
         );
     }
 

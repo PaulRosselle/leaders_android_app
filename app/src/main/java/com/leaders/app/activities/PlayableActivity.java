@@ -117,7 +117,7 @@ public abstract class PlayableActivity extends BaseActivity
 
     //region INTERACTION UI METHODS
 
-    protected void clearInteractionUI() {
+    protected void clearInteractionUI(@NonNull GameContext gameContext) {
         bdvBoard.clearTargets();
         ButtonUtils.setEnabled(btnUndoLastAction, false);
     }
@@ -193,13 +193,13 @@ public abstract class PlayableActivity extends BaseActivity
     protected final void showEndGame(@NonNull GameContext gameContext,
                                      @NonNull TeamColor winnerColor,
                                      @NonNull EndGameType endGameType,
-                                     int titleResId,
-                                     int subtitleResId) {
+                                     String title,
+                                     String subtitle) {
         egvEndGame.update(
                 endGameType,
                 getLeaderType(gameContext.getBoard(), winnerColor),
-                getString(titleResId),
-                getString(subtitleResId)
+                title,
+                subtitle
         );
 
         egvEndGame.show();
@@ -213,8 +213,9 @@ public abstract class PlayableActivity extends BaseActivity
     @Override
     public void onGameStarted(@NonNull Game game) {
         runOnUiThread(() -> {
-            clearInteractionUI();
-            bdvBoard.setBoard(game.getBoard());
+            GameContext gameContext = controller.getCurrentContext();
+            clearInteractionUI(gameContext);
+            bdvBoard.setBoard(gameContext.getBoard());
         });
     }
 
@@ -231,7 +232,7 @@ public abstract class PlayableActivity extends BaseActivity
 
     @Override
     public void onInteractionCleared() {
-        runOnUiThread(this::clearInteractionUI);
+        runOnUiThread(() -> clearInteractionUI(controller.getCurrentContext()));
     }
 
 
