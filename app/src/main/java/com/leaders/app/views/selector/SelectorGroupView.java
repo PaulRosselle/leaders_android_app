@@ -162,7 +162,7 @@ public abstract class SelectorGroupView<T, V extends SelectorView<T>> extends Li
                     endIndex = closestSelectedIndex;
                 } else {
                     startIndex = closestSelectedIndex + 1;
-                    endIndex = selectorIndex + 1;
+                    endIndex = selectorIndex;
                 }
 
                 for (int i = startIndex; i <= endIndex; i++) {

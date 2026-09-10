@@ -22,42 +22,8 @@
           {
             "motion_type": "Add",
             "character": {
-              "uuid": "379cc863-1daa-4bc7-a145-61cb5142169b",
-              "character_type": "Assassin",
-              "team_color": "White"
-            },
-            "position": {
-              "x": 2,
-              "y": 1
-            }
-          }
-        ],
-        "type": "Recruitment"
-      },
-      {
-        "motions": [
-          {
-            "motion_type": "Add",
-            "character": {
-              "uuid": "473c39c7-d17b-43db-be0a-7b8eddf388f2",
-              "character_type": "Brewmaster",
-              "team_color": "White"
-            },
-            "position": {
-              "x": 4,
-              "y": 3
-            }
-          }
-        ],
-        "type": "Recruitment"
-      },
-      {
-        "motions": [
-          {
-            "motion_type": "Add",
-            "character": {
-              "uuid": "e924b28a-13d7-4096-8c8c-55a35ca0b0ac",
-              "character_type": "Wanderer",
+              "uuid": "21b604b8-5d1c-41dc-9f3f-d35ebba7d847",
+              "character_type": "LeaderKing",
               "team_color": "Black"
             },
             "position": {
@@ -73,46 +39,12 @@
           {
             "motion_type": "Add",
             "character": {
-              "uuid": "4526b8eb-125e-4fca-a8db-20e194bf77da",
-              "character_type": "RoyalGuard",
-              "team_color": "White"
-            },
-            "position": {
-              "x": 2,
-              "y": 4
-            }
-          }
-        ],
-        "type": "Recruitment"
-      },
-      {
-        "motions": [
-          {
-            "motion_type": "Add",
-            "character": {
-              "uuid": "94d694f0-4631-4477-afdd-707e3275acab",
-              "character_type": "LeaderQueen",
-              "team_color": "White"
+              "uuid": "b98737ce-4381-40b1-bd50-85e07a509e93",
+              "character_type": "Illusionist",
+              "team_color": "Black"
             },
             "position": {
               "x": 5,
-              "y": 0
-            }
-          }
-        ],
-        "type": "Recruitment"
-      },
-      {
-        "motions": [
-          {
-            "motion_type": "Add",
-            "character": {
-              "uuid": "5a558b5e-6991-4068-b27e-2aedee70e96a",
-              "character_type": "Manipulator",
-              "team_color": "White"
-            },
-            "position": {
-              "x": 3,
               "y": 1
             }
           }
@@ -124,13 +56,13 @@
           {
             "motion_type": "Add",
             "character": {
-              "uuid": "fa3ebce6-da49-45e5-975b-c2eba772e9c8",
-              "character_type": "Illusionist",
+              "uuid": "58b65163-3c80-4e7b-b3a6-9326a7540059",
+              "character_type": "Assassin",
               "team_color": "Black"
             },
             "position": {
-              "x": 3,
-              "y": 2
+              "x": 5,
+              "y": 3
             }
           }
         ],
@@ -141,13 +73,13 @@
           {
             "motion_type": "Add",
             "character": {
-              "uuid": "ee41bf35-6a6e-485f-8ee1-1d33c3bf68a0",
-              "character_type": "LeaderKing",
-              "team_color": "Black"
+              "uuid": "c2101e90-ffbc-4b04-8824-4a32511c366b",
+              "character_type": "LeaderQueen",
+              "team_color": "White"
             },
             "position": {
               "x": 1,
-              "y": 2
+              "y": 0
             }
           }
         ],
@@ -158,9 +90,9 @@
           {
             "motion_type": "Add",
             "character": {
-              "uuid": "63105501-9116-4ea4-987f-ef94ebbce716",
-              "character_type": "ClawLauncher",
-              "team_color": "Black"
+              "uuid": "165132df-1fce-4b37-93a0-755460b23f6f",
+              "character_type": "Manipulator",
+              "team_color": "White"
             },
             "position": {
               "x": 1,
@@ -175,13 +107,30 @@
           {
             "motion_type": "Add",
             "character": {
-              "uuid": "ac48a60e-23e3-4734-9f20-f396397a6b4f",
-              "character_type": "Acrobat",
-              "team_color": "Black"
+              "uuid": "450c77a0-069c-4641-b8d9-5e816c5235c5",
+              "character_type": "Brewmaster",
+              "team_color": "White"
             },
             "position": {
-              "x": 3,
-              "y": 5
+              "x": 6,
+              "y": 1
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "adf9598a-d932-4bbd-92fc-854ea88fb2c0",
+              "character_type": "Vizier",
+              "team_color": "White"
+            },
+            "position": {
+              "x": 2,
+              "y": 0
             }
           }
         ],
@@ -210,7 +159,36 @@
           "transition_target": "ActionsPhase"
         },
         "turn_team_color": "Black",
-        "actions": []
+        "actions": [
+          {
+            "comment": "This action is an unplayable dummy to prevent this character to move",
+            "src_character": {
+              "uuid": "21b604b8-5d1c-41dc-9f3f-d35ebba7d847",
+              "character_type": "LeaderKing",
+              "team_color": "Black"
+            },
+            "motions": [
+              {
+                "motion_type": "Add",
+                "targets": []
+              }
+            ]
+          },
+          {
+            "comment": "This action is an unplayable dummy to prevent this character to move",
+            "src_character": {
+              "uuid": "58b65163-3c80-4e7b-b3a6-9326a7540059",
+              "character_type": "Assassin",
+              "team_color": "Black"
+            },
+            "motions": [
+              {
+                "motion_type": "Add",
+                "targets": []
+              }
+            ]
+          }
+        ]
       },
       "recruitment_phase": {
         "turn_team_color": "Black",

@@ -22,43 +22,9 @@
           {
             "motion_type": "Add",
             "character": {
-              "uuid": "379cc863-1daa-4bc7-a145-61cb5142169b",
-              "character_type": "Assassin",
+              "uuid": "6e6bdc7c-a3b8-4246-be83-9cc61bcf623b",
+              "character_type": "LeaderQueen",
               "team_color": "White"
-            },
-            "position": {
-              "x": 2,
-              "y": 1
-            }
-          }
-        ],
-        "type": "Recruitment"
-      },
-      {
-        "motions": [
-          {
-            "motion_type": "Add",
-            "character": {
-              "uuid": "473c39c7-d17b-43db-be0a-7b8eddf388f2",
-              "character_type": "Brewmaster",
-              "team_color": "White"
-            },
-            "position": {
-              "x": 4,
-              "y": 3
-            }
-          }
-        ],
-        "type": "Recruitment"
-      },
-      {
-        "motions": [
-          {
-            "motion_type": "Add",
-            "character": {
-              "uuid": "e924b28a-13d7-4096-8c8c-55a35ca0b0ac",
-              "character_type": "Wanderer",
-              "team_color": "Black"
             },
             "position": {
               "x": 0,
@@ -73,97 +39,12 @@
           {
             "motion_type": "Add",
             "character": {
-              "uuid": "4526b8eb-125e-4fca-a8db-20e194bf77da",
-              "character_type": "RoyalGuard",
-              "team_color": "White"
-            },
-            "position": {
-              "x": 2,
-              "y": 4
-            }
-          }
-        ],
-        "type": "Recruitment"
-      },
-      {
-        "motions": [
-          {
-            "motion_type": "Add",
-            "character": {
-              "uuid": "94d694f0-4631-4477-afdd-707e3275acab",
-              "character_type": "LeaderQueen",
-              "team_color": "White"
-            },
-            "position": {
-              "x": 5,
-              "y": 0
-            }
-          }
-        ],
-        "type": "Recruitment"
-      },
-      {
-        "motions": [
-          {
-            "motion_type": "Add",
-            "character": {
-              "uuid": "5a558b5e-6991-4068-b27e-2aedee70e96a",
-              "character_type": "Manipulator",
-              "team_color": "White"
-            },
-            "position": {
-              "x": 3,
-              "y": 1
-            }
-          }
-        ],
-        "type": "Recruitment"
-      },
-      {
-        "motions": [
-          {
-            "motion_type": "Add",
-            "character": {
-              "uuid": "fa3ebce6-da49-45e5-975b-c2eba772e9c8",
-              "character_type": "Illusionist",
-              "team_color": "Black"
-            },
-            "position": {
-              "x": 3,
-              "y": 2
-            }
-          }
-        ],
-        "type": "Recruitment"
-      },
-      {
-        "motions": [
-          {
-            "motion_type": "Add",
-            "character": {
-              "uuid": "ee41bf35-6a6e-485f-8ee1-1d33c3bf68a0",
+              "uuid": "31390018-fe8d-4773-87e7-015d57f46ca2",
               "character_type": "LeaderKing",
               "team_color": "Black"
             },
             "position": {
-              "x": 1,
-              "y": 2
-            }
-          }
-        ],
-        "type": "Recruitment"
-      },
-      {
-        "motions": [
-          {
-            "motion_type": "Add",
-            "character": {
-              "uuid": "63105501-9116-4ea4-987f-ef94ebbce716",
-              "character_type": "ClawLauncher",
-              "team_color": "Black"
-            },
-            "position": {
-              "x": 1,
+              "x": 2,
               "y": 3
             }
           }
@@ -175,13 +56,81 @@
           {
             "motion_type": "Add",
             "character": {
-              "uuid": "ac48a60e-23e3-4734-9f20-f396397a6b4f",
-              "character_type": "Acrobat",
+              "uuid": "a65dbcf6-7056-47a0-9928-bfe7e145dc32",
+              "character_type": "Jailer",
+              "team_color": "White"
+            },
+            "position": {
+              "x": 3,
+              "y": 0
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "1d90f32b-d850-41a6-a6e8-fcbe586ef4c6",
+              "character_type": "Archer",
+              "team_color": "White"
+            },
+            "position": {
+              "x": 5,
+              "y": 3
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "0f3bfd6f-9edd-4564-bd3f-6fc8e3e5393b",
+              "character_type": "ClawLauncher",
               "team_color": "Black"
             },
             "position": {
               "x": 3,
-              "y": 5
+              "y": 3
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "3cd5a466-8866-4a08-9f90-8b39daa4dd45",
+              "character_type": "Protector",
+              "team_color": "White"
+            },
+            "position": {
+              "x": 3,
+              "y": 6
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "1541df09-de70-406c-a6b7-98be92cb2aab",
+              "character_type": "Brewmaster",
+              "team_color": "Black"
+            },
+            "position": {
+              "x": 6,
+              "y": 0
             }
           }
         ],
@@ -210,7 +159,36 @@
           "transition_target": "ActionsPhase"
         },
         "turn_team_color": "Black",
-        "actions": []
+        "actions": [
+          {
+            "comment": "This action is an unplayable dummy to prevent this character to move",
+            "src_character": {
+              "uuid": "31390018-fe8d-4773-87e7-015d57f46ca2",
+              "character_type": "LeaderKing",
+              "team_color": "Black"
+            },
+            "motions": [
+              {
+                "motion_type": "Add",
+                "targets": []
+              }
+            ]
+          },
+          {
+            "comment": "This action is an unplayable dummy to prevent this character to move",
+            "src_character": {
+              "uuid": "1541df09-de70-406c-a6b7-98be92cb2aab",
+              "character_type": "Brewmaster",
+              "team_color": "Black"
+            },
+            "motions": [
+              {
+                "motion_type": "Add",
+                "targets": []
+              }
+            ]
+          }
+        ]
       },
       "recruitment_phase": {
         "turn_team_color": "Black",

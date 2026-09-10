@@ -22,47 +22,13 @@
           {
             "motion_type": "Add",
             "character": {
-              "uuid": "379cc863-1daa-4bc7-a145-61cb5142169b",
-              "character_type": "Assassin",
-              "team_color": "White"
-            },
-            "position": {
-              "x": 2,
-              "y": 1
-            }
-          }
-        ],
-        "type": "Recruitment"
-      },
-      {
-        "motions": [
-          {
-            "motion_type": "Add",
-            "character": {
-              "uuid": "473c39c7-d17b-43db-be0a-7b8eddf388f2",
-              "character_type": "Brewmaster",
-              "team_color": "White"
-            },
-            "position": {
-              "x": 4,
-              "y": 3
-            }
-          }
-        ],
-        "type": "Recruitment"
-      },
-      {
-        "motions": [
-          {
-            "motion_type": "Add",
-            "character": {
-              "uuid": "e924b28a-13d7-4096-8c8c-55a35ca0b0ac",
-              "character_type": "Wanderer",
+              "uuid": "b0277a49-ac5c-4fb7-b822-5edadc3774e5",
+              "character_type": "Vizier",
               "team_color": "Black"
             },
             "position": {
               "x": 0,
-              "y": 0
+              "y": 1
             }
           }
         ],
@@ -73,13 +39,13 @@
           {
             "motion_type": "Add",
             "character": {
-              "uuid": "4526b8eb-125e-4fca-a8db-20e194bf77da",
-              "character_type": "RoyalGuard",
-              "team_color": "White"
+              "uuid": "55aac741-c7bb-47f9-acd9-2a6bccf1f6c7",
+              "character_type": "Nemesis",
+              "team_color": "Black"
             },
             "position": {
-              "x": 2,
-              "y": 4
+              "x": 4,
+              "y": 5
             }
           }
         ],
@@ -90,12 +56,29 @@
           {
             "motion_type": "Add",
             "character": {
-              "uuid": "94d694f0-4631-4477-afdd-707e3275acab",
-              "character_type": "LeaderQueen",
-              "team_color": "White"
+              "uuid": "412504f8-437a-40f1-bcf3-d9396a762789",
+              "character_type": "LeaderKing",
+              "team_color": "Black"
             },
             "position": {
               "x": 5,
+              "y": 1
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "2201f3fd-3ecb-47a7-95da-b800b5c3f9ff",
+              "character_type": "Nemesis",
+              "team_color": "White"
+            },
+            "position": {
+              "x": 3,
               "y": 0
             }
           }
@@ -107,8 +90,8 @@
           {
             "motion_type": "Add",
             "character": {
-              "uuid": "5a558b5e-6991-4068-b27e-2aedee70e96a",
-              "character_type": "Manipulator",
+              "uuid": "744e9226-4337-4d1c-91af-fa0e420a446e",
+              "character_type": "Cub",
               "team_color": "White"
             },
             "position": {
@@ -124,26 +107,9 @@
           {
             "motion_type": "Add",
             "character": {
-              "uuid": "fa3ebce6-da49-45e5-975b-c2eba772e9c8",
-              "character_type": "Illusionist",
-              "team_color": "Black"
-            },
-            "position": {
-              "x": 3,
-              "y": 2
-            }
-          }
-        ],
-        "type": "Recruitment"
-      },
-      {
-        "motions": [
-          {
-            "motion_type": "Add",
-            "character": {
-              "uuid": "ee41bf35-6a6e-485f-8ee1-1d33c3bf68a0",
-              "character_type": "LeaderKing",
-              "team_color": "Black"
+              "uuid": "bf752dc1-2c9c-44cc-8e27-6881efdcf94d",
+              "character_type": "Hermit",
+              "team_color": "White"
             },
             "position": {
               "x": 1,
@@ -158,9 +124,9 @@
           {
             "motion_type": "Add",
             "character": {
-              "uuid": "63105501-9116-4ea4-987f-ef94ebbce716",
-              "character_type": "ClawLauncher",
-              "team_color": "Black"
+              "uuid": "ee4a0e38-69c9-4791-a773-b70fa94baba4",
+              "character_type": "LeaderQueen",
+              "team_color": "White"
             },
             "position": {
               "x": 1,
@@ -175,13 +141,30 @@
           {
             "motion_type": "Add",
             "character": {
-              "uuid": "ac48a60e-23e3-4734-9f20-f396397a6b4f",
-              "character_type": "Acrobat",
+              "uuid": "cc0d67e6-6db0-4fb3-9422-4fcc800c2b9d",
+              "character_type": "Illusionist",
               "team_color": "Black"
             },
             "position": {
-              "x": 3,
-              "y": 5
+              "x": 6,
+              "y": 0
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "2a32a6d3-d377-450d-9d3a-f38603a3e3c4",
+              "character_type": "Manipulator",
+              "team_color": "Black"
+            },
+            "position": {
+              "x": 6,
+              "y": 2
             }
           }
         ],

@@ -22,26 +22,9 @@
           {
             "motion_type": "Add",
             "character": {
-              "uuid": "379cc863-1daa-4bc7-a145-61cb5142169b",
-              "character_type": "Assassin",
-              "team_color": "White"
-            },
-            "position": {
-              "x": 2,
-              "y": 1
-            }
-          }
-        ],
-        "type": "Recruitment"
-      },
-      {
-        "motions": [
-          {
-            "motion_type": "Add",
-            "character": {
-              "uuid": "473c39c7-d17b-43db-be0a-7b8eddf388f2",
-              "character_type": "Brewmaster",
-              "team_color": "White"
+              "uuid": "2797d9cf-67f0-4c59-bcd6-0bee33c609b9",
+              "character_type": "Manipulator",
+              "team_color": "Black"
             },
             "position": {
               "x": 4,
@@ -56,8 +39,8 @@
           {
             "motion_type": "Add",
             "character": {
-              "uuid": "e924b28a-13d7-4096-8c8c-55a35ca0b0ac",
-              "character_type": "Wanderer",
+              "uuid": "0e4af89b-4bb0-451f-9eca-9c992ef52e10",
+              "character_type": "Jailer",
               "team_color": "Black"
             },
             "position": {
@@ -73,13 +56,13 @@
           {
             "motion_type": "Add",
             "character": {
-              "uuid": "4526b8eb-125e-4fca-a8db-20e194bf77da",
-              "character_type": "RoyalGuard",
+              "uuid": "52b8b2f8-764d-4fbc-b075-0a84638532dc",
+              "character_type": "LeaderQueen",
               "team_color": "White"
             },
             "position": {
               "x": 2,
-              "y": 4
+              "y": 2
             }
           }
         ],
@@ -90,12 +73,12 @@
           {
             "motion_type": "Add",
             "character": {
-              "uuid": "94d694f0-4631-4477-afdd-707e3275acab",
-              "character_type": "LeaderQueen",
-              "team_color": "White"
+              "uuid": "8644327c-ee7e-4a87-9f9f-f31e0a46286c",
+              "character_type": "Bruiser",
+              "team_color": "Black"
             },
             "position": {
-              "x": 5,
+              "x": 1,
               "y": 0
             }
           }
@@ -107,12 +90,46 @@
           {
             "motion_type": "Add",
             "character": {
-              "uuid": "5a558b5e-6991-4068-b27e-2aedee70e96a",
-              "character_type": "Manipulator",
+              "uuid": "6d6000cc-dbb8-4e32-b80f-085c7d5e77f8",
+              "character_type": "ClawLauncher",
+              "team_color": "White"
+            },
+            "position": {
+              "x": 5,
+              "y": 4
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "0d345718-87d3-42b1-8448-47b61a972133",
+              "character_type": "Wanderer",
               "team_color": "White"
             },
             "position": {
               "x": 3,
+              "y": 4
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "8abce7f3-a7db-4b9c-9e67-9437f8b32e14",
+              "character_type": "LeaderKing",
+              "team_color": "Black"
+            },
+            "position": {
+              "x": 6,
               "y": 1
             }
           }
@@ -124,64 +141,13 @@
           {
             "motion_type": "Add",
             "character": {
-              "uuid": "fa3ebce6-da49-45e5-975b-c2eba772e9c8",
-              "character_type": "Illusionist",
-              "team_color": "Black"
+              "uuid": "e617f39a-73f3-47a3-a812-d4def788ce58",
+              "character_type": "Rider",
+              "team_color": "White"
             },
             "position": {
-              "x": 3,
-              "y": 2
-            }
-          }
-        ],
-        "type": "Recruitment"
-      },
-      {
-        "motions": [
-          {
-            "motion_type": "Add",
-            "character": {
-              "uuid": "ee41bf35-6a6e-485f-8ee1-1d33c3bf68a0",
-              "character_type": "LeaderKing",
-              "team_color": "Black"
-            },
-            "position": {
-              "x": 1,
-              "y": 2
-            }
-          }
-        ],
-        "type": "Recruitment"
-      },
-      {
-        "motions": [
-          {
-            "motion_type": "Add",
-            "character": {
-              "uuid": "63105501-9116-4ea4-987f-ef94ebbce716",
-              "character_type": "ClawLauncher",
-              "team_color": "Black"
-            },
-            "position": {
-              "x": 1,
-              "y": 3
-            }
-          }
-        ],
-        "type": "Recruitment"
-      },
-      {
-        "motions": [
-          {
-            "motion_type": "Add",
-            "character": {
-              "uuid": "ac48a60e-23e3-4734-9f20-f396397a6b4f",
-              "character_type": "Acrobat",
-              "team_color": "Black"
-            },
-            "position": {
-              "x": 3,
-              "y": 5
+              "x": 4,
+              "y": 1
             }
           }
         ],
@@ -210,7 +176,50 @@
           "transition_target": "ActionsPhase"
         },
         "turn_team_color": "Black",
-        "actions": []
+        "actions": [
+          {
+            "comment": "This action is an unplayable dummy to prevent this character to move",
+            "src_character": {
+              "uuid": "8abce7f3-a7db-4b9c-9e67-9437f8b32e14",
+              "character_type": "LeaderKing",
+              "team_color": "Black"
+            },
+            "motions": [
+              {
+                "motion_type": "Add",
+                "targets": []
+              }
+            ]
+          },
+          {
+            "comment": "This action is an unplayable dummy to prevent this character to move",
+            "src_character": {
+              "uuid": "0e4af89b-4bb0-451f-9eca-9c992ef52e10",
+              "character_type": "Jailer",
+              "team_color": "Black"
+            },
+            "motions": [
+              {
+                "motion_type": "Add",
+                "targets": []
+              }
+            ]
+          },
+          {
+            "comment": "This action is an unplayable dummy to prevent this character to move",
+            "src_character": {
+              "uuid": "8644327c-ee7e-4a87-9f9f-f31e0a46286c",
+              "character_type": "Bruiser",
+              "team_color": "Black"
+            },
+            "motions": [
+              {
+                "motion_type": "Add",
+                "targets": []
+              }
+            ]
+          }
+        ]
       },
       "recruitment_phase": {
         "turn_team_color": "Black",

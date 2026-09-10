@@ -22,77 +22,9 @@
           {
             "motion_type": "Add",
             "character": {
-              "uuid": "379cc863-1daa-4bc7-a145-61cb5142169b",
-              "character_type": "Assassin",
-              "team_color": "White"
-            },
-            "position": {
-              "x": 2,
-              "y": 1
-            }
-          }
-        ],
-        "type": "Recruitment"
-      },
-      {
-        "motions": [
-          {
-            "motion_type": "Add",
-            "character": {
-              "uuid": "473c39c7-d17b-43db-be0a-7b8eddf388f2",
-              "character_type": "Brewmaster",
-              "team_color": "White"
-            },
-            "position": {
-              "x": 4,
-              "y": 3
-            }
-          }
-        ],
-        "type": "Recruitment"
-      },
-      {
-        "motions": [
-          {
-            "motion_type": "Add",
-            "character": {
-              "uuid": "e924b28a-13d7-4096-8c8c-55a35ca0b0ac",
-              "character_type": "Wanderer",
+              "uuid": "0d453570-7e98-4826-b7c1-77dd3afa9563",
+              "character_type": "Nemesis",
               "team_color": "Black"
-            },
-            "position": {
-              "x": 0,
-              "y": 0
-            }
-          }
-        ],
-        "type": "Recruitment"
-      },
-      {
-        "motions": [
-          {
-            "motion_type": "Add",
-            "character": {
-              "uuid": "4526b8eb-125e-4fca-a8db-20e194bf77da",
-              "character_type": "RoyalGuard",
-              "team_color": "White"
-            },
-            "position": {
-              "x": 2,
-              "y": 4
-            }
-          }
-        ],
-        "type": "Recruitment"
-      },
-      {
-        "motions": [
-          {
-            "motion_type": "Add",
-            "character": {
-              "uuid": "94d694f0-4631-4477-afdd-707e3275acab",
-              "character_type": "LeaderQueen",
-              "team_color": "White"
             },
             "position": {
               "x": 5,
@@ -107,8 +39,8 @@
           {
             "motion_type": "Add",
             "character": {
-              "uuid": "5a558b5e-6991-4068-b27e-2aedee70e96a",
-              "character_type": "Manipulator",
+              "uuid": "c8b14530-b6e0-44cc-b2f8-c381a148bb71",
+              "character_type": "Bruiser",
               "team_color": "White"
             },
             "position": {
@@ -124,46 +56,12 @@
           {
             "motion_type": "Add",
             "character": {
-              "uuid": "fa3ebce6-da49-45e5-975b-c2eba772e9c8",
-              "character_type": "Illusionist",
-              "team_color": "Black"
-            },
-            "position": {
-              "x": 3,
-              "y": 2
-            }
-          }
-        ],
-        "type": "Recruitment"
-      },
-      {
-        "motions": [
-          {
-            "motion_type": "Add",
-            "character": {
-              "uuid": "ee41bf35-6a6e-485f-8ee1-1d33c3bf68a0",
+              "uuid": "7b1a2102-435d-4a57-a20b-500ad741b6fa",
               "character_type": "LeaderKing",
               "team_color": "Black"
             },
             "position": {
-              "x": 1,
-              "y": 2
-            }
-          }
-        ],
-        "type": "Recruitment"
-      },
-      {
-        "motions": [
-          {
-            "motion_type": "Add",
-            "character": {
-              "uuid": "63105501-9116-4ea4-987f-ef94ebbce716",
-              "character_type": "ClawLauncher",
-              "team_color": "Black"
-            },
-            "position": {
-              "x": 1,
+              "x": 3,
               "y": 3
             }
           }
@@ -175,13 +73,13 @@
           {
             "motion_type": "Add",
             "character": {
-              "uuid": "ac48a60e-23e3-4734-9f20-f396397a6b4f",
-              "character_type": "Acrobat",
-              "team_color": "Black"
+              "uuid": "466ff0c3-91fd-4c11-8d6f-7ae8d8046c68",
+              "character_type": "LeaderQueen",
+              "team_color": "White"
             },
             "position": {
-              "x": 3,
-              "y": 5
+              "x": 4,
+              "y": 1
             }
           }
         ],

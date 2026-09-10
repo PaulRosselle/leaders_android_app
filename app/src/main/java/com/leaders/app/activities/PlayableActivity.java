@@ -26,6 +26,7 @@ import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.interactions.InteractionType;
 import com.leaders.gamelogic.queries.BoardQuery;
 
+import java.util.Collections;
 import java.util.Objects;
 
 public abstract class PlayableActivity extends BaseActivity
@@ -195,6 +196,9 @@ public abstract class PlayableActivity extends BaseActivity
                                      @NonNull EndGameType endGameType,
                                      String title,
                                      String subtitle) {
+        clearInteractionUI(gameContext);
+        bdvBoard.highlightPlayableCharacters(Collections.emptyList(), null, gameContext.getBoard());
+
         egvEndGame.update(
                 endGameType,
                 getLeaderType(gameContext.getBoard(), winnerColor),
