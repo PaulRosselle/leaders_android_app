@@ -15,6 +15,7 @@ import com.leaders.app.enums.ActivityType;
 import com.leaders.app.utilities.ButtonUtils;
 import com.leaders.app.utilities.CharacterCardUtils;
 import com.leaders.app.utilities.ExtraUtils;
+import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.views.board.PlayableBoardView;
 import com.leaders.app.views.character.CharacterNotificationView;
 import com.leaders.app.views.character.CharacterView;
@@ -98,11 +99,10 @@ public final class RulesCharacterActivity extends BaseActivity
     protected void initDatas() {
         super.initDatas();
 
-        CharacterCard card = CharacterCard.valueOf(getIntent().getStringExtra(ExtraUtils.EXTRA_CHARACTER_CARD));
-        initCharacter(card);
+        CharacterCard characterCard = CharacterCard.valueOf(getIntent().getStringExtra(ExtraUtils.EXTRA_CHARACTER_CARD));
+        initCharacter(characterCard);
 
-        // TODO - load demo from Json
-        startHistory = PuzzleEditionUtils.getDefaultHistory();
+        startHistory = JsonUtils.loadCharacterDemo(this, characterCard);
         startHistoryHash = getHistoryHash(startHistory);
 
         controller = new GameController(this);

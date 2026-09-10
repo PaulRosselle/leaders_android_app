@@ -9,9 +9,13 @@ import androidx.annotation.Nullable;
 import com.leaders.R;
 import com.leaders.app.entities.ReplaySave;
 import com.leaders.app.entities.crash.CrashLog;
+import com.leaders.gamelogic.entities.GameHistory;
+import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
 import com.leaders.puzzlelogic.entities.OfficialPuzzleSave;
 import com.leaders.puzzlelogic.entities.PuzzleSave;
+import com.leaders.puzzlelogic.serializers.SerializationContext;
+import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -341,8 +345,6 @@ public final class JsonUtils {
 
     //endregion
 
-
-
     //region PUZZLE SAVE METHODS
 
     public static List<ReplaySave> loadReplays(@NonNull Context context) {
@@ -414,6 +416,49 @@ public final class JsonUtils {
         joReplays.put("replays", jaReplays);
 
         return joReplays;
+    }
+
+    //endregion
+
+    //region CHARACTER DEMO METHODS
+
+    public static GameHistory loadCharacterDemo(@NonNull Context context,
+                                                @NonNull CharacterCard characterCard) {
+        // Character demos are stored within raw resource files
+        try (InputStream fisCharacterDemo = context.getResources().openRawResource(getCharacterDemoResId(characterCard))) {
+            JSONObject joCharacterDemo = openJsonFile(fisCharacterDemo);
+
+            GameHistorySerializer serializer = new GameHistorySerializer();
+
+            return serializer.getFromJson(joCharacterDemo, new SerializationContext());
+
+        } catch (IOException | JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    private static int getCharacterDemoResId(@NonNull CharacterCard characterCard) {
+        switch (characterCard) {
+            case Acrobat: return R.raw.character_demo_acrobat;
+            case Archer: return R.raw.character_demo_archer;
+            case Assassin: return R.raw.character_demo_assassin;
+            case Brewmaster: return R.raw.character_demo_brewmaster;
+            case Bruiser: return R.raw.character_demo_bruiser;
+            case ClawLauncher: return R.raw.character_demo_claw_launcher;
+            case HermitAndCub: return R.raw.character_demo_hermit_and_cub;
+            case Illusionist: return R.raw.character_demo_illusionist;
+            case Jailer: return R.raw.character_demo_jailer;
+            case LeaderKing: return R.raw.character_demo_leader_king;
+            case LeaderQueen: return R.raw.character_demo_leader_queen;
+            case Manipulator: return R.raw.character_demo_manipulator;
+            case Nemesis: return R.raw.character_demo_nemesis;
+            case Protector: return R.raw.character_demo_protector;
+            case Rider: return R.raw.character_demo_rider;
+            case RoyalGuard: return R.raw.character_demo_royal_guard;
+            case Vizier: return R.raw.character_demo_vizier;
+            case Wanderer: return R.raw.character_demo_wanderer;
+            default: throw new IllegalStateException("No character demo file found for character card: " + characterCard);
+        }
     }
 
     //endregion
