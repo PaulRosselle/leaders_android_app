@@ -1,5 +1,6 @@
 package com.leaders.app.activities.rules.character;
 
+import android.content.Intent;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -9,11 +10,13 @@ import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
+import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.views.portrait.AbilityPortraitGroupView;
+import com.leaders.app.views.portrait.PortraitView;
 
 import java.util.List;
 
-public class RulesCharacterMenuActivity extends BaseActivity {
+public final class RulesCharacterMenuActivity extends BaseActivity {
 
     //region BASE ACTIVITY OVERRIDEN METHODS
 
@@ -41,7 +44,7 @@ public class RulesCharacterMenuActivity extends BaseActivity {
         return R.id.gdlRoot_actRulesCharacterMenu;
     }
 
-    @Nullable
+    @NonNull
     @Override
     protected Integer getBtnBackResId() {
         return R.id.btnBack_actRulesCharacterMenu;
@@ -67,6 +70,7 @@ public class RulesCharacterMenuActivity extends BaseActivity {
     public ActivityType getActivityType() {
         return ActivityType.RulesCharacterMenu;
     }
+
     @Override
     protected void doOnBackPressed() {
         goToActivity(ActivityType.RulesMenu, ActivityTransitionType.SlideLeft);
@@ -77,7 +81,11 @@ public class RulesCharacterMenuActivity extends BaseActivity {
     //region VIEWS LISTENER METHODS
 
     private void onPortraitClick(View v) {
-        // TODO - open RulesCharacterActivity
+        Intent intent = ActivityType.RulesCharacter.getIntent(this);
+
+        intent.putExtra(ExtraUtils.EXTRA_CHARACTER_CARD, ((PortraitView) v).getPortraitCard().name());
+
+        goToActivity(intent);
     }
 
     //endregion

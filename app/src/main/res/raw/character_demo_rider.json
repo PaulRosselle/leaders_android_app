@@ -1,0 +1,204 @@
+{
+  "config": {
+    "players": [
+      {
+        "team_color": "Black",
+        "name": "Player"
+      },
+      {
+        "team_color": "White",
+        "name": "Puzzle"
+      }
+    ],
+    "first_player": {
+      "team_color": "Black",
+      "name": "Player"
+    },
+    "game_mode": "Strategist",
+    "initial_recruitable_cards": [],
+    "initial_placements": [
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "d2c9624f-437f-45f0-96c2-2ee60d8c3058",
+              "character_type": "LeaderKing",
+              "team_color": "White"
+            },
+            "position": {
+              "x": 3,
+              "y": 0
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "2909cd94-f09a-49e6-bde6-dc3b036e9a8f",
+              "character_type": "Assassin",
+              "team_color": "Black"
+            },
+            "position": {
+              "x": 5,
+              "y": 2
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "1aff532e-c39b-4c14-99ce-8979698c0582",
+              "character_type": "Protector",
+              "team_color": "White"
+            },
+            "position": {
+              "x": 1,
+              "y": 1
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "94836fc0-0d4a-4093-b335-fbb3bb22c2da",
+              "character_type": "Rider",
+              "team_color": "Black"
+            },
+            "position": {
+              "x": 3,
+              "y": 3
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "a5f0dbd5-446c-41db-b668-ebdef62d793b",
+              "character_type": "RoyalGuard",
+              "team_color": "White"
+            },
+            "position": {
+              "x": 4,
+              "y": 0
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "4e4095ed-c660-48af-a352-9d0fe9d7028c",
+              "character_type": "Illusionist",
+              "team_color": "White"
+            },
+            "position": {
+              "x": 2,
+              "y": 0
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "961e9afb-23c9-4fdf-a8e5-0a49a9a5b3d1",
+              "character_type": "LeaderQueen",
+              "team_color": "Black"
+            },
+            "position": {
+              "x": 4,
+              "y": 2
+            }
+          }
+        ],
+        "type": "Recruitment"
+      }
+    ]
+  },
+  "entries": [
+    {
+      "team_color": "Black",
+      "turn_start_phase": {
+        "start_action": {
+          "transition_type": "Start",
+          "transition_target": "TurnStartPhase"
+        },
+        "end_action": {
+          "transition_type": "End",
+          "transition_target": "TurnStartPhase"
+        },
+        "turn_team_color": "Black",
+        "actions": []
+      },
+      "actions_phase": {
+        "start_action": {
+          "transition_type": "Start",
+          "transition_target": "ActionsPhase"
+        },
+        "turn_team_color": "Black",
+        "actions": [
+          {
+            "comment": "This action is an unplayable dummy to prevent this character to move",
+            "src_character": {
+              "uuid": "961e9afb-23c9-4fdf-a8e5-0a49a9a5b3d1",
+              "character_type": "LeaderQueen",
+              "team_color": "Black"
+            },
+            "motions": [
+              {
+                "motion_type": "Add",
+                "targets": []
+              }
+            ]
+          },
+          {
+            "comment": "This action is an unplayable dummy to prevent this character to move",
+            "src_character": {
+              "uuid": "2909cd94-f09a-49e6-bde6-dc3b036e9a8f",
+              "character_type": "Assassin",
+              "team_color": "Black"
+            },
+            "motions": [
+              {
+                "motion_type": "Add",
+                "targets": []
+              }
+            ]
+          }
+        ]
+      },
+      "recruitment_phase": {
+        "turn_team_color": "Black",
+        "actions": []
+      },
+      "turn_end_phase": {
+        "turn_team_color": "Black",
+        "actions": []
+      },
+      "type": "turn"
+    }
+  ]
+}

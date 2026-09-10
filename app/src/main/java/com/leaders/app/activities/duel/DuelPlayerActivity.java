@@ -11,7 +11,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
-import com.leaders.app.activities.BaseActivity;
+import com.leaders.app.activities.PlayableActivity;
 import com.leaders.app.controllers.GameController;
 import com.leaders.app.entities.ReplaySave;
 import com.leaders.app.enums.ActivityType;
@@ -22,13 +22,9 @@ import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.utilities.TeamColorUtils;
 import com.leaders.app.views.ActionsMenuView;
-import com.leaders.app.views.EndGameView;
-import com.leaders.app.views.board.PlayableBoardView;
 import com.leaders.app.views.portrait.PortraitView;
 import com.leaders.app.views.character.CharacterDisplay;
 import com.leaders.app.views.character.HighlightView;
-import com.leaders.app.views.character.CharacterNotificationView;
-import com.leaders.app.views.character.CharacterView;
 import com.leaders.app.views.duel.CharacterCardSelectionView;
 import com.leaders.app.views.duel.PlayerBottomView;
 import com.leaders.app.views.duel.PlayerTopView;
@@ -42,11 +38,8 @@ import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.entities.PlayerWarningState;
-import com.leaders.gamelogic.enums.CharacterCard;
-import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.GamePhaseType;
 import com.leaders.gamelogic.enums.TeamColor;
-import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.interactions.InteractionType;
@@ -62,10 +55,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
-public final class DuelPlayerActivity extends BaseActivity implements
-        PlayableBoardView.OnTargetClickListener,
-        CharacterCardSelectionView.OnCardSelectedListener,
-        GameController.Listener {
+public final class DuelPlayerActivity extends PlayableActivity implements
+        CharacterCardSelectionView.OnCardSelectedListener {
 
     private enum DuelAction {
         SaveAsReplay,
@@ -96,30 +87,21 @@ public final class DuelPlayerActivity extends BaseActivity implements
         }
     }
 
-    private PlayableBoardView bdvBoard;
     private CharacterCardSelectionView ccsvCardSelector;
     private PlayerBottomView pbvCurrentPlayer;
     private PlayerTopView ptvOpposingPlayer;
     private TextView txvPlayerTurn;
-
-    private CharacterNotificationView cnvCardInfo;
 
     private MaterialButton btnActions;
     private ActionsMenuView amvActions;
     private ReplaySaveView rsvReplaySave;
     private View vwDialogBg;
 
-    private EndGameView egvEndGame;
-
     private CharacterDisplay chdNewCharacter;
 
     private MaterialButton btnCards;
-    private MaterialButton btnUndoLastAction;
     private MaterialButton btnNextPhase;
     private HighlightView hlvNextPhase;
-
-
-    private GameController controller;
     
 
     //region BASE ACTIVITY OVERRIDEN METHODS
@@ -128,16 +110,12 @@ public final class DuelPlayerActivity extends BaseActivity implements
     protected void initViews() {
         super.initViews();
 
-        bdvBoard = findViewById(R.id.bdvBoard_actDuelPlayer);
-
         ccsvCardSelector = findViewById(R.id.ccsvCardSelector_actDuelPlayer);
         chdNewCharacter = new CharacterDisplay(this, ccsvCardSelector);
 
         pbvCurrentPlayer = findViewById(R.id.pbvCurrentPlayer_actDuelPlayer);
         ptvOpposingPlayer = findViewById(R.id.ptvOpposingPlayer_actDuelPlayer);
         txvPlayerTurn = findViewById(R.id.txvPlayerTurn_actDuelPlayer);
-
-        cnvCardInfo = findViewById(R.id.cnvCardInfo_actDuelPlayer);
 
         btnActions = findViewById(R.id.btnActions_actDuelPlayer);
         amvActions = findViewById(R.id.amvActions_actDuelPlayer);
@@ -148,10 +126,7 @@ public final class DuelPlayerActivity extends BaseActivity implements
         rsvReplaySave = findViewById(R.id.rsvReplaySave_actDuelPlayer);
         vwDialogBg = findViewById(R.id.vwDialogBg_actDuelPlayer);
 
-        egvEndGame = findViewById(R.id.egvEndGame_actDuelPlayer);
-
         btnCards = findViewById(R.id.btnCards_actDuelPlayer);
-        btnUndoLastAction = findViewById(R.id.btnUndoLastAction_actDuelPlayer);
         btnNextPhase = findViewById(R.id.btnNextPhase_actDuelPlayer);
         hlvNextPhase = findViewById(R.id.hlvNextPhase_actDuelPlayer);
     }
@@ -166,23 +141,15 @@ public final class DuelPlayerActivity extends BaseActivity implements
         ccsvCardSelector.setOnClickListener(this::onNonInteractiveElementClick);
         ccsvCardSelector.setOnScrollViewClickListener(this::onNonInteractiveElementClick);
 
-        bdvBoard.setOnTargetClickListener(this);
-        bdvBoard.setOnCharacterLongClickListener(this::onBoardCharacterLongClick);
-
         ccsvCardSelector.setOnCardSelectedListener(this);
         ccsvCardSelector.setOnPortraitLongClickListener(this::onPortraitLongClick);
-
-        cnvCardInfo.setOnClickListener(v -> cnvCardInfo.hide());
 
         btnActions.setOnClickListener(this::onActionsClick);
         rsvReplaySave.setOnSaveClick(this::onSaveAsReplayConfirmed);
         rsvReplaySave.setOnCancelClick(this::onSaveAsReplayCancelled);
         vwDialogBg.setOnClickListener(this::vwDialogBgClick);
 
-        egvEndGame.setOnClickListener(view -> egvEndGame.hide());
-
         btnCards.setOnClickListener(this::onCardsClick);
-        btnUndoLastAction.setOnClickListener(this::onUndoLastActionClick);
         btnNextPhase.setOnClickListener(this::onNextPhaseClick);
     }
 
@@ -209,6 +176,26 @@ public final class DuelPlayerActivity extends BaseActivity implements
     }
 
     @Override
+    protected int getBoardViewId() {
+        return R.id.bdvBoard_actDuelPlayer;
+    }
+
+    @Override
+    protected int getUndoLastActionButtonId() {
+        return R.id.btnUndoLastAction_actDuelPlayer;
+    }
+
+    @Override
+    protected int getCharacterNotificationViewId() {
+        return R.id.cnvCardInfo_actDuelPlayer;
+    }
+
+    @Override
+    protected int getEndGameViewId() {
+        return R.id.egvEndGame_actDuelPlayer;
+    }
+
+    @Override
     protected int getLayoutResId() {
         return R.layout.activity_duel_player;
     }
@@ -222,16 +209,6 @@ public final class DuelPlayerActivity extends BaseActivity implements
     @Override
     protected Integer getBtnBackResId() {
         return R.id.btnBack_actDuelPlayer;
-    }
-
-    @Override
-    protected boolean isImmersiveActivity() {
-        return true;
-    }
-
-    @Override
-    protected boolean overrideOnBackPressed() {
-        return true;
     }
 
     @Override
@@ -249,16 +226,8 @@ public final class DuelPlayerActivity extends BaseActivity implements
 
     //region VIEW LISTENER METHODS
 
-    public void onNonInteractiveElementClick(View v) {
-        controller.cancelAction();
-    }
-
     private void onCardsClick(View v) {
         setCardSelectorVisible(ccsvCardSelector.getVisibility() != View.VISIBLE);
-    }
-
-    private void onUndoLastActionClick(View v) {
-        controller.undoLastAction();
     }
 
     private void onNextPhaseClick(View v) {
@@ -273,13 +242,6 @@ public final class DuelPlayerActivity extends BaseActivity implements
 
     private void onActionsClick(View v) {
         setActionsMenuVisible(true);
-    }
-
-    private boolean onBoardCharacterLongClick(View v) {
-        CharacterType characterType = Objects.requireNonNull(((CharacterView) v).getCharacterType(),
-                "An empty character piece is not authorized in the puzzle editor");
-        showCardDescriptionNotification(characterType.getCharacterCard());
-        return true;
     }
 
     private boolean onPortraitLongClick(View v) {
@@ -354,16 +316,6 @@ public final class DuelPlayerActivity extends BaseActivity implements
 
     //region INTERACTION METHODS
 
-    @Override
-    public void onEmptyClick() {
-        controller.cancelAction();
-    }
-
-    @Override
-    public void onTargetClick(@NonNull InteractionTarget target) {
-        controller.selectTarget(target);
-    }
-
     public void onRecruitmentCardSelected(@NonNull InteractionTarget target) {
         controller.selectTarget(target);
     }
@@ -381,18 +333,6 @@ public final class DuelPlayerActivity extends BaseActivity implements
     //endregion
 
     //region UI STATE METHODS
-
-    private void showCardDescriptionNotification(@NonNull CharacterCard characterCard) {
-        if (cnvCardInfo.getCharacterCard() == characterCard) {
-            cnvCardInfo.setCharacterCard(null);
-            cnvCardInfo.hide();
-        } else {
-            cnvCardInfo.setCharacterCard(characterCard);
-            if (cnvCardInfo.getVisibility() != View.VISIBLE) {
-                cnvCardInfo.show();
-            }
-        }
-    }
 
     private void setCardSelectorVisible(boolean visible) {
         // When recruiting, we display the cardSelector view below the current player view.
@@ -435,10 +375,7 @@ public final class DuelPlayerActivity extends BaseActivity implements
 
     private void showEndGame(@NonNull GameContext gameContext, @NonNull Player winner) {
         TeamColor winnerColor = winner.getTeamColor();
-        Cell leaderCell = Objects.requireNonNull(
-                BoardQuery.findLeaderCell(gameContext.getBoard(), winnerColor),
-                "No leader found for team: " + winnerColor
-        );
+
         String loserName = "";
         for (Player player : List.of(gameContext.getCurrentPlayer(), gameContext.getOpposingPlayer())) {
             if (player.getTeamColor() != winnerColor) {
@@ -446,9 +383,9 @@ public final class DuelPlayerActivity extends BaseActivity implements
             }
         }
 
-        egvEndGame.update(
+        showEndGame(gameContext,
+                winnerColor,
                 EndGameType.Victory,
-                LeaderType.getFromCharacter(leaderCell.getCharacter()),
                 getString(R.string.duel_over),
                 String.format(getString(R.string.player_defeated_player), winner.getName(), loserName)
         );
@@ -473,19 +410,10 @@ public final class DuelPlayerActivity extends BaseActivity implements
         return LeaderType.getFromCharacter(leaderCell.getCharacter());
     }
 
-    private void highlightPlayableCharacters(@NonNull GameContext gameContext,
+    @Override
+    protected void highlightPlayableCharacters(@NonNull GameContext gameContext,
                                              @NonNull InteractionRequest request) {
-        bdvBoard.highlightPlayableCharacters(
-                gameContext.getPlayableCharacters(),
-                request.getContext().getCharacter(),
-                gameContext.getBoard()
-        );
-
-        if (request.getRequestType() == InteractionType.PlayableCharacterExpected) {
-            bdvBoard.startPlayableCharactersShineAnimation();
-        } else {
-            bdvBoard.stopPlayableCharactersShineAnimation();
-        }
+        super.highlightPlayableCharacters(gameContext, request);
 
         if (request.getLegalTargets().stream()
                 .anyMatch(target -> target.getCategory() == TargetCategory.RecruitmentDestination)) {
@@ -583,23 +511,44 @@ public final class DuelPlayerActivity extends BaseActivity implements
 
     //region INTERACTION METHODS
 
-    private void clearInteractionUI(@NonNull GameContext gameContext) {
-        bdvBoard.clearTargets();
+    @Override
+    protected void clearInteractionUI(@NonNull GameContext gameContext) {
+        super.clearInteractionUI(gameContext);
+
         ccsvCardSelector.applyCards(gameContext.getAvailableCharacterCards());
 
         ccsvCardSelector.setPortraitsVisible(true);
         setNewCharacterVisible(null, false);
 
-        ButtonUtils.setEnabled(btnUndoLastAction, false);
         setBtnNextPhaseEnabled(false, false);
     }
 
-    private void updateInteractionUI(@NonNull GameContext gameContext,
+    @Override
+    protected void applyInteractionTargets(@NonNull GameContext gameContext,
+                                           @NonNull InteractionRequest request) {
+        switch (request.getRequestType()) {
+            case NoTargetExpected:
+                clearInteractionUI(gameContext); // Only require to choose a result within legalResults
+                break;
+            case SelectableCharacterCardExpected:
+                ccsvCardSelector.applyTargets(request.getLegalTargets());
+                break;
+            case PlayableCharacterExpected:
+            case PositionExpected: {
+                bdvBoard.applyTargets(request.getLegalTargets(), request.getContext(), gameContext.getBoard());
+            } break;
+            default:
+                throw new IllegalStateException("Unexpected request type: " + request.getRequestType());
+        }
+    }
+
+    @Override
+    protected void updateInteractionUI(@NonNull GameContext gameContext,
                                      @NonNull InteractionRequest request) {
-        highlightPlayableCharacters(gameContext, request);
+        super.updateInteractionUI(gameContext, request);
+
         highlightSelectableCards(gameContext, request);
 
-        ButtonUtils.setEnabled(btnUndoLastAction, controller.canUndoLastAction());
         setBtnNextPhaseEnabled(controller.canEndPhaseAction(), request.getLegalTargets().isEmpty());
 
         if (request.getRequestType() == InteractionType.PositionExpected &&
@@ -639,34 +588,6 @@ public final class DuelPlayerActivity extends BaseActivity implements
     }
 
     @Override
-    public void onActionUndone(@NonNull Game game) {
-        runOnUiThread(() -> bdvBoard.setBoard(game.getBoard()));
-    }
-
-    @Override
-    public void onInteractionRequired(@NonNull InteractionRequest request) {
-        runOnUiThread(() -> {
-            GameContext gameContext = controller.getCurrentContext();
-            switch (request.getRequestType()) {
-                case NoTargetExpected:
-                    clearInteractionUI(gameContext); // Only require to choose a result within legalResults
-                    break;
-                case SelectableCharacterCardExpected:
-                    ccsvCardSelector.applyTargets(request.getLegalTargets());
-                    break;
-                case PlayableCharacterExpected:
-                case PositionExpected: {
-                    bdvBoard.applyTargets(request.getLegalTargets(), request.getContext(), gameContext.getBoard());
-                } break;
-                default:
-                    throw new IllegalStateException("Unexpected request type: " + request.getRequestType());
-            }
-
-            updateInteractionUI(gameContext, request);
-        });
-    }
-
-    @Override
     public void onPhaseChanged(@NonNull GamePhase phase) {
         runOnUiThread(() -> {
             GameContext gameContext = controller.getCurrentContext();
@@ -677,17 +598,6 @@ public final class DuelPlayerActivity extends BaseActivity implements
 
             applyPhaseChange(phase, true);
         });
-    }
-
-    @Override
-    public void onFeedback(@NonNull InteractionFeedback feedback,
-                           @NonNull GameController.InteractionCompletion completion) {
-        runOnUiThread(() -> bdvBoard.animateFeedback(feedback, completion::complete));
-    }
-
-    @Override
-    public void onInteractionCleared() {
-        runOnUiThread(() -> clearInteractionUI(controller.getCurrentContext()));
     }
 
     //enregion

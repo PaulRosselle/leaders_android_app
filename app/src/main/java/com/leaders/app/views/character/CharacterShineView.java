@@ -17,7 +17,7 @@ import android.view.animation.DecelerateInterpolator;
 
 import androidx.annotation.NonNull;
 
-public class CharacterShineView extends View {
+public final class CharacterShineView extends View {
     private static final int SHINE_ANIMATION_DURATION = 600;
     private static final float SHINE_THICKNESS_RATIO = 0.26f;
 

@@ -143,9 +143,9 @@
     <string name="next_puzzle">Next puzzle</string>
     <string name="previous_puzzle">Previous puzzle</string>
     <string name="victory_title">ViCtORY</string>
-    <string name="victory_subtitle">The opponent\\\'s leader has been neutralized</string>
+    <string name="victory_subtitle">The opponent\\\'s leader has been defeated</string>
     <string name="defeat_title">defeat</string>
-    <string name="defeat_subtitle">Your leader has been neutralized</string>
+    <string name="defeat_subtitle">Your leader has been defeated</string>
     <string name="player_name">player name</string>
     <string name="discovery_mode_title">discovery</string>
     <string name="strategist_mode_title">strategist</string>

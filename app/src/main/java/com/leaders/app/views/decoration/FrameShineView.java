@@ -16,7 +16,7 @@ import android.view.animation.AccelerateInterpolator;
 
 import androidx.annotation.NonNull;
 
-public class FrameShineView extends View {
+public final class FrameShineView extends View {
 
     public static final int SHINE_ANIMATION_DURATION = 1800;
     private static final float SHINE_ANGLE = -25f;

@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class AnimationSpeedView extends ConstraintLayout {
+public final class AnimationSpeedView extends ConstraintLayout {
     public interface onSpeedChangeListener {
         void onSpeedChange(@NonNull AnimationSpeed speed);
     }

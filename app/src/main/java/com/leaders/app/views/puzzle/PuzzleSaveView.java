@@ -10,7 +10,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.leaders.R;
 
-public class PuzzleSaveView extends ConstraintLayout {
+public final class PuzzleSaveView extends ConstraintLayout {
     private String defaultName;
 
     private final EditText edtName;

@@ -1,0 +1,235 @@
+{
+  "config": {
+    "players": [
+      {
+        "team_color": "Black",
+        "name": "Player"
+      },
+      {
+        "team_color": "White",
+        "name": "Puzzle"
+      }
+    ],
+    "first_player": {
+      "team_color": "Black",
+      "name": "Player"
+    },
+    "game_mode": "Strategist",
+    "initial_recruitable_cards": [],
+    "initial_placements": [
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "2797d9cf-67f0-4c59-bcd6-0bee33c609b9",
+              "character_type": "Manipulator",
+              "team_color": "Black"
+            },
+            "position": {
+              "x": 4,
+              "y": 3
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "0e4af89b-4bb0-451f-9eca-9c992ef52e10",
+              "character_type": "Jailer",
+              "team_color": "Black"
+            },
+            "position": {
+              "x": 0,
+              "y": 0
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "52b8b2f8-764d-4fbc-b075-0a84638532dc",
+              "character_type": "LeaderQueen",
+              "team_color": "White"
+            },
+            "position": {
+              "x": 2,
+              "y": 2
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "8644327c-ee7e-4a87-9f9f-f31e0a46286c",
+              "character_type": "Bruiser",
+              "team_color": "Black"
+            },
+            "position": {
+              "x": 1,
+              "y": 0
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "6d6000cc-dbb8-4e32-b80f-085c7d5e77f8",
+              "character_type": "ClawLauncher",
+              "team_color": "White"
+            },
+            "position": {
+              "x": 5,
+              "y": 4
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "0d345718-87d3-42b1-8448-47b61a972133",
+              "character_type": "Wanderer",
+              "team_color": "White"
+            },
+            "position": {
+              "x": 3,
+              "y": 4
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "8abce7f3-a7db-4b9c-9e67-9437f8b32e14",
+              "character_type": "LeaderKing",
+              "team_color": "Black"
+            },
+            "position": {
+              "x": 6,
+              "y": 1
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "e617f39a-73f3-47a3-a812-d4def788ce58",
+              "character_type": "Rider",
+              "team_color": "White"
+            },
+            "position": {
+              "x": 4,
+              "y": 1
+            }
+          }
+        ],
+        "type": "Recruitment"
+      }
+    ]
+  },
+  "entries": [
+    {
+      "team_color": "Black",
+      "turn_start_phase": {
+        "start_action": {
+          "transition_type": "Start",
+          "transition_target": "TurnStartPhase"
+        },
+        "end_action": {
+          "transition_type": "End",
+          "transition_target": "TurnStartPhase"
+        },
+        "turn_team_color": "Black",
+        "actions": []
+      },
+      "actions_phase": {
+        "start_action": {
+          "transition_type": "Start",
+          "transition_target": "ActionsPhase"
+        },
+        "turn_team_color": "Black",
+        "actions": [
+          {
+            "comment": "This action is an unplayable dummy to prevent this character to move",
+            "src_character": {
+              "uuid": "8abce7f3-a7db-4b9c-9e67-9437f8b32e14",
+              "character_type": "LeaderKing",
+              "team_color": "Black"
+            },
+            "motions": [
+              {
+                "motion_type": "Add",
+                "targets": []
+              }
+            ]
+          },
+          {
+            "comment": "This action is an unplayable dummy to prevent this character to move",
+            "src_character": {
+              "uuid": "0e4af89b-4bb0-451f-9eca-9c992ef52e10",
+              "character_type": "Jailer",
+              "team_color": "Black"
+            },
+            "motions": [
+              {
+                "motion_type": "Add",
+                "targets": []
+              }
+            ]
+          },
+          {
+            "comment": "This action is an unplayable dummy to prevent this character to move",
+            "src_character": {
+              "uuid": "8644327c-ee7e-4a87-9f9f-f31e0a46286c",
+              "character_type": "Bruiser",
+              "team_color": "Black"
+            },
+            "motions": [
+              {
+                "motion_type": "Add",
+                "targets": []
+              }
+            ]
+          }
+        ]
+      },
+      "recruitment_phase": {
+        "turn_team_color": "Black",
+        "actions": []
+      },
+      "turn_end_phase": {
+        "turn_team_color": "Black",
+        "actions": []
+      },
+      "type": "turn"
+    }
+  ]
+}

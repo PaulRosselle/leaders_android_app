@@ -21,7 +21,7 @@ import com.leaders.gamelogic.enums.CharacterMotionType;
 import java.util.List;
 import java.util.Objects;
 
-public class CharacterActionView extends LinearLayoutCompat {
+public final class CharacterActionView extends LinearLayoutCompat {
     @NonNull
     private final CharacterView chvSourceCharacter;
     @NonNull

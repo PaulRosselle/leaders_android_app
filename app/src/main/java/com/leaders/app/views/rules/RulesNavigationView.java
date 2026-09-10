@@ -19,7 +19,7 @@ import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.RulesChapter;
 
-public class RulesNavigationView extends ConstraintLayout {
+public final class RulesNavigationView extends ConstraintLayout {
     public interface IRulesNavigation {
         RulesChapter getChapter();
         BaseActivity getActivity();

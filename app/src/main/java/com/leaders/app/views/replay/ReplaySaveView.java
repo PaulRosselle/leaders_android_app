@@ -20,7 +20,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Locale;
 
-public class ReplaySaveView extends ConstraintLayout {
+public final class ReplaySaveView extends ConstraintLayout {
     private String defaultName;
 
     private final EditText edtName;

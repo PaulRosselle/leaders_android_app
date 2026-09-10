@@ -141,6 +141,7 @@ public final class AbilityPortraitGroupView extends ConstraintLayout {
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
 
+        layoutParams.topMargin = (int) (4 * getResources().getDisplayMetrics().density);
         layoutParams.weight = 1;
 
         return layoutParams;

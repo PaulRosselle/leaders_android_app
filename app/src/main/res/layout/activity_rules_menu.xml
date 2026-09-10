@@ -76,7 +76,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txvTitle_actRulesMenu"
-        app:srcCompat="@drawable/character_artwork_vizier" />
+        app:srcCompat="@drawable/rules_character_background" />
 
     <LinearLayout
         android:layout_width="0dp"
