@@ -53,7 +53,7 @@ public enum TutorialChapter {
 
     public int getTextBeforeResId() {
         switch (this) {
-            case CaptureLeader: return R.string.rules_chapter_capture_leader;
+            case CaptureLeader: return R.string.tutorial_capture_before;
             case ActiveAbilities: return R.string.rules_chapter_active_abilities;
             case PassiveAbilities: return R.string.rules_chapter_passive_abilities;
             case Recruitment: return R.string.rules_chapter_recruitment;
@@ -65,7 +65,7 @@ public enum TutorialChapter {
 
     public int getTextAfterResId() {
         switch (this) {
-            case CaptureLeader: return R.string.rules_chapter_capture_leader;
+            case CaptureLeader: return R.string.tutorial_capture_after;
             case ActiveAbilities: return R.string.rules_chapter_active_abilities;
             case PassiveAbilities: return R.string.rules_chapter_passive_abilities;
             case Recruitment: return R.string.rules_chapter_recruitment;

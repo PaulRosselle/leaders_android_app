@@ -14,6 +14,7 @@ import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.EndGameType;
 import com.leaders.app.enums.TutorialChapter;
 import com.leaders.app.utilities.ButtonUtils;
+import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.views.character.HighlightView;
 import com.leaders.app.views.rules.TutorialNavigationView;
 import com.leaders.gamelogic.entities.GameContext;
@@ -21,7 +22,6 @@ import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.Player;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
-import com.leaders.puzzlelogic.utilities.PuzzleEditionUtils;
 
 import org.json.JSONException;
 
@@ -81,8 +81,7 @@ public abstract class RulesTutorialActivity extends PlayableActivity implements 
         txvBefore.setText(getChapter().getTextBeforeResId());
         txvAfter.setText(getChapter().getTextAfterResId());
 
-        // TODO - load tutorial history from Json
-        startHistory = PuzzleEditionUtils.getDefaultHistory();
+        startHistory = JsonUtils.loadTutorialChapter(this, getChapter());
         startHistoryHash = getHistoryHash(startHistory);
 
         controller = new GameController(this);

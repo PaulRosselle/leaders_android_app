@@ -219,5 +219,7 @@
     <string name="learn_using_the_tutorial">apprendre avec le tutoriel</string>
     <string name="test_out_characters">tester les personnages</string>
     <string name="online_guide">guide en ligne</string>
+    <string name="tutorial_capture_before">Pour gagner dans Leaders vous devez capturer le leader adverse. Pour cela, amenez deux de vos personnages sur des cases qui lui sont adjacentes.</string>
+    <string name="tutorial_capture_after">La plupart des personnages peuvent faire plus que se déplacer d\'une case.\n\nDécouvrez cela dans le chapitre suivant.</string>
 
 </resources>
