@@ -39,7 +39,7 @@ import java.util.Objects;
 
 public class RulesTutorialRecruitmentActivity extends PlayableActivity implements
         TutorialNavigationView.IRulesNavigation,
-        CharacterCardSelectionView.OnCardSelectedListener{
+        CharacterCardSelectionView.OnCardSelectedListener {
     private CharacterCardSelectionView ccsvCardSelector;
     private CharacterDisplay chdNewCharacter;
 

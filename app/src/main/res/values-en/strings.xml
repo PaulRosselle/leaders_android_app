@@ -229,5 +229,7 @@
     <string name="tutorial_surround_info">Press and hold a character to discover their ability.</string>
     <string name="second_player_recruitment">The second player recruits a second time during their first turn.\nThis rule helps offset the advantage of going first.\n\nYou can now recruit another character.</string>
     <string name="new_rule">New rule!</string>
+    <string name="tutorial_capture_game_vs_bot">TODO</string>
+    <string name="restart_game_vs_bot">Would you like to restart this match?</string>
 
 </resources>

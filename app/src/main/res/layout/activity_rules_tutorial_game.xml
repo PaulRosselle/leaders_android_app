@@ -36,7 +36,6 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:visibility="gone" />
 
-
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnBack_actRulesTutorialGame"
         android:layout_width="@dimen/round_button_size"
@@ -59,15 +58,27 @@
         app:layout_constraintVertical_bias="0.0"
         tools:ignore="SpeakableTextPresentCheck" />
 
+    <com.leaders.app.views.rules.TutorialNavigationView
+        android:id="@+id/tnvNavigation_actRulesTutorialGame"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btnInfo_actRulesTutorialGame"
+        app:layout_constraintStart_toEndOf="@+id/btnBack_actRulesTutorialGame"
+        app:layout_constraintTop_toTopOf="@id/gdlRoot_actRulesTutorialGame"
+        app:layout_constraintVertical_bias="0.0" />
+
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnActions_actRulesTutorialGame"
+        android:id="@+id/btnInfo_actRulesTutorialGame"
         android:layout_width="@dimen/round_button_size"
         android:layout_height="@dimen/round_button_size"
         android:layout_marginEnd="8dp"
         android:background="@color/transparent"
         android:insetTop="0dp"
         android:insetBottom="0dp"
-        app:icon="@drawable/icon_more_actions"
+        app:icon="@drawable/icon_info"
         app:iconGravity="textStart"
         app:iconPadding="0dp"
         app:iconSize="@dimen/round_button_icon_size"
@@ -93,7 +104,7 @@
         app:layout_constraintBottom_toTopOf="@+id/btnUndoLastAction_actRulesTutorialGame"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pbvCurrentPlayer_actRulesTutorialGame" />
+        app:layout_constraintTop_toBottomOf="@+id/pbvPlayer_actRulesTutorialGame" />
 
     <com.leaders.app.views.board.PlayableBoardView
         android:id="@+id/bdvBoard_actRulesTutorialGame"
@@ -108,7 +119,7 @@
         app:layout_constraintTop_toBottomOf="@+id/btnBack_actRulesTutorialGame" />
 
     <com.leaders.app.views.duel.PlayerTopView
-        android:id="@+id/ptvOpposingPlayer_actRulesTutorialGame"
+        android:id="@+id/ptvBot_actRulesTutorialGame"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -120,7 +131,7 @@
         app:layout_constraintVertical_bias="0.0" />
 
     <com.leaders.app.views.duel.PlayerBottomView
-        android:id="@+id/pbvCurrentPlayer_actRulesTutorialGame"
+        android:id="@+id/pbvPlayer_actRulesTutorialGame"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -203,20 +214,6 @@
         app:strokeWidth="1dp"
         tools:ignore="SpeakableTextPresentCheck" />
 
-    <TextView
-        android:id="@+id/txvPlayerTurn_actRulesTutorialGame"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/futura"
-        android:textAllCaps="true"
-        android:textColor="@color/app_golden"
-        android:textSize="@dimen/default_text_font_size"
-        app:layout_constraintBottom_toBottomOf="@+id/btnBack_actRulesTutorialGame"
-        app:layout_constraintEnd_toStartOf="@+id/btnActions_actRulesTutorialGame"
-        app:layout_constraintStart_toEndOf="@+id/btnBack_actRulesTutorialGame"
-        app:layout_constraintTop_toTopOf="@id/gdlRoot_actRulesTutorialGame"
-        tools:text="Au tour de Nemesis is top tier" />
-
     <com.leaders.app.views.character.HighlightView
         android:id="@+id/hlvNextPhase_actRulesTutorialGame"
         android:layout_width="0dp"
@@ -245,42 +242,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/gdlRoot_actRulesTutorialGame"
         app:layout_constraintVertical_bias="0.0" />
-
-    <View
-        android:id="@+id/vwDialogBg_actRulesTutorialGame"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@color/transparent_black"
-        android:clickable="true"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <com.leaders.app.views.ActionsMenuView
-        android:id="@+id/amvActions_actRulesTutorialGame"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/btnActions_actRulesTutorialGame"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnActions_actRulesTutorialGame"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <com.leaders.app.views.replay.ReplaySaveView
-        android:id="@+id/rsvReplaySave_actRulesTutorialGame"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <com.leaders.app.views.EndGameView
         android:id="@+id/egvEndGame_actRulesTutorialGame"
