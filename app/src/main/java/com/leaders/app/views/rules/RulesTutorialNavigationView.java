@@ -19,7 +19,7 @@ import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.RulesChapter;
 
-public final class RulesNavigationView extends ConstraintLayout {
+public final class RulesTutorialNavigationView extends ConstraintLayout {
     public interface IRulesNavigation {
         RulesChapter getChapter();
         BaseActivity getActivity();
@@ -37,14 +37,14 @@ public final class RulesNavigationView extends ConstraintLayout {
     private final ArrayAdapter<String> chapterNamesAdapter;
 
 
-    public RulesNavigationView(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public RulesTutorialNavigationView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
-        inflate(context, R.layout.view_rules_navigation, this);
+        inflate(context, R.layout.view_rules_tutorial_navigation, this);
 
-        txvChapterNumber = findViewById(R.id.txvChapterNumber_actRulesNavigation);
-        txvChapterName = findViewById(R.id.txvChapterName_actRulesNavigation);
-        btnChangeChapter = findViewById(R.id.btnChangeChapter_actRulesNavigation);
+        txvChapterNumber = findViewById(R.id.txvChapterNumber_actRulesTutorialNavigation);
+        txvChapterName = findViewById(R.id.txvChapterName_actRulesTutorialNavigation);
+        btnChangeChapter = findViewById(R.id.btnChangeChapter_actRulesTutorialNavigation);
 
         chapterNamesAdapter = new ArrayAdapter<>(
                 context,

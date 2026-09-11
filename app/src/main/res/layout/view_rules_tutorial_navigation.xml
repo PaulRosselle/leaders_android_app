@@ -7,7 +7,7 @@
     tools:ignore="SpUsage">
 
     <ImageView
-        android:id="@+id/imvChapterBg_actRulesNavigation"
+        android:id="@+id/imvChapterBg_actRulesTutorialNavigation"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:importantForAccessibility="no"
@@ -19,7 +19,7 @@
 
 
     <TextView
-        android:id="@+id/txvChapterNumber_actRulesNavigation"
+        android:id="@+id/txvChapterNumber_actRulesTutorialNavigation"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:clickable="true"
@@ -33,13 +33,13 @@
         android:textColor="@color/app_golden"
         android:textSize="@dimen/default_text_font_size"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btnChangeChapter_actRulesNavigation"
+        app:layout_constraintEnd_toStartOf="@+id/btnChangeChapter_actRulesTutorialNavigation"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/txvChapterName_actRulesNavigation"
+        android:id="@+id/txvChapterName_actRulesTutorialNavigation"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:autoSizeMaxTextSize="@dimen/default_text_font_size"
@@ -57,12 +57,12 @@
         android:textColor="@color/app_golden"
         android:textSize="@dimen/default_text_font_size"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btnChangeChapter_actRulesNavigation"
-        app:layout_constraintStart_toEndOf="@+id/txvChapterNumber_actRulesNavigation"
+        app:layout_constraintEnd_toStartOf="@+id/btnChangeChapter_actRulesTutorialNavigation"
+        app:layout_constraintStart_toEndOf="@+id/txvChapterNumber_actRulesTutorialNavigation"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnChangeChapter_actRulesNavigation"
+        android:id="@+id/btnChangeChapter_actRulesTutorialNavigation"
         android:layout_width="42dp"
         android:layout_height="42dp"
         android:layout_marginTop="2dp"
@@ -78,7 +78,7 @@
         app:iconSize="14dp"
         app:iconTint="@color/app_golden"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/imvChapterBg_actRulesNavigation"
+        app:layout_constraintEnd_toEndOf="@+id/imvChapterBg_actRulesTutorialNavigation"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
