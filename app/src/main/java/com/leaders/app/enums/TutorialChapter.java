@@ -25,7 +25,7 @@ public enum TutorialChapter {
             case PassiveAbilities: return ActivityType.RulesTutorialPassiveAbilities;
             case SurroundLeader: return ActivityType.RulesTutorialSurround;
             case Recruitment: return ActivityType.RulesTutorialRecruitment;
-            // TODO - handle GameVsBot
+            case GameVsBot: return ActivityType.RulesTutorialGame;
             default: throw new IllegalStateException("No activity type found for chapter: " + this);
         }
     }
