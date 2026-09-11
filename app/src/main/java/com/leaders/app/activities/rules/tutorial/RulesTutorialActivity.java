@@ -144,10 +144,10 @@ public abstract class RulesTutorialActivity extends PlayableActivity implements 
 
     @Override
     protected boolean canUndoLastAction() {
-        return super.canUndoLastAction() && !getStartHistory();
+        return super.canUndoLastAction() && !isStartHistory();
     }
 
-    private boolean getStartHistory() {
+    private boolean isStartHistory() {
         return getHistoryHash(controller.getHistory()).equals(startHistoryHash);
     }
 

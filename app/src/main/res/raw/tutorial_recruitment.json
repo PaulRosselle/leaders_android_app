@@ -1,0 +1,240 @@
+{
+  "config": {
+    "players": [
+      {
+        "team_color": "Black",
+        "name": "player"
+      },
+      {
+        "team_color": "White",
+        "name": "tutorial"
+      }
+    ],
+    "first_player": {
+      "team_color": "White",
+      "name": "tutorial"
+    },
+    "game_mode": "Discovery",
+    "initial_recruitable_cards": [
+      "Acrobat",
+      "Illusionist",
+      "Protector",
+      "Vizier"
+    ],
+    "initial_placements": [
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "2abff8b4-990a-4be3-8e06-d08f7e46cc8f",
+              "character_type": "LeaderQueen",
+              "team_color": "Black"
+            },
+            "position": {
+              "x": 3,
+              "y": 6
+            }
+          },
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "cb9edddb-a4fe-4696-a0cb-48776d3decd5",
+              "character_type": "LeaderKing",
+              "team_color": "White"
+            },
+            "position": {
+              "x": 3,
+              "y": 0
+            }
+          }
+        ],
+        "type": "Recruitment"
+      }
+    ]
+  },
+  "entries": [
+    {
+      "start_action": {
+        "transition_type": "Start",
+        "transition_target": "Turn"
+      },
+      "end_action": {
+        "transition_type": "End",
+        "transition_target": "Turn"
+      },
+      "team_color": "White",
+      "turn_start_phase": {
+        "start_action": {
+          "transition_type": "Start",
+          "transition_target": "TurnStartPhase"
+        },
+        "end_action": {
+          "transition_type": "End",
+          "transition_target": "TurnStartPhase"
+        },
+        "turn_team_color": "White",
+        "actions": []
+      },
+      "actions_phase": {
+        "start_action": {
+          "transition_type": "Start",
+          "transition_target": "ActionsPhase"
+        },
+        "end_action": {
+          "transition_type": "End",
+          "transition_target": "ActionsPhase"
+        },
+        "turn_team_color": "White",
+        "actions": [
+          {
+            "src_character": {
+              "uuid": "cb9edddb-a4fe-4696-a0cb-48776d3decd5",
+              "character_type": "LeaderKing",
+              "team_color": "White"
+            },
+            "motions": [
+              {
+                "motion_type": "Move",
+                "targets": [
+                  {
+                    "character": {
+                      "uuid": "cb9edddb-a4fe-4696-a0cb-48776d3decd5",
+                      "character_type": "LeaderKing",
+                      "team_color": "White"
+                    },
+                    "origin_pos": {
+                      "x": 3,
+                      "y": 0
+                    },
+                    "dest_pos": {
+                      "x": 3,
+                      "y": 1
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "recruitment_phase": {
+        "start_action": {
+          "transition_type": "Start",
+          "transition_target": "RecruitmentPhase"
+        },
+        "end_action": {
+          "transition_type": "End",
+          "transition_target": "RecruitmentPhase"
+        },
+        "turn_team_color": "White",
+        "actions": [
+          {
+            "motions": [
+              {
+                "motion_type": "Add",
+                "character": {
+                  "uuid": "b6ae2874-8953-442c-ac8b-71f5f46d24d7",
+                  "character_type": "Bruiser",
+                  "team_color": "White"
+                },
+                "position": {
+                  "x": 2,
+                  "y": 0
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "turn_end_phase": {
+        "start_action": {
+          "transition_type": "Start",
+          "transition_target": "TurnEndPhase"
+        },
+        "end_action": {
+          "transition_type": "End",
+          "transition_target": "TurnEndPhase"
+        },
+        "turn_team_color": "White",
+        "actions": []
+      },
+      "type": "turn"
+    },
+    {
+      "start_action": {
+        "transition_type": "Start",
+        "transition_target": "Turn"
+      },
+      "team_color": "Black",
+      "turn_start_phase": {
+        "start_action": {
+          "transition_type": "Start",
+          "transition_target": "TurnStartPhase"
+        },
+        "end_action": {
+          "transition_type": "End",
+          "transition_target": "TurnStartPhase"
+        },
+        "turn_team_color": "Black",
+        "actions": []
+      },
+      "actions_phase": {
+        "start_action": {
+          "transition_type": "Start",
+          "transition_target": "ActionsPhase"
+        },
+        "end_action": {
+          "transition_type": "End",
+          "transition_target": "ActionsPhase"
+        },
+        "turn_team_color": "Black",
+        "actions": [
+          {
+            "src_character": {
+              "uuid": "2abff8b4-990a-4be3-8e06-d08f7e46cc8f",
+              "character_type": "LeaderQueen",
+              "team_color": "Black"
+            },
+            "motions": [
+              {
+                "motion_type": "Move",
+                "targets": [
+                  {
+                    "character": {
+                      "uuid": "2abff8b4-990a-4be3-8e06-d08f7e46cc8f",
+                      "character_type": "LeaderQueen",
+                      "team_color": "Black"
+                    },
+                    "origin_pos": {
+                      "x": 3,
+                      "y": 6
+                    },
+                    "dest_pos": {
+                      "x": 3,
+                      "y": 5
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "recruitment_phase": {
+        "turn_team_color": "Black",
+        "start_action": {
+          "transition_type": "Start",
+          "transition_target": "RecruitmentPhase"
+        },
+        "actions": []
+      },
+      "turn_end_phase": {
+        "turn_team_color": "Black",
+        "actions": []
+      },
+      "type": "turn"
+    }
+  ]
+}
+

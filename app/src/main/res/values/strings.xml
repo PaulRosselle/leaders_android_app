@@ -229,8 +229,13 @@
     <string name="tutorial_passive_abilities_before">L\'effet des compétences passives est actif en permanence et ne consomme pas d\'action pour être utilisé.</string>
     <string name="tutorial_passive_abilities_after">Une fois vos personnages joués, vous pouvez recruter de nouveaux personnages.\n\nDécouvrez cela dans le chapitre suivant.</string>
     <string name="tutorial_passive_abilities_info">Restez appuyé sur un personnage pour découvrir sa compétence.\n\nLes compétences passives sont indiquées par une boucle infinie bleue.</string>
+    <string name="tutorial_recruitment_before">Chaque tour, après avoir joué vos personnages vous pouvez en recruter un nouveau. Votre adversaire à commencé, à vous de recruter.</string>
+    <string name="tutorial_recruitment_after">Il est possible de terminer la partie autrement qu\'en capturant le leader adverse.\n\nDécouvrez cela dans le chapitre suivant.</string>
+    <string name="tutorial_recruitment_info">Chaque joueur a le droit à 4 recrutements par partie.\n\nUn personnage recruté doit être placé sur la première ligne du plateau du côté de son propriétaire. Les cases viables sont indiquées par un motif en cercle doré.</string>
     <string name="tutorial_surround_before">Un joueur perd immédiatement la partie dès lors que toutes les cases adjacentes à son leader son occupées. On appelle cela un encerclement.</string>
     <string name="tutorial_surround_after">Féliticitations, vous connaissez maintenant les bases de Leaders !\n\nMettez ce que vous avez appris en pratique contre un bot lors du dernier chapitre.</string>
     <string name="tutorial_surround_info">Restez appuyé sur un personnage pour découvrir sa compétence.</string>
+    <string name="second_player_recruitment">Le deuxième joueur recrute une seconde fois lors de son premier tour.\nCette règle permet de compenser l\'avantage qu\'a le premier joueur en commençant.\n\nVous pouvez donc recruter un autre personnage.</string>
+    <string name="new_rule">Nouvelle règle !</string>
 
 </resources>

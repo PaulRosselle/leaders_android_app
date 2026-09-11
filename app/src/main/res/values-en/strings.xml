@@ -221,8 +221,13 @@
     <string name="tutorial_passive_abilities_before">Passive abilities are always active and don’t require an action to use.</string>
     <string name="tutorial_passive_abilities_after">Once you\'ve played your characters, you can recruit new ones.\n\nDiscover how in the next chapter.</string>
     <string name="tutorial_passive_abilities_info">Press and hold a character to discover their ability.\n\nPassive abilities are represented by a blue infinite loop.</string>
+    <string name="tutorial_recruitment_before">Each turn, after playing your characters, you can recruit a new one. Your opponent started, so it’s your turn to recruit.</string>
+    <string name="tutorial_recruitment_after">There are other ways to end the game besides capturing the opposing Leader.\n\nDiscover how in the next chapter.</string>
+    <string name="tutorial_recruitment_info">Each player can recruit up to 4 times per game.\n\nA recruited character must be placed on the first row of the board on their owner’s side. Valid spaces are marked with a golden circle pattern.</string>
     <string name="tutorial_surround_before">A player immediately loses the game when all spaces adjacent to their Leader are occupied. This is called surrounding a leader.</string>
     <string name="tutorial_surround_after">Congratulations, you now know the basics of Leaders!\n\nPut what you\'ve learned into practice against a bot in the final chapter.</string>
     <string name="tutorial_surround_info">Press and hold a character to discover their ability.</string>
+    <string name="second_player_recruitment">The second player recruits a second time during their first turn.\nThis rule helps offset the advantage of going first.\n\nYou can now recruit another character.</string>
+    <string name="new_rule">New rule!</string>
 
 </resources>

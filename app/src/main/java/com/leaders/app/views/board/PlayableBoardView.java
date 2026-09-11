@@ -9,7 +9,6 @@ import android.view.animation.LinearInterpolator;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.leaders.R;
 import com.leaders.app.enums.AnimationSpeed;
 import com.leaders.app.enums.BoardOrientation;
 import com.leaders.app.animators.CharacterActionAnimator;
@@ -53,7 +52,7 @@ public final class PlayableBoardView extends BoardView {
 
 
     private static final int RECRUITMENT_CELL_HIGHLIGHT_CYCLE_PAUSE = 1200;
-    private static final int RECRUITMENT_CELL_HIGHLIGHT_ANIMATION_INTERVAL = 800;
+    private static final int RECRUITMENT_CELL_HIGHLIGHT_ANIMATION_INTERVAL = 600;
     @Nullable
     private ValueAnimator recruitmentCellAnimator;
 
