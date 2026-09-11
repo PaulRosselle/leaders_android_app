@@ -12,7 +12,6 @@ public final class ExtraUtils {
     public static final String EXTRA_DUEL_GAME_DATAS = "EXTRA_DUEL_GAME_DATAS";
     public static final String EXTRA_REPLAY_INDEX = "EXTRA_REPLAY_INDEX";
     public static final String EXTRA_CHARACTER_CARD = "EXTRA_CHARACTER_CARD";
-    public static final String EXTRA_TUTORIAL_CHAPTER = "EXTRA_TUTORIAL_CHAPTER";
 
     private ExtraUtils(){
         throw new AssertionError("Cannot instantiate utility class");

@@ -93,7 +93,7 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".app.activities.rules.tutorial.RulesTutorialActivity"
+            android:name=".app.activities.rules.tutorial.RulesTutorialCaptureActivity"
             android:configChanges="orientation|keyboardHidden"
             android:exported="false"
             android:screenOrientation="portrait"

@@ -4,7 +4,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
@@ -15,7 +14,7 @@ import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.EndGameType;
 import com.leaders.app.enums.TutorialChapter;
 import com.leaders.app.utilities.ButtonUtils;
-import com.leaders.app.utilities.ExtraUtils;
+import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.views.character.HighlightView;
 import com.leaders.app.views.rules.TutorialNavigationView;
 import com.leaders.gamelogic.entities.GameContext;
@@ -23,11 +22,12 @@ import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.Player;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
-import com.leaders.puzzlelogic.utilities.PuzzleEditionUtils;
 
 import org.json.JSONException;
 
-public final class RulesTutorialActivity extends PlayableActivity implements TutorialNavigationView.IRulesNavigation {
+import java.util.Objects;
+
+public abstract class RulesTutorialActivity extends PlayableActivity implements TutorialNavigationView.IRulesNavigation {
     private TutorialNavigationView tnvNavigation;
 
     private TextView txvBefore;
@@ -38,10 +38,8 @@ public final class RulesTutorialActivity extends PlayableActivity implements Tut
 
     private HighlightView hlvNextChapter;
 
-    private TutorialChapter chapter;
-
-    private GameHistory chapterHistory;
-    private String chapterHistoryHash;
+    private GameHistory startHistory;
+    private String startHistoryHash;
 
     //region BASE ACTIVITY OVERRIDEN METHODS
 
@@ -67,6 +65,8 @@ public final class RulesTutorialActivity extends PlayableActivity implements Tut
         // Non interactive element listeners
         (findViewById(R.id.clyMain_actRulesTutorial)).setOnClickListener(this::onNonInteractiveElementClick);
 
+        tnvNavigation.setNavigator(this);
+
         btnReset.setOnClickListener(this::onResetClick);
         btnNextChapter.setOnClickListener(this::onNextChapterClick);
     }
@@ -76,13 +76,16 @@ public final class RulesTutorialActivity extends PlayableActivity implements Tut
         super.initDatas();
 
         setBtnNextChapterEnabled(false);
+        txvAfter.setVisibility(View.GONE);
 
-        TutorialChapter intentChapter = TutorialChapter.valueOf(
-                getIntent().getStringExtra(ExtraUtils.EXTRA_TUTORIAL_CHAPTER)
-        );
+        txvBefore.setText(getChapter().getTextBeforeResId());
+        txvAfter.setText(getChapter().getTextAfterResId());
+
+        startHistory = JsonUtils.loadTutorialChapter(this, getChapter());
+        startHistoryHash = getHistoryHash(startHistory);
 
         controller = new GameController(this);
-        loadChapter(intentChapter);
+        controller.restartGame(new GameHistory(startHistory));
     }
 
     @Override
@@ -115,7 +118,7 @@ public final class RulesTutorialActivity extends PlayableActivity implements Tut
         return R.id.gdlRoot_actRulesTutorial;
     }
 
-    @Nullable
+    @NonNull
     @Override
     protected Integer getBtnBackResId() {
         return R.id.btnBack_actRulesTutorial;
@@ -124,12 +127,6 @@ public final class RulesTutorialActivity extends PlayableActivity implements Tut
     @Override
     protected boolean askForConfirmationBeforeFinish() {
         return false;
-    }
-
-    @NonNull
-    @Override
-    public ActivityType getActivityType() {
-        return ActivityType.RulesTutorial;
     }
 
     @Override
@@ -143,11 +140,11 @@ public final class RulesTutorialActivity extends PlayableActivity implements Tut
 
     @Override
     protected boolean canUndoLastAction() {
-        return super.canUndoLastAction() && !getChapterHistory();
+        return super.canUndoLastAction() && !getStartHistory();
     }
 
-    private boolean getChapterHistory() {
-        return getHistoryHash(controller.getHistory()).equals(chapterHistoryHash);
+    private boolean getStartHistory() {
+        return getHistoryHash(controller.getHistory()).equals(startHistoryHash);
     }
 
     private String getHistoryHash(@NonNull GameHistory gameHistory) {
@@ -201,29 +198,10 @@ public final class RulesTutorialActivity extends PlayableActivity implements Tut
 
     //endregion
 
-    //region CHAPTER LOADING
+    //region CHAPTER NAVIGATION
 
-    public TutorialChapter getChapter() {
-        return chapter;
-    }
-
-    public void loadChapter(@NonNull TutorialChapter chapter) {
-        this.chapter = chapter;
-
-        tnvNavigation.setNavigator(this);
-
-        setBtnNextChapterEnabled(false);
-
-        txvBefore.setText(chapter.getTextBeforeResId());
-        txvAfter.setText(chapter.getTextAfterResId());
-
-        txvAfter.setVisibility(View.GONE);
-
-        // TODO - load tutorial history from Json
-        chapterHistory = PuzzleEditionUtils.getDefaultHistory();
-        chapterHistoryHash = getHistoryHash(chapterHistory);
-
-        controller.restartGame(new GameHistory(chapterHistory));
+    public void goToChapter(@NonNull TutorialChapter chapter) {
+        goToActivity(chapter.getActivityType(), ActivityTransitionType.Fade);
     }
 
     //endregion
@@ -231,17 +209,13 @@ public final class RulesTutorialActivity extends PlayableActivity implements Tut
     //region VIEW LISTENER METHODS
 
     private void onResetClick(View v) {
-        controller.restartGame(new GameHistory(chapterHistory));
+        controller.restartGame(new GameHistory(startHistory));
     }
 
     private void onNextChapterClick(View v) {
-        TutorialChapter nextChapter = chapter.getNext();
-        if (nextChapter != null) {
-            loadChapter(nextChapter);
-        } else {
-            // The last chapter leads to the character demo menu
-            goToActivity(ActivityType.RulesCharacterMenu);
-        }
+        goToChapter(Objects.requireNonNull(getChapter().getNext(),
+                "Navigation impossible: no next chapter")
+        );
     }
 
     //endregion

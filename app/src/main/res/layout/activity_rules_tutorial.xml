@@ -62,6 +62,7 @@
         android:id="@+id/tnvNavigation_actRulesTutoriel"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:layout_marginEnd="64dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -84,7 +85,6 @@
         android:fontFamily="@font/bobby_jones_condensed"
         android:gravity="center"
         android:justificationMode="inter_word"
-        android:text="@string/card_description_hermit_and_cub"
         android:textAllCaps="true"
         android:textColor="@color/font"
         android:textSize="@dimen/default_text_font_size"
@@ -93,7 +93,8 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnBack_actRulesTutorial"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintVertical_bias="1.0"
+        tools:text="@string/tutorial_capture_before" />
 
     <com.leaders.app.views.board.PlayableBoardView
         android:id="@+id/bdvBoard_actRulesTutorial"
@@ -121,7 +122,7 @@
         android:fontFamily="@font/bobby_jones_condensed"
         android:gravity="center"
         android:justificationMode="inter_word"
-        android:text="@string/card_description_hermit_and_cub"
+        android:text="@string/tutorial_capture_after"
         android:textAllCaps="true"
         android:textColor="@color/app_golden"
         android:textSize="@dimen/default_text_font_size"

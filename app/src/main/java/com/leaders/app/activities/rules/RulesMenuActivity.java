@@ -10,8 +10,6 @@ import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.enums.ActivityType;
-import com.leaders.app.enums.TutorialChapter;
-import com.leaders.app.utilities.ExtraUtils;
 
 public final class RulesMenuActivity extends BaseActivity {
     private static final String OFFICIAL_GUIDE_URL = "https://www.leadersthegame.com/rules";
@@ -83,9 +81,7 @@ public final class RulesMenuActivity extends BaseActivity {
     //region VIEWS LISTENER METHODS
 
     public void onTutorialClick(View v) {
-        Intent intent = ActivityType.RulesTutorial.getIntent(this);
-        intent.putExtra(ExtraUtils.EXTRA_TUTORIAL_CHAPTER, TutorialChapter.CaptureLeader.name());
-        goToActivity(intent);
+        goToActivity(ActivityType.RulesTutorialCapture);
     }
 
     public void onCharactersClick(View v) {

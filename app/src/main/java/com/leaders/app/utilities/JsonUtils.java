@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 import com.leaders.R;
 import com.leaders.app.entities.ReplaySave;
 import com.leaders.app.entities.crash.CrashLog;
+import com.leaders.app.enums.TutorialChapter;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
@@ -458,6 +459,32 @@ public final class JsonUtils {
             case Vizier: return R.raw.character_demo_vizier;
             case Wanderer: return R.raw.character_demo_wanderer;
             default: throw new IllegalStateException("No character demo file found for character card: " + characterCard);
+        }
+    }
+
+    //endregion
+
+    //region CHARACTER DEMO METHODS
+
+    public static GameHistory loadTutorialChapter(@NonNull Context context,
+                                                  @NonNull TutorialChapter tutorialChapter) {
+        // Tutorial chapters are stored within raw resource files
+        try (InputStream fisCharacterDemo = context.getResources().openRawResource(getTutorialChapterResId(tutorialChapter))) {
+            JSONObject joCharacterDemo = openJsonFile(fisCharacterDemo);
+
+            GameHistorySerializer serializer = new GameHistorySerializer();
+
+            return serializer.getFromJson(joCharacterDemo, new SerializationContext());
+
+        } catch (IOException | JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static int getTutorialChapterResId(@NonNull TutorialChapter tutorialChapter) {
+        switch (tutorialChapter) {
+            case CaptureLeader: return R.raw.tutorial_capture;
+            default: throw new IllegalStateException("No tutorial chapter file found for: " + tutorialChapter);
         }
     }
 
