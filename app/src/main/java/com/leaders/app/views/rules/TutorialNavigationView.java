@@ -22,7 +22,7 @@ import com.leaders.app.enums.TutorialChapter;
 public final class TutorialNavigationView extends ConstraintLayout {
     public interface IRulesNavigation {
         TutorialChapter getChapter();
-        BaseActivity getActivity();
+        void loadChapter(@NonNull TutorialChapter chapter);
     }
 
     @NonNull
@@ -93,10 +93,7 @@ public final class TutorialNavigationView extends ConstraintLayout {
             throw new IllegalStateException("Rules navigation impossible: navigator missing");
         }
 
-        navigator.getActivity().goToActivity(
-                tutorialChapter.getActivityType(),
-                ActivityTransitionType.Fade
-        );
+        navigator.loadChapter(tutorialChapter);
     }
 
     public void setNavigator(@NonNull IRulesNavigation navigator) {
