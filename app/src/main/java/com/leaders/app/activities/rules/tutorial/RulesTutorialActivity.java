@@ -1,5 +1,6 @@
 package com.leaders.app.activities.rules.tutorial;
 
+import android.app.AlertDialog;
 import android.view.View;
 import android.widget.TextView;
 
@@ -28,6 +29,7 @@ import org.json.JSONException;
 import java.util.Objects;
 
 public abstract class RulesTutorialActivity extends PlayableActivity implements TutorialNavigationView.IRulesNavigation {
+    private MaterialButton btnInfo;
     private TutorialNavigationView tnvNavigation;
 
     private TextView txvBefore;
@@ -47,6 +49,7 @@ public abstract class RulesTutorialActivity extends PlayableActivity implements 
     protected void initViews() {
         super.initViews();
 
+        btnInfo = findViewById(R.id.btnInfo_actRulesTutorial);
         tnvNavigation = findViewById(R.id.tnvNavigation_actRulesTutoriel);
 
         txvBefore = findViewById(R.id.txvBefore_actRulesTutorial);
@@ -65,6 +68,7 @@ public abstract class RulesTutorialActivity extends PlayableActivity implements 
         // Non interactive element listeners
         (findViewById(R.id.clyMain_actRulesTutorial)).setOnClickListener(this::onNonInteractiveElementClick);
 
+        btnInfo.setOnClickListener(this::onInfoClick);
         tnvNavigation.setNavigator(this);
 
         btnReset.setOnClickListener(this::onResetClick);
@@ -207,6 +211,17 @@ public abstract class RulesTutorialActivity extends PlayableActivity implements 
     //endregion
 
     //region VIEW LISTENER METHODS
+
+    private void onInfoClick(View v) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.alert_dialog_theme);
+
+        builder.setIcon(getChapter().getInfoIconResId());
+        builder.setTitle(R.string.extra_infos);
+        builder.setMessage(getChapter().getInfoTextResId());
+        builder.setPositiveButton(R.string.ok, null);
+
+        builder.show();
+    }
 
     private void onResetClick(View v) {
         controller.restartGame(new GameHistory(startHistory));

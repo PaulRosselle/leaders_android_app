@@ -219,13 +219,18 @@
     <string name="learn_using_the_tutorial">apprendre avec le tutoriel</string>
     <string name="test_out_characters">tester les personnages</string>
     <string name="online_guide">guide en ligne</string>
-    <string name="tutorial_capture_before">Pour gagner dans Leaders vous devez capturer le leader adverse. Pour cela, amenez deux de vos personnages sur des cases qui lui sont adjacentes.</string>
+    <string name="extra_infos">Informations supplémentaires</string>
+    <string name="tutorial_capture_before">Afin de gagner dans Leaders vous devez capturer le leader adverse. Pour cela, amenez deux de vos personnages sur des cases qui lui sont adjacentes.</string>
     <string name="tutorial_capture_after">La plupart des personnages peuvent faire plus que se déplacer d\'une case.\n\nDécouvrez cela dans le chapitre suivant.</string>
-    <string name="tutorial_active_abilities_before">Chaque personnage peut, une fois par tour, se déplacer d’une case ou activer sa compétence.\nRestez appuyé sur un personnage pour découvrir sa compétence.</string>
+    <string name="tutorial_capture_info">Les leaders sont repérables de part leur courrone et le cercle doré décorant leur pion.</string>
+    <string name="tutorial_active_abilities_before">Chaque personnage peut, une fois par tour, se déplacer d’une case ou activer sa compétence.</string>
     <string name="tutorial_active_abilities_after">Certaines compétences n\'ont pas besoin d\'être activées en consommant une action.\n\nDécouvrez cela dans le chapitre suivant.</string>
-    <string name="tutorial_passive_abilities_before">L\'effet des compétences passives est actif en permanence et ne consomme pas d\'action pour être utilisé.\nRestez appuyé sur un personnage pour découvrir sa compétence.</string>
+    <string name="tutorial_active_abilities_info">Restez appuyé sur un personnage pour découvrir sa compétence.\n\nLes compétences actives sont indiquées par un éclair rouge.</string>
+    <string name="tutorial_passive_abilities_before">L\'effet des compétences passives est actif en permanence et ne consomme pas d\'action pour être utilisé.</string>
     <string name="tutorial_passive_abilities_after">Une fois vos personnages joués, vous pouvez recruter de nouveaux personnages.\n\nDécouvrez cela dans le chapitre suivant.</string>
-    <string name="tutorial_surround_before">TODO</string>
-    <string name="tutorial_surround_after">TODO</string>
+    <string name="tutorial_passive_abilities_info">Restez appuyé sur un personnage pour découvrir sa compétence.\n\nLes compétences passives sont indiquées par une boucle infinie bleue.</string>
+    <string name="tutorial_surround_before">Un joueur perd immédiatement la partie dès lors que toutes les cases adjacentes à son leader son occupées. On appelle cela un encerclement.</string>
+    <string name="tutorial_surround_after">Féliticitations, vous connaissez maintenant les bases de Leaders !\n\nMettez ce que vous avez appris en pratique contre un bot lors du dernier chapitre.</string>
+    <string name="tutorial_surround_info">Restez appuyé sur un personnage pour découvrir sa compétence.</string>
 
 </resources>

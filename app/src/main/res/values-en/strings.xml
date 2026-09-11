@@ -211,13 +211,18 @@
     <string name="learn_using_the_tutorial">learn using the tutorial</string>
     <string name="test_out_characters">test out characters</string>
     <string name="online_guide">online guide</string>
+    <string name="extra_infos">Additionnal informations</string>
     <string name="tutorial_capture_before">In Leaders, you win by capturing the opposing Leader. To do so, move two of your characters onto spaces adjacent to them.</string>
     <string name="tutorial_capture_after">Most characters can do more than just move one space.\n\nDiscover how in the next chapter.</string>
-    <string name="tutorial_active_abilities_before">Each character can move one space or activate their ability once per turn.\nPress and hold a character to discover their ability.</string>
-    <string name="tutorial_active_abilities_after">Some abilities don’t require an action to activate.\nDiscover how in the next chapter.</string>
-    <string name="tutorial_passive_abilities_before">Passive abilities are always active and don’t require an action to use.\nPress and hold a character to discover their ability.</string>
-    <string name="tutorial_passive_abilities_after">Once you’ve played your characters, you can recruit new ones.\n\nDiscover how in the next chapter.</string>
-    <string name="tutorial_surround_before">TODO</string>
-    <string name="tutorial_surround_after">TODO</string>
+    <string name="tutorial_capture_info">Leaders are represented wearing a crown, a golden circle can also be seen on their character piece.</string>
+    <string name="tutorial_active_abilities_before">Each character can move one space or activate their ability once per turn.</string>
+    <string name="tutorial_active_abilities_after">Some abilities don\'t require an action to activate.\nDiscover how in the next chapter.</string>
+    <string name="tutorial_active_abilities_info">Press and hold a character to discover their ability.\n\nActive abilities are represented by a red lightning.</string>
+    <string name="tutorial_passive_abilities_before">Passive abilities are always active and don’t require an action to use.</string>
+    <string name="tutorial_passive_abilities_after">Once you\'ve played your characters, you can recruit new ones.\n\nDiscover how in the next chapter.</string>
+    <string name="tutorial_passive_abilities_info">Press and hold a character to discover their ability.\n\nPassive abilities are represented by a blue infinite loop.</string>
+    <string name="tutorial_surround_before">A player immediately loses the game when all spaces adjacent to their Leader are occupied. This is called surrounding a leader.</string>
+    <string name="tutorial_surround_after">Congratulations, you now know the basics of Leaders!\n\nPut what you\'ve learned into practice against a bot in the final chapter.</string>
+    <string name="tutorial_surround_info">Press and hold a character to discover their ability.</string>
 
 </resources>

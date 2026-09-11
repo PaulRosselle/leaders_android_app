@@ -53,6 +53,25 @@ public enum TutorialChapter {
         }
     }
 
+    public int getInfoTextResId() {
+        switch (this) {
+            case CaptureLeader: return R.string.tutorial_capture_info;
+            case ActiveAbilities: return R.string.tutorial_active_abilities_info;
+            case PassiveAbilities: return R.string.tutorial_passive_abilities_info;
+            case Recruitment: return R.string.rules_chapter_recruitment;
+            case SurroundLeader: return R.string.tutorial_surround_info;
+            case GameVsBot: return R.string.rules_chapter_game_vs_bot;
+            default: throw new IllegalStateException("No info text found for chapter: " + this);
+        }
+    }
+
+    public int getInfoIconResId() {
+        switch (this) {
+            case ActiveAbilities: return R.drawable.icon_ability_active;
+            case PassiveAbilities: return R.drawable.icon_ability_passive;
+            default: return R.drawable.icon_leader;
+        }
+    }
 
     public int getTextBeforeResId() {
         switch (this) {
