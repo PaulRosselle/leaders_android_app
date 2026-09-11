@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.view.View;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
@@ -81,7 +80,7 @@ public final class RulesCharacterMenuActivity extends BaseActivity {
     //region VIEWS LISTENER METHODS
 
     private void onPortraitClick(View v) {
-        Intent intent = ActivityType.RulesCharacter.getIntent(this);
+        Intent intent = ActivityType.RulesCharacterDemo.getIntent(this);
 
         intent.putExtra(ExtraUtils.EXTRA_CHARACTER_CARD, ((PortraitView) v).getPortraitCard().name());
 

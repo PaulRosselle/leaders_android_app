@@ -13,4 +13,4 @@
     android:textColor="@color/app_golden"
     android:textSize="@dimen/default_text_font_size"
     tools:ignore="SpUsage"
-    tools:text="@string/rules_chapter_res_intro" />
+    tools:text="@string/rules_chapter_res_capture_leader" />

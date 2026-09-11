@@ -7,7 +7,7 @@
     tools:ignore="SpUsage">
 
     <ImageView
-        android:id="@+id/imvChapterBg_actRulesNavigation"
+        android:id="@+id/imvChapterBg_vwTutorialNavigation"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:importantForAccessibility="no"
@@ -19,7 +19,7 @@
 
 
     <TextView
-        android:id="@+id/txvChapterNumber_actRulesNavigation"
+        android:id="@+id/txvChapterNumber_vwTutorialNavigation"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:clickable="true"
@@ -28,41 +28,39 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:popupBackground="@drawable/round_rect"
-        android:text="@string/rules_chapter_number_win_the_game"
+        android:text="@string/rules_chapter_number_capture_leader"
         android:textAllCaps="true"
         android:textColor="@color/app_golden"
-        android:textSize="@dimen/default_text_font_size"
+        android:textSize="18dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btnChangeChapter_actRulesNavigation"
+        app:layout_constraintEnd_toStartOf="@+id/btnChangeChapter_vwTutorialNavigation"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/txvChapterName_actRulesNavigation"
+        android:id="@+id/txvChapterName_vwTutorialNavigation"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:autoSizeMaxTextSize="@dimen/default_text_font_size"
-        android:autoSizeMinTextSize="14dp"
-        android:autoSizeStepGranularity="1dp"
-        android:autoSizeTextType="uniform"
-        android:clickable="true"
         android:fontFamily="@font/futura"
         android:gravity="center"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:popupBackground="@drawable/round_rect"
-        android:text="@string/rules_chapter_win_the_game"
+        android:maxLines="1"
+        android:ellipsize="none"
+        android:autoSizeTextType="uniform"
+        android:autoSizeMinTextSize="12dp"
+        android:autoSizeMaxTextSize="18dp"
+        android:autoSizeStepGranularity="1dp"
+        android:text="@string/rules_chapter_capture_leader"
         android:textAllCaps="true"
         android:textColor="@color/app_golden"
-        android:textSize="@dimen/default_text_font_size"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btnChangeChapter_actRulesNavigation"
-        app:layout_constraintStart_toEndOf="@+id/txvChapterNumber_actRulesNavigation"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:textSize="18sp"
+        app:layout_constraintStart_toEndOf="@id/txvChapterNumber_vwTutorialNavigation"
+        app:layout_constraintEnd_toStartOf="@id/btnChangeChapter_vwTutorialNavigation"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnChangeChapter_actRulesNavigation"
+        android:id="@+id/btnChangeChapter_vwTutorialNavigation"
         android:layout_width="42dp"
         android:layout_height="42dp"
         android:layout_marginTop="2dp"
@@ -78,7 +76,7 @@
         app:iconSize="14dp"
         app:iconTint="@color/app_golden"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/imvChapterBg_actRulesNavigation"
+        app:layout_constraintEnd_toEndOf="@+id/imvChapterBg_vwTutorialNavigation"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

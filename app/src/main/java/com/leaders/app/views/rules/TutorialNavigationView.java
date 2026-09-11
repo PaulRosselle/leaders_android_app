@@ -17,12 +17,12 @@ import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.enums.ActivityTransitionType;
-import com.leaders.app.enums.RulesChapter;
+import com.leaders.app.enums.TutorialChapter;
 
-public final class RulesNavigationView extends ConstraintLayout {
+public final class TutorialNavigationView extends ConstraintLayout {
     public interface IRulesNavigation {
-        RulesChapter getChapter();
-        BaseActivity getActivity();
+        TutorialChapter getChapter();
+        void loadChapter(@NonNull TutorialChapter chapter);
     }
 
     @NonNull
@@ -37,19 +37,19 @@ public final class RulesNavigationView extends ConstraintLayout {
     private final ArrayAdapter<String> chapterNamesAdapter;
 
 
-    public RulesNavigationView(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public TutorialNavigationView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
-        inflate(context, R.layout.view_rules_navigation, this);
+        inflate(context, R.layout.view_tutorial_navigation, this);
 
-        txvChapterNumber = findViewById(R.id.txvChapterNumber_actRulesNavigation);
-        txvChapterName = findViewById(R.id.txvChapterName_actRulesNavigation);
-        btnChangeChapter = findViewById(R.id.btnChangeChapter_actRulesNavigation);
+        txvChapterNumber = findViewById(R.id.txvChapterNumber_vwTutorialNavigation);
+        txvChapterName = findViewById(R.id.txvChapterName_vwTutorialNavigation);
+        btnChangeChapter = findViewById(R.id.btnChangeChapter_vwTutorialNavigation);
 
         chapterNamesAdapter = new ArrayAdapter<>(
                 context,
                 R.layout.res_navigation_chapter_item,
-                getResources().getStringArray(R.array.rules_chapter_names)
+                getResources().getStringArray(R.array.tutorial_chapter_names)
         );
 
         txvChapterNumber.setOnClickListener(this::txvChapterClick);
@@ -61,7 +61,7 @@ public final class RulesNavigationView extends ConstraintLayout {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.alert_dialog_theme);
         builder.setSingleChoiceItems(chapterNamesAdapter, 0,
                 (dialog, which) -> {
-                    goToChapter(RulesChapter.values()[which]);
+                    goToChapter(TutorialChapter.values()[which]);
                     dialog.dismiss();
                 });
         builder.show();
@@ -88,21 +88,18 @@ public final class RulesNavigationView extends ConstraintLayout {
     }
 
 
-    private void goToChapter(@NonNull RulesChapter rulesChapter) {
+    private void goToChapter(@NonNull TutorialChapter tutorialChapter) {
         if (navigator == null) {
             throw new IllegalStateException("Rules navigation impossible: navigator missing");
         }
 
-        navigator.getActivity().goToActivity(
-                rulesChapter.getActivityType(),
-                ActivityTransitionType.Fade
-        );
+        navigator.loadChapter(tutorialChapter);
     }
 
     public void setNavigator(@NonNull IRulesNavigation navigator) {
         this.navigator = navigator;
 
-        RulesChapter chapter = navigator.getChapter();
+        TutorialChapter chapter = navigator.getChapter();
         txvChapterName.setText(chapter.getNameResId());
         txvChapterNumber.setText(chapter.getNumberResId());
     }

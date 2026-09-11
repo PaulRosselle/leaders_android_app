@@ -2,16 +2,16 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/clyMain_actRulesCharacter"
+    android:id="@+id/clyMain_actRulesCharacterDemo"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
-    tools:context=".app.activities.rules.character.RulesCharacterActivity"
+    tools:context=".app.activities.rules.character.RulesCharacterDemoActivity"
     tools:ignore="SpUsage"
     tools:theme="@style/Theme.LeadersAndroidApp">
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/gdlRoot_actRulesCharacter"
+        android:id="@+id/gdlRoot_actRulesCharacterDemo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -43,7 +43,7 @@
 
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnBack_actRulesCharacter"
+        android:id="@+id/btnBack_actRulesCharacterDemo"
         android:layout_width="@dimen/round_button_size"
         android:layout_height="@dimen/round_button_size"
         android:layout_marginStart="8dp"
@@ -60,12 +60,12 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actRulesCharacter"
+        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actRulesCharacterDemo"
         app:layout_constraintVertical_bias="0.0"
         tools:ignore="SpeakableTextPresentCheck" />
 
     <ImageView
-        android:id="@+id/imvAbility_actRulesCharacter"
+        android:id="@+id/imvAbility_actRulesCharacterDemo"
         android:layout_width="@dimen/round_button_size"
         android:layout_height="@dimen/round_button_size"
         android:layout_marginEnd="8dp"
@@ -75,23 +75,23 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actRulesCharacter"
+        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actRulesCharacterDemo"
         app:layout_constraintVertical_bias="0.0"
         app:srcCompat="@drawable/icon_ability_special" />
 
     <com.leaders.app.views.board.PlayableBoardView
-        android:id="@+id/bdvBoard_actRulesCharacter"
+        android:id="@+id/bdvBoard_actRulesCharacterDemo"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/btnUndoLastAction_actRulesCharacter"
+        app:layout_constraintBottom_toTopOf="@+id/btnUndoLastAction_actRulesCharacterDemo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnBack_actRulesCharacter" />
+        app:layout_constraintTop_toBottomOf="@+id/btnBack_actRulesCharacterDemo" />
 
     <ImageView
-        android:id="@+id/imvArtwork_actRulesCharacter"
+        android:id="@+id/imvArtwork_actRulesCharacterDemo"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:adjustViewBounds="true"
@@ -106,7 +106,7 @@
         app:srcCompat="@drawable/character_artwork_hermit_and_cub" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnUndoLastAction_actRulesCharacter"
+        android:id="@+id/btnUndoLastAction_actRulesCharacterDemo"
         android:layout_width="@dimen/round_button_size"
         android:layout_height="@dimen/round_button_size"
         android:layout_marginBottom="16dp"
@@ -128,7 +128,7 @@
         app:strokeWidth="@dimen/default_stroke_width" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnReset_actRulesCharacter"
+        android:id="@+id/btnReset_actRulesCharacterDemo"
         android:layout_width="@dimen/round_button_size"
         android:layout_height="@dimen/round_button_size"
         android:layout_marginBottom="16dp"
@@ -150,7 +150,7 @@
         app:strokeWidth="@dimen/default_stroke_width" />
 
     <TextView
-        android:id="@+id/txvDescription_actRulesCharacter"
+        android:id="@+id/txvDescription_actRulesCharacterDemo"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="16dp"
@@ -168,15 +168,15 @@
         android:textAllCaps="true"
         android:textColor="@color/font"
         android:textSize="@dimen/default_text_font_size"
-        app:layout_constraintBottom_toTopOf="@+id/bdvBoard_actRulesCharacter"
+        app:layout_constraintBottom_toTopOf="@+id/bdvBoard_actRulesCharacterDemo"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.518"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnBack_actRulesCharacter"
+        app:layout_constraintTop_toBottomOf="@+id/btnBack_actRulesCharacterDemo"
         app:layout_constraintVertical_bias="0.0" />
 
     <TextView
-        android:id="@+id/txvName_actRulesCharacter"
+        android:id="@+id/txvName_actRulesCharacterDemo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/bourbon_test_regular"
@@ -184,13 +184,13 @@
         android:textColor="@color/app_golden"
         android:textSize="34sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/imvAbility_actRulesCharacter"
-        app:layout_constraintStart_toEndOf="@+id/btnBack_actRulesCharacter"
-        app:layout_constraintTop_toTopOf="@id/gdlRoot_actRulesCharacter"
+        app:layout_constraintEnd_toStartOf="@+id/imvAbility_actRulesCharacterDemo"
+        app:layout_constraintStart_toEndOf="@+id/btnBack_actRulesCharacterDemo"
+        app:layout_constraintTop_toTopOf="@id/gdlRoot_actRulesCharacterDemo"
         app:layout_constraintVertical_bias="0.0" />
 
     <com.leaders.app.views.character.CharacterNotificationView
-        android:id="@+id/cnvCardInfo_actRulesCharacter"
+        android:id="@+id/cnvCardInfo_actRulesCharacterDemo"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -199,23 +199,11 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/gdlRoot_actRulesCharacter"
+        app:layout_constraintTop_toTopOf="@id/gdlRoot_actRulesCharacterDemo"
         app:layout_constraintVertical_bias="0.0" />
 
-    <View
-        android:id="@+id/vwDialogBg_actRulesCharacter"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@color/transparent_black"
-        android:clickable="true"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <com.leaders.app.views.EndGameView
-        android:id="@+id/egvEndGame_actRulesCharacter"
+        android:id="@+id/egvEndGame_actRulesCharacterDemo"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:visibility="gone"

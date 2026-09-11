@@ -191,27 +191,24 @@
     <string name="character_cards">Cartes de personnages</string>
     <string name="barrage_warning_title">Avertissement reçu : Barrage</string>
     <string name="barrage_warning_message">Recevoir deux avertissements de ce type d\'affilé met fin à la partie.</string>
-    <string name="rules_chapter_res_intro">I.\t\t\t\t but du jeu</string>
-    <string name="rules_chapter_res_win_the_game">II.\t\t\t gagner la partie</string>
-    <string name="rules_chapter_res_turn">III.\t\t tour de jeu</string>
-    <string name="rules_chapter_res_characters">IV.\t\t personnages</string>
-    <string name="rules_chapter_res_game_modes">V.\t\t\t modes de jeu</string>
-    <string name="rules_chapter_res_barrage">VI.\t règle de barrage</string>
-    <string name="rules_chapter_res_faq">VII.\t f.a.q</string>
-    <string name="rules_chapter_intro">but du jeu</string>
-    <string name="rules_chapter_win_the_game">gagner la partie</string>
-    <string name="rules_chapter_turn">tour de jeu</string>
-    <string name="rules_chapter_characters">personnages</string>
-    <string name="rules_chapter_game_modes">modes de jeu</string>
-    <string name="rules_chapter_barrage">règle de barrage</string>
-    <string name="rules_chapter_faq">f.a.q</string>
-    <string name="rules_chapter_number_intro" translatable="false">I.</string>
-    <string name="rules_chapter_number_win_the_game" translatable="false">II.</string>
-    <string name="rules_chapter_number_turn" translatable="false">III.</string>
-    <string name="rules_chapter_number_characters" translatable="false">IV.</string>
-    <string name="rules_chapter_number_game_modes" translatable="false">V.</string>
-    <string name="rules_chapter_number_barrage" translatable="false">VI.</string>
-    <string name="rules_chapter_number_faq" translatable="false">VII.</string>
+    <string name="rules_chapter_res_capture_leader">I.\t\t\t\t Capturer un leader</string>
+    <string name="rules_chapter_res_active_abilities">II.\t\t\t Compétences actives</string>
+    <string name="rules_chapter_res_passive_abilities">III.\t\t Compétences passives</string>
+    <string name="rules_chapter_res_recruitment">IV.\t\t Recruter un personnage</string>
+    <string name="rules_chapter_res_surround_leader">V.\t\t\t Encercler un leader</string>
+    <string name="rules_chapter_res_game_vs_bot">VI.\t Affronter le bot</string>
+    <string name="rules_chapter_capture_leader">Capturer un leader</string>
+    <string name="rules_chapter_active_abilities">Compétences actives</string>
+    <string name="rules_chapter_passive_abilities">Compétences passives</string>
+    <string name="rules_chapter_recruitment">Recruter un personnage</string>
+    <string name="rules_chapter_surround_leader">Encercler un leader</string>
+    <string name="rules_chapter_game_vs_bot">Affronter le bot</string>
+    <string name="rules_chapter_number_capture_leader" translatable="false">I.</string>
+    <string name="rules_chapter_number_active_abilities" translatable="false">II.</string>
+    <string name="rules_chapter_number_passive_abilities" translatable="false">III.</string>
+    <string name="rules_chapter_number_recruitment" translatable="false">IV.</string>
+    <string name="rules_chapter_number_surround_leader" translatable="false">V.</string>
+    <string name="rules_chapter_number_game_vs_bot" translatable="false">VI.</string>
     <string name="replays">ReplayS</string>
     <string name="game_rules">RÈglES dU jEU</string>
     <string name="group_name_leaders">Leaders</string>
