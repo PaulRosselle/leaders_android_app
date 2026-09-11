@@ -443,7 +443,7 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
 
             applyPlayerChange(gameContext);
 
-            applyPhaseChange(phase, true);
+            applyPhaseChange(phase, !isBotPlaying(gameContext));
         });
     }
 

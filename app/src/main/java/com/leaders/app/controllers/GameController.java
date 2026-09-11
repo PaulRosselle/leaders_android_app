@@ -160,11 +160,11 @@ public final class GameController implements IGameFlowListener {
     }
 
     private void completeInteraction(@NonNull InteractionResult result) {
-        if (pendingRequestFuture == null || pendingRequestFuture.isDone()) {
+        final CompletableFuture<InteractionResult> future = pendingRequestFuture;
+
+        if (future == null || future.isDone()) {
             return;
         }
-
-        CompletableFuture<InteractionResult> future = pendingRequestFuture;
 
         pendingRequest = null;
         pendingRequestFuture = null;
@@ -219,12 +219,14 @@ public final class GameController implements IGameFlowListener {
     @NonNull
     @Override
     public CompletableFuture<InteractionResult> onInputRequired(@NonNull InteractionRequest request) {
+        final CompletableFuture<InteractionResult> future = new CompletableFuture<>();
+
         pendingRequest = request;
-        pendingRequestFuture = new CompletableFuture<>();
+        pendingRequestFuture = future;
 
         listener.onInteractionRequired(request);
 
-        return pendingRequestFuture;
+        return future;
     }
 
     @NonNull
