@@ -188,6 +188,8 @@ public final class RulesTutorialActivity extends PlayableActivity implements Tut
     public void onGameEnded(@NonNull Player winner) {
         runOnUiThread(() -> {
             showEndGame(winner);
+
+            txvAfter.setVisibility(View.VISIBLE);
             setBtnNextChapterEnabled(true);
         });
     }
@@ -237,7 +239,7 @@ public final class RulesTutorialActivity extends PlayableActivity implements Tut
         if (nextChapter != null) {
             loadChapter(nextChapter);
         } else {
-            // TODO - comment
+            // The last chapter leads to the character demo menu
             goToActivity(ActivityType.RulesCharacterMenu);
         }
     }

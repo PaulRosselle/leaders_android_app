@@ -26,7 +26,7 @@ import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
 
 import org.json.JSONException;
 
-public final class RulesCharacterActivity extends PlayableActivity {
+public final class RulesCharacterDemoActivity extends PlayableActivity {
     private TextView txvName;
     private TextView txvDescription;
     private ImageView imvAbility;
@@ -45,12 +45,12 @@ public final class RulesCharacterActivity extends PlayableActivity {
     protected void initViews() {
         super.initViews();
 
-        txvName = findViewById(R.id.txvName_actRulesCharacter);
-        txvDescription = findViewById(R.id.txvDescription_actRulesCharacter);
-        imvAbility = findViewById(R.id.imvAbility_actRulesCharacter);
-        imvArtwork = findViewById(R.id.imvArtwork_actRulesCharacter);
+        txvName = findViewById(R.id.txvName_actRulesCharacterDemo);
+        txvDescription = findViewById(R.id.txvDescription_actRulesCharacterDemo);
+        imvAbility = findViewById(R.id.imvAbility_actRulesCharacterDemo);
+        imvArtwork = findViewById(R.id.imvArtwork_actRulesCharacterDemo);
 
-        btnReset = findViewById(R.id.btnReset_actRulesCharacter);
+        btnReset = findViewById(R.id.btnReset_actRulesCharacterDemo);
     }
 
     @Override
@@ -58,7 +58,7 @@ public final class RulesCharacterActivity extends PlayableActivity {
         super.initListeners();
 
         // Non interactive element listeners
-        (findViewById(R.id.clyMain_actRulesCharacter)).setOnClickListener(this::onNonInteractiveElementClick);
+        (findViewById(R.id.clyMain_actRulesCharacterDemo)).setOnClickListener(this::onNonInteractiveElementClick);
 
         btnReset.setOnClickListener(this::onResetClick);
     }
@@ -79,38 +79,38 @@ public final class RulesCharacterActivity extends PlayableActivity {
 
     @Override
     protected int getBoardViewId() {
-        return R.id.bdvBoard_actRulesCharacter;
+        return R.id.bdvBoard_actRulesCharacterDemo;
     }
 
     @Override
     protected int getUndoLastActionButtonId() {
-        return R.id.btnUndoLastAction_actRulesCharacter;
+        return R.id.btnUndoLastAction_actRulesCharacterDemo;
     }
 
     @Override
     protected int getCharacterNotificationViewId() {
-        return R.id.cnvCardInfo_actRulesCharacter;
+        return R.id.cnvCardInfo_actRulesCharacterDemo;
     }
 
     @Override
     protected int getEndGameViewId() {
-        return R.id.egvEndGame_actRulesCharacter;
+        return R.id.egvEndGame_actRulesCharacterDemo;
     }
 
     @Override
     protected int getLayoutResId() {
-        return R.layout.activity_rules_character;
+        return R.layout.activity_rules_character_demo;
     }
 
     @Override
     protected int getRootGuidelineResId() {
-        return R.id.gdlRoot_actRulesCharacter;
+        return R.id.gdlRoot_actRulesCharacterDemo;
     }
 
     @NonNull
     @Override
     protected Integer getBtnBackResId() {
-        return R.id.btnBack_actRulesCharacter;
+        return R.id.btnBack_actRulesCharacterDemo;
     }
 
     @Override
@@ -121,7 +121,7 @@ public final class RulesCharacterActivity extends PlayableActivity {
     @NonNull
     @Override
     public ActivityType getActivityType() {
-        return ActivityType.RulesCharacter;
+        return ActivityType.RulesCharacterDemo;
     }
 
     @Override
