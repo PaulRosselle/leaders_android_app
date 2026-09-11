@@ -485,6 +485,7 @@ public final class JsonUtils {
         switch (tutorialChapter) {
             case CaptureLeader: return R.raw.tutorial_capture;
             case ActiveAbilities: return R.raw.tutorial_active_abilities;
+            case PassiveAbilities: return R.raw.tutorial_passive_abilities;
             default: throw new IllegalStateException("No tutorial chapter file found for: " + tutorialChapter);
         }
     }

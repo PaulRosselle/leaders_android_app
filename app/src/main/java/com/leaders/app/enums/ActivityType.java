@@ -20,6 +20,7 @@ import com.leaders.app.activities.rules.character.RulesCharacterMenuActivity;
 import com.leaders.app.activities.rules.tutorial.RulesTutorialActiveAbilitiesActivity;
 import com.leaders.app.activities.rules.tutorial.RulesTutorialActivity;
 import com.leaders.app.activities.rules.tutorial.RulesTutorialCaptureActivity;
+import com.leaders.app.activities.rules.tutorial.RulesTutorialPassiveAbilitiesActivity;
 
 import java.util.NoSuchElementException;
 
@@ -41,7 +42,8 @@ public enum ActivityType {
     RulesCharacterMenu,
     RulesCharacterDemo,
     RulesTutorialCapture,
-    RulesTutorialActiveAbilities;
+    RulesTutorialActiveAbilities,
+    RulesTutorialPassiveAbilities;
 
     @NonNull
     public Intent getIntent(@NonNull Context context) {
@@ -60,6 +62,7 @@ public enum ActivityType {
             case RulesCharacterDemo: return new Intent(context, RulesCharacterDemoActivity.class);
             case RulesTutorialCapture: return new Intent(context, RulesTutorialCaptureActivity.class);
             case RulesTutorialActiveAbilities: return new Intent(context, RulesTutorialActiveAbilitiesActivity.class);
+            case RulesTutorialPassiveAbilities: return new Intent(context, RulesTutorialPassiveAbilitiesActivity.class);
             default: throw new NoSuchElementException(String.format("No class found matching %s", this));
         }
     }

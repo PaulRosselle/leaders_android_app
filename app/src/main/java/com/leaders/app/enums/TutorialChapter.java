@@ -23,6 +23,7 @@ public enum TutorialChapter {
         switch (this) {
             case CaptureLeader: return ActivityType.RulesTutorialCapture;
             case ActiveAbilities: return ActivityType.RulesTutorialActiveAbilities;
+            case PassiveAbilities: return ActivityType.RulesTutorialPassiveAbilities;
             default: throw new IllegalStateException("No activity type found for chapter: " + this);
         }
     }
@@ -56,7 +57,7 @@ public enum TutorialChapter {
         switch (this) {
             case CaptureLeader: return R.string.tutorial_capture_before;
             case ActiveAbilities: return R.string.tutorial_active_abilities_before;
-            case PassiveAbilities: return R.string.rules_chapter_passive_abilities;
+            case PassiveAbilities: return R.string.tutorial_passive_abilities_before;
             case Recruitment: return R.string.rules_chapter_recruitment;
             case SurroundLeader: return R.string.rules_chapter_surround_leader;
             case GameVsBot: return R.string.rules_chapter_game_vs_bot;
@@ -68,7 +69,7 @@ public enum TutorialChapter {
         switch (this) {
             case CaptureLeader: return R.string.tutorial_capture_after;
             case ActiveAbilities: return R.string.tutorial_active_abilities_after;
-            case PassiveAbilities: return R.string.rules_chapter_passive_abilities;
+            case PassiveAbilities: return R.string.tutorial_passive_abilities_after;
             case Recruitment: return R.string.rules_chapter_recruitment;
             case SurroundLeader: return R.string.rules_chapter_surround_leader;
             case GameVsBot: return R.string.rules_chapter_game_vs_bot;
