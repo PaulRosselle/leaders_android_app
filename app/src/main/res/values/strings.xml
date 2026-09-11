@@ -239,6 +239,8 @@
     <string name="new_rule">Nouvelle règle !</string>
     <string name="tutorial_capture_game_vs_bot">TODO</string>
     <string name="restart_game_vs_bot">Voulez-vous recommencer la partie ?</string>
+    <string name="player">joueur</string>
+    <string name="barry_the_bot">BaRRy le Bot</string>
 
 
 </resources>

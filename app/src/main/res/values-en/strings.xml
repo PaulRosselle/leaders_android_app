@@ -231,5 +231,7 @@
     <string name="new_rule">New rule!</string>
     <string name="tutorial_capture_game_vs_bot">TODO</string>
     <string name="restart_game_vs_bot">Would you like to restart this match?</string>
+    <string name="player">player</string>
+    <string name="barry_the_bot">BaRRy the Bot</string>
 
 </resources>

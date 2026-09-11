@@ -19,6 +19,7 @@ import com.leaders.app.enums.EndGameType;
 import com.leaders.app.enums.LeaderType;
 import com.leaders.app.enums.TutorialChapter;
 import com.leaders.app.utilities.ButtonUtils;
+import com.leaders.app.utilities.TutorialGameUtils;
 import com.leaders.app.views.character.CharacterDisplay;
 import com.leaders.app.views.character.HighlightView;
 import com.leaders.app.views.duel.CharacterCardSelectionView;
@@ -36,13 +37,11 @@ import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.entities.PlayerWarningState;
 import com.leaders.gamelogic.enums.GamePhaseType;
-import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.interactions.InteractionType;
 import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
-import com.leaders.puzzlelogic.utilities.PuzzleEditionUtils;
 
 import java.util.List;
 import java.util.Objects;
@@ -109,8 +108,7 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
     protected void initDatas() {
         super.initDatas();
 
-        // TODO - getDefaultHistory properly
-        startHistory = PuzzleEditionUtils.getDefaultHistory();
+        startHistory = TutorialGameUtils.getDefaultHistory(this);
 
         controller = new GameController(this);
         controller.restartGame(new GameHistory(startHistory));
@@ -279,7 +277,7 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
     }
 
     private void showEndGame(@NonNull GameContext gameContext, @NonNull Player winner) {
-        boolean isVictory = winner.getTeamColor() == TeamColor.Black;
+        boolean isVictory = winner.getTeamColor() == TutorialGameUtils.getPlayerTeamColor();
         EndGameType endGameType = isVictory ? EndGameType.Victory : EndGameType.Defeat;
 
         int titleId = isVictory ? R.string.victory_title : R.string.defeat_title;
@@ -332,7 +330,7 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
     }
 
     private boolean isBotPlaying(@NonNull GameContext gameContext) {
-        return gameContext.getOpposingPlayer().getTeamColor() == TeamColor.White;
+        return gameContext.getCurrentPlayer().getTeamColor() != TutorialGameUtils.getPlayerTeamColor();
     }
 
     private Player getPlayer(@NonNull GameContext gameContext) {
@@ -419,6 +417,7 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
         runOnUiThread(() -> {
             GameContext gameContext = controller.getCurrentContext();
 
+            initPlayerViews(gameContext);
             bdvBoard.setBoard(game.getBoard());
             ccsvCardSelector.applyGameModeParams(gameContext.getGameMode());
 
