@@ -110,7 +110,7 @@ public abstract class PlayableActivity extends BaseActivity
 
         showCardDescriptionNotification(characterType.getCharacterCard());
 
-        return false;
+        return true;
     }
 
     //endregion
