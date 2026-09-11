@@ -225,5 +225,7 @@
     <string name="tutorial_active_abilities_after">Certaines compétences n\'ont pas besoin d\'être activées en consommant une action.\n\nDécouvrez cela dans le chapitre suivant.</string>
     <string name="tutorial_passive_abilities_before">L\'effet des compétences passives est actif en permanence et ne consomme pas d\'action pour être utilisé.\nRestez appuyé sur un personnage pour découvrir sa compétence.</string>
     <string name="tutorial_passive_abilities_after">Une fois vos personnages joués, vous pouvez recruter de nouveaux personnages.\n\nDécouvrez cela dans le chapitre suivant.</string>
+    <string name="tutorial_surround_before">TODO</string>
+    <string name="tutorial_surround_after">TODO</string>
 
 </resources>
