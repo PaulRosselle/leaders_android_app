@@ -19,12 +19,13 @@ public enum TutorialChapter {
     }
 
     public ActivityType getActivityType() {
-        // TODO - handle every Chapter activity
         switch (this) {
             case CaptureLeader: return ActivityType.RulesTutorialCapture;
             case ActiveAbilities: return ActivityType.RulesTutorialActiveAbilities;
             case PassiveAbilities: return ActivityType.RulesTutorialPassiveAbilities;
             case SurroundLeader: return ActivityType.RulesTutorialSurround;
+            case Recruitment: return ActivityType.RulesTutorialRecruitment;
+            // TODO - handle GameVsBot
             default: throw new IllegalStateException("No activity type found for chapter: " + this);
         }
     }
@@ -58,7 +59,7 @@ public enum TutorialChapter {
             case CaptureLeader: return R.string.tutorial_capture_info;
             case ActiveAbilities: return R.string.tutorial_active_abilities_info;
             case PassiveAbilities: return R.string.tutorial_passive_abilities_info;
-            case Recruitment: return R.string.rules_chapter_recruitment;
+            case Recruitment: return R.string.tutorial_recruitment_info;
             case SurroundLeader: return R.string.tutorial_surround_info;
             case GameVsBot: return R.string.rules_chapter_game_vs_bot;
             default: throw new IllegalStateException("No info text found for chapter: " + this);
@@ -69,6 +70,7 @@ public enum TutorialChapter {
         switch (this) {
             case ActiveAbilities: return R.drawable.icon_ability_active;
             case PassiveAbilities: return R.drawable.icon_ability_passive;
+            case Recruitment: return R.drawable.target_recruitment_center;
             default: return R.drawable.icon_leader;
         }
     }
@@ -78,7 +80,7 @@ public enum TutorialChapter {
             case CaptureLeader: return R.string.tutorial_capture_before;
             case ActiveAbilities: return R.string.tutorial_active_abilities_before;
             case PassiveAbilities: return R.string.tutorial_passive_abilities_before;
-            case Recruitment: return R.string.rules_chapter_recruitment;
+            case Recruitment: return R.string.tutorial_recruitment_before;
             case SurroundLeader: return R.string.tutorial_surround_before;
             case GameVsBot: return R.string.rules_chapter_game_vs_bot;
             default: throw new IllegalStateException("No before text found for chapter: " + this);
@@ -90,7 +92,7 @@ public enum TutorialChapter {
             case CaptureLeader: return R.string.tutorial_capture_after;
             case ActiveAbilities: return R.string.tutorial_active_abilities_after;
             case PassiveAbilities: return R.string.tutorial_passive_abilities_after;
-            case Recruitment: return R.string.rules_chapter_recruitment;
+            case Recruitment: return R.string.tutorial_recruitment_after;
             case SurroundLeader: return R.string.tutorial_surround_after;
             case GameVsBot: return R.string.rules_chapter_game_vs_bot;
             default: throw new IllegalStateException("No after text found for chapter: " + this);
