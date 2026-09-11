@@ -213,5 +213,7 @@
     <string name="online_guide">online guide</string>
     <string name="tutorial_capture_before">In Leaders, you win by capturing the opposing Leader. To do so, move two of your characters onto spaces adjacent to them.</string>
     <string name="tutorial_capture_after">Most characters can do more than just move one space.\n\nDiscover how in the next chapter.</string>
+    <string name="tutorial_active_abilities_before">Each character can move one space or activate their ability once per turn.\nPress and hold a character to discover their ability.</string>
+    <string name="tutorial_active_abilities_after">Some abilities don’t require an action to activate.\nDiscover how in the next chapter.</string>
 
 </resources>

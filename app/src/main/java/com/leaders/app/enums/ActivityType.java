@@ -17,6 +17,7 @@ import com.leaders.app.activities.replay.ReplayViewerActivity;
 import com.leaders.app.activities.rules.RulesMenuActivity;
 import com.leaders.app.activities.rules.character.RulesCharacterDemoActivity;
 import com.leaders.app.activities.rules.character.RulesCharacterMenuActivity;
+import com.leaders.app.activities.rules.tutorial.RulesTutorialActiveAbilitiesActivity;
 import com.leaders.app.activities.rules.tutorial.RulesTutorialActivity;
 import com.leaders.app.activities.rules.tutorial.RulesTutorialCaptureActivity;
 
@@ -39,7 +40,8 @@ public enum ActivityType {
     RulesMenu,
     RulesCharacterMenu,
     RulesCharacterDemo,
-    RulesTutorialCapture;
+    RulesTutorialCapture,
+    RulesTutorialActiveAbilities;
 
     @NonNull
     public Intent getIntent(@NonNull Context context) {
@@ -57,6 +59,7 @@ public enum ActivityType {
             case RulesCharacterMenu: return new Intent(context, RulesCharacterMenuActivity.class);
             case RulesCharacterDemo: return new Intent(context, RulesCharacterDemoActivity.class);
             case RulesTutorialCapture: return new Intent(context, RulesTutorialCaptureActivity.class);
+            case RulesTutorialActiveAbilities: return new Intent(context, RulesTutorialActiveAbilitiesActivity.class);
             default: throw new NoSuchElementException(String.format("No class found matching %s", this));
         }
     }

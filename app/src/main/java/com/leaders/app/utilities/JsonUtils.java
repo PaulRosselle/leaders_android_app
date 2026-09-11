@@ -484,6 +484,7 @@ public final class JsonUtils {
     private static int getTutorialChapterResId(@NonNull TutorialChapter tutorialChapter) {
         switch (tutorialChapter) {
             case CaptureLeader: return R.raw.tutorial_capture;
+            case ActiveAbilities: return R.raw.tutorial_active_abilities;
             default: throw new IllegalStateException("No tutorial chapter file found for: " + tutorialChapter);
         }
     }

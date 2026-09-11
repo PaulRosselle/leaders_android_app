@@ -193,7 +193,7 @@ public abstract class RulesTutorialActivity extends PlayableActivity implements 
 
     @Override
     public void onPhaseChanged(@NonNull GamePhase phase) {
-        // TODO - handle recruitment
+        throw new IllegalStateException("Phase change is not supported within default tutorial activies");
     }
 
     //endregion
