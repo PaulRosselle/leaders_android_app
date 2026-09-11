@@ -215,5 +215,7 @@
     <string name="tutorial_capture_after">Most characters can do more than just move one space.\n\nDiscover how in the next chapter.</string>
     <string name="tutorial_active_abilities_before">Each character can move one space or activate their ability once per turn.\nPress and hold a character to discover their ability.</string>
     <string name="tutorial_active_abilities_after">Some abilities don’t require an action to activate.\nDiscover how in the next chapter.</string>
+    <string name="tutorial_passive_abilities_before">Passive abilities are always active and don’t require an action to use.\nPress and hold a character to discover their ability.</string>
+    <string name="tutorial_passive_abilities_after">Once you’ve played your characters, you can recruit new ones.\n\nDiscover how in the next chapter.</string>
 
 </resources>
