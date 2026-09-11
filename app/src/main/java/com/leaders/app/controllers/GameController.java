@@ -110,7 +110,7 @@ public final class GameController implements IGameFlowListener {
         return hasLegalResult(InteractionResultType.UndoLastAction);
     }
 
-    public boolean canEndPhaseAction() {
+    public boolean canEndPhase() {
         return hasLegalResult(InteractionResultType.EndPhase);
     }
 
@@ -147,7 +147,7 @@ public final class GameController implements IGameFlowListener {
     }
 
     public void endPhase() {
-        if (!hasPendingInteraction() || !canEndPhaseAction()) {
+        if (!hasPendingInteraction() || !canEndPhase()) {
             throw new IllegalStateException("Undo should not exist outside of a valid request context");
         }
 

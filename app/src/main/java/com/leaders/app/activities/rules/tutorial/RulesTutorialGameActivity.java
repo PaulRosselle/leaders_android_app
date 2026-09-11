@@ -19,6 +19,7 @@ import com.leaders.app.enums.EndGameType;
 import com.leaders.app.enums.LeaderType;
 import com.leaders.app.enums.TutorialChapter;
 import com.leaders.app.utilities.ButtonUtils;
+import com.leaders.app.utilities.TutorialBotUtils;
 import com.leaders.app.utilities.TutorialGameUtils;
 import com.leaders.app.views.character.CharacterDisplay;
 import com.leaders.app.views.character.HighlightView;
@@ -208,7 +209,7 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
 
         highlightSelectableCards(gameContext, request);
 
-        setBtnNextPhaseEnabled(controller.canEndPhaseAction(), request.getLegalTargets().isEmpty());
+        setBtnNextPhaseEnabled(controller.canEndPhase(), request.getLegalTargets().isEmpty());
 
         if (request.getRequestType() == InteractionType.PositionExpected &&
                 gameContext.getGamePhase().getPhaseType() == GamePhaseType.Recruitment) {
@@ -448,8 +449,11 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
 
     @Override
     public void onInteractionRequired(@NonNull InteractionRequest request) {
-        // TODO - handle bot response
-        super.onInteractionRequired(request);
+        if (isBotPlaying(controller.getCurrentContext())) {
+            TutorialBotUtils.handleRequest(controller, request);
+        } else {
+            super.onInteractionRequired(request);
+        }
     }
 
     //endregion
