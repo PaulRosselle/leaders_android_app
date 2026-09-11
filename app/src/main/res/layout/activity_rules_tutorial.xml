@@ -2,34 +2,29 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/clyMain_actRulesCharacter"
+    android:id="@+id/clyMain_actRulesTutorial"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
-    tools:context=".app.activities.rules.character.RulesCharacterActivity"
+    tools:context=".app.activities.rules.tutorial.RulesTutorialActivity"
     tools:ignore="SpUsage"
     tools:theme="@style/Theme.LeadersAndroidApp">
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/gdlRoot_actRulesCharacter"
+        android:id="@+id/gdlRoot_actRulesTutorial"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_begin="0dp" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/gdlArtworkTop_actRulesActivity"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.6" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/gdlArtworkEnd_actRulesActivity"
-        android:layout_width="wrap_content"
+        android:id="@+id/gdl50V_actRulesTutorial"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.75" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintGuide_percent="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <com.leaders.app.views.decoration.DecorativeBackgroundView
         android:id="@+id/decorativeBackgroundView"
@@ -41,9 +36,8 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:visibility="gone" />
 
-
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnBack_actRulesCharacter"
+        android:id="@+id/btnBack_actRulesTutorial"
         android:layout_width="@dimen/round_button_size"
         android:layout_height="@dimen/round_button_size"
         android:layout_marginStart="8dp"
@@ -60,53 +54,34 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actRulesCharacter"
+        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actRulesTutorial"
         app:layout_constraintVertical_bias="0.0"
         tools:ignore="SpeakableTextPresentCheck" />
 
-    <ImageView
-        android:id="@+id/imvAbility_actRulesCharacter"
-        android:layout_width="@dimen/round_button_size"
-        android:layout_height="@dimen/round_button_size"
-        android:layout_marginEnd="8dp"
-        android:importantForAccessibility="no"
-        android:padding="4dp"
+    <com.leaders.app.views.rules.RulesNavigationView
+        android:id="@+id/tnvNavigation_actRulesTutoriel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="64dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actRulesCharacter"
-        app:layout_constraintVertical_bias="0.0"
-        app:srcCompat="@drawable/icon_ability_special" />
+        app:layout_constraintStart_toEndOf="@+id/btnBack_actRulesTutorial"
+        app:layout_constraintTop_toTopOf="@id/gdlRoot_actRulesTutorial"
+        app:layout_constraintVertical_bias="0.0" />
 
     <com.leaders.app.views.board.PlayableBoardView
-        android:id="@+id/bdvBoard_actRulesCharacter"
+        android:id="@+id/bdvBoard_actRulesTutorial"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/btnUndoLastAction_actRulesCharacter"
+        app:layout_constraintBottom_toTopOf="@+id/btnUndoLastAction_actRulesTutorial"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnBack_actRulesCharacter" />
-
-    <ImageView
-        android:id="@+id/imvArtwork_actRulesCharacter"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:adjustViewBounds="true"
-        android:importantForAccessibility="no"
-        android:scaleType="fitStart"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/gdlArtworkEnd_actRulesActivity"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/gdlArtworkTop_actRulesActivity"
-        app:layout_constraintVertical_bias="1.0"
-        app:srcCompat="@drawable/character_artwork_hermit_and_cub" />
+        app:layout_constraintTop_toBottomOf="@+id/btnBack_actRulesTutorial" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnUndoLastAction_actRulesCharacter"
+        android:id="@+id/btnUndoLastAction_actRulesTutorial"
         android:layout_width="@dimen/round_button_size"
         android:layout_height="@dimen/round_button_size"
         android:layout_marginBottom="16dp"
@@ -120,7 +95,6 @@
         app:iconTint="@color/font"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.75"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0"
@@ -128,7 +102,7 @@
         app:strokeWidth="@dimen/default_stroke_width" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnReset_actRulesCharacter"
+        android:id="@+id/btnReset_actRulesTutorial"
         android:layout_width="@dimen/round_button_size"
         android:layout_height="@dimen/round_button_size"
         android:layout_marginBottom="16dp"
@@ -141,56 +115,40 @@
         android:textSize="14dp"
         app:backgroundTint="@color/darker_background"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.25"
+        app:layout_constraintEnd_toStartOf="@+id/gdl50V_actRulesTutorial"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0"
         app:strokeColor="@color/font"
         app:strokeWidth="@dimen/default_stroke_width" />
 
-    <TextView
-        android:id="@+id/txvDescription_actRulesCharacter"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="8dp"
-        android:autoSizeMaxTextSize="@dimen/default_text_font_size"
-        android:autoSizeMinTextSize="14dp"
-        android:autoSizeStepGranularity="1dp"
-        android:autoSizeTextType="uniform"
-        android:fontFamily="@font/bobby_jones_condensed"
-        android:gravity="center"
-        android:justificationMode="inter_word"
-        android:text="@string/card_description_hermit_and_cub"
-        android:textAllCaps="true"
-        android:textColor="@color/font"
-        android:textSize="@dimen/default_text_font_size"
-        app:layout_constraintBottom_toTopOf="@+id/bdvBoard_actRulesCharacter"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.518"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnBack_actRulesCharacter"
-        app:layout_constraintVertical_bias="0.0" />
 
-    <TextView
-        android:id="@+id/txvName_actRulesCharacter"
-        android:layout_width="wrap_content"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnNextPhase_actRulesTutorial"
+        android:layout_width="@dimen/round_button_size"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/bourbon_test_regular"
-        android:text="@string/card_formatted_name_hermit_and_cub"
-        android:textColor="@color/app_golden"
-        android:textSize="34sp"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/darker_background"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:padding="0dp"
+        app:icon="@drawable/icon_arrow_head"
+        app:iconGravity="textStart"
+        app:iconPadding="0dp"
+        app:iconSize="@dimen/round_button_icon_size"
+        app:iconTint="@color/font"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/imvAbility_actRulesCharacter"
-        app:layout_constraintStart_toEndOf="@+id/btnBack_actRulesCharacter"
-        app:layout_constraintTop_toTopOf="@id/gdlRoot_actRulesCharacter"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/gdl50V_actRulesTutorial"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        app:strokeColor="@color/font"
+        app:strokeWidth="1dp"
+        tools:ignore="SpeakableTextPresentCheck" />
 
     <com.leaders.app.views.character.CharacterNotificationView
-        android:id="@+id/cnvCardInfo_actRulesCharacter"
+        android:id="@+id/cnvCardInfo_actRulesTutorial"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -199,11 +157,11 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/gdlRoot_actRulesCharacter"
+        app:layout_constraintTop_toTopOf="@id/gdlRoot_actRulesTutorial"
         app:layout_constraintVertical_bias="0.0" />
 
     <com.leaders.app.views.EndGameView
-        android:id="@+id/egvEndGame_actRulesCharacter"
+        android:id="@+id/egvEndGame_actRulesTutorial"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:visibility="gone"
@@ -211,5 +169,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/txvNextPhase_actRulesTutorial"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/bobby_jones_condensed"
+        android:textAllCaps="true"
+        android:textColor="@color/font"
+        app:layout_constraintBottom_toTopOf="@+id/btnNextPhase_actRulesTutorial"
+        app:layout_constraintEnd_toEndOf="@+id/btnNextPhase_actRulesTutorial"
+        app:layout_constraintStart_toStartOf="@+id/btnNextPhase_actRulesTutorial"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        tools:text="Étape suivante" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
