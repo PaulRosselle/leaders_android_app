@@ -10,8 +10,10 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.leaders.R;
+import com.leaders.app.utilities.ContactUtils;
 
 public class ContactFormView extends ConstraintLayout {
+    private final static String CONTACT_TITLE = "REPORT BUG | SUGGESTION";
     private final EditText edtSubject;
     private final EditText edtMessage;
 
@@ -44,7 +46,13 @@ public class ContactFormView extends ConstraintLayout {
     }
 
     private void onSendClick(View v) {
-        // TODO
+        ContactUtils.sendMessage(
+                getContext(),
+                CONTACT_TITLE,
+                getFormattedText(edtSubject),
+                getFormattedText(edtMessage)
+        );
+
         hide();
     }
 }

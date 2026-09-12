@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:ignore="SpUsage">
+
+    <TextView
+        android:id="@+id/txvTitle_vwContact"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="8dp"
+        android:autoSizeMaxTextSize="@dimen/smaller_text_font_size"
+        android:autoSizeMinTextSize="14dp"
+        android:autoSizeStepGranularity="1dp"
+        android:autoSizeTextType="uniform"
+        android:fontFamily="sans-serif"
+        android:maxLines="1"
+        android:ellipsize="none"
+        android:text="un problème, une suggestion ?"
+        android:textAllCaps="true"
+        android:textColor="@color/font"
+        android:textSize="@dimen/smaller_text_font_size"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btnOpenForm_vwContact"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnOpenForm_vwContact"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/round_button_size"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="16dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        app:backgroundTint="@color/ultra_dark_background"
+        app:cornerRadius="@dimen/default_corner_radius"
+        app:icon="@drawable/icon_mail"
+        app:iconGravity="textStart"
+        app:iconPadding="0dp"
+        app:iconSize="@dimen/round_button_icon_size"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:strokeColor="@color/font"
+        app:strokeWidth="@dimen/default_stroke_width" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
