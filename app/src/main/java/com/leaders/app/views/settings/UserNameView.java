@@ -27,6 +27,8 @@ public class UserNameView extends ConstraintLayout {
 
         inflate(context, R.layout.view_user_name, this);
 
+        setBackgroundResource(R.drawable.round_rect);
+
         edtName = findViewById(R.id.edtName_vwUserName);
 
         edtName.addTextChangedListener(new TextWatcher() {

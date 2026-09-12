@@ -13,8 +13,10 @@ import com.leaders.app.enums.HighlightColor;
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.views.settings.AnimationSpeedView;
 import com.leaders.app.views.settings.HighlightColorView;
+import com.leaders.app.views.settings.UserNameView;
 
 public class SettingsActivity extends BaseActivity {
+    private UserNameView unvUserName;
     private AnimationSpeedView asvAnimationSpeed;
     private HighlightColorView hcvHighlightColor;
 
@@ -27,6 +29,7 @@ public class SettingsActivity extends BaseActivity {
     protected void initViews() {
         super.initViews();
 
+        unvUserName = findViewById(R.id.unvUserName_actSettings);
         asvAnimationSpeed = findViewById(R.id.asvAnimationSpeed_actSettings);
         hcvHighlightColor = findViewById(R.id.hcvHighlightColor_actSettings);
         // TODO
@@ -36,6 +39,7 @@ public class SettingsActivity extends BaseActivity {
     protected void initListeners() {
         super.initListeners();
 
+        unvUserName.setChangeListener(this::onNameChange);
         asvAnimationSpeed.setChangeListener(this::onAnimationSpeedChange);
         hcvHighlightColor.setChangeListener(this::onColorChange);
         // TODO
@@ -47,6 +51,7 @@ public class SettingsActivity extends BaseActivity {
 
         settings = ((LeadersApplication) getApplication()).getSettings();
 
+        unvUserName.setName(settings.getUserName());
         asvAnimationSpeed.setSpeed(settings.getAnimationSpeed());
         hcvHighlightColor.setColor(settings.getHighlightColor());
         // TODO
@@ -92,6 +97,11 @@ public class SettingsActivity extends BaseActivity {
     //endregion
 
     //region CHANGE LISTENERS
+
+    private void onNameChange(@NonNull String name) {
+        settings.setUserName(name);
+        JsonUtils.saveSettings(this, settings);
+    }
 
     private void onAnimationSpeedChange(@NonNull AnimationSpeed speed) {
         settings.setAnimationSpeed(speed);
