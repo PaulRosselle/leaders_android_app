@@ -37,7 +37,7 @@ public class ContactFormView extends ConstraintLayout {
         setVisibility(VISIBLE);
     }
 
-    private void hide() {
+    public void hide() {
         setVisibility(GONE);
     }
 

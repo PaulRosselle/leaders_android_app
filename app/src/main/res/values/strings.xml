@@ -246,6 +246,7 @@
     <string name="mail_message">message</string>
     <string name="send">envoyer</string>
     <string name="contact_me">me contacter</string>
+    <string name="problem_suggestion">un problème,\nune suggestion ?</string>
 
 
 </resources>

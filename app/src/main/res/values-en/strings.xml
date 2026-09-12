@@ -238,5 +238,6 @@
     <string name="mail_message">message</string>
     <string name="send">send</string>
     <string name="contact_me">contact me</string>
+    <string name="problem_suggestion">A problem,\na suggestion ?</string>
 
 </resources>
