@@ -10,11 +10,14 @@ import org.json.JSONObject;
 
 public final class Settings {
     @NonNull
+    private String userName;
+    @NonNull
     private AnimationSpeed animationSpeed;
     @NonNull
     private HighlightColor highlightColor;
 
     private Settings(){
+        userName = "";
         animationSpeed = AnimationSpeed.Normal;
         highlightColor = HighlightColor.Default;
     }
@@ -24,6 +27,9 @@ public final class Settings {
         Settings settings = new Settings();
 
         try {
+            if (joSettings.has("user_name")) {
+                settings.setUserName(joSettings.getString("user_name"));
+            }
             if (joSettings.has("animation_speed")) {
                 settings.setAnimationSpeed(AnimationSpeed.valueOf(joSettings.getString("animation_speed")));
             }
@@ -41,11 +47,21 @@ public final class Settings {
     @NonNull
     public JSONObject getAsJson() throws JSONException {
         JSONObject joSettings = new JSONObject();
-        
-        joSettings.put("animation_speed", animationSpeed.name());
-        joSettings.put("highlight_color", highlightColor.name());
+
+        joSettings.put("user_name", getUserName());
+        joSettings.put("animation_speed", getAnimationSpeed().name());
+        joSettings.put("highlight_color", getHighlightColor().name());
 
         return joSettings;
+    }
+
+    @NonNull
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(@NonNull String userName) {
+        this.userName = userName;
     }
 
     @NonNull

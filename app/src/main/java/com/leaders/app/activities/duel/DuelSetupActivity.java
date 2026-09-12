@@ -11,7 +11,9 @@ import androidx.appcompat.content.res.AppCompatResources;
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
+import com.leaders.app.entities.LeadersApplication;
 import com.leaders.app.entities.PlayerSetup;
+import com.leaders.app.entities.Settings;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.LeaderType;
 import com.leaders.app.utilities.DuelStartUtils;
@@ -79,6 +81,10 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
     @Override
     protected void initDatas() {
         super.initDatas();
+
+        Settings settings = ((LeadersApplication) getApplication()).getSettings();
+        // First player setup is always loaded with the username
+        psvFirst.setName(settings.getUserName());
 
         firstTeamColor = null;
         gameMode = null;

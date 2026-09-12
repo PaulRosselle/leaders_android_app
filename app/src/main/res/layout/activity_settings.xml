@@ -81,10 +81,16 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <com.leaders.app.views.settings.UserNameView
+                android:id="@+id/unvUserName_actSettings"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
             <com.leaders.app.views.settings.AnimationSpeedView
                 android:id="@+id/asvAnimationSpeed_actSettings"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" >
+                android:layout_height="match_parent"
+                android:layout_marginTop="8dp">
 
             </com.leaders.app.views.settings.AnimationSpeedView>
 

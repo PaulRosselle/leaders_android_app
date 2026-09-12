@@ -762,7 +762,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
         // In case the user overwrite the default value and want them back,
         // we apply them every time the save form is reopened
         psvSave.setDefaultPuzzleName(puzzleSave != null ? puzzleSave.getName() : "");
-        psvSave.setDefaultPuzzleAuthor(puzzleSave != null ? puzzleSave.getAuthor() : "");
+        psvSave.setDefaultPuzzleAuthor(puzzleSave != null ? puzzleSave.getAuthor() : settings.getUserName());
         setSaveDialogVisible(true);
     }
 
