@@ -508,7 +508,7 @@ public final class JsonUtils {
 
     public static void saveSettings(@NonNull Context context, @NonNull Settings settings) {
         try {
-            saveJsonFile(context, CUSTOM_PUZZLES_FILENAME, settings.getAsJson());
+            saveJsonFile(context, SETTINGS_FILENAME, settings.getAsJson());
         } catch (JSONException | IOException e) {
             throw new RuntimeException(e);
         }

@@ -58,13 +58,13 @@ public final class PlayableBoardView extends BoardView {
 
     private OnTargetClickListener onTargetClickListener;
 
+
     public PlayableBoardView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
         setOnCellClickListener(this::onCellClick);
         setOnCharacterDisplayClickListener(this::onCharacterDisplayClick);
     }
-
 
     //region TARGET APPLICATION METHODS
 
@@ -238,14 +238,15 @@ public final class PlayableBoardView extends BoardView {
     }
 
     public void animateFeedback(@NonNull InteractionFeedback feedback,
+                                @NonNull AnimationSpeed animationSpeed,
                                 @Nullable Runnable onAnimationEnd) {
         switch (feedback.getFeedbackType()) {
             case CharacterAction:
-                new CharacterActionAnimator(AnimationSpeed.Normal)
+                new CharacterActionAnimator(animationSpeed)
                         .animate(this, feedback.getCharacterActionMotions(), onAnimationEnd);
                 break;
             case RecruitmentAction:
-                new RecruitmentActionAnimator(AnimationSpeed.Normal)
+                new RecruitmentActionAnimator(animationSpeed)
                         .animate(this, feedback.getRecruitmentActionMotions(), onAnimationEnd);
                 break;
             default:

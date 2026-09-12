@@ -184,7 +184,6 @@
     <string name="very_slow_speed">Very slow</string>
     <string name="fast_speed">Fast</string>
     <string name="very_fast_speed">Very fast</string>
-    <string name="no_animation_speed">No animation</string>
     <string name="switch_side">Switch sides</string>
     <string name="character_cards">Character cards</string>
     <string name="barrage_warning_title">Warning received: Barrage</string>
@@ -233,5 +232,6 @@
     <string name="restart_game_vs_bot">Would you like to restart this match?</string>
     <string name="player">player</string>
     <string name="barry_the_bot">BaRRy the Bot</string>
+    <string name="highlight_color">Highlight color</string>
 
 </resources>

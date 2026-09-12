@@ -15,6 +15,7 @@ import com.leaders.app.activities.PlayableActivity;
 import com.leaders.app.controllers.GameController;
 import com.leaders.app.entities.ReplaySave;
 import com.leaders.app.enums.ActivityType;
+import com.leaders.app.enums.AnimationSpeed;
 import com.leaders.app.enums.EndGameType;
 import com.leaders.app.enums.LeaderType;
 import com.leaders.app.utilities.ButtonUtils;
@@ -29,6 +30,7 @@ import com.leaders.app.views.duel.CharacterCardSelectionView;
 import com.leaders.app.views.duel.PlayerBottomView;
 import com.leaders.app.views.duel.PlayerTopView;
 import com.leaders.app.views.replay.ReplaySaveView;
+import com.leaders.app.views.settings.AnimationSpeedView;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
@@ -60,11 +62,13 @@ public final class DuelPlayerActivity extends PlayableActivity implements
 
     private enum DuelAction {
         SaveAsReplay,
+        ChangeAnimationSpeed,
         DisplayCellPositions;
 
         private int getIconResId() {
             switch (this) {
                 case SaveAsReplay: return R.drawable.icon_save;
+                case ChangeAnimationSpeed: return R.drawable.icon_speed;
                 case DisplayCellPositions: return R.drawable.icon_position;
                 default: throw new IllegalStateException("No icon found for puzzle action: " + this);
             }
@@ -73,6 +77,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
         private int getTextResId() {
             switch (this) {
                 case SaveAsReplay: return R.string.record_game;
+                case ChangeAnimationSpeed: return R.string.animation_speed;
                 case DisplayCellPositions: return R.string.board_coordinates;
                 default: throw new IllegalStateException("No text found for puzzle action: " + this);
             }
@@ -81,6 +86,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
         private View.OnClickListener getOnClickListener(@NonNull DuelPlayerActivity activity) {
             switch (this) {
                 case SaveAsReplay: return activity::onSaveAsReplay;
+                case ChangeAnimationSpeed: return activity::onChangeAnimationSpeedClick;
                 case DisplayCellPositions: return activity::onDisplayCellPosition;
                 default: throw new IllegalStateException("No click listener found for puzzle action: " + this);
             }
@@ -94,6 +100,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
 
     private MaterialButton btnActions;
     private ActionsMenuView amvActions;
+    private AnimationSpeedView asvAnimationSpeed;
     private ReplaySaveView rsvReplaySave;
     private View vwDialogBg;
 
@@ -123,6 +130,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
             amvActions.addActionButton(action.getIconResId(), action.getTextResId(),
                     action.ordinal(), action.getOnClickListener(this));
         }
+        asvAnimationSpeed = findViewById(R.id.asvAnimationSpeed_actDuelPlayer);
         rsvReplaySave = findViewById(R.id.rsvReplaySave_actDuelPlayer);
         vwDialogBg = findViewById(R.id.vwDialogBg_actDuelPlayer);
 
@@ -148,6 +156,8 @@ public final class DuelPlayerActivity extends PlayableActivity implements
         rsvReplaySave.setOnSaveClick(this::onSaveAsReplayConfirmed);
         rsvReplaySave.setOnCancelClick(this::onSaveAsReplayCancelled);
         vwDialogBg.setOnClickListener(this::vwDialogBgClick);
+        asvAnimationSpeed.setChangeListener(this::onAnimationSpeedChange);
+        asvAnimationSpeed.setOnClickListener(this::onAsvAnimationBgClick);
 
         btnCards.setOnClickListener(this::onCardsClick);
         btnNextPhase.setOnClickListener(this::onNextPhaseClick);
@@ -257,9 +267,20 @@ public final class DuelPlayerActivity extends PlayableActivity implements
         if (rsvReplaySave.getVisibility() == View.VISIBLE) {
             setReplaySaveVisible(false);
         }
+        if (asvAnimationSpeed.getVisibility() == View.VISIBLE) {
+            setAnimationSpeedVisible(false);
+        }
         if (amvActions.getVisibility() == View.VISIBLE) {
             setActionsMenuVisible(false);
         }
+    }
+
+    private void onAsvAnimationBgClick(View v) {
+        // Dummy on click listener to prevent a "onDialogBgClick"
+    }
+
+    private void onAnimationSpeedChange(@NonNull AnimationSpeed speed) {
+        animationSpeed = speed;
     }
 
     private void onSaveAsReplay(View v) {
@@ -296,10 +317,22 @@ public final class DuelPlayerActivity extends PlayableActivity implements
         setReplaySaveVisible(false);
     }
 
+
+    private void onChangeAnimationSpeedClick(View v) {
+        amvActions.setVisibility(View.GONE);
+        asvAnimationSpeed.setSpeed(animationSpeed);
+        setAnimationSpeedVisible(true);
+    }
+
     private void onDisplayCellPosition(View v) {
         bdvBoard.setCellPositionVisible(!bdvBoard.isCellPositionVisible());
 
         setActionsMenuVisible(false);
+    }
+
+    private void setAnimationSpeedVisible(boolean visible) {
+        asvAnimationSpeed.setVisibility(visible ? View.VISIBLE : View.GONE);
+        vwDialogBg.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     private void setActionsMenuVisible(boolean visible) {

@@ -10,7 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
 
-import com.leaders.R;
+import com.leaders.app.entities.LeadersApplication;
+import com.leaders.app.entities.Settings;
 
 public final class HighlightView extends AppCompatImageView {
     private static final int HIGHLIGHT_ANIMATION_DURATION = 800;
@@ -18,7 +19,9 @@ public final class HighlightView extends AppCompatImageView {
 
     public HighlightView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        setImageResource(R.drawable.character_highlight);
+
+        Settings settings = ((LeadersApplication) context.getApplicationContext()).getSettings();
+        setImageResource(settings.getHighlightColor().getOutlineResId());
 
         animator = ObjectAnimator.ofFloat(this, ROTATION, 0f, 360f);
         animator.setDuration(HIGHLIGHT_ANIMATION_DURATION);

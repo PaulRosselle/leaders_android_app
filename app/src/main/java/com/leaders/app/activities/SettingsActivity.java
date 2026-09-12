@@ -9,11 +9,14 @@ import com.leaders.app.entities.LeadersApplication;
 import com.leaders.app.entities.Settings;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.AnimationSpeed;
+import com.leaders.app.enums.HighlightColor;
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.views.settings.AnimationSpeedView;
+import com.leaders.app.views.settings.HighlightColorView;
 
 public class SettingsActivity extends BaseActivity {
     private AnimationSpeedView asvAnimationSpeed;
+    private HighlightColorView hcvHighlightColor;
 
     private Settings settings;
 
@@ -25,6 +28,7 @@ public class SettingsActivity extends BaseActivity {
         super.initViews();
 
         asvAnimationSpeed = findViewById(R.id.asvAnimationSpeed_actSettings);
+        hcvHighlightColor = findViewById(R.id.hcvHighlightColor_actSettings);
         // TODO
     }
 
@@ -33,6 +37,7 @@ public class SettingsActivity extends BaseActivity {
         super.initListeners();
 
         asvAnimationSpeed.setChangeListener(this::onAnimationSpeedChange);
+        hcvHighlightColor.setChangeListener(this::onColorChange);
         // TODO
     }
 
@@ -43,6 +48,7 @@ public class SettingsActivity extends BaseActivity {
         settings = ((LeadersApplication) getApplication()).getSettings();
 
         asvAnimationSpeed.setSpeed(settings.getAnimationSpeed());
+        hcvHighlightColor.setColor(settings.getHighlightColor());
         // TODO
     }
 
@@ -87,8 +93,13 @@ public class SettingsActivity extends BaseActivity {
 
     //region CHANGE LISTENERS
 
-    public void onAnimationSpeedChange(@NonNull AnimationSpeed speed) {
+    private void onAnimationSpeedChange(@NonNull AnimationSpeed speed) {
         settings.setAnimationSpeed(speed);
+        JsonUtils.saveSettings(this, settings);
+    }
+
+    private void onColorChange(@NonNull HighlightColor color) {
+        settings.setHighlightColor(color);
         JsonUtils.saveSettings(this, settings);
     }
 
