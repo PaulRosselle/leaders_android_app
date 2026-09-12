@@ -59,7 +59,7 @@ public final class AnimationSpeedView extends ConstraintLayout {
         setSpeed(availableSpeeds.contains(AnimationSpeed.Normal) ? AnimationSpeed.Normal : availableSpeeds.get(0));
     }
 
-    private void setSpeed(@NonNull AnimationSpeed speed) {
+    public void setSpeed(@NonNull AnimationSpeed speed) {
         this.speed = speed;
         skbSpeed.setProgress(availableSpeeds.indexOf(speed));
         txvSpeed.setText(getContext().getString(speed.getNameResId()));
