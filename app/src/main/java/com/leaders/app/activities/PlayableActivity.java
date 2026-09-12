@@ -8,6 +8,7 @@ import com.google.android.material.button.MaterialButton;
 import com.leaders.app.controllers.GameController;
 import com.leaders.app.entities.LeadersApplication;
 import com.leaders.app.entities.Settings;
+import com.leaders.app.enums.AnimationSpeed;
 import com.leaders.app.enums.EndGameType;
 import com.leaders.app.enums.LeaderType;
 import com.leaders.app.utilities.ButtonUtils;
@@ -43,7 +44,7 @@ public abstract class PlayableActivity extends BaseActivity
     protected EndGameView egvEndGame;
 
 
-    protected Settings settings;
+    protected AnimationSpeed animationSpeed;
     protected GameController controller;
 
 
@@ -77,7 +78,8 @@ public abstract class PlayableActivity extends BaseActivity
     protected void initDatas() {
         super.initDatas();
 
-        settings = ((LeadersApplication) getApplication()).getSettings();
+        Settings settings = ((LeadersApplication) getApplication()).getSettings();
+        animationSpeed = settings.getAnimationSpeed();
     }
 
     protected abstract int getBoardViewId();
@@ -242,7 +244,7 @@ public abstract class PlayableActivity extends BaseActivity
     @Override
     public void onFeedback(@NonNull InteractionFeedback feedback,
                            @NonNull GameController.InteractionCompletion completion) {
-        runOnUiThread(() -> bdvBoard.animateFeedback(feedback, completion::complete));
+        runOnUiThread(() -> bdvBoard.animateFeedback(feedback, animationSpeed, completion::complete));
     }
 
     @Override

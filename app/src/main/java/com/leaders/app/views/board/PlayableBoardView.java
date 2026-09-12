@@ -9,8 +9,7 @@ import android.view.animation.LinearInterpolator;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.leaders.app.entities.LeadersApplication;
-import com.leaders.app.entities.Settings;
+import com.leaders.app.enums.AnimationSpeed;
 import com.leaders.app.enums.BoardOrientation;
 import com.leaders.app.animators.CharacterActionAnimator;
 import com.leaders.app.animators.RecruitmentActionAnimator;
@@ -59,17 +58,13 @@ public final class PlayableBoardView extends BoardView {
 
     private OnTargetClickListener onTargetClickListener;
 
-    private final Settings settings;
 
     public PlayableBoardView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
         setOnCellClickListener(this::onCellClick);
         setOnCharacterDisplayClickListener(this::onCharacterDisplayClick);
-
-        settings = ((LeadersApplication) getContext().getApplicationContext()).getSettings();
     }
-
 
     //region TARGET APPLICATION METHODS
 
@@ -243,14 +238,15 @@ public final class PlayableBoardView extends BoardView {
     }
 
     public void animateFeedback(@NonNull InteractionFeedback feedback,
+                                @NonNull AnimationSpeed animationSpeed,
                                 @Nullable Runnable onAnimationEnd) {
         switch (feedback.getFeedbackType()) {
             case CharacterAction:
-                new CharacterActionAnimator(settings.getAnimationSpeed())
+                new CharacterActionAnimator(animationSpeed)
                         .animate(this, feedback.getCharacterActionMotions(), onAnimationEnd);
                 break;
             case RecruitmentAction:
-                new RecruitmentActionAnimator(settings.getAnimationSpeed())
+                new RecruitmentActionAnimator(animationSpeed)
                         .animate(this, feedback.getRecruitmentActionMotions(), onAnimationEnd);
                 break;
             default:

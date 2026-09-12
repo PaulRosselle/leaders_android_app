@@ -13,11 +13,13 @@ import com.leaders.app.activities.PlayableActivity;
 import com.leaders.app.controllers.GameController;
 import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
+import com.leaders.app.enums.AnimationSpeed;
 import com.leaders.app.enums.EndGameType;
 import com.leaders.app.enums.PuzzleSource;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.views.ActionsMenuView;
+import com.leaders.app.views.settings.AnimationSpeedView;
 import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
@@ -41,12 +43,14 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
     private enum PuzzlePlayerAction {
         GoToPreviousPuzzle,
         GoToNextPuzzle,
+        ChangeAnimationSpeed,
         DisplayCellPositions;
 
         private int getIconResId() {
             switch (this) {
                 case GoToPreviousPuzzle: return R.drawable.icon_arrow_head_reversed;
                 case GoToNextPuzzle: return R.drawable.icon_arrow_head;
+                case ChangeAnimationSpeed: return R.drawable.icon_speed;
                 case DisplayCellPositions: return R.drawable.icon_position;
                 default: throw new IllegalStateException("No icon found for puzzle action: " + this);
             }
@@ -56,6 +60,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
             switch (this) {
                 case GoToPreviousPuzzle: return R.string.previous_puzzle;
                 case GoToNextPuzzle: return R.string.next_puzzle;
+                case ChangeAnimationSpeed: return R.string.animation_speed;
                 case DisplayCellPositions: return R.string.board_coordinates;
                 default: throw new IllegalStateException("No text found for puzzle action: " + this);
             }
@@ -65,6 +70,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
             switch (this) {
                 case GoToPreviousPuzzle: return activity::onPreviousPuzzleClick;
                 case GoToNextPuzzle: return activity::onNextPuzzleClick;
+                case ChangeAnimationSpeed: return activity::onChangeAnimationSpeedClick;
                 case DisplayCellPositions: return activity::onDisplayCellPositionClick;
                 default: throw new IllegalStateException("No click listener found for puzzle action: " + this);
             }
@@ -73,6 +79,8 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
 
     private MaterialButton btnPuzzleActions;
     private ActionsMenuView amvPuzzleActions;
+
+    private AnimationSpeedView asvAnimationSpeed;
     private View vwDialogBg;
 
     private MaterialButton btnReset;
@@ -99,6 +107,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
             amvPuzzleActions.addActionButton(action.getIconResId(), action.getTextResId(),
                     action.ordinal(), action.getOnClickListener(this));
         }
+        asvAnimationSpeed = findViewById(R.id.asvAnimationSpeed_actPuzzlePlayer);
 
         btnReset = findViewById(R.id.btnReset_actPuzzlePlayer);
         txvPuzzleName = findViewById(R.id.txvPuzzleName_actPuzzlePlayer);
@@ -115,6 +124,8 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
         // Puzzle actions listeners
         btnPuzzleActions.setOnClickListener(this::onPuzzleActionsClick);
         vwDialogBg.setOnClickListener(this::onDialogBgClick);
+        asvAnimationSpeed.setChangeListener(this::onAnimationSpeedChange);
+        asvAnimationSpeed.setOnClickListener(this::onAsvAnimationBgClick);
 
         btnReset.setOnClickListener(this::onResetClick);
     }
@@ -235,7 +246,19 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
     }
 
     private void onDialogBgClick(View v) {
-        hidePuzzleActions();
+        if (asvAnimationSpeed.getVisibility() == View.VISIBLE) {
+            setAnimationSpeedVisible(false);
+        } else {
+            hidePuzzleActions();
+        }
+    }
+
+    private void onAsvAnimationBgClick(View v) {
+        // Dummy on click listener to prevent a "onDialogBgClick"
+    }
+
+    private void onAnimationSpeedChange(@NonNull AnimationSpeed speed) {
+        animationSpeed = speed;
     }
 
     private void onPuzzleActionsClick(View v) {
@@ -331,6 +354,12 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
         hidePuzzleActions();
     }
 
+    private void onChangeAnimationSpeedClick(View v) {
+        amvPuzzleActions.setVisibility(View.GONE);
+        asvAnimationSpeed.setSpeed(animationSpeed);
+        setAnimationSpeedVisible(true);
+    }
+
     private void onDisplayCellPositionClick(View v) {
         bdvBoard.setCellPositionVisible(!bdvBoard.isCellPositionVisible());
         hidePuzzleActions();
@@ -363,6 +392,11 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
 
         amvPuzzleActions.setButtonEnabled(PuzzlePlayerAction.GoToNextPuzzle.ordinal(), hasNextPuzzle);
         amvPuzzleActions.setButtonEnabled(PuzzlePlayerAction.GoToPreviousPuzzle.ordinal(), hasPreviousPuzzle);
+    }
+
+    private void setAnimationSpeedVisible(boolean visible) {
+        asvAnimationSpeed.setVisibility(visible ? View.VISIBLE : View.GONE);
+        vwDialogBg.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     private void hidePuzzleActions() {
