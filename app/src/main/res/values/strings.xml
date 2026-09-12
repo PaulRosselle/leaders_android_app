@@ -242,6 +242,10 @@
     <string name="barry_the_bot">BaRRy le Bot</string>
     <string name="highlight_color">Couleur de surbrillance</string>
     <string name="user_name">nom d\'utilisateur</string>
+    <string name="mail_subject">objet</string>
+    <string name="mail_message">message</string>
+    <string name="send">envoyer</string>
+    <string name="contact_me">me contacter</string>
 
 
 </resources>
