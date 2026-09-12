@@ -5,6 +5,7 @@ import android.content.Intent;
 
 import androidx.annotation.NonNull;
 
+import com.leaders.app.activities.SettingsActivity;
 import com.leaders.app.activities.duel.DuelPlayerActivity;
 import com.leaders.app.activities.duel.DuelSetupActivity;
 import com.leaders.app.activities.MainActivity;
@@ -49,7 +50,9 @@ public enum ActivityType {
     RulesTutorialPassiveAbilities,
     RulesTutorialRecruitment,
     RulesTutorialSurround,
-    RulesTutorialGame;
+    RulesTutorialGame,
+    // SETTINGS
+    Settings;
 
     @NonNull
     public Intent getIntent(@NonNull Context context) {
@@ -72,6 +75,7 @@ public enum ActivityType {
             case RulesTutorialRecruitment: return new Intent(context, RulesTutorialRecruitmentActivity.class);
             case RulesTutorialSurround: return new Intent(context, RulesTutorialSurroundActivity.class);
             case RulesTutorialGame: return new Intent(context, RulesTutorialGameActivity.class);
+            case Settings: return new Intent(context, SettingsActivity.class);
             default: throw new NoSuchElementException(String.format("No class found matching %s", this));
         }
     }
