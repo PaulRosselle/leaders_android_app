@@ -1,7 +1,6 @@
 package com.leaders.app.activities;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
@@ -20,8 +19,6 @@ import com.leaders.app.enums.ActivityType;
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.views.mainmenu.CrashLogView;
 import com.leaders.app.views.mainmenu.MainMenuView;
-
-import java.util.List;
 
 public final class MainActivity extends BaseActivity {
     private CrashLogView clvCrashDialog;
@@ -149,27 +146,6 @@ public final class MainActivity extends BaseActivity {
     }
 
     private void onSettingsClick(View v) {
-        showNotImplementedDialog("v0.8.0",
-                List.of("Animation speed",
-                        "Character highlight color",
-                        "Character appearances",
-                        "Default board coordinates visibility",
-                        "Default author name",
-                        "Contact")
-        );
-    }
-
-    private void showNotImplementedDialog(@NonNull String version, @NonNull List<String> content) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.alert_dialog_theme);
-        builder.setTitle("Will be available starting with " + version);
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Expected features :");
-        for (String contentItem : content) {
-            stringBuilder.append("\n• ");
-            stringBuilder.append(contentItem);
-        }
-        builder.setMessage(stringBuilder.toString());
-        builder.setNeutralButton(R.string.ok, null);
-        builder.show();
+        goToActivity(ActivityType.Settings);
     }
 }

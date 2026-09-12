@@ -1,20 +1,22 @@
 package com.leaders.app.entities;
 
-import android.content.Context;
-
 import androidx.annotation.NonNull;
 
-public final class Settings {
+import org.json.JSONException;
+import org.json.JSONObject;
 
+public final class Settings {
     private Settings(){
         // TODO
     }
 
-    public static Settings loadFromJson(@NonNull Context context) {
+    @NonNull
+    public static Settings getFromJson(JSONObject joSettings) {
         return new Settings(); // TODO
     }
 
-    public void saveToJson(@NonNull Context context) {
-        // TODO
+    @NonNull
+    public JSONObject getAsJson() throws JSONException {
+        return new JSONObject();
     }
 }

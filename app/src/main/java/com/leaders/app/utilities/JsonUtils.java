@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 
 import com.leaders.R;
 import com.leaders.app.entities.ReplaySave;
+import com.leaders.app.entities.Settings;
 import com.leaders.app.entities.crash.CrashLog;
 import com.leaders.app.enums.TutorialChapter;
 import com.leaders.gamelogic.entities.GameHistory;
@@ -465,7 +466,7 @@ public final class JsonUtils {
 
     //endregion
 
-    //region CHARACTER DEMO METHODS
+    //region TUTORIAL CHAPTER METHODS
 
     public static GameHistory loadTutorialChapter(@NonNull Context context,
                                                   @NonNull TutorialChapter tutorialChapter) {
@@ -490,6 +491,26 @@ public final class JsonUtils {
             case Recruitment: return R.raw.tutorial_recruitment;
             case SurroundLeader: return R.raw.tutorial_surround;
             default: throw new IllegalStateException("No tutorial chapter file found for: " + tutorialChapter);
+        }
+    }
+
+    //endregion
+
+    //region CHARACTER DEMO METHODS
+
+    public static Settings loadSettings(@NonNull Context context) {
+        if (!fileExists(context, SETTINGS_FILENAME)) {
+            return Settings.getFromJson(new JSONObject());
+        }
+
+        return Settings.getFromJson(openJsonFile(context, SETTINGS_FILENAME));
+    }
+
+    public static void saveSettings(@NonNull Context context, @NonNull Settings settings) {
+        try {
+            saveJsonFile(context, CUSTOM_PUZZLES_FILENAME, settings.getAsJson());
+        } catch (JSONException | IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
