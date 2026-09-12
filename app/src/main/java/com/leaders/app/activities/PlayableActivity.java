@@ -6,6 +6,8 @@ import androidx.annotation.NonNull;
 
 import com.google.android.material.button.MaterialButton;
 import com.leaders.app.controllers.GameController;
+import com.leaders.app.entities.LeadersApplication;
+import com.leaders.app.entities.Settings;
 import com.leaders.app.enums.EndGameType;
 import com.leaders.app.enums.LeaderType;
 import com.leaders.app.utilities.ButtonUtils;
@@ -40,6 +42,8 @@ public abstract class PlayableActivity extends BaseActivity
 
     protected EndGameView egvEndGame;
 
+
+    protected Settings settings;
     protected GameController controller;
 
 
@@ -67,6 +71,13 @@ public abstract class PlayableActivity extends BaseActivity
         cnvCardInfo.setOnClickListener(this::onCardInfoClick);
 
         egvEndGame.setOnClickListener(this::onEndGameClick);
+    }
+
+    @Override
+    protected void initDatas() {
+        super.initDatas();
+
+        settings = ((LeadersApplication) getApplication()).getSettings();
     }
 
     protected abstract int getBoardViewId();

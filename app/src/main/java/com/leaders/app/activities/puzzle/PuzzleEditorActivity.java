@@ -14,6 +14,8 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
+import com.leaders.app.entities.LeadersApplication;
+import com.leaders.app.entities.Settings;
 import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.AnimationSpeed;
@@ -123,6 +125,8 @@ public final class PuzzleEditorActivity extends BaseActivity {
     private PuzzleEditorBoardView bdvBoard;
     private CharacterEditorView cevCharacterEditor;
 
+
+    private Settings settings;
     private Board initialBoard;
     private Board board;
     private EditorState editorState;
@@ -189,6 +193,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
     protected void initDatas() {
         super.initDatas();
 
+        settings = ((LeadersApplication) getApplication()).getSettings();
         puzzleSaves = JsonUtils.loadCustomPuzzles(this);
 
         // When editing an existing puzzle, its index within customPuzzleSaves is sent through the intent
@@ -463,7 +468,9 @@ public final class PuzzleEditorActivity extends BaseActivity {
         }
 
         CharacterType characterType = character.getCharacterType();
-        characterDisplay.getCharacterView().animateSetCharacter(characterType, newTeamColor, () -> {
+
+        int duration = (int) (200 * settings.getAnimationSpeed().getMultiplier());
+        characterDisplay.getCharacterView().animateSetCharacter(characterType, newTeamColor, duration, () -> {
             board.getCell(position).setCharacter(Character.transform(character, characterType, newTeamColor));
             onAnimationEnd.run();
         });

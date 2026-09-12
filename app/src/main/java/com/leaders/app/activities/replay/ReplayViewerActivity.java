@@ -136,7 +136,6 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
         }
         cnvCardInfo = findViewById(R.id.cnvCardInfo_actReplayViewer);
         asvAnimationSpeed = findViewById(R.id.asvAnimationSpeed_actReplayViewer);
-        asvAnimationSpeed.setAvailableSpeeds(AnimationSpeed.getAllSpeedsWithMultiplier());
         vwDialogBg = findViewById(R.id.vwDialogBg_actReplayViewer);
     }
 

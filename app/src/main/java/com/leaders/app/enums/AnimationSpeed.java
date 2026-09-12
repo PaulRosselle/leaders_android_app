@@ -2,11 +2,7 @@ package com.leaders.app.enums;
 
 import com.leaders.R;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public enum AnimationSpeed {
-    noAnimation,
     VerySlow,
     Slow,
     Normal,
@@ -26,7 +22,6 @@ public enum AnimationSpeed {
 
     public int getNameResId() {
         switch (this) {
-            case noAnimation: return R.string.no_animation_speed;
             case VerySlow: return R.string.very_slow_speed;
             case Slow: return R.string.slow_speed;
             case Normal: return R.string.normal_speed;
@@ -34,18 +29,5 @@ public enum AnimationSpeed {
             case VeryFast: return R.string.very_fast_speed;
             default: throw new IllegalStateException("No name found matching animation speed: " + this);
         }
-    }
-
-    public static List<AnimationSpeed> getAllSpeedsWithMultiplier() {
-        List<AnimationSpeed> speedsWithMultiplier = new ArrayList<>();
-        for (AnimationSpeed animationSpeed : AnimationSpeed.values()) {
-            try {
-                animationSpeed.getMultiplier();
-                speedsWithMultiplier.add(animationSpeed);
-            } catch (IllegalStateException e) {
-                // No treatment on catch since we only use is as a "hasMultiplier"
-            }
-        }
-        return speedsWithMultiplier;
     }
 }
