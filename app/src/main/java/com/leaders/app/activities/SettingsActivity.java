@@ -1,6 +1,8 @@
 package com.leaders.app.activities;
 
 
+import android.view.View;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -12,6 +14,8 @@ import com.leaders.app.enums.AnimationSpeed;
 import com.leaders.app.enums.HighlightColor;
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.views.settings.AnimationSpeedView;
+import com.leaders.app.views.settings.ContactFormView;
+import com.leaders.app.views.settings.ContactView;
 import com.leaders.app.views.settings.HighlightColorView;
 import com.leaders.app.views.settings.UserNameView;
 
@@ -19,6 +23,9 @@ public class SettingsActivity extends BaseActivity {
     private UserNameView unvUserName;
     private AnimationSpeedView asvAnimationSpeed;
     private HighlightColorView hcvHighlightColor;
+    private ContactView ctvContact;
+    private View vwDialogBg;
+    private ContactFormView cfvContact;
 
     private Settings settings;
 
@@ -32,7 +39,9 @@ public class SettingsActivity extends BaseActivity {
         unvUserName = findViewById(R.id.unvUserName_actSettings);
         asvAnimationSpeed = findViewById(R.id.asvAnimationSpeed_actSettings);
         hcvHighlightColor = findViewById(R.id.hcvHighlightColor_actSettings);
-        // TODO
+        ctvContact = findViewById(R.id.ctvContact_actSettings);
+        vwDialogBg = findViewById(R.id.vwDialogBg_actSettings);
+        cfvContact = findViewById(R.id.cfvContact_actSettings);
     }
 
     @Override
@@ -42,7 +51,8 @@ public class SettingsActivity extends BaseActivity {
         unvUserName.setChangeListener(this::onNameChange);
         asvAnimationSpeed.setChangeListener(this::onAnimationSpeedChange);
         hcvHighlightColor.setChangeListener(this::onColorChange);
-        // TODO
+        ctvContact.setOnOpenFormClickListener(this::onOpenFormClick);
+        vwDialogBg.setOnClickListener(this::onDialogBgClick);
     }
 
     @Override
@@ -54,7 +64,6 @@ public class SettingsActivity extends BaseActivity {
         unvUserName.setName(settings.getUserName());
         asvAnimationSpeed.setSpeed(settings.getAnimationSpeed());
         hcvHighlightColor.setColor(settings.getHighlightColor());
-        // TODO
     }
 
     @Override
@@ -111,6 +120,23 @@ public class SettingsActivity extends BaseActivity {
     private void onColorChange(@NonNull HighlightColor color) {
         settings.setHighlightColor(color);
         JsonUtils.saveSettings(this, settings);
+    }
+
+    private void onOpenFormClick(View v) {
+        setContactFormVisible(true);
+    }
+
+    private void onDialogBgClick(View v) {
+        setContactFormVisible(false);
+    }
+
+    private void setContactFormVisible(boolean visible) {
+        if (visible) {
+            cfvContact.show();
+        } else {
+            cfvContact.hide();
+        }
+        vwDialogBg.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     //endregion
