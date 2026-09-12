@@ -3,6 +3,7 @@ package com.leaders.app.entities;
 import androidx.annotation.NonNull;
 
 import com.leaders.app.enums.AnimationSpeed;
+import com.leaders.app.enums.HighlightColor;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -10,9 +11,12 @@ import org.json.JSONObject;
 public final class Settings {
     @NonNull
     private AnimationSpeed animationSpeed;
+    @NonNull
+    private HighlightColor highlightColor;
 
     private Settings(){
         animationSpeed = AnimationSpeed.Normal;
+        highlightColor = HighlightColor.Default;
     }
 
     @NonNull
@@ -23,6 +27,10 @@ public final class Settings {
             if (joSettings.has("animation_speed")) {
                 settings.setAnimationSpeed(AnimationSpeed.valueOf(joSettings.getString("animation_speed")));
             }
+            if (joSettings.has("highlight_color")) {
+                settings.setHighlightColor(HighlightColor.valueOf(joSettings.getString("highlight_color")));
+            }
+
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
@@ -35,6 +43,7 @@ public final class Settings {
         JSONObject joSettings = new JSONObject();
         
         joSettings.put("animation_speed", animationSpeed.name());
+        joSettings.put("highlight_color", highlightColor.name());
 
         return joSettings;
     }
@@ -46,5 +55,14 @@ public final class Settings {
 
     public void setAnimationSpeed(@NonNull AnimationSpeed animationSpeed) {
         this.animationSpeed = animationSpeed;
+    }
+
+    @NonNull
+    public HighlightColor getHighlightColor() {
+        return highlightColor;
+    }
+
+    public void setHighlightColor(@NonNull HighlightColor highlightColor) {
+        this.highlightColor = highlightColor;
     }
 }
