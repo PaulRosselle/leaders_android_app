@@ -8,8 +8,13 @@ import com.leaders.R;
 import com.leaders.app.entities.LeadersApplication;
 import com.leaders.app.entities.Settings;
 import com.leaders.app.enums.ActivityType;
+import com.leaders.app.enums.AnimationSpeed;
+import com.leaders.app.utilities.JsonUtils;
+import com.leaders.app.views.settings.AnimationSpeedView;
 
 public class SettingsActivity extends BaseActivity {
+    private AnimationSpeedView asvAnimationSpeed;
+
     private Settings settings;
 
 
@@ -19,6 +24,7 @@ public class SettingsActivity extends BaseActivity {
     protected void initViews() {
         super.initViews();
 
+        asvAnimationSpeed = findViewById(R.id.asvAnimationSpeed_actSettings);
         // TODO
     }
 
@@ -26,6 +32,7 @@ public class SettingsActivity extends BaseActivity {
     protected void initListeners() {
         super.initListeners();
 
+        asvAnimationSpeed.setChangeListener(this::onAnimationSpeedChange);
         // TODO
     }
 
@@ -35,6 +42,7 @@ public class SettingsActivity extends BaseActivity {
 
         settings = ((LeadersApplication) getApplication()).getSettings();
 
+        asvAnimationSpeed.setSpeed(settings.getAnimationSpeed());
         // TODO
     }
 
@@ -73,6 +81,15 @@ public class SettingsActivity extends BaseActivity {
     @Override
     public ActivityType getActivityType() {
         return ActivityType.Settings;
+    }
+
+    //endregion
+
+    //region CHANGE LISTENERS
+
+    public void onAnimationSpeedChange(@NonNull AnimationSpeed speed) {
+        settings.setAnimationSpeed(speed);
+        JsonUtils.saveSettings(this, settings);
     }
 
     //endregion
