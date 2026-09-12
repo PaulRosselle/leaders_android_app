@@ -20,6 +20,7 @@ import com.leaders.app.activities.rules.character.RulesCharacterMenuActivity;
 import com.leaders.app.activities.rules.tutorial.RulesTutorialActiveAbilitiesActivity;
 import com.leaders.app.activities.rules.tutorial.RulesTutorialActivity;
 import com.leaders.app.activities.rules.tutorial.RulesTutorialCaptureActivity;
+import com.leaders.app.activities.rules.tutorial.RulesTutorialGameActivity;
 import com.leaders.app.activities.rules.tutorial.RulesTutorialPassiveAbilitiesActivity;
 import com.leaders.app.activities.rules.tutorial.RulesTutorialRecruitmentActivity;
 import com.leaders.app.activities.rules.tutorial.RulesTutorialSurroundActivity;
@@ -47,7 +48,8 @@ public enum ActivityType {
     RulesTutorialActiveAbilities,
     RulesTutorialPassiveAbilities,
     RulesTutorialRecruitment,
-    RulesTutorialSurround;
+    RulesTutorialSurround,
+    RulesTutorialGame;
 
     @NonNull
     public Intent getIntent(@NonNull Context context) {
@@ -69,6 +71,7 @@ public enum ActivityType {
             case RulesTutorialPassiveAbilities: return new Intent(context, RulesTutorialPassiveAbilitiesActivity.class);
             case RulesTutorialRecruitment: return new Intent(context, RulesTutorialRecruitmentActivity.class);
             case RulesTutorialSurround: return new Intent(context, RulesTutorialSurroundActivity.class);
+            case RulesTutorialGame: return new Intent(context, RulesTutorialGameActivity.class);
             default: throw new NoSuchElementException(String.format("No class found matching %s", this));
         }
     }

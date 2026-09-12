@@ -549,7 +549,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
 
         highlightSelectableCards(gameContext, request);
 
-        setBtnNextPhaseEnabled(controller.canEndPhaseAction(), request.getLegalTargets().isEmpty());
+        setBtnNextPhaseEnabled(controller.canEndPhase(), request.getLegalTargets().isEmpty());
 
         if (request.getRequestType() == InteractionType.PositionExpected &&
                 gameContext.getGamePhase().getPhaseType() == GamePhaseType.Recruitment) {

@@ -237,5 +237,10 @@
     <string name="tutorial_surround_info">Restez appuyé sur un personnage pour découvrir sa compétence.</string>
     <string name="second_player_recruitment">Le deuxième joueur recrute une seconde fois lors de son premier tour.\nCette règle permet de compenser l\'avantage qu\'a le premier joueur en commençant.\n\nVous pouvez donc recruter un autre personnage.</string>
     <string name="new_rule">Nouvelle règle !</string>
+    <string name="tutorial_capture_game_vs_bot">Restez appuyé sur un personnage pour découvrir sa compétence.</string>
+    <string name="restart_game_vs_bot">Voulez-vous recommencer la partie ?</string>
+    <string name="player">joueur</string>
+    <string name="barry_the_bot">BaRRy le Bot</string>
+
 
 </resources>

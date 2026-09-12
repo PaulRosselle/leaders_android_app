@@ -1,43 +1,53 @@
 package com.leaders.app.activities.rules.tutorial;
 
+import android.animation.LayoutTransition;
 import android.app.AlertDialog;
 import android.view.View;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
+
 import com.leaders.app.activities.PlayableActivity;
 import com.leaders.app.controllers.GameController;
 import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
+import com.leaders.app.enums.EndGameType;
+import com.leaders.app.enums.LeaderType;
 import com.leaders.app.enums.TutorialChapter;
 import com.leaders.app.utilities.ButtonUtils;
-import com.leaders.app.utilities.JsonUtils;
+import com.leaders.app.utilities.TutorialBotUtils;
+import com.leaders.app.utilities.TutorialGameUtils;
 import com.leaders.app.views.character.CharacterDisplay;
 import com.leaders.app.views.character.HighlightView;
 import com.leaders.app.views.duel.CharacterCardSelectionView;
+import com.leaders.app.views.duel.PlayerBottomView;
+import com.leaders.app.views.duel.PlayerTopView;
 import com.leaders.app.views.portrait.PortraitView;
 import com.leaders.app.views.rules.TutorialNavigationView;
+import com.leaders.gamelogic.entities.Board;
+import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.Player;
+import com.leaders.gamelogic.entities.PlayerWarningState;
 import com.leaders.gamelogic.enums.GamePhaseType;
-import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.interactions.InteractionType;
 import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
 
+import java.util.List;
 import java.util.Objects;
 
-public class RulesTutorialRecruitmentActivity extends PlayableActivity implements
+public class RulesTutorialGameActivity extends PlayableActivity implements
         TutorialNavigationView.IRulesNavigation,
         CharacterCardSelectionView.OnCardSelectedListener {
     private CharacterCardSelectionView ccsvCardSelector;
@@ -46,13 +56,12 @@ public class RulesTutorialRecruitmentActivity extends PlayableActivity implement
     private MaterialButton btnInfo;
     private TutorialNavigationView tnvNavigation;
 
-    private TextView txvBefore;
-    private TextView txvAfter;
+    private PlayerBottomView pbvPlayer;
+    private PlayerTopView ptvBot;
 
     private MaterialButton btnReset;
-    private MaterialButton btnNextChapter;
-
-    private HighlightView hlvNextChapter;
+    private MaterialButton btnNextPhase;
+    private HighlightView hlvNextPhase;
 
 
     private GameHistory startHistory;
@@ -63,19 +72,18 @@ public class RulesTutorialRecruitmentActivity extends PlayableActivity implement
     protected void initViews() {
         super.initViews();
 
-        ccsvCardSelector = findViewById(R.id.ccsvCardSelector_actRulesTutorialRecruitment);
+        ccsvCardSelector = findViewById(R.id.ccsvCardSelector_actRulesTutorialGame);
         chdNewCharacter = new CharacterDisplay(this, ccsvCardSelector);
 
-        btnInfo = findViewById(R.id.btnInfo_actRulesTutorialRecruitment);
-        tnvNavigation = findViewById(R.id.tnvNavigation_actRulesTutorielRecruitment);
+        btnInfo = findViewById(R.id.btnInfo_actRulesTutorialGame);
+        tnvNavigation = findViewById(R.id.tnvNavigation_actRulesTutorialGame);
 
-        txvBefore = findViewById(R.id.txvBefore_actRulesTutorialRecruitment);
-        txvAfter = findViewById(R.id.txvAfter_actRulesTutorialRecruitment);
+        pbvPlayer = findViewById(R.id.pbvPlayer_actRulesTutorialGame);
+        ptvBot = findViewById(R.id.ptvBot_actRulesTutorialGame);
 
-        btnReset = findViewById(R.id.btnReset_actRulesTutorialRecruitment);
-        btnNextChapter = findViewById(R.id.btnNextChapter_actRulesTutorialRecruitment);
-
-        hlvNextChapter = findViewById(R.id.hlvNextChapter_actRulesTutorialRecruitment);
+        btnReset = findViewById(R.id.btnReset_actRulesTutorialGame);
+        btnNextPhase = findViewById(R.id.btnNextPhase_actRulesTutorialGame);
+        hlvNextPhase = findViewById(R.id.hlvNextPhase_actRulesTutorialGame);
     }
 
     @Override
@@ -83,7 +91,7 @@ public class RulesTutorialRecruitmentActivity extends PlayableActivity implement
         super.initListeners();
 
         // Non interactive element listeners
-        (findViewById(R.id.clyMain_actRulesTutorialRecruitment)).setOnClickListener(this::onNonInteractiveElementClick);
+        (findViewById(R.id.clyMain_actRulesTutorialGame)).setOnClickListener(this::onNonInteractiveElementClick);
         ccsvCardSelector.setOnClickListener(this::onNonInteractiveElementClick);
         ccsvCardSelector.setOnScrollViewClickListener(this::onNonInteractiveElementClick);
 
@@ -94,20 +102,14 @@ public class RulesTutorialRecruitmentActivity extends PlayableActivity implement
         tnvNavigation.setNavigator(this);
 
         btnReset.setOnClickListener(this::onResetClick);
-        btnNextChapter.setOnClickListener(this::onNextChapterClick);
+        btnNextPhase.setOnClickListener(this::onNextPhaseClick);
     }
 
     @Override
     protected void initDatas() {
         super.initDatas();
 
-        setBtnNextChapterEnabled(false);
-        txvAfter.setVisibility(View.GONE);
-
-        txvBefore.setText(getChapter().getTextBeforeResId());
-        txvAfter.setText(getChapter().getTextAfterResId());
-
-        startHistory = JsonUtils.loadTutorialChapter(this, getChapter());
+        startHistory = TutorialGameUtils.getDefaultHistory(this);
 
         controller = new GameController(this);
         controller.restartGame(new GameHistory(startHistory));
@@ -115,38 +117,38 @@ public class RulesTutorialRecruitmentActivity extends PlayableActivity implement
 
     @Override
     protected int getBoardViewId() {
-        return R.id.bdvBoard_actRulesTutorialRecruitment;
+        return R.id.bdvBoard_actRulesTutorialGame;
     }
 
     @Override
     protected int getUndoLastActionButtonId() {
-        return R.id.btnUndoLastAction_actRulesTutorialRecruitment;
+        return R.id.btnUndoLastAction_actRulesTutorialGame;
     }
 
     @Override
     protected int getCharacterNotificationViewId() {
-        return R.id.cnvCardInfo_actRulesTutorialRecruitment;
+        return R.id.cnvCardInfo_actRulesTutorialGame;
     }
 
     @Override
     protected int getEndGameViewId() {
-        return R.id.egvEndGame_actRulesTutorialRecruitment;
+        return R.id.egvEndGame_actRulesTutorialGame;
     }
 
     @Override
     protected int getLayoutResId() {
-        return R.layout.activity_rules_tutorial_recruitment;
+        return R.layout.activity_rules_tutorial_game;
     }
 
     @Override
     protected int getRootGuidelineResId() {
-        return R.id.gdlRoot_actRulesTutorialRecruitment;
+        return R.id.gdlRoot_actRulesTutorialGame;
     }
 
     @Nullable
     @Override
     protected Integer getBtnBackResId() {
-        return R.id.btnBack_actRulesTutorialRecruitment;
+        return R.id.btnBack_actRulesTutorialGame;
     }
 
     @Override
@@ -157,7 +159,7 @@ public class RulesTutorialRecruitmentActivity extends PlayableActivity implement
     @NonNull
     @Override
     public ActivityType getActivityType() {
-        return ActivityType.RulesTutorialRecruitment;
+        return ActivityType.RulesTutorialGame;
     }
 
     @Override
@@ -177,15 +179,21 @@ public class RulesTutorialRecruitmentActivity extends PlayableActivity implement
 
         ccsvCardSelector.setPortraitsVisible(true);
         setNewCharacterVisible(null, false);
+
+        setBtnNextPhaseEnabled(false, false);
     }
 
     @Override
     protected void applyInteractionTargets(@NonNull GameContext gameContext,
                                            @NonNull InteractionRequest request) {
         switch (request.getRequestType()) {
+            case NoTargetExpected:
+                clearInteractionUI(gameContext); // Only require to choose a result within legalResults
+                break;
             case SelectableCharacterCardExpected:
                 ccsvCardSelector.applyTargets(request.getLegalTargets());
                 break;
+            case PlayableCharacterExpected:
             case PositionExpected: {
                 bdvBoard.applyTargets(request.getLegalTargets(), request.getContext(), gameContext.getBoard());
             } break;
@@ -201,25 +209,17 @@ public class RulesTutorialRecruitmentActivity extends PlayableActivity implement
 
         highlightSelectableCards(gameContext, request);
 
+        setBtnNextPhaseEnabled(controller.canEndPhase(), request.getLegalTargets().isEmpty());
+
         if (request.getRequestType() == InteractionType.PositionExpected &&
                 gameContext.getGamePhase().getPhaseType() == GamePhaseType.Recruitment) {
             ccsvCardSelector.setPortraitsVisible(false);
             setNewCharacterVisible(request.getContext().getCharacter(), true);
-        } else if (hasRecruitedCharacter(gameContext)) {
-            showSecondRecruitmentDialog();
         }
-    }
 
-    private boolean hasRecruitedCharacter(@NonNull GameContext gameContext) {
-        return BoardQuery.getRecruitmentCells(gameContext.getBoard(), TeamColor.Black).size() < 7;
-    }
+        applyPlayerChange(gameContext);
 
-    private void showSecondRecruitmentDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.alert_dialog_theme);
-        builder.setTitle(R.string.new_rule);
-        builder.setMessage(R.string.second_player_recruitment);
-        builder.setPositiveButton(R.string.ok, null);
-        builder.show();
+        applyPhaseChange(gameContext.getGamePhase(), false);
     }
 
     public void onRecruitmentCardSelected(@NonNull InteractionTarget target) {
@@ -238,13 +238,67 @@ public class RulesTutorialRecruitmentActivity extends PlayableActivity implement
 
     //region UI STATE METHODS
 
-    private void setBtnNextChapterEnabled(boolean enabled) {
-        ButtonUtils.setEnabled(btnNextChapter, enabled);
-        hlvNextChapter.setVisibility(enabled ? View.VISIBLE : View.GONE);
-        if (enabled) {
-            hlvNextChapter.startAnimation();
+    private void setCardSelectorVisible(boolean visible) {
+        // When recruiting, we display the cardSelector view below the player view.
+        // The layout transition is animated for both the board and player view
+        bdvBoard.getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
+        pbvPlayer.getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
+
+        ConstraintLayout.LayoutParams boardParams = (ConstraintLayout.LayoutParams) bdvBoard.getLayoutParams();
+        ConstraintLayout.LayoutParams playerViewParams = (ConstraintLayout.LayoutParams) pbvPlayer.getLayoutParams();
+        // When recruiting, every view is aligned on top of each other
+        if (visible) {
+            boardParams.verticalBias = 0f;
+            playerViewParams.verticalBias = 0f;
+            float dpRatio = getResources().getDisplayMetrics().density;
+            int boardHeight = bdvBoard.getMeasuredHeight();
+            float playerHeaderHeight = boardHeight * (72f / 1177f);
+            int boardMargin = 16;
+            int playerViewMargin = boardMargin + 8;
+
+            boardParams.topMargin = (int) (playerHeaderHeight + boardMargin * dpRatio);
+            playerViewParams.topMargin = (int) (boardHeight - pbvPlayer.getMeasuredHeight() +
+                    playerHeaderHeight * 2 + playerViewMargin * dpRatio);
+            ccsvCardSelector.show(true);
+
+            // By default, each playerView is on a vertical extremity while the board is centered
         } else {
-            hlvNextChapter.stopAnimation();
+            boardParams.verticalBias = 0.5f;
+            playerViewParams.verticalBias = 1f;
+            boardParams.topMargin = 0;
+            playerViewParams.topMargin = 0;
+            ccsvCardSelector.hide();
+        }
+        bdvBoard.setLayoutParams(boardParams);
+        pbvPlayer.setLayoutParams(playerViewParams);
+
+        // The requestLayout calls start the layout transition animation
+        bdvBoard.requestLayout();
+        pbvPlayer.requestLayout();
+    }
+
+    private void showEndGame(@NonNull GameContext gameContext, @NonNull Player winner) {
+        boolean isVictory = winner.getTeamColor() == TutorialGameUtils.getPlayerTeamColor();
+        EndGameType endGameType = isVictory ? EndGameType.Victory : EndGameType.Defeat;
+
+        int titleId = isVictory ? R.string.victory_title : R.string.defeat_title;
+        int subtitleId = isVictory ? R.string.victory_subtitle : R.string.defeat_subtitle;
+
+        showEndGame(gameContext,
+                winner.getTeamColor(),
+                endGameType,
+                getString(titleId),
+                getString(subtitleId)
+        );
+    }
+
+    private void setBtnNextPhaseEnabled(boolean enabled, boolean highlight) {
+        ButtonUtils.setEnabled(btnNextPhase, enabled);
+        hlvNextPhase.setVisibility(highlight ? View.VISIBLE : View.GONE);
+        if (highlight) {
+            hlvNextPhase.startAnimation();
+        } else {
+            hlvNextPhase.stopAnimation();
         }
     }
 
@@ -261,7 +315,6 @@ public class RulesTutorialRecruitmentActivity extends PlayableActivity implement
         }
     }
 
-
     private void highlightSelectableCards(@NonNull GameContext gameContext,
                                           @NonNull InteractionRequest request) {
         GamePhase gamePhase = gameContext.getGamePhase();
@@ -274,6 +327,64 @@ public class RulesTutorialRecruitmentActivity extends PlayableActivity implement
             ccsvCardSelector.startShineAnimation();
         } else {
             ccsvCardSelector.stopShineAnimation();
+        }
+    }
+
+    private boolean isBotPlaying(@NonNull GameContext gameContext) {
+        return gameContext.getCurrentPlayer().getTeamColor() != TutorialGameUtils.getPlayerTeamColor();
+    }
+
+    private Player getPlayer(@NonNull GameContext gameContext) {
+        return isBotPlaying(gameContext) ? gameContext.getOpposingPlayer() : gameContext.getCurrentPlayer();
+    }
+
+    private Player getBot(@NonNull GameContext gameContext) {
+        return isBotPlaying(gameContext) ? gameContext.getCurrentPlayer() : gameContext.getOpposingPlayer();
+    }
+
+    private void initPlayerViews(@NonNull GameContext gameContext) {
+        Player player = getPlayer(gameContext);
+        Player bot = getBot(gameContext);
+
+        Board board = gameContext.getBoard();
+        pbvPlayer.setPlayer(player, getPlayerLeaderType(player, board));
+        ptvBot.setPlayer(bot, getPlayerLeaderType(bot, board));
+    }
+
+    private LeaderType getPlayerLeaderType(@NonNull Player player, @NonNull Board board) {
+        Cell leaderCell = Objects.requireNonNull(
+                BoardQuery.findLeaderCell(board, player.getTeamColor()),
+                "No leader found for player: " + player
+        );
+        return LeaderType.getFromCharacter(leaderCell.getCharacter());
+    }
+
+    private void applyPlayerChange(@NonNull GameContext gameContext) {
+        List<PlayerWarningState> warningStates = gameContext.getPlayerWarningStates();
+
+        pbvPlayer.setWarningVisible(playerHasWarnings(getPlayer(gameContext), warningStates));
+        ptvBot.setWarningVisible(playerHasWarnings(getBot(gameContext), warningStates));
+    }
+
+    private boolean playerHasWarnings(@NonNull Player player,
+                                      @NonNull List<PlayerWarningState> warningStates) {
+        for (PlayerWarningState warningState : warningStates) {
+            if (warningState.getPlayerTeamColor() == player.getTeamColor() &&
+                    warningState.getWarningCount() > 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void applyPhaseChange(@NonNull GamePhase gamePhase,
+                                  boolean canChangeSelectableCardsVisibility) {
+        boolean lockSelectableCardsView = gamePhase.getPhaseType() == GamePhaseType.Recruitment ||
+                gamePhase.getPhaseType() == GamePhaseType.Banishment;
+
+        if (canChangeSelectableCardsVisibility) {
+            setCardSelectorVisible(lockSelectableCardsView);
         }
     }
 
@@ -307,6 +418,7 @@ public class RulesTutorialRecruitmentActivity extends PlayableActivity implement
         runOnUiThread(() -> {
             GameContext gameContext = controller.getCurrentContext();
 
+            initPlayerViews(gameContext);
             bdvBoard.setBoard(game.getBoard());
             ccsvCardSelector.applyGameModeParams(gameContext.getGameMode());
 
@@ -316,24 +428,32 @@ public class RulesTutorialRecruitmentActivity extends PlayableActivity implement
 
     @Override
     public void onGameEnded(@NonNull Player winner) {
-        throw new IllegalStateException("End game is not supported within recruitment tutorial activity");
+        GameContext gameContext = controller.getCurrentContext();
+
+        clearInteractionUI(gameContext);
+        showEndGame(gameContext, winner);
     }
 
     @Override
     public void onPhaseChanged(@NonNull GamePhase phase) {
-        ccsvCardSelector.setPortraitsVisible(false);
-        txvAfter.setVisibility(View.VISIBLE);
-        setBtnNextChapterEnabled(true);
+        runOnUiThread(() -> {
+            GameContext gameContext = controller.getCurrentContext();
+
+            clearInteractionUI(gameContext);
+
+            applyPlayerChange(gameContext);
+
+            applyPhaseChange(phase, !isBotPlaying(gameContext));
+        });
     }
 
     @Override
     public void onInteractionRequired(@NonNull InteractionRequest request) {
-        // Playable character action requests are ignored in the activity
-        if (request.getRequestType() == InteractionType.PlayableCharacterExpected) {
-            return;
+        if (isBotPlaying(controller.getCurrentContext())) {
+            TutorialBotUtils.handleRequest(controller, request);
+        } else {
+            super.onInteractionRequired(request);
         }
-
-        super.onInteractionRequired(request);
     }
 
     //endregion
@@ -342,7 +462,7 @@ public class RulesTutorialRecruitmentActivity extends PlayableActivity implement
 
     @Override
     public TutorialChapter getChapter() {
-        return TutorialChapter.Recruitment;
+        return TutorialChapter.GameVsBot;
     }
 
     public void goToChapter(@NonNull TutorialChapter chapter) {
@@ -370,15 +490,23 @@ public class RulesTutorialRecruitmentActivity extends PlayableActivity implement
     }
 
     private void onResetClick(View v) {
-        ccsvCardSelector.setPortraitsVisible(true);
-        txvAfter.setVisibility(View.GONE);
-        controller.restartGame(new GameHistory(startHistory));
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.alert_dialog_theme);
+        builder.setTitle(R.string.new_attempt);
+        builder.setMessage(R.string.restart_game_vs_bot);
+        builder.setPositiveButton(R.string.start_over, (dialogInterface, i) ->
+                controller.restartGame(new GameHistory(startHistory)));
+        builder.setNegativeButton(R.string.cancel, null);
+        builder.show();
     }
 
-    private void onNextChapterClick(View v) {
-        goToChapter(Objects.requireNonNull(getChapter().getNext(),
-                "Navigation impossible: no next chapter")
-        );
+    private void onNextPhaseClick(View v) {
+        GameContext gameContext = controller.getCurrentContext();
+
+        if (gameContext.getGamePhase().getPhaseType() == GamePhaseType.Banishment) {
+            controller.selectTarget(ccsvCardSelector.getSelectedTarget());
+        } else {
+            controller.endPhase();
+        }
     }
 
     //endregion
