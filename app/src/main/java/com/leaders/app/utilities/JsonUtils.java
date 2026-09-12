@@ -44,6 +44,7 @@ public final class JsonUtils {
     private static final String CUSTOM_PUZZLES_FILENAME = "custom_puzzles.json";
     private static final String SOLVED_OFFICIAL_PUZZLES_FILENAME = "solved_official_puzzles.json";
     private static final String REPLAYS_FILENAME = "replays.json";
+    private static final String SETTINGS_FILENAME = "settings.json";
 
     private JsonUtils(){
         throw new AssertionError("Cannot instantiate utility class");
