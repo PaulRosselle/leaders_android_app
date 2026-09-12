@@ -241,6 +241,7 @@
     <string name="restart_game_vs_bot">Voulez-vous recommencer la partie ?</string>
     <string name="player">joueur</string>
     <string name="barry_the_bot">BaRRy le Bot</string>
+    <string name="highlight_color">Couleur de surbrillance</string>
 
 
 </resources>
