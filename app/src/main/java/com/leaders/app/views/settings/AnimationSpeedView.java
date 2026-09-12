@@ -69,6 +69,10 @@ public final class AnimationSpeedView extends ConstraintLayout {
         }
     }
 
+    public AnimationSpeed getSpeed() {
+        return speed;
+    }
+
     private void initListeners() {
         skbSpeed.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -88,10 +92,6 @@ public final class AnimationSpeedView extends ConstraintLayout {
                 // No treatment here
             }
         });
-    }
-
-    public AnimationSpeed getSpeed() {
-        return speed;
     }
 
     public void setChangeListener(onSpeedChangeListener changeListener) {
