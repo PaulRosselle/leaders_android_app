@@ -187,6 +187,7 @@ public final class BoardQuery {
 
         List<List<Position>> currentLevel = new ArrayList<>();
         currentLevel.add(new ArrayList<>(List.of(position)));
+        // The original position is always the path start and cannot be revisited
         visited.add(position);
 
         for (int currentDistance = 1; currentDistance <= distance; currentDistance++) {
@@ -208,7 +209,10 @@ public final class BoardQuery {
                         continue;
                     }
 
-                    visited.add(adjacentPosition);
+                    // If we avoid duplicates paths, each cell can be visited exactly once
+                    if (avoidDuplicates) {
+                        visited.add(adjacentPosition);
+                    }
 
                     List<Position> newPath = new ArrayList<>(currentPath);
                     newPath.add(adjacentPosition);
