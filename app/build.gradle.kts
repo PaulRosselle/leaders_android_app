@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId = "com.paulrosselle.leaders"
-        minSdk = 29
+        minSdk = 28
         targetSdk = 37
         versionCode = 7
         versionName = "v0.9.0"
