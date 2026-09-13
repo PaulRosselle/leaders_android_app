@@ -125,7 +125,14 @@ public final class NemesisActionResolver extends CharacterActionResolver {
             }
         }
 
-        return filterValidPaths(builder, paths);
+        List<CharacterPath> filteredPaths = filterValidPaths(builder, paths);
+        // Prefer paths that avoid surrounding the Nemesis's leader.
+        if (!filteredPaths.isEmpty()) {
+            return filteredPaths;
+        }
+
+        // If none are available, she is forced to choose a path that will surround her leader.
+        return paths;
     }
 
     @NonNull
