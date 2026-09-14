@@ -308,10 +308,10 @@ public final class GameHandler {
                 case UndoLastAction:
                     iterationExecution = undoLastAction();
                     break;
-                case EndPhase:
+                case EndPhase: {
                     iterationExecution = CompletableFuture.completedFuture(null);
                     continuePhase = false;
-                    break;
+                } break;
                 default:
                     throw new IllegalStateException(
                             "Invalid interaction result : illegal type \"" +
@@ -522,20 +522,45 @@ public final class GameHandler {
      * @return a future completed when the recruitment phase is finished
      */
     private CompletableFuture<Void> runRecruitmentPhaseAsync(@NonNull GamePhase currentPhase) {
-        TeamColor recruitmentTeamColor = currentPhase.getPhasePlayer().getTeamColor();
+        return runSelectRecruitmentCardAsync(currentPhase).thenCompose(result -> {
+            CompletableFuture<Void> iterationExecution;
+            boolean continuePhase = true;
 
-        if (!RecruitmentQuery.canRecruit(currentGame, currentHistory, recruitmentTeamColor)) {
-            // When the user cannot undo recruitments, the phase ends automatically
-            if (canUndoLastRecruitment(currentPhase)) {
-                return runRequestEndRecruitmentPhase(currentPhase);
+            switch (result.getResultType()) {
+                case SelectableCharacterCardChosen: {
+                    iterationExecution = runRecruitCardAsync(currentPhase,
+                            getSelectableCharacterCardFromResult(result,
+                                    TargetCategory.RecruitmentCard).getCharacterCard()
+                    );
+                } break;
+                case UndoLastAction: {
+                    if (canUndoLastRecruitment(currentPhase)) {
+                        iterationExecution = undoLastAction();
+                    } else {
+                        iterationExecution = undoPhaseStart();
+                        continuePhase = false;
+                    }
+                } break;
+                case EndPhase: {
+                    iterationExecution = CompletableFuture.completedFuture(null);
+                    continuePhase = false;
+                    break;
+                }
+                default:
+                    throw new IllegalStateException(
+                            "Invalid interaction result : illegal type \"" +
+                                    result.getResultType() + "\" for actions phase"
+                    );
             }
-            return CompletableFuture.completedFuture(null);
-        }
 
-        return runSelectRecruitmentCardAsync(currentPhase)
-                .thenCompose(selectableCard ->
-                        runRecruitCardAsync(currentPhase, selectableCard.getCharacterCard()))
-                .thenCompose(ignored -> runRecruitmentPhaseAsync(currentPhase));
+            if (continuePhase) {
+                iterationExecution = iterationExecution.thenCompose(
+                        ignored -> runRecruitmentPhaseAsync(currentPhase)
+                );
+            }
+
+            return iterationExecution;
+        });
     }
 
     /**
@@ -551,41 +576,28 @@ public final class GameHandler {
     }
 
     /**
-     * Requests the user an input to end the current recruitment phase.
+     * Determines the legal results for recruitment card selection.
      *
-     * @param currentPhase the current game phase
-     * @return a future completed when the phase-ending request is resolved
+     * @param currentPhase current actions phase
+     * @return the legal interaction results
      */
-    private CompletableFuture<Void> runRequestEndRecruitmentPhase(@NonNull GamePhase currentPhase) {
-        checkStopped();
-
+    private List<InteractionResultType> getSelectRecruitmentCardLegalResults(@NonNull GamePhase currentPhase) {
         List<InteractionResultType> legalResults = new ArrayList<>();
-        legalResults.add(InteractionResultType.EndPhase);
+
+        legalResults.add(InteractionResultType.SelectableCharacterCardChosen);
+
+        // An action can only be undone when the current turn actions list isn't empty.
         if (canUndoLastRecruitment(currentPhase)) {
             legalResults.add(InteractionResultType.UndoLastAction);
         }
 
-        InteractionRequest request = new InteractionRequest(
-                InteractionType.NoTargetExpected,
-                new InteractionContext(),
-                new ArrayList<>(), // Legal targets
-                legalResults
-        );
+        // Every recruitment is mandatory, the user can only end the phase when they can no longer recruit.
+        TeamColor recruitmentTeamColor = currentPhase.getPhasePlayer().getTeamColor();
+        if (!RecruitmentQuery.canRecruit(currentGame, currentHistory, recruitmentTeamColor)) {
+            legalResults.add(InteractionResultType.EndPhase);
+        }
 
-        return gameFlowListener.onInputRequired(request).thenCompose(result -> {
-            checkStopped();
-
-            // Since recruitments are mandatory we reenter immediately after an undo
-            if (result.getResultType() == InteractionResultType.UndoLastAction) {
-                return undoLastAction().thenCompose(ignored -> runRecruitmentPhaseAsync(currentPhase));
-            }
-
-            if (result.getResultType() != InteractionResultType.EndPhase) {
-                throw new IllegalStateException("Invalid interaction result : illegal type \"" + result.getResultType() + "\" end phase request");
-            }
-
-            return CompletableFuture.completedFuture(null);
-        });
+        return legalResults;
     }
 
     /**
@@ -594,49 +606,47 @@ public final class GameHandler {
      * @return the selected character card
      */
     @NonNull
-    private CompletableFuture<SelectableCharacterCard> runSelectRecruitmentCardAsync(@NonNull GamePhase currentPhase) {
+    private CompletableFuture<InteractionResult> runSelectRecruitmentCardAsync(@NonNull GamePhase currentPhase) {
         checkStopped();
 
-        List<SelectableCharacterCard> selectableRecruitmentCards =
-                RecruitmentQuery.getCurrentSelectableCards(currentGame, currentHistory);
-
+        InteractionContext requestContext = new InteractionContext();
         List<InteractionTarget> legalTargets = new ArrayList<>();
-        for (SelectableCharacterCard selectableRecruitmentCard : selectableRecruitmentCards) {
-            legalTargets.add(new InteractionTarget(TargetCategory.RecruitmentCard, selectableRecruitmentCard));
+        List<InteractionResultType> legalResults = getSelectRecruitmentCardLegalResults(currentPhase);
+
+        // TODO - comment
+        InteractionType requestType;
+        if (legalResults.contains(InteractionResultType.EndPhase)) {
+            requestType = InteractionType.NoTargetExpected;
+            // TODO - comment
+            if (!legalResults.contains(InteractionResultType.UndoLastAction)) {
+                return CompletableFuture.completedFuture(new InteractionResult(
+                        InteractionResultType.EndPhase,
+                        requestContext,
+                        null
+                ));
+            }
+        } else {
+            requestType = InteractionType.SelectableCharacterCardExpected;
+            List<SelectableCharacterCard> selectableRecruitmentCards =
+                    RecruitmentQuery.getCurrentSelectableCards(currentGame, currentHistory);
+
+            for (SelectableCharacterCard selectableRecruitmentCard : selectableRecruitmentCards) {
+                legalTargets.add(new InteractionTarget(TargetCategory.RecruitmentCard, selectableRecruitmentCard));
+            }
         }
 
-        List<InteractionResultType> legalResults = new ArrayList<>();
-        legalResults.add(InteractionResultType.SelectableCharacterCardChosen);
-        if (canUndoLastRecruitment(currentPhase)) {
-            legalResults.add(InteractionResultType.UndoLastAction);
-        }
+        // TODO - get legal results through a method
+
 
         InteractionRequest request = new InteractionRequest(
-                InteractionType.SelectableCharacterCardExpected,
-                new InteractionContext(),
+                requestType,
+                requestContext,
                 legalTargets,
                 legalResults
         );
 
-        // Request an input to select the recruited card
-        return gameFlowListener.onInputRequired(request).thenCompose(result -> {
-            checkStopped();
-
-            // Since recruitments are mandatory we reenter immediately after an undo
-            if (result.getResultType() == InteractionResultType.UndoLastAction) {
-                return undoLastAction().thenCompose(ignored -> runSelectRecruitmentCardAsync(currentPhase));
-            }
-
-            if (result.getResultType() != InteractionResultType.SelectableCharacterCardChosen) {
-                throw new IllegalStateException(
-                        "Invalid interaction result : illegal type \"" +
-                                result.getResultType() + "\" for recruitment card selection"
-                );
-            }
-
-            return CompletableFuture.completedFuture(
-                    getSelectableCharacterCardFromResult(result, TargetCategory.RecruitmentCard));
-        });
+        // TODO - comment ?
+        return gameFlowListener.onInputRequired(request);
     }
 
     /**
@@ -827,6 +837,27 @@ public final class GameHandler {
         actionHandler.undoAction();
 
         return gameFlowListener.onActionUndone(currentGame);
+    }
+
+    // TODO - javadoc
+    private CompletableFuture<Void> undoPhaseStart() {
+        IPhase currentPhase = GameHistoryQuery.findCurrentPhase(currentHistory);
+
+        // TODO
+        if (currentPhase == null) {
+            throw new IllegalStateException("Cannot undo phase start without a current phase");
+        }
+
+        if (!currentPhase.getActions().isEmpty()) {
+            throw new IllegalStateException("Cannot undo a phase start with actions phase registered");
+        }
+
+        // TODO - get previous phase
+        // TODO - remove current phase start action
+        // TODO - remove last phase end action
+
+        // return gameFlowListener.onPhaseChanged(); TODO - use last phase
+        return CompletableFuture.completedFuture(null);
     }
 
     /**
