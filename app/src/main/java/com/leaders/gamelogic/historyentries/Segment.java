@@ -43,10 +43,16 @@ public abstract class Segment {
     }
 
     public void cancelStart() {
+        if (!hasStarted()) {
+            throw new IllegalStateException("Cannot cancel the start of a non-started segment");
+        }
         startAction = null;
     }
 
     public void cancelEnd() {
+        if (!hasEnded()) {
+            throw new IllegalStateException("Cannot cancel the end of a non-ended segment");
+        }
         endAction = null;
     }
 
