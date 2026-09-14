@@ -5,6 +5,8 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 
 import com.leaders.R;
+import com.leaders.app.entities.LeadersApplication;
+import com.leaders.app.entities.Settings;
 import com.leaders.gamelogic.actions.RecruitmentAction;
 import com.leaders.gamelogic.actions.RecruitmentActionMotion;
 import com.leaders.gamelogic.entities.Character;
@@ -30,7 +32,10 @@ public class TutorialGameUtils {
     @NonNull
     public static GameHistory getDefaultHistory(@NonNull Context context) {
         List<Player> players = new ArrayList<>();
-        Player player = new Player(getPlayerTeamColor(), context.getString(R.string.player));
+
+        Settings settings = ((LeadersApplication) context.getApplicationContext()).getSettings();
+        Player player = new Player(getPlayerTeamColor(), !settings.getUserName().isEmpty() ?
+                settings.getUserName() : context.getString(R.string.player));
         players.add(player);
         players.add(new Player(getPlayerTeamColor().getOpposite(), context.getString(R.string.barry_the_bot)));
 
