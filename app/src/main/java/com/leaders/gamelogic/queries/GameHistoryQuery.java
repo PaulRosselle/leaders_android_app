@@ -4,7 +4,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.leaders.gamelogic.entities.GameHistory;
+import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.Player;
+import com.leaders.gamelogic.enums.GamePhaseType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.enums.TransitionTarget;
 import com.leaders.gamelogic.historyentries.IHistoryEntry;
@@ -174,5 +176,19 @@ public final class GameHistoryQuery {
         }
 
         throw new IllegalStateException("No player found for team " + teamColor);
+    }
+
+    /**
+     * Returns the game phase corresponding to the given IPhase.
+     *
+     * @param history the game history
+     * @param phase the phase to convert
+     * @return the corresponding game phase
+     */
+    public static GamePhase getGamePhase(@NonNull GameHistory history, @NonNull IPhase phase) {
+        return new GamePhase(
+                GamePhaseType.getFromTransitionTarget(GameHistoryQuery.getPhaseTransitionTarget(phase)),
+                GameHistoryQuery.getPlayerFromTeam(history, GameHistoryQuery.getPhaseTeamColor(phase))
+        );
     }
 }

@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class TutorialGameUtils {
-    private TutorialGameUtils(){
+    private TutorialGameUtils() {
         throw new AssertionError("Cannot instantiate utility class");
     }
 
