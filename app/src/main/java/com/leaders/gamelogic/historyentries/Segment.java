@@ -42,6 +42,14 @@ public abstract class Segment {
         return endAction != null;
     }
 
+    public void cancelStart() {
+        startAction = null;
+    }
+
+    public void cancelEnd() {
+        endAction = null;
+    }
+
     @Nullable
     public TransitionAction getStartAction() {
         return startAction;

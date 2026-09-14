@@ -99,10 +99,7 @@ public final class GameContext {
 
         IPhase currentPhase = GameHistoryQuery.findCurrentPhase(gameHistory);
         if (currentPhase != null) {
-            return new GamePhase(
-                    GamePhaseType.getFromTransitionTarget(GameHistoryQuery.getPhaseTransitionTarget(currentPhase)),
-                    GameHistoryQuery.getPlayerFromTeam( gameHistory, GameHistoryQuery.getPhaseTeamColor(currentPhase))
-            );
+            return GameHistoryQuery.getGamePhase(gameHistory, currentPhase);
         }
 
         IPhase lastEndedPhase = GameHistoryQuery.findLastEndedPhase(gameHistory);
@@ -110,10 +107,7 @@ public final class GameContext {
             throw new IllegalStateException("A non empty history should always a current or ended phase");
         }
 
-        return new GamePhase(
-                GamePhaseType.getFromTransitionTarget(GameHistoryQuery.getPhaseTransitionTarget(lastEndedPhase)),
-                GameHistoryQuery.getPlayerFromTeam( gameHistory, GameHistoryQuery.getPhaseTeamColor(lastEndedPhase))
-        );
+        return GameHistoryQuery.getGamePhase(gameHistory, lastEndedPhase);
     }
 
     @Nullable
