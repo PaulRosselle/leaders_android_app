@@ -248,6 +248,7 @@
     <string name="contact_me">me contacter</string>
     <string name="problem_suggestion">un problème,\nune suggestion ?</string>
     <string name="credits">crédits</string>
+    <string name="credits_title">CReditS</string>
 
 
 </resources>

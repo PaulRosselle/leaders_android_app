@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/round_rect">
+
+    <ImageView
+        android:id="@+id/imvBox_vwOfficialGame"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/leaders_box" />
+
+    <TextView
+        android:id="@+id/txvBoardGameIntro_vwOfficialGame"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:fontFamily="@font/bobby_jones_condensed"
+        android:justificationMode="inter_word"
+        android:text="Leaders est un jeu de société compétitif publié par Studio H en 2025 proposant à deux joueurs de s'affronter dans un duel tactique intense."
+        android:textAllCaps="false"
+        android:textColor="@color/font"
+        android:textSize="@dimen/smaller_text_font_size"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imvBox_vwOfficialGame"
+        app:layout_constraintTop_toTopOf="@+id/imvBox_vwOfficialGame"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <ImageView
+        android:id="@+id/imvStudioH_vwOfficialGame"
+        android:layout_width="44dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="@+id/txvIllustrator_vwOfficialGame"
+        app:layout_constraintEnd_toEndOf="@+id/txvBoardGameIntro_vwOfficialGame"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/imvBox_vwOfficialGame"
+        app:layout_constraintTop_toTopOf="@+id/txvCreator_vwOfficialGame"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/icon_studio_h" />
+
+    <TextView
+        android:id="@+id/txvCreator_vwOfficialGame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/bobby_jones_condensed"
+        android:text="Il a été imaginé par :"
+        android:textColor="@color/font"
+        android:textSize="@dimen/smaller_text_font_size"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/txvBoardGameIntro_vwOfficialGame"
+        app:layout_constraintTop_toBottomOf="@+id/txvBoardGameIntro_vwOfficialGame"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/txvIllustrator_vwOfficialGame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:fontFamily="@font/bobby_jones_condensed"
+        android:text="et illustré par :"
+        android:textColor="@color/font"
+        android:textSize="@dimen/smaller_text_font_size"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/txvBoardGameIntro_vwOfficialGame"
+        app:layout_constraintTop_toBottomOf="@+id/txvCreator_vwOfficialGame"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/txvIllustratorName_vwOfficialGame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:fontFamily="@font/bukhari_script"
+        android:text="Naïade"
+        android:textColor="@color/app_cyan"
+        android:textSize="14dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/txvIllustrator_vwOfficialGame"
+        app:layout_constraintTop_toBottomOf="@+id/txvCreator_vwOfficialGame"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/txvCreatorName_vwOfficialGame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:fontFamily="@font/bukhari_script"
+        android:text="Hugo Fresnoy"
+        android:textColor="@color/app_cyan"
+        android:textSize="14dp"
+        app:layout_constraintBottom_toBottomOf="@+id/txvCreator_vwOfficialGame"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/txvCreator_vwOfficialGame"
+        app:layout_constraintTop_toTopOf="@+id/txvCreator_vwOfficialGame"
+        app:layout_constraintVertical_bias="0.0" />
+</androidx.constraintlayout.widget.ConstraintLayout>
