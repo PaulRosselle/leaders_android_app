@@ -101,7 +101,7 @@
         app:textResId="@string/puzzles" />
 
     <com.leaders.app.views.mainmenu.MainMenuButtonView
-        android:id="@+id/mmbvPlay_vwMainMenu"
+        android:id="@+id/mmbvDuel_vwMainMenu"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"

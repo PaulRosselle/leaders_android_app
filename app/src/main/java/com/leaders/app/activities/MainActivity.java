@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import com.leaders.R;
 import com.leaders.app.entities.crash.CrashLog;
 import com.leaders.app.enums.ActivityType;
+import com.leaders.app.enums.AppSection;
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.views.mainmenu.CrashLogView;
 import com.leaders.app.views.mainmenu.MainMenuView;
@@ -41,11 +42,7 @@ public final class MainActivity extends BaseActivity {
         super.initListeners();
 
         MainMenuView mmvMainMenu = findViewById(R.id.mmvMainMenu_actMain);
-        mmvMainMenu.setOnPuzzlesClickListener(this::onPuzzlesClick);
-        mmvMainMenu.setOnPlayClickListener(this::onPlayClick);
-        mmvMainMenu.setOnReplayClickListener(this::onReplayClick);
-        mmvMainMenu.setOnRulesClickListener(this::onRulesClick);
-        mmvMainMenu.setOnSettingsClickListener(this::onSettingsClick);
+        mmvMainMenu.setSectionClickListener(this::onSectionClick);
     }
 
     @Override
@@ -129,23 +126,7 @@ public final class MainActivity extends BaseActivity {
         return animator;
     }
 
-    private void onPuzzlesClick(View v) {
-        goToActivity(ActivityType.PuzzleMenu);
-    }
-
-    private void onPlayClick(View v) {
-        goToActivity(ActivityType.DuelSetup);
-    }
-
-    private void onReplayClick(View v) {
-        goToActivity(ActivityType.ReplayMenu);
-    }
-
-    private void onRulesClick(View v) {
-        goToActivity(ActivityType.RulesMenu);
-    }
-
-    private void onSettingsClick(View v) {
-        goToActivity(ActivityType.Settings);
+    private void onSectionClick(@NonNull AppSection appSection) {
+        goToActivity(appSection.getEntranceActivity());
     }
 }
