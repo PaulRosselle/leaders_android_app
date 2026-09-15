@@ -241,5 +241,11 @@
     <string name="problem_suggestion">A problem,\na suggestion ?</string>
     <string name="credits">credits</string>
     <string name="credits_title">CReditS</string>
+    <string name="official_game_intro">Leaders is a competitive board game edited by Studio H in 2025 allowing two players to battle in an intense strategic duel.</string>
+    <string name="created_by">An idea from:</string>
+    <string name="illustrated_by">Illustrated by:</string>
+    <string name="privacy_policy">privacy policy</string>
+    <string name="thanks">thanks</string>
+    <string name="app_adaptation">This application is a non-official adaptation of the Leaders board game. It was made with the help of the fantastic Leaders community.</string>
 
 </resources>
