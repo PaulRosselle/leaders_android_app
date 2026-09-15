@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.leaders.R;
+import com.leaders.app.entities.Contributor;
 import com.leaders.app.entities.ReplaySave;
 import com.leaders.app.entities.Settings;
 import com.leaders.app.entities.crash.CrashLog;
@@ -510,6 +511,28 @@ public final class JsonUtils {
         try {
             saveJsonFile(context, SETTINGS_FILENAME, settings.getAsJson());
         } catch (JSONException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    //endregion
+
+    //region CONTRIBUTORS METHODS
+
+    public static List<Contributor> loadContributors(@NonNull Context context) {
+        try (InputStream fisContributors = context.getResources().openRawResource(R.raw.contributors)) {
+            JSONObject joContributors = openJsonFile(fisContributors);
+            JSONArray jaContributors = joContributors.getJSONArray("contributors");
+
+            List<Contributor> contributors = new ArrayList<>();
+
+            for (int i = 0; i < jaContributors.length(); i++) {
+                contributors.add(Contributor.getFromJson(jaContributors.getJSONObject(i)));
+            }
+
+            return contributors;
+
+        } catch (IOException | JSONException e) {
             throw new RuntimeException(e);
         }
     }

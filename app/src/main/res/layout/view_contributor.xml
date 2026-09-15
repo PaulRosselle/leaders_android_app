@@ -23,7 +23,7 @@
         android:layout_weight="1"
         android:fontFamily="@font/bukhari_script"
         android:gravity="start|center_vertical"
-        android:textColor="@color/app_golden"
+        android:textColor="@color/font"
         android:textSize="14dp"
         tools:text="@string/creator_name" />
 

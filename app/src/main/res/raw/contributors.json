@@ -1,0 +1,81 @@
+{
+  "contributors": [
+    {
+      "team_color": "Black",
+      "character_type": "LeaderKing",
+      "name": "Hugo Fresnoy",
+      "has_contributed_to_alpha": true,
+      "has_contributed_to_beta": true
+    },
+    {
+      "team_color": "White",
+      "character_type": "Jailer",
+      "name": "BatTotoro",
+      "has_contributed_to_alpha": true,
+      "has_contributed_to_beta": false
+    },
+    {
+      "team_color": "Black",
+      "character_type": "Nemesis",
+      "name": "RalzMaw",
+      "has_contributed_to_alpha": true,
+      "has_contributed_to_beta": false
+    },
+    {
+      "team_color": "White",
+      "character_type": "Vizier",
+      "name": "Meygavox",
+      "has_contributed_to_alpha": true,
+      "has_contributed_to_beta": false
+    },
+    {
+      "team_color": "Black",
+      "character_type": "RoyalGuard",
+      "name": "Mathieu Brt.",
+      "has_contributed_to_alpha": true,
+      "has_contributed_to_beta": true
+    },
+    {
+      "team_color": "Black",
+      "character_type": "LeaderQueen",
+      "name": "Lyriade",
+      "has_contributed_to_alpha": true,
+      "has_contributed_to_beta": true
+    },
+    {
+      "team_color": "White",
+      "character_type": "ClawLauncher",
+      "name": "Makito",
+      "has_contributed_to_alpha": true,
+      "has_contributed_to_beta": true
+    },
+    {
+      "team_color": "Black",
+      "character_type": "Bruiser",
+      "name": "Poncho Vila",
+      "has_contributed_to_alpha": false,
+      "has_contributed_to_beta": true
+    },
+    {
+      "team_color": "Black",
+      "character_type": "Acrobat",
+      "name": "Shusaku",
+      "has_contributed_to_alpha": false,
+      "has_contributed_to_beta": true
+    },
+    {
+      "team_color": "Black",
+      "character_type": "Assassin",
+      "name": "slww",
+      "has_contributed_to_alpha": false,
+      "has_contributed_to_beta": true
+    },
+    {
+      "team_color": "Black",
+      "character_type": "Hermit",
+      "name": "Thibs",
+      "has_contributed_to_alpha": false,
+      "has_contributed_to_beta": true
+    }
+  ]
+}

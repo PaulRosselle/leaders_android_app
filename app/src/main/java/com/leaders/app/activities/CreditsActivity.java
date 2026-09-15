@@ -10,7 +10,10 @@ import androidx.annotation.NonNull;
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 
+import com.leaders.app.entities.Contributor;
 import com.leaders.app.enums.ActivityType;
+import com.leaders.app.utilities.JsonUtils;
+import com.leaders.app.views.credits.ContributorView;
 
 public class CreditsActivity extends BaseActivity {
     private static final String PRIVACY_POLICY_URL = "https://paulrosselle.github.io/leaders_android_app/privacy_policy/";
@@ -39,8 +42,12 @@ public class CreditsActivity extends BaseActivity {
     protected void initDatas() {
         super.initDatas();
 
-        // TODO - load contributors
+        for (Contributor contributor : JsonUtils.loadContributors(this)) {
+            ContributorView contributorView = new ContributorView(this, contributor);
+            llyContributors.addView(contributorView, getContributorLayoutParams());
+        }
     }
+
     @Override
     protected int getLayoutResId() {
         return R.layout.activity_credits;
@@ -87,4 +94,15 @@ public class CreditsActivity extends BaseActivity {
     }
 
     //endregion
+
+    private LinearLayout.LayoutParams getContributorLayoutParams() {
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+
+        params.topMargin = (int) (4 * getResources().getDisplayMetrics().density);
+
+        return params;
+    }
 }
