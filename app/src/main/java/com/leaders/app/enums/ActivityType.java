@@ -5,6 +5,7 @@ import android.content.Intent;
 
 import androidx.annotation.NonNull;
 
+import com.leaders.app.activities.CreditsActivity;
 import com.leaders.app.activities.SettingsActivity;
 import com.leaders.app.activities.duel.DuelPlayerActivity;
 import com.leaders.app.activities.duel.DuelSetupActivity;
@@ -19,7 +20,6 @@ import com.leaders.app.activities.rules.RulesMenuActivity;
 import com.leaders.app.activities.rules.character.RulesCharacterDemoActivity;
 import com.leaders.app.activities.rules.character.RulesCharacterMenuActivity;
 import com.leaders.app.activities.rules.tutorial.RulesTutorialActiveAbilitiesActivity;
-import com.leaders.app.activities.rules.tutorial.RulesTutorialActivity;
 import com.leaders.app.activities.rules.tutorial.RulesTutorialCaptureActivity;
 import com.leaders.app.activities.rules.tutorial.RulesTutorialGameActivity;
 import com.leaders.app.activities.rules.tutorial.RulesTutorialPassiveAbilitiesActivity;
@@ -52,7 +52,9 @@ public enum ActivityType {
     RulesTutorialSurround,
     RulesTutorialGame,
     // SETTINGS
-    Settings;
+    Settings,
+    // CREDITS
+    Credits;
 
     @NonNull
     public Intent getIntent(@NonNull Context context) {
@@ -76,6 +78,7 @@ public enum ActivityType {
             case RulesTutorialSurround: return new Intent(context, RulesTutorialSurroundActivity.class);
             case RulesTutorialGame: return new Intent(context, RulesTutorialGameActivity.class);
             case Settings: return new Intent(context, SettingsActivity.class);
+            case Credits: return new Intent(context, CreditsActivity.class);
             default: throw new NoSuchElementException(String.format("No class found matching %s", this));
         }
     }
