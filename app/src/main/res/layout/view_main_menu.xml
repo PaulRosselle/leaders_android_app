@@ -40,6 +40,13 @@
         app:layout_constraintGuide_percent="0.513" />
 
     <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gdlR4T_vwMainMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.664" />
+
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/gdlC1L_vwMainMenu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -85,12 +92,12 @@
         android:id="@+id/mmbvPuzzles_vwMainMenu"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        app:iconResId="@drawable/icon_puzzle"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/gdlC2R_vwMainMenu"
         app:layout_constraintStart_toStartOf="@+id/gdlC2L_vwMainMenu"
         app:layout_constraintTop_toTopOf="@+id/gdlR1T_vwMainMenu"
         app:layout_constraintVertical_bias="0.0"
-        app:iconResId="@drawable/icon_puzzle"
         app:textResId="@string/puzzles" />
 
     <com.leaders.app.views.mainmenu.MainMenuButtonView
@@ -140,5 +147,18 @@
         app:layout_constraintVertical_bias="0.0"
         app:iconResId="@drawable/icon_replay"
         app:textResId="@string/replay" />
+
+    <com.leaders.app.views.mainmenu.MainMenuButtonView
+        android:id="@+id/mmbvCredits_vwMainMenu"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:alpha="0.7"
+        app:iconResId="@drawable/icon_credits"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdlC2R_vwMainMenu"
+        app:layout_constraintStart_toStartOf="@+id/gdlC2L_vwMainMenu"
+        app:layout_constraintTop_toTopOf="@+id/gdlR4T_vwMainMenu"
+        app:layout_constraintVertical_bias="0.0"
+        app:textResId="@string/credits" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

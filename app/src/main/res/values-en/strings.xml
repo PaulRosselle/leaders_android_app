@@ -239,5 +239,6 @@
     <string name="send">send</string>
     <string name="contact_me">contact me</string>
     <string name="problem_suggestion">A problem,\na suggestion ?</string>
+    <string name="credits">credits</string>
 
 </resources>

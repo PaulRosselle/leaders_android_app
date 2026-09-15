@@ -247,6 +247,7 @@
     <string name="send">envoyer</string>
     <string name="contact_me">me contacter</string>
     <string name="problem_suggestion">un problème,\nune suggestion ?</string>
+    <string name="credits">crédits</string>
 
 
 </resources>
