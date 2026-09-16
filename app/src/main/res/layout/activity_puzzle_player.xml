@@ -138,6 +138,60 @@
         app:strokeColor="@color/font"
         app:strokeWidth="@dimen/default_stroke_width" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnNextPuzzle_actPuzzlePlayer"
+        android:layout_width="@dimen/round_button_size"
+        android:layout_height="@dimen/round_button_size"
+        android:layout_marginBottom="16dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:visibility="gone"
+        app:backgroundTint="@color/darker_background"
+        app:icon="@drawable/icon_arrow_head"
+        app:iconGravity="textStart"
+        app:iconPadding="0dp"
+        app:iconSize="@dimen/round_button_icon_size"
+        app:iconTint="@color/font"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.75"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        app:strokeColor="@color/font"
+        app:strokeWidth="@dimen/default_stroke_width" />
+
+    <com.leaders.app.views.character.HighlightView
+        android:id="@+id/hlvNextPuzzle_actPuzzlePlayer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginLeft="-1dp"
+        android:layout_marginTop="-1dp"
+        android:layout_marginRight="-1dp"
+        android:layout_marginBottom="-1dp"
+        android:clickable="false"
+        android:importantForAccessibility="no"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/btnNextPuzzle_actPuzzlePlayer"
+        app:layout_constraintLeft_toLeftOf="@+id/btnNextPuzzle_actPuzzlePlayer"
+        app:layout_constraintRight_toRightOf="@+id/btnNextPuzzle_actPuzzlePlayer"
+        app:layout_constraintTop_toTopOf="@+id/btnNextPuzzle_actPuzzlePlayer" />
+
+    <TextView
+        android:id="@+id/txvNextPuzzle_actPuzzlePlayer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/bobby_jones_condensed"
+        android:text="@string/next_puzzle"
+        android:textColor="@color/font"
+        android:textSize="14dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/btnNextPuzzle_actPuzzlePlayer"
+        app:layout_constraintEnd_toEndOf="@+id/btnNextPuzzle_actPuzzlePlayer"
+        app:layout_constraintStart_toStartOf="@+id/btnNextPuzzle_actPuzzlePlayer"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
     <TextView
         android:id="@+id/txvPuzzleName_actPuzzlePlayer"
         android:layout_width="wrap_content"

@@ -19,6 +19,7 @@ import com.leaders.app.enums.PuzzleSource;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.views.ActionsMenuView;
+import com.leaders.app.views.character.HighlightView;
 import com.leaders.app.views.settings.AnimationSpeedView;
 import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.GameHistory;
@@ -88,6 +89,9 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
     private View vwDialogBg;
 
     private MaterialButton btnReset;
+    private MaterialButton btnNextPuzzle;
+    private HighlightView hlvNextPuzzle;
+    private TextView txvNextPuzzle;
 
     private TextView txvPuzzleName;
     private TextView txvAuthorName;
@@ -114,6 +118,11 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
         asvAnimationSpeed = findViewById(R.id.asvAnimationSpeed_actPuzzlePlayer);
 
         btnReset = findViewById(R.id.btnReset_actPuzzlePlayer);
+
+        btnNextPuzzle = findViewById(R.id.btnNextPuzzle_actPuzzlePlayer);
+        hlvNextPuzzle = findViewById(R.id.hlvNextPuzzle_actPuzzlePlayer);
+        txvNextPuzzle = findViewById(R.id.txvNextPuzzle_actPuzzlePlayer);
+
         txvPuzzleName = findViewById(R.id.txvPuzzleName_actPuzzlePlayer);
         txvAuthorName = findViewById(R.id.txvAuthorName_actPuzzlePlayer);
     }
@@ -132,6 +141,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
         asvAnimationSpeed.setOnClickListener(this::onAsvAnimationBgClick);
 
         btnReset.setOnClickListener(this::onResetClick);
+        btnNextPuzzle.setOnClickListener(this::onNextPuzzleClick);
     }
 
     @Override
@@ -243,8 +253,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.alert_dialog_theme);
         builder.setTitle(R.string.new_attempt);
         builder.setMessage(R.string.restart_puzzle);
-        builder.setPositiveButton(R.string.start_over, (dialogInterface, i) ->
-                controller.restartGame(puzzleSave.getPuzzleGameHistory()));
+        builder.setPositiveButton(R.string.start_over, (dialogInterface, i) -> restartPuzzle());
         builder.setNegativeButton(R.string.cancel, null);
         builder.show();
     }
@@ -319,6 +328,18 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
         }
     }
 
+    private void setNextPuzzleVisible(boolean visible) {
+        txvNextPuzzle.setVisibility(visible ? View.VISIBLE : View.GONE);
+        btnNextPuzzle.setVisibility(visible ? View.VISIBLE : View.GONE);
+        hlvNextPuzzle.setVisibility(visible ? View.VISIBLE : View.GONE);
+        btnUndoLastAction.setVisibility(visible ? View.GONE : View.VISIBLE);
+        if (visible) {
+            hlvNextPuzzle.startAnimation();
+        } else {
+            hlvNextPuzzle.stopAnimation();
+        }
+    }
+
     //endregion
 
     //region CONTROLLER METHODS
@@ -331,6 +352,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
 
             saveProgress(isVictory);
             showEndGame(winnerColor, isVictory);
+            setNextPuzzleVisible(isVictory);
         });
     }
 
@@ -351,9 +373,14 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
         loadPuzzle(puzzleSaves.get(puzzleSaves.indexOf(puzzleSave) - 1));
     }
 
+    private void restartPuzzle() {
+        controller.restartGame(puzzleSave.getPuzzleGameHistory());
+        setNextPuzzleVisible(false);
+    }
+
     private void loadPuzzle(@NonNull PuzzleSave puzzleSave) {
         this.puzzleSave = puzzleSave;
-        controller.restartGame(puzzleSave.getPuzzleGameHistory());
+        restartPuzzle();
         updatePuzzleInfos();
         hidePuzzleActions();
     }
