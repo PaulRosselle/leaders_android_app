@@ -247,5 +247,6 @@
     <string name="privacy_policy">privacy policy</string>
     <string name="thanks">thanks</string>
     <string name="app_adaptation">This application is a non-official adaptation of the Leaders board game. It was made with the help of the fantastic Leaders community.</string>
+    <string name="playable_items_animation">playable items animation</string>
 
 </resources>
