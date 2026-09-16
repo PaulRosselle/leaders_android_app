@@ -17,6 +17,7 @@ import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
 import com.leaders.puzzlelogic.entities.OfficialPuzzleSave;
 import com.leaders.puzzlelogic.entities.PuzzleSave;
+import com.leaders.puzzlelogic.entities.TransferablePuzzleSave;
 import com.leaders.puzzlelogic.serializers.SerializationContext;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
 
@@ -246,7 +247,14 @@ public final class JsonUtils {
         }
 
         try {
-            return getCustomPuzzlesFromJson(openJsonFile(context, CUSTOM_PUZZLES_FILENAME));
+            List<CustomPuzzleSave> customPuzzles = new ArrayList<>();
+
+            JSONArray jaCustomPuzzles = openJsonFile(context, CUSTOM_PUZZLES_FILENAME).getJSONArray("puzzles");
+            for (int i = 0; i < jaCustomPuzzles.length(); i++) {
+                customPuzzles.add(new CustomPuzzleSave(jaCustomPuzzles.getJSONObject(i)));
+            }
+
+            return customPuzzles;
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
@@ -258,22 +266,20 @@ public final class JsonUtils {
             if (inputStream == null) {
                 throw new IllegalArgumentException("Cannot get valid input stream from Uri");
             }
+            List<CustomPuzzleSave> customPuzzles = new ArrayList<>();
 
-            return getCustomPuzzlesFromJson(openJsonFile(inputStream));
+            JSONArray jaCustomPuzzles = openJsonFile(inputStream).getJSONArray("puzzles");
+            for (int i = 0; i < jaCustomPuzzles.length(); i++) {
+                TransferablePuzzleSave puzzleSave = TransferablePuzzleSave.fromJson(
+                        jaCustomPuzzles.getJSONObject(i)
+                );
+                customPuzzles.add(puzzleSave.toCustomSave());
+            }
+
+            return customPuzzles;
         } catch (IOException | JSONException e) {
             throw new IllegalArgumentException(e);
         }
-    }
-
-    private static List<CustomPuzzleSave> getCustomPuzzlesFromJson(@NonNull JSONObject joCustomPuzzles) throws JSONException {
-        List<CustomPuzzleSave> customPuzzles = new ArrayList<>();
-
-        JSONArray jaCustomPuzzles = joCustomPuzzles.getJSONArray("puzzles");
-        for (int i = 0; i < jaCustomPuzzles.length(); i++) {
-            customPuzzles.add(new CustomPuzzleSave(jaCustomPuzzles.getJSONObject(i)));
-        }
-
-        return customPuzzles;
     }
 
     public static void saveOfficialPuzzles(@NonNull Context context,
@@ -304,7 +310,7 @@ public final class JsonUtils {
         try {
             JSONArray jaCustomPuzzles = new JSONArray();
             for (CustomPuzzleSave customPuzzle : customPuzzles) {
-                jaCustomPuzzles.put(customPuzzle.getAsJsonObject());
+                jaCustomPuzzles.put(customPuzzle.getAsJson());
             }
 
             JSONObject joCustomPuzzles = new JSONObject();
@@ -327,15 +333,7 @@ public final class JsonUtils {
 
             JSONArray jaPuzzles = new JSONArray();
             for (PuzzleSave puzzleSave : puzzleSaves) {
-                // We only save puzzle in files as custom puzzles
-                CustomPuzzleSave customPuzzleSave;
-                if (puzzleSave instanceof CustomPuzzleSave) {
-                    customPuzzleSave = (CustomPuzzleSave) puzzleSave;
-                } else {
-                    customPuzzleSave = new CustomPuzzleSave(puzzleSave.getName(), "",
-                            puzzleSave.getLifetime(), puzzleSave.getDatas(), puzzleSave.isSolved());
-                }
-                jaPuzzles.put(customPuzzleSave.getAsJsonObject());
+                jaPuzzles.put(TransferablePuzzleSave.fromSave(puzzleSave).getAsJson());
             }
 
             JSONObject joCustomPuzzles = new JSONObject();
@@ -349,7 +347,7 @@ public final class JsonUtils {
 
     //endregion
 
-    //region PUZZLE SAVE METHODS
+    //region REPLAY SAVE METHODS
 
     public static List<ReplaySave> loadReplays(@NonNull Context context) {
         if (!fileExists(context, REPLAYS_FILENAME)) {

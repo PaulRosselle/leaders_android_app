@@ -40,7 +40,7 @@ public abstract class PuzzleSave {
 
     @NonNull
     @CallSuper
-    public JSONObject getAsJsonObject() throws JSONException {
+    public JSONObject getAsJson() throws JSONException {
         JSONObject joPuzzleSave = new JSONObject();
         joPuzzleSave.put("name", getName());
         joPuzzleSave.put("lifetime", getLifetime().name());

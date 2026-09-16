@@ -26,8 +26,8 @@ public final class OfficialPuzzleSave extends PuzzleSave {
 
     @NonNull
     @Override
-    public JSONObject getAsJsonObject() throws JSONException {
-        JSONObject joPuzzle = super.getAsJsonObject();
+    public JSONObject getAsJson() throws JSONException {
+        JSONObject joPuzzle = super.getAsJson();
         joPuzzle.put("id", id);
         return joPuzzle;
     }

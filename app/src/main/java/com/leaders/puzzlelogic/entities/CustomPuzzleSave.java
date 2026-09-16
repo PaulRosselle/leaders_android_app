@@ -21,17 +21,17 @@ public final class CustomPuzzleSave extends PuzzleSave {
         this.author = author;
     }
 
-    public CustomPuzzleSave(JSONObject joPuzzle) throws JSONException {
+    public CustomPuzzleSave(@NonNull JSONObject joPuzzle) throws JSONException {
         super(joPuzzle);
         this.author = joPuzzle.getString("author");
     }
 
     @NonNull
     @Override
-    public JSONObject getAsJsonObject() throws JSONException {
-        JSONObject joPuzzle = super.getAsJsonObject();
-        joPuzzle.put("author", author);
-        return joPuzzle;
+    public JSONObject getAsJson() throws JSONException {
+        JSONObject joPuzzleSave = super.getAsJson();
+        joPuzzleSave.put("author", author);
+        return joPuzzleSave;
     }
 
     @NonNull
