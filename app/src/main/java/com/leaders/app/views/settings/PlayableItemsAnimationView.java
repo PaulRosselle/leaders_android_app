@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.content.ContextCompat;
@@ -22,17 +23,23 @@ public class PlayableItemsAnimationView extends SwitchCompat {
 
         // SHAPE
         float density = context.getResources().getDisplayMetrics().density;
-        int paddingHorizontal = dpToPx(density, 16);
-        int paddingVertical = dpToPx(density, 12);
-        setPadding(paddingHorizontal, paddingVertical, paddingHorizontal, paddingVertical);
+        int padding = dpToPx(density, 16);
+        setPadding(padding, padding, padding, padding);
         setThumbDrawable(ContextCompat.getDrawable(context, R.drawable.seekbar_thumb));
         setBackgroundResource(R.drawable.round_rect);
 
         // TEXT
         setText(R.string.playable_items_animation);
         setTextColor(ContextCompat.getColor(context, R.color.font));
-        setTextSize(getResources().getDimensionPixelSize(R.dimen.default_text_font_size));
-        setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
+        setAllCaps(true);
+
+        setAutoSizeTextTypeUniformWithConfiguration(
+                dpToPx(density, 14),  // min size
+                dpToPx(density, 18),  // max size
+                dpToPx(density, 1),   // granularity
+                TypedValue.COMPLEX_UNIT_PX
+        );
+        setTypeface(Typeface.create("sans-serif", Typeface.BOLD));
 
         // TRACK COLOR
         ColorStateList trackTint = new ColorStateList(
