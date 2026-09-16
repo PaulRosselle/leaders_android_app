@@ -63,12 +63,14 @@ public final class DuelPlayerActivity extends PlayableActivity implements
     private enum DuelAction {
         SaveAsReplay,
         ChangeAnimationSpeed,
+        AnimatePlayableItems,
         DisplayCellPositions;
 
         private int getIconResId() {
             switch (this) {
                 case SaveAsReplay: return R.drawable.icon_save;
                 case ChangeAnimationSpeed: return R.drawable.icon_speed;
+                case AnimatePlayableItems: return R.drawable.icon_sparkles;
                 case DisplayCellPositions: return R.drawable.icon_position;
                 default: throw new IllegalStateException("No icon found for puzzle action: " + this);
             }
@@ -78,6 +80,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
             switch (this) {
                 case SaveAsReplay: return R.string.record_game;
                 case ChangeAnimationSpeed: return R.string.animation_speed;
+                case AnimatePlayableItems: return R.string.playable_items_animation;
                 case DisplayCellPositions: return R.string.board_coordinates;
                 default: throw new IllegalStateException("No text found for puzzle action: " + this);
             }
@@ -87,6 +90,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
             switch (this) {
                 case SaveAsReplay: return activity::onSaveAsReplay;
                 case ChangeAnimationSpeed: return activity::onChangeAnimationSpeedClick;
+                case AnimatePlayableItems: return activity::onAnimatePlayableItems;
                 case DisplayCellPositions: return activity::onDisplayCellPosition;
                 default: throw new IllegalStateException("No click listener found for puzzle action: " + this);
             }
@@ -317,11 +321,31 @@ public final class DuelPlayerActivity extends PlayableActivity implements
         setReplaySaveVisible(false);
     }
 
-
     private void onChangeAnimationSpeedClick(View v) {
         amvActions.setVisibility(View.GONE);
         asvAnimationSpeed.setSpeed(animationSpeed);
         setAnimationSpeedVisible(true);
+    }
+
+    private void onAnimatePlayableItems(View v) {
+        if (animatePlayableItems) {
+            bdvBoard.stopPlayableCharactersShineAnimation();
+            bdvBoard.stopRecruitmentCellsAnimation();
+            ccsvCardSelector.stopShineAnimation();
+        } else {
+            if (bdvBoard.canShinePlayableCharacters()) {
+                bdvBoard.startPlayableCharactersShineAnimation();
+            }
+            if (bdvBoard.canShineRecruitmentCells()) {
+                bdvBoard.startRecruitmentCellsAnimation();
+            }
+            if (ccsvCardSelector.hasTargets()) {
+                ccsvCardSelector.startShineAnimation();
+            }
+        }
+        animatePlayableItems = !animatePlayableItems;
+
+        setActionsMenuVisible(false);
     }
 
     private void onDisplayCellPosition(View v) {

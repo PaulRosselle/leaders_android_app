@@ -107,6 +107,10 @@ public final class CharacterCardSelectionView extends ConstraintLayout {
         return selectedTarget;
     }
 
+    public boolean hasTargets() {
+        return targets != null && !targets.isEmpty();
+    }
+
     private void updatePortraitsFromTargets() {
         List<InteractionTarget> sortedTargets = getSortedTargets();
 
