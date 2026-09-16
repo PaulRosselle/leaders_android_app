@@ -270,6 +270,10 @@ public class RulesTutorialRecruitmentActivity extends PlayableActivity implement
                 gamePhase.getPhaseType() == GamePhaseType.Banishment;
         boolean selectableCardRequest = request.getRequestType() == InteractionType.SelectableCharacterCardExpected;
 
+        if (!animatePlayableItems) {
+            return;
+        }
+
         if (isValidPhase && selectableCardRequest) {
             ccsvCardSelector.startShineAnimation();
         } else {
