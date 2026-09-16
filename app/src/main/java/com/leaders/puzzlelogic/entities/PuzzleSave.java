@@ -34,7 +34,7 @@ public abstract class PuzzleSave {
                 joPuzzleSave.getString("name"),
                 PuzzleLifetime.valueOf(joPuzzleSave.getString("lifetime")),
                 joPuzzleSave.getJSONObject("datas"),
-                isSavedAsSolved(joPuzzleSave)
+                joPuzzleSave.getBoolean("solved")
         );
     }
 
@@ -45,11 +45,8 @@ public abstract class PuzzleSave {
         joPuzzleSave.put("name", getName());
         joPuzzleSave.put("lifetime", getLifetime().name());
         joPuzzleSave.put("datas", datas);
+        joPuzzleSave.put("solved", isSolved());
         return joPuzzleSave;
-    }
-
-    private static boolean isSavedAsSolved(@NonNull JSONObject joPuzzleSave) throws JSONException {
-        return joPuzzleSave.has("solved") && joPuzzleSave.getBoolean("solved");
     }
 
     @NonNull

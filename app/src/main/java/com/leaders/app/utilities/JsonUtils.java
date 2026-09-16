@@ -17,6 +17,7 @@ import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
 import com.leaders.puzzlelogic.entities.OfficialPuzzleSave;
 import com.leaders.puzzlelogic.entities.PuzzleSave;
+import com.leaders.puzzlelogic.entities.TransferablePuzzleSave;
 import com.leaders.puzzlelogic.serializers.SerializationContext;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
 
@@ -269,7 +270,10 @@ public final class JsonUtils {
 
             JSONArray jaCustomPuzzles = openJsonFile(inputStream).getJSONArray("puzzles");
             for (int i = 0; i < jaCustomPuzzles.length(); i++) {
-                customPuzzles.add(CustomPuzzleSave.getFromImportJson(jaCustomPuzzles.getJSONObject(i)));
+                TransferablePuzzleSave puzzleSave = TransferablePuzzleSave.fromJson(
+                        jaCustomPuzzles.getJSONObject(i)
+                );
+                customPuzzles.add(puzzleSave.toCustomSave());
             }
 
             return customPuzzles;
@@ -329,15 +333,7 @@ public final class JsonUtils {
 
             JSONArray jaPuzzles = new JSONArray();
             for (PuzzleSave puzzleSave : puzzleSaves) {
-                // We only save puzzle in files as custom puzzles
-                CustomPuzzleSave customPuzzleSave;
-                if (puzzleSave instanceof CustomPuzzleSave) {
-                    customPuzzleSave = (CustomPuzzleSave) puzzleSave;
-                } else {
-                    customPuzzleSave = new CustomPuzzleSave(puzzleSave.getName(), "",
-                            puzzleSave.getLifetime(), puzzleSave.getDatas(), false);
-                }
-                jaPuzzles.put(customPuzzleSave.getAsExportJson());
+                jaPuzzles.put(TransferablePuzzleSave.fromSave(puzzleSave).getAsJson());
             }
 
             JSONObject joCustomPuzzles = new JSONObject();

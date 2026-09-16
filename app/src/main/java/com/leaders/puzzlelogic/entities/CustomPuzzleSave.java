@@ -31,20 +31,7 @@ public final class CustomPuzzleSave extends PuzzleSave {
     public JSONObject getAsJson() throws JSONException {
         JSONObject joPuzzleSave = super.getAsJson();
         joPuzzleSave.put("author", author);
-        joPuzzleSave.put("solved", isSolved());
         return joPuzzleSave;
-    }
-
-    public JSONObject getAsExportJson() throws JSONException {
-        JSONObject joPuzzleSave = super.getAsJson();
-        joPuzzleSave.put("author", author);
-        return joPuzzleSave;
-    }
-
-    public static CustomPuzzleSave getFromImportJson(@NonNull JSONObject joPuzzle) throws JSONException {
-        CustomPuzzleSave puzzleSave = new CustomPuzzleSave(joPuzzle);
-        puzzleSave.setSolved(false);
-        return puzzleSave;
     }
 
     @NonNull
