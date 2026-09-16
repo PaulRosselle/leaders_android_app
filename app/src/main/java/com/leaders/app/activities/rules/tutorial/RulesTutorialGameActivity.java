@@ -307,6 +307,10 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
                                                @NonNull InteractionRequest request) {
         super.highlightPlayableCharacters(gameContext, request);
 
+        if (!animatePlayableItems) {
+            return;
+        }
+
         if (request.getLegalTargets().stream()
                 .anyMatch(target -> target.getCategory() == TargetCategory.RecruitmentDestination)) {
             bdvBoard.startRecruitmentCellsAnimation();
@@ -322,6 +326,10 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
         boolean isValidPhase = gamePhase.getPhaseType() == GamePhaseType.Recruitment ||
                 gamePhase.getPhaseType() == GamePhaseType.Banishment;
         boolean selectableCardRequest = request.getRequestType() == InteractionType.SelectableCharacterCardExpected;
+
+        if (!animatePlayableItems) {
+            return;
+        }
 
         if (isValidPhase && selectableCardRequest) {
             ccsvCardSelector.startShineAnimation();

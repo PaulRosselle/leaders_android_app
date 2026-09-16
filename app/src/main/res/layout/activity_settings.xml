@@ -94,6 +94,13 @@
 
             </com.leaders.app.views.settings.AnimationSpeedView>
 
+            <com.leaders.app.views.settings.PlayableItemsAnimationView
+                android:id="@+id/piasAnimatePlayableItems_actSettings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="com.leaders.app.views.settings.PlayableItemsAnimationView" />
+
             <com.leaders.app.views.settings.HighlightColorView
                 android:id="@+id/hcvHighlightColor_actSettings"
                 android:layout_width="match_parent"

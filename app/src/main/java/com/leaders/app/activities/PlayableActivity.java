@@ -45,6 +45,7 @@ public abstract class PlayableActivity extends BaseActivity
 
 
     protected AnimationSpeed animationSpeed;
+    protected boolean animatePlayableItems;
     protected GameController controller;
 
 
@@ -80,6 +81,7 @@ public abstract class PlayableActivity extends BaseActivity
 
         Settings settings = ((LeadersApplication) getApplication()).getSettings();
         animationSpeed = settings.getAnimationSpeed();
+        animatePlayableItems = settings.animatePlayableItems();
     }
 
     protected abstract int getBoardViewId();
@@ -144,6 +146,10 @@ public abstract class PlayableActivity extends BaseActivity
                 request.getContext().getCharacter(),
                 gameContext.getBoard()
         );
+
+        if (!animatePlayableItems) {
+            return;
+        }
 
         if (request.getRequestType() == InteractionType.PlayableCharacterExpected) {
             bdvBoard.startPlayableCharactersShineAnimation();

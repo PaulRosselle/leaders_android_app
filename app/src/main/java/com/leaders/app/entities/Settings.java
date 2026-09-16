@@ -15,11 +15,13 @@ public final class Settings {
     private AnimationSpeed animationSpeed;
     @NonNull
     private HighlightColor highlightColor;
+    private boolean animatePlayableItems;
 
     private Settings(){
         userName = "";
         animationSpeed = AnimationSpeed.Normal;
         highlightColor = HighlightColor.Default;
+        animatePlayableItems = true;
     }
 
     @NonNull
@@ -36,6 +38,9 @@ public final class Settings {
             if (joSettings.has("highlight_color")) {
                 settings.setHighlightColor(HighlightColor.valueOf(joSettings.getString("highlight_color")));
             }
+            if (joSettings.has("animate_playable_items")) {
+                settings.setAnimatePlayableItems(joSettings.getBoolean("animate_playable_items"));
+            }
 
         } catch (JSONException e) {
             throw new RuntimeException(e);
@@ -51,6 +56,7 @@ public final class Settings {
         joSettings.put("user_name", getUserName());
         joSettings.put("animation_speed", getAnimationSpeed().name());
         joSettings.put("highlight_color", getHighlightColor().name());
+        joSettings.put("animate_playable_items", animatePlayableItems());
 
         return joSettings;
     }
@@ -80,5 +86,13 @@ public final class Settings {
 
     public void setHighlightColor(@NonNull HighlightColor highlightColor) {
         this.highlightColor = highlightColor;
+    }
+
+    public boolean animatePlayableItems() {
+        return animatePlayableItems;
+    }
+
+    public void setAnimatePlayableItems(boolean animatePlayableItems) {
+        this.animatePlayableItems = animatePlayableItems;
     }
 }

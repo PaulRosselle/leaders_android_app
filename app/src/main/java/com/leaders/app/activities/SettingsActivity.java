@@ -2,6 +2,7 @@ package com.leaders.app.activities;
 
 
 import android.view.View;
+import android.widget.CompoundButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,11 +18,13 @@ import com.leaders.app.views.settings.AnimationSpeedView;
 import com.leaders.app.views.settings.ContactFormView;
 import com.leaders.app.views.settings.ContactView;
 import com.leaders.app.views.settings.HighlightColorView;
+import com.leaders.app.views.settings.PlayableItemsAnimationView;
 import com.leaders.app.views.settings.UserNameView;
 
 public class SettingsActivity extends BaseActivity {
     private UserNameView unvUserName;
     private AnimationSpeedView asvAnimationSpeed;
+    private PlayableItemsAnimationView piasAnimatePlayableItems;
     private HighlightColorView hcvHighlightColor;
     private ContactView ctvContact;
     private View vwDialogBg;
@@ -38,7 +41,9 @@ public class SettingsActivity extends BaseActivity {
 
         unvUserName = findViewById(R.id.unvUserName_actSettings);
         asvAnimationSpeed = findViewById(R.id.asvAnimationSpeed_actSettings);
+        piasAnimatePlayableItems = findViewById(R.id.piasAnimatePlayableItems_actSettings);
         hcvHighlightColor = findViewById(R.id.hcvHighlightColor_actSettings);
+
         ctvContact = findViewById(R.id.ctvContact_actSettings);
         vwDialogBg = findViewById(R.id.vwDialogBg_actSettings);
         cfvContact = findViewById(R.id.cfvContact_actSettings);
@@ -50,7 +55,9 @@ public class SettingsActivity extends BaseActivity {
 
         unvUserName.setChangeListener(this::onNameChange);
         asvAnimationSpeed.setChangeListener(this::onAnimationSpeedChange);
+        piasAnimatePlayableItems.setOnCheckedChangeListener(this::onAnimatePlayableItemsChanged);
         hcvHighlightColor.setChangeListener(this::onColorChange);
+
         ctvContact.setOnOpenFormClickListener(this::onOpenFormClick);
         vwDialogBg.setOnClickListener(this::onDialogBgClick);
     }
@@ -64,6 +71,7 @@ public class SettingsActivity extends BaseActivity {
         unvUserName.setName(settings.getUserName());
         asvAnimationSpeed.setSpeed(settings.getAnimationSpeed());
         hcvHighlightColor.setColor(settings.getHighlightColor());
+        piasAnimatePlayableItems.setChecked(settings.animatePlayableItems());
     }
 
     @Override
@@ -114,6 +122,12 @@ public class SettingsActivity extends BaseActivity {
 
     private void onAnimationSpeedChange(@NonNull AnimationSpeed speed) {
         settings.setAnimationSpeed(speed);
+        JsonUtils.saveSettings(this, settings);
+    }
+
+    public void onAnimatePlayableItemsChanged(@NonNull CompoundButton compoundButton,
+                                              boolean animatePlayableItems) {
+        settings.setAnimatePlayableItems(animatePlayableItems);
         JsonUtils.saveSettings(this, settings);
     }
 

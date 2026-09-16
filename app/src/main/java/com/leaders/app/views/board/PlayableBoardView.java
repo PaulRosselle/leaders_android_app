@@ -136,10 +136,19 @@ public final class PlayableBoardView extends BoardView {
         getCharacterDisplay(targetPos).getCharacterView().setAsActiveAbilityTarget(target);
     }
 
+    public boolean canShinePlayableCharacters() {
+        return !getShineCharacterDisplays().isEmpty();
+    }
+
+    public boolean canShineRecruitmentCells() {
+        return !getRecruitmentCellViews().isEmpty();
+    }
+
     //endregion
 
     //region ANIMATION METHODS
 
+    @NonNull
     private List<CharacterDisplay> getShineCharacterDisplays() {
         final int compareFactor = orientation == BoardOrientation.Rotated ? -1 : 1;
 
@@ -266,6 +275,7 @@ public final class PlayableBoardView extends BoardView {
         return false;
     }
 
+    @NonNull
     public List<CellView> getRecruitmentCellViews() {
         final int compareFactor = orientation == BoardOrientation.Rotated ? -1 : 1;
 

@@ -44,6 +44,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
         GoToPreviousPuzzle,
         GoToNextPuzzle,
         ChangeAnimationSpeed,
+        AnimatePlayableItems,
         DisplayCellPositions;
 
         private int getIconResId() {
@@ -51,6 +52,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
                 case GoToPreviousPuzzle: return R.drawable.icon_arrow_head_reversed;
                 case GoToNextPuzzle: return R.drawable.icon_arrow_head;
                 case ChangeAnimationSpeed: return R.drawable.icon_speed;
+                case AnimatePlayableItems: return R.drawable.icon_sparkles;
                 case DisplayCellPositions: return R.drawable.icon_position;
                 default: throw new IllegalStateException("No icon found for puzzle action: " + this);
             }
@@ -61,6 +63,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
                 case GoToPreviousPuzzle: return R.string.previous_puzzle;
                 case GoToNextPuzzle: return R.string.next_puzzle;
                 case ChangeAnimationSpeed: return R.string.animation_speed;
+                case AnimatePlayableItems: return R.string.playable_items_animation;
                 case DisplayCellPositions: return R.string.board_coordinates;
                 default: throw new IllegalStateException("No text found for puzzle action: " + this);
             }
@@ -71,6 +74,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
                 case GoToPreviousPuzzle: return activity::onPreviousPuzzleClick;
                 case GoToNextPuzzle: return activity::onNextPuzzleClick;
                 case ChangeAnimationSpeed: return activity::onChangeAnimationSpeedClick;
+                case AnimatePlayableItems: return activity::onAnimatePlayableItems;
                 case DisplayCellPositions: return activity::onDisplayCellPositionClick;
                 default: throw new IllegalStateException("No click listener found for puzzle action: " + this);
             }
@@ -358,6 +362,19 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
         amvPuzzleActions.setVisibility(View.GONE);
         asvAnimationSpeed.setSpeed(animationSpeed);
         setAnimationSpeedVisible(true);
+    }
+
+    private void onAnimatePlayableItems(View v) {
+        if (animatePlayableItems) {
+            bdvBoard.stopPlayableCharactersShineAnimation();
+        } else {
+            if (bdvBoard.canShinePlayableCharacters()) {
+                bdvBoard.startPlayableCharactersShineAnimation();
+            }
+        }
+        animatePlayableItems = !animatePlayableItems;
+
+        hidePuzzleActions();
     }
 
     private void onDisplayCellPositionClick(View v) {
