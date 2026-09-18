@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.leaders.R;
+import com.leaders.app.entities.WarningDimension;
 import com.leaders.app.enums.LeaderType;
 import com.leaders.gamelogic.entities.Player;
 
@@ -51,5 +52,10 @@ public final class PlayerTopView extends PlayerView {
             case White: return R.drawable.player_top_bg_w;
             default: throw new IllegalStateException("No background res id found for team: " + player.getTeamColor());
         }
+    }
+
+    @Override
+    protected WarningDimension getWarningDimensions() {
+        return new WarningDimension(213f,  77f, 467f,  78f, 277f, 188f);
     }
 }

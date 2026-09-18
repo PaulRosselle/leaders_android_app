@@ -189,7 +189,7 @@
     <string name="switch_side">Changer de camp</string>
     <string name="character_cards">Cartes de personnages</string>
     <string name="barrage_warning_title">Avertissement reçu : Barrage</string>
-    <string name="barrage_warning_message">Recevoir deux avertissements de ce type d\'affilé met fin à la partie.</string>
+    <string name="barrage_warning_message">Un barrage est une chaîne de 4 personnages alliés coupant le plateau en deux. Le plateau est considéré comme \"coupé en deux\" lorsqu\'au moins une case vide est présente de chaque côté de la chaîne.\n\nLa présence d\'un barrage est vérifié à la fin du tour de chaque joueur. Si un joueur reçoit un avertissement 2 tours de suite, il perd immédiatement la partie.</string>
     <string name="rules_chapter_res_capture_leader">I.\t\t\t\t Capturer un leader</string>
     <string name="rules_chapter_res_active_abilities">II.\t\t\t Compétences actives</string>
     <string name="rules_chapter_res_passive_abilities">III.\t\t Compétences passives</string>
