@@ -156,13 +156,9 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
             puzzleSaves = JsonUtils.loadCustomPuzzles(this);
         }
 
-        // When the player is loading a saved puzzle, its index is sent through the intent
-        int puzzleIdx = getIntent().getIntExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, -1);
-
         // For unsaved puzzles, datas are directly sent through the intent
         String puzzleDatas = getIntent().getStringExtra(ExtraUtils.EXTRA_PUZZLE_DATAS);
-
-        GameHistory puzzleGameHistory;
+        GameHistory puzzleGameHistory = null;
         if (puzzleDatas != null && !puzzleDatas.isEmpty()) {
             try {
                 JSONObject joGameHistory = new JSONObject(puzzleDatas);
@@ -171,10 +167,16 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
             } catch (JSONException e) {
                 throw new RuntimeException(e);
             }
-        } else if (puzzleIdx != -1) {
+        }
+
+        // When the player is loading a saved puzzle, its index is sent through the intent
+        int puzzleIdx = getIntent().getIntExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, -1);
+        if (puzzleIdx != -1) {
             puzzleSave = puzzleSaves.get(puzzleIdx);
             puzzleGameHistory = puzzleSave.getPuzzleGameHistory();
-        } else {
+        }
+
+        if (puzzleGameHistory == null) {
             throw new IllegalStateException("No puzzle data received by the player");
         }
 
