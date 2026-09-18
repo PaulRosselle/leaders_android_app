@@ -6,7 +6,6 @@ import androidx.annotation.Nullable;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
-import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.GamePhaseType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.enums.TransitionTarget;
@@ -36,24 +35,20 @@ public final class PhaseTransitionQuery {
     @NonNull
     private static GamePhase getFirstPhase(@NonNull GameHistory gameHistory) {
         // The first phase depends on the game mode
-        if (gameHistory.getConfig().getGameMode() == GameMode.Discovery) {
-            return new GamePhase(
+        switch (gameHistory.getConfig().getGameMode()) {
+            case Discovery: return new GamePhase(
                     GamePhaseType.TurnStart,
                     gameHistory.getConfig().getFirstPlayer()
             );
-        }
-
-        if (gameHistory.getConfig().getGameMode() == GameMode.Strategist) {
-            TeamColor oppositeTeam = gameHistory.getConfig().getFirstPlayer().getTeamColor().getOpposite();
-
-            return new GamePhase(
+            case Strategist: return new GamePhase(
                     GamePhaseType.Banishment,
-                    GameHistoryQuery.getPlayerFromTeam(gameHistory, oppositeTeam)
+                    GameHistoryQuery.getPlayerFromTeam(gameHistory,
+                            gameHistory.getConfig().getFirstPlayer().getTeamColor().getOpposite()
+                    )
             );
+            case Puzzle: throw new IllegalStateException("A puzzle should always be started with a phase in progress");
+            default: throw new IllegalStateException("Game mode not handled: " + gameHistory.getConfig().getGameMode());
         }
-
-        // If this change, this algorithm would need to be updated to take into account the new cases
-        throw new IllegalStateException("Game modes are limited to Discovery and Strategist");
     }
 
     /**

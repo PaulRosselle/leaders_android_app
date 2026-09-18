@@ -36,9 +36,9 @@ public final class ReplayCardsView extends ConstraintLayout {
     private static final int DISCOVERY_PORTRAITS_GROUP_COUNT = 1;
     private static final int DISCOVERY_PORTRAITS_PER_GROUP = 3;
     private static final int DISCOVERY_PORTRAIT_SPACING = 32;
-    private static final int STRATEGIST_PORTRAITS_GROUP_COUNT = 2;
-    private static final int STRATEGIST_PORTRAITS_PER_GROUP = 8;
-    private static final int STRATEGIST_PORTRAIT_SPACING = 2;
+    private static final int DEFAULT_PORTRAITS_GROUP_COUNT = 2;
+    private static final int DEFAULT_PORTRAITS_PER_GROUP = 8;
+    private static final int DEFAULT_PORTRAIT_SPACING = 2;
     private static final float RECRUITED_PORTRAIT_ALPHA = 0.4f;
 
     private final ScrollView scvPortraits;
@@ -64,7 +64,9 @@ public final class ReplayCardsView extends ConstraintLayout {
         List<PortraitGroupView> portraitGroups;
         switch (gameMode) {
             case Discovery: portraitGroups = getDiscoveryPortraitGroups(); break;
-            case Strategist: portraitGroups = getStrategistPortraitGroups(); break;
+            case Strategist:
+            case Puzzle:
+                portraitGroups = getDefaultPortraitGroups(); break;
             default: throw new IllegalStateException("No portrait update possible for game mode: " + gameMode);
         }
 
@@ -82,7 +84,9 @@ public final class ReplayCardsView extends ConstraintLayout {
     public void updatePortraits(@NonNull Game game, @NonNull GameMode gameMode) {
         switch (gameMode) {
             case Discovery: updateDiscoveryPortraits(game); break;
-            case Strategist: updateStrategistPortraits(game); break;
+            case Strategist:
+            case Puzzle:
+                updateDefaultPortraits(game); break;
             default: throw new IllegalStateException("No portrait update possible for game mode: " + gameMode);
         }
     }
@@ -95,11 +99,11 @@ public final class ReplayCardsView extends ConstraintLayout {
         );
     }
 
-    private List<PortraitGroupView> getStrategistPortraitGroups() {
+    private List<PortraitGroupView> getDefaultPortraitGroups() {
         return getPortraitGroups(
-                STRATEGIST_PORTRAITS_GROUP_COUNT,
-                STRATEGIST_PORTRAITS_PER_GROUP,
-                STRATEGIST_PORTRAIT_SPACING
+                DEFAULT_PORTRAITS_GROUP_COUNT,
+                DEFAULT_PORTRAITS_PER_GROUP,
+                DEFAULT_PORTRAIT_SPACING
         );
     }
 
@@ -118,7 +122,7 @@ public final class ReplayCardsView extends ConstraintLayout {
         }
     }
 
-    private void updateStrategistPortraits(@NonNull Game game) {
+    private void updateDefaultPortraits(@NonNull Game game) {
         List<CharacterCard> availableCards = SelectableCardsQuery.getAvailableCards(game, GameMode.Strategist);
         List<CharacterCard> recruitedCards = getRecruitedCards(game);
         List<CharacterCard> bannedCards = getBannedCards(game);
