@@ -156,24 +156,28 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
             puzzleSaves = JsonUtils.loadCustomPuzzles(this);
         }
 
-        // For unsaved puzzles, datas are directly sent through the intent
-        String puzzleDatas = getIntent().getStringExtra(ExtraUtils.EXTRA_PUZZLE_DATAS);
         GameHistory puzzleGameHistory = null;
-        if (puzzleDatas != null && !puzzleDatas.isEmpty()) {
-            try {
-                JSONObject joGameHistory = new JSONObject(puzzleDatas);
-                puzzleGameHistory = (new GameHistorySerializer()).getFromJson(joGameHistory, new SerializationContext());
-                puzzleSave = CustomPuzzleSave.getDefault(puzzleGameHistory);
-            } catch (JSONException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
         // When the player is loading a saved puzzle, its index is sent through the intent
         int puzzleIdx = getIntent().getIntExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, -1);
         if (puzzleIdx != -1) {
             puzzleSave = puzzleSaves.get(puzzleIdx);
             puzzleGameHistory = puzzleSave.getPuzzleGameHistory();
+        }
+
+        // If explicit datas have been sent, they override the ones in the saved puzzle
+        String puzzleDatas = getIntent().getStringExtra(ExtraUtils.EXTRA_PUZZLE_DATAS);
+        if (puzzleDatas != null && !puzzleDatas.isEmpty()) {
+            try {
+                JSONObject joGameHistory = new JSONObject(puzzleDatas);
+                puzzleGameHistory = (new GameHistorySerializer()).getFromJson(joGameHistory, new SerializationContext());
+                if (puzzleSave != null) {
+                    puzzleSave.updatePuzzleGameHistory(puzzleGameHistory);
+                } else {
+                    puzzleSave = CustomPuzzleSave.getDefault(puzzleGameHistory);
+                }
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         if (puzzleGameHistory == null) {
