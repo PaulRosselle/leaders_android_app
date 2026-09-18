@@ -190,7 +190,7 @@ public final class PuzzleEditionUtils {
         GameConfig gameConfig =new GameConfig(
                 List.of(playerBlack, playerWhite),
                 playerBlack, // firstPlayer ; the human player
-                GameMode.Strategist,
+                GameMode.Puzzle,
                 Collections.emptyList(), // initialRecruitableCards ; no recruitment in puzzles
                 initialActions
         );

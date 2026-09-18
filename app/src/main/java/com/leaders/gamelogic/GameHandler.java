@@ -29,7 +29,6 @@ import com.leaders.gamelogic.historyentries.Segment;
 import com.leaders.gamelogic.historyentries.segments.BanishmentPhase;
 import com.leaders.gamelogic.historyentries.segments.Turn;
 import com.leaders.gamelogic.historyentries.segments.TurnEndPhase;
-import com.leaders.gamelogic.historyentries.segments.TurnPhase;
 import com.leaders.gamelogic.interactions.CharacterActionBuilder;
 import com.leaders.gamelogic.interactions.IGameFlowListener;
 import com.leaders.gamelogic.interactions.InteractionContext;
@@ -338,21 +337,34 @@ public final class GameHandler {
     }
 
     /**
-     * Checks whether the current turn phase contains actions that can be undone.
+     * Checks whether the current game phase has any actions.
      *
-     * @param currentPhase the current game phase
-     * @return {@code true} if the current turn phase contains at least one action,
-     *         {@code false} otherwise
-     * @throws IllegalStateException if no current turn is found
+     * @return {@code true} if the current phase has at least one action, otherwise {@code false}
+     * @throws IllegalStateException if no phase is currently in progress
      */
-    private boolean currentTurnPhaseContainsActions(@NonNull GamePhase currentPhase) {
-        // An action can only be undone when the current turn actions list isn't empty.
-        Turn currentTurn = GameHistoryQuery.findCurrentTurn(currentHistory);
-        if (currentTurn == null) {
-            throw new IllegalStateException("No current turn phase found to check for actions");
+    private boolean currentPhaseHasActions() {
+        return getCurrentPhaseLastAction() != null;
+    }
+
+    /**
+     * Returns the last action of the current game phase.
+     *
+     * @return the last action, or {@code null} if the current phase has no actions
+     * @throws IllegalStateException if no phase is currently in progress
+     */
+    @Nullable
+    private IGameAction getCurrentPhaseLastAction() {
+        IPhase currentPhase = GameHistoryQuery.findCurrentPhase(currentHistory);
+        if (currentPhase == null) {
+            throw new IllegalStateException("Last action cannot be searched without a phase in progress");
         }
-        TurnPhase currentTurnPhase = currentTurn.getSubPhase(currentPhase.getPhaseType());
-        return !currentTurnPhase.getActions().isEmpty();
+
+        if (currentPhase.getActions().isEmpty()) {
+            return null;
+        }
+
+        List<IGameAction> actions = currentPhase.getActions();
+        return actions.get(actions.size() - 1);
     }
 
     /**
@@ -368,24 +380,51 @@ public final class GameHandler {
 
         legalResults.add(InteractionResultType.PlayableCharacterChosen);
 
-        // An action can only be undone when the current turn actions list isn't empty.
-        if (currentTurnPhaseContainsActions(currentPhase)) {
+        PlayableCharacter mandatoryCharacter = null;
+        for (PlayableCharacter playableCharacter : playableCharacters) {
+            if (playableCharacter.isMandatory()) {
+                mandatoryCharacter = playableCharacter;
+                break;
+            }
+        }
+
+        // Outside of puzzle mode, actions can only be undone by their player.
+        IGameAction lastAction = getCurrentPhaseLastAction();
+        if (lastAction instanceof CharacterAction &&
+                canUndoLastCharacterAction(currentPhase, (CharacterAction) lastAction, mandatoryCharacter)) {
             legalResults.add(InteractionResultType.UndoLastAction);
         }
 
         // The actions phase can only end when no playable character is mandatory.
-        boolean canEndTurn = true;
-        for (PlayableCharacter playableCharacter : playableCharacters) {
-            if (playableCharacter.isMandatory()) {
-                canEndTurn = false;
-                break;
-            }
-        }
-        if (canEndTurn) {
+        if (mandatoryCharacter == null) {
             legalResults.add(InteractionResultType.EndPhase);
         }
 
         return legalResults;
+    }
+
+    /**
+     * Checks whether the last character action can be undone.
+     *
+     * @param currentPhase the current game phase
+     * @param lastCharacterAction the last character action
+     * @param mandatoryCharacter the character that must be selected, or {@code null}
+     * @return {@code true} if the action can be undone, otherwise {@code false}
+     */
+    private boolean canUndoLastCharacterAction(@NonNull GamePhase currentPhase,
+                                               @NonNull CharacterAction lastCharacterAction,
+                                               @Nullable PlayableCharacter mandatoryCharacter) {
+        // Undoing is always allowed in puzzle mode since the player has no opponent
+        if (getGameMode() == GameMode.Puzzle) {
+            return true;
+        }
+
+        TeamColor phasePlayerTeam = currentPhase.getPhasePlayer().getTeamColor();
+
+        // Undoing is only allowed for the current phase player and only for actions made by characters they control.
+        return (mandatoryCharacter == null ||
+                mandatoryCharacter.getCharacter().getTeamColor() == phasePlayerTeam)
+                && lastCharacterAction.getSrcCharacter().getTeamColor() == phasePlayerTeam;
     }
 
     /**
@@ -518,7 +557,7 @@ public final class GameHandler {
                             .thenCompose(ignored -> runRecruitmentPhaseAsync(currentPhase));
                 }
                 case UndoLastAction: {
-                    if (currentTurnPhaseContainsActions(currentPhase)) {
+                    if (currentPhaseHasActions()) {
                         return undoLastAction()
                                 .thenCompose(ignored -> runRecruitmentPhaseAsync(currentPhase));
                     }
@@ -548,7 +587,7 @@ public final class GameHandler {
         legalResults.add(InteractionResultType.SelectableCharacterCardChosen);
 
         // Phase start can always be undone but actions can only be undone in strategist mode.
-        if (!currentTurnPhaseContainsActions(currentPhase) || getGameMode() == GameMode.Strategist) {
+        if (!currentPhaseHasActions() || getGameMode() != GameMode.Discovery) {
             legalResults.add(InteractionResultType.UndoLastAction);
         }
 
@@ -784,6 +823,8 @@ public final class GameHandler {
      * @throws IllegalStateException if no current phase exists or the current phase has no actions
      */
     private CompletableFuture<Void> undoLastAction() {
+        // We don't use "getCurrentPhaseLastAction" to access the last action
+        // since we also need to access the phase actions list to undo it
         IPhase currentPhase = GameHistoryQuery.findCurrentPhase(currentHistory);
         if (currentPhase == null || currentPhase.getActions().isEmpty()) {
             throw new IllegalStateException("Cannot undo an action outside of a game phase or within an empty phase");
