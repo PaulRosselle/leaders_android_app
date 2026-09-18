@@ -2,6 +2,7 @@ package com.leaders.app.views.duel;
 
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
@@ -15,6 +16,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.leaders.R;
+import com.leaders.app.entities.WarningDimension;
 import com.leaders.app.enums.LeaderType;
 import com.leaders.gamelogic.entities.Player;
 
@@ -41,7 +43,14 @@ public abstract class PlayerView extends ConstraintLayout {
         animator.setRepeatCount(ValueAnimator.INFINITE);
         animator.setRepeatMode(ValueAnimator.RESTART);
 
-        imvWarning.setOnLongClickListener(this::onWarningLongClick);
+        initWarningTouchListener();
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private void initWarningTouchListener() {
+        imvWarning.setOnTouchListener(
+                new WarningTouchListener(getWarningDimensions(), this::onWarningClick)
+        );
     }
 
     protected abstract int getLayoutResId();
@@ -55,13 +64,15 @@ public abstract class PlayerView extends ConstraintLayout {
 
     protected abstract int getBackgroundResId(@NonNull Player player);
 
+    protected abstract WarningDimension getWarningDimensions();
+
     public void setPlayer(@NonNull Player player, @NonNull LeaderType leaderType) {
         txvName.setText(player.getName());
         imvLeader.setImageResource(getLeaderResId(leaderType));
         imvLeader.setBackgroundResource(getBackgroundResId(player));
     }
 
-    public boolean onWarningLongClick(View v) {
+    public void onWarningClick() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.alert_dialog_theme);
 
         builder.setTitle(R.string.barrage_warning_title);
@@ -69,8 +80,6 @@ public abstract class PlayerView extends ConstraintLayout {
         builder.setPositiveButton(R.string.ok, null);
 
         builder.show();
-
-        return true;
     }
 
     public void setWarningVisible(boolean visible) {
