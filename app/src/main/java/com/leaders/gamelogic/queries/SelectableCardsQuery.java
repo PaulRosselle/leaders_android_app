@@ -55,17 +55,20 @@ public class SelectableCardsQuery {
         // First, we add recruitable cards as banishable ones
         for (CharacterCard availableCard : getAvailableCards(game, gameHistory)) {
             if (validCards == null || validCards.contains(availableCard)) {
-                selectableCards.add(new SelectableCharacterCard(availableCard, validCardStatus));
+                selectableCards.add(new SelectableCharacterCard(availableCard, validCardStatus, null));
             } else {
-                selectableCards.add(new SelectableCharacterCard(availableCard, invalidCardStatus));
+                selectableCards.add(new SelectableCharacterCard(availableCard, invalidCardStatus, null));
             }
         }
 
         // Then we add already banished cards as an indication
         for (TeamColor playerTeamColor : TeamColor.values()) {
             for (CharacterCard banishedCard : game.getBanishedCards(playerTeamColor)) {
-                selectableCards.add(new SelectableCharacterCard(banishedCard,
-                        CharacterCardSelectionStatus.AlreadyBanned));
+                selectableCards.add(new SelectableCharacterCard(
+                        banishedCard,
+                        CharacterCardSelectionStatus.AlreadyBanned,
+                        playerTeamColor
+                ));
             }
         }
 
