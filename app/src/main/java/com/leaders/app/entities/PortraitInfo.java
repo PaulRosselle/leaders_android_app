@@ -5,11 +5,14 @@ import androidx.annotation.Nullable;
 
 import com.leaders.app.enums.PortraitDisplayMode;
 import com.leaders.gamelogic.enums.CharacterCard;
+import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 
 public final class PortraitInfo {
     @NonNull
     private CharacterCard card;
+    @Nullable
+    private TeamColor teamColor;
     private boolean isBanned;
     @NonNull
     private PortraitDisplayMode displayMode;
@@ -18,24 +21,26 @@ public final class PortraitInfo {
 
     public PortraitInfo(@NonNull CharacterCard card, boolean isBanned,
                         @NonNull PortraitDisplayMode displayMode,
+                        @Nullable TeamColor teamColor,
                         @Nullable InteractionTarget target) {
         this.card = card;
         this.isBanned = isBanned;
+        this.teamColor = teamColor;
         this.displayMode = displayMode;
         this.target = target;
     }
 
     public PortraitInfo(@NonNull CharacterCard card, boolean isBanned,
                         @NonNull PortraitDisplayMode displayMode) {
-        this(card, isBanned, displayMode, null);
+        this(card, isBanned, displayMode, null, null);
     }
 
-    public PortraitInfo(@NonNull CharacterCard card, boolean isBanned) {
-        this(card, isBanned, PortraitDisplayMode.Default, null);
+    public PortraitInfo(@NonNull CharacterCard card, boolean isBanned, @Nullable TeamColor teamColor) {
+        this(card, isBanned, PortraitDisplayMode.Default, teamColor, null);
     }
 
     public PortraitInfo(@NonNull CharacterCard card) {
-        this(card, false, PortraitDisplayMode.Default, null);
+        this(card, false, PortraitDisplayMode.Default, null, null);
     }
 
     @NonNull
@@ -53,6 +58,15 @@ public final class PortraitInfo {
 
     public void setBanned(boolean banned) {
         isBanned = banned;
+    }
+
+    @Nullable
+    public TeamColor getTeamColor() {
+        return teamColor;
+    }
+
+    public void setTeamColor(@Nullable TeamColor teamColor) {
+        this.teamColor = teamColor;
     }
 
     @NonNull

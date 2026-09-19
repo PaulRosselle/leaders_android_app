@@ -187,7 +187,7 @@
     <string name="switch_side">Switch sides</string>
     <string name="character_cards">Character cards</string>
     <string name="barrage_warning_title">Warning received: Barrage</string>
-    <string name="barrage_warning_message">A barrage is a chain of 4 allied characters splitting the board in two. The board is considered to be "split in two" when at least one empty space is present on each side of the chain.\n\nThe presence of a barrage is checked at the end of each player's turn. If a player receives a warning 2 turns in a row, they immediately lose the game.</string>
+    <string name="barrage_warning_message">A barrage is a chain of 4 allied characters splitting the board in two. The board is considered to be \"split in two\" when at least one empty space is present on each side of the chain.\n\nThe presence of a barrage is checked at the end of each player\'s turn. If a player receives a warning 2 turns in a row, they immediately lose the game.</string>
     <string name="rules_chapter_res_capture_leader">I.\t\t\t\t Capture a leader</string>
     <string name="rules_chapter_res_active_abilities">II.\t\t\t Active abilities</string>
     <string name="rules_chapter_res_passive_abilities">III.\t\t Passive abilities</string>
