@@ -12,11 +12,8 @@ import com.leaders.R;
 import com.leaders.app.entities.PortraitInfo;
 import com.leaders.app.enums.PortraitDisplayMode;
 import com.leaders.gamelogic.enums.CharacterCard;
-import com.leaders.gamelogic.enums.CharacterCardSelectionStatus;
-import com.leaders.gamelogic.interactions.InteractionResultType;
+import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.interactions.InteractionTarget;
-
-import java.util.Objects;
 
 public final class PortraitView extends AppCompatImageView {
     @NonNull
@@ -96,22 +93,86 @@ public final class PortraitView extends AppCompatImageView {
 
     private int getPortraitBannedDrawableId() {
         switch (info.getCard()) {
-            case Acrobat: return R.drawable.card_portrait_banned_acrobat;
-            case Archer: return R.drawable.card_portrait_banned_archer;
-            case Assassin: return R.drawable.card_portrait_banned_assassin;
-            case Brewmaster: return R.drawable.card_portrait_banned_brewmaster;
-            case Bruiser: return R.drawable.card_portrait_banned_bruiser;
-            case ClawLauncher: return R.drawable.card_portrait_banned_claw_launcher;
-            case HermitAndCub: return R.drawable.card_portrait_banned_hermit_and_cub;
-            case Illusionist: return R.drawable.card_portrait_banned_illusionist;
-            case Jailer: return R.drawable.card_portrait_banned_jailer;
-            case Manipulator: return R.drawable.card_portrait_banned_manipulator;
-            case Nemesis: return R.drawable.card_portrait_banned_nemesis;
-            case Protector: return R.drawable.card_portrait_banned_protector;
-            case Rider: return R.drawable.card_portrait_banned_rider;
-            case RoyalGuard: return R.drawable.card_portrait_banned_royal_guard;
-            case Vizier: return R.drawable.card_portrait_banned_vizier;
-            case Wanderer: return R.drawable.card_portrait_banned_wanderer;
+            case Acrobat: return getPortraitFromTeamColor(info.getTeamColor(),
+                    R.drawable.card_portrait_banned_acrobat,
+                    R.drawable.card_portrait_banned_acrobat_b,
+                    R.drawable.card_portrait_banned_acrobat_w
+            );
+            case Archer: return getPortraitFromTeamColor(info.getTeamColor(),
+                    R.drawable.card_portrait_banned_archer,
+                    R.drawable.card_portrait_banned_archer_b,
+                    R.drawable.card_portrait_banned_archer_w
+            );
+            case Assassin: return getPortraitFromTeamColor(info.getTeamColor(),
+                    R.drawable.card_portrait_banned_assassin,
+                    R.drawable.card_portrait_banned_assassin_b,
+                    R.drawable.card_portrait_banned_assassin_w
+            );
+            case Brewmaster: return getPortraitFromTeamColor(info.getTeamColor(),
+                    R.drawable.card_portrait_banned_brewmaster,
+                    R.drawable.card_portrait_banned_brewmaster_b,
+                    R.drawable.card_portrait_banned_brewmaster_w
+            );
+            case Bruiser: return getPortraitFromTeamColor(info.getTeamColor(),
+                    R.drawable.card_portrait_banned_bruiser,
+                    R.drawable.card_portrait_banned_bruiser_b,
+                    R.drawable.card_portrait_banned_bruiser_w
+            );
+            case ClawLauncher: return getPortraitFromTeamColor(info.getTeamColor(),
+                    R.drawable.card_portrait_banned_claw_launcher,
+                    R.drawable.card_portrait_banned_claw_launcher_b,
+                    R.drawable.card_portrait_banned_claw_launcher_w
+            );
+            case HermitAndCub: return getPortraitFromTeamColor(info.getTeamColor(),
+                    R.drawable.card_portrait_banned_hermit_and_cub,
+                    R.drawable.card_portrait_banned_hermit_and_cub_b,
+                    R.drawable.card_portrait_banned_hermit_and_cub_w
+            );
+            case Illusionist: return getPortraitFromTeamColor(info.getTeamColor(),
+                    R.drawable.card_portrait_banned_illusionist,
+                    R.drawable.card_portrait_banned_illusionist_b,
+                    R.drawable.card_portrait_banned_illusionist_w
+            );
+            case Jailer: return getPortraitFromTeamColor(info.getTeamColor(),
+                    R.drawable.card_portrait_banned_jailer,
+                    R.drawable.card_portrait_banned_jailer_b,
+                    R.drawable.card_portrait_banned_jailer_w
+            );
+            case Manipulator: return getPortraitFromTeamColor(info.getTeamColor(),
+                    R.drawable.card_portrait_banned_manipulator,
+                    R.drawable.card_portrait_banned_manipulator_b,
+                    R.drawable.card_portrait_banned_manipulator_w
+            );
+            case Nemesis: return getPortraitFromTeamColor(info.getTeamColor(),
+                    R.drawable.card_portrait_banned_nemesis,
+                    R.drawable.card_portrait_banned_nemesis_b,
+                    R.drawable.card_portrait_banned_nemesis_w
+            );
+            case Protector: return getPortraitFromTeamColor(info.getTeamColor(),
+                    R.drawable.card_portrait_banned_protector,
+                    R.drawable.card_portrait_banned_protector_b,
+                    R.drawable.card_portrait_banned_protector_w
+            );
+            case Rider: return getPortraitFromTeamColor(info.getTeamColor(),
+                    R.drawable.card_portrait_banned_rider,
+                    R.drawable.card_portrait_banned_rider_b,
+                    R.drawable.card_portrait_banned_rider_w
+            );
+            case RoyalGuard: return getPortraitFromTeamColor(info.getTeamColor(),
+                    R.drawable.card_portrait_banned_royal_guard,
+                    R.drawable.card_portrait_banned_royal_guard_b,
+                    R.drawable.card_portrait_banned_royal_guard_w
+            );
+            case Vizier: return getPortraitFromTeamColor(info.getTeamColor(),
+                    R.drawable.card_portrait_banned_vizier,
+                    R.drawable.card_portrait_banned_vizier_b,
+                    R.drawable.card_portrait_banned_vizier_w
+            );
+            case Wanderer: return getPortraitFromTeamColor(info.getTeamColor(),
+                    R.drawable.card_portrait_banned_wanderer,
+                    R.drawable.card_portrait_banned_wanderer_b,
+                    R.drawable.card_portrait_banned_wanderer_w
+            );
             default: throw new IllegalArgumentException("No portrait drawable for card: " + info.getCard());
         }
     }
@@ -146,26 +207,101 @@ public final class PortraitView extends AppCompatImageView {
 
     private int getPortraitHexagonalBannedDrawableId() {
         switch (info.getCard()) {
-            case Acrobat: return R.drawable.card_hex_portrait_banned_acrobat;
-            case Archer: return R.drawable.card_hex_portrait_banned_archer;
-            case Assassin: return R.drawable.card_hex_portrait_banned_assassin;
-            case Brewmaster: return R.drawable.card_hex_portrait_banned_brewmaster;
-            case Bruiser: return R.drawable.card_hex_portrait_banned_bruiser;
-            case ClawLauncher: return R.drawable.card_hex_portrait_banned_claw_launcher;
-            case HermitAndCub: return R.drawable.card_hex_portrait_banned_hermit_and_cub;
-            case Illusionist: return R.drawable.card_hex_portrait_banned_illusionist;
-            case Jailer: return R.drawable.card_hex_portrait_banned_jailer;
-            case LeaderKing: return R.drawable.card_hex_portrait_banned_leader_king;
-            case LeaderQueen: return R.drawable.card_hex_portrait_banned_leader_queen;
-            case Manipulator: return R.drawable.card_hex_portrait_banned_manipulator;
-            case Nemesis: return R.drawable.card_hex_portrait_banned_nemesis;
-            case Protector: return R.drawable.card_hex_portrait_banned_protector;
-            case Rider: return R.drawable.card_hex_portrait_banned_rider;
-            case RoyalGuard: return R.drawable.card_hex_portrait_banned_royal_guard;
-            case Vizier: return R.drawable.card_hex_portrait_banned_vizier;
-            case Wanderer: return R.drawable.card_hex_portrait_banned_wanderer;
-            default: throw new IllegalArgumentException("No portrait drawable for card: " + info.getCard());
+            case Acrobat: return getPortraitFromTeamColor(info.getTeamColor(),
+                    R.drawable.card_hex_portrait_banned_acrobat,
+                    R.drawable.card_hex_portrait_banned_acrobat_b,
+                    R.drawable.card_hex_portrait_banned_acrobat_w
+            );
+            case Archer: return getPortraitFromTeamColor(info.getTeamColor(),
+                    R.drawable.card_hex_portrait_banned_archer,
+                    R.drawable.card_hex_portrait_banned_archer_b,
+                    R.drawable.card_hex_portrait_banned_archer_w
+            );
+            case Assassin: return getPortraitFromTeamColor(info.getTeamColor(),
+                    R.drawable.card_hex_portrait_banned_assassin,
+                    R.drawable.card_hex_portrait_banned_assassin_b,
+                    R.drawable.card_hex_portrait_banned_assassin_w
+            );
+            case Brewmaster: return getPortraitFromTeamColor(info.getTeamColor(),
+                    R.drawable.card_hex_portrait_banned_brewmaster,
+                    R.drawable.card_hex_portrait_banned_brewmaster_b,
+                    R.drawable.card_hex_portrait_banned_brewmaster_w
+            );
+            case Bruiser: return getPortraitFromTeamColor(info.getTeamColor(),
+                    R.drawable.card_hex_portrait_banned_bruiser,
+                    R.drawable.card_hex_portrait_banned_bruiser_b,
+                    R.drawable.card_hex_portrait_banned_bruiser_w
+            );
+            case ClawLauncher: return getPortraitFromTeamColor(info.getTeamColor(),
+                    R.drawable.card_hex_portrait_banned_claw_launcher,
+                    R.drawable.card_hex_portrait_banned_claw_launcher_b,
+                    R.drawable.card_hex_portrait_banned_claw_launcher_w
+            );
+            case HermitAndCub: return getPortraitFromTeamColor(info.getTeamColor(),
+                    R.drawable.card_hex_portrait_banned_hermit_and_cub,
+                    R.drawable.card_hex_portrait_banned_hermit_and_cub_b,
+                    R.drawable.card_hex_portrait_banned_hermit_and_cub_w
+            );
+            case Illusionist: return getPortraitFromTeamColor(info.getTeamColor(),
+                    R.drawable.card_hex_portrait_banned_illusionist,
+                    R.drawable.card_hex_portrait_banned_illusionist_b,
+                    R.drawable.card_hex_portrait_banned_illusionist_w
+            );
+            case Jailer: return getPortraitFromTeamColor(info.getTeamColor(),
+                    R.drawable.card_hex_portrait_banned_jailer,
+                    R.drawable.card_hex_portrait_banned_jailer_b,
+                    R.drawable.card_hex_portrait_banned_jailer_w
+            );
+            case Manipulator: return getPortraitFromTeamColor(info.getTeamColor(),
+                    R.drawable.card_hex_portrait_banned_manipulator,
+                    R.drawable.card_hex_portrait_banned_manipulator_b,
+                    R.drawable.card_hex_portrait_banned_manipulator_w
+            );
+            case Nemesis: return getPortraitFromTeamColor(info.getTeamColor(),
+                    R.drawable.card_hex_portrait_banned_nemesis,
+                    R.drawable.card_hex_portrait_banned_nemesis_b,
+                    R.drawable.card_hex_portrait_banned_nemesis_w
+            );
+            case Protector: return getPortraitFromTeamColor(info.getTeamColor(),
+                    R.drawable.card_hex_portrait_banned_protector,
+                    R.drawable.card_hex_portrait_banned_protector_b,
+                    R.drawable.card_hex_portrait_banned_protector_w
+            );
+            case Rider: return getPortraitFromTeamColor(info.getTeamColor(),
+                    R.drawable.card_hex_portrait_banned_rider,
+                    R.drawable.card_hex_portrait_banned_rider_b,
+                    R.drawable.card_hex_portrait_banned_rider_w
+            );
+            case RoyalGuard: return getPortraitFromTeamColor(info.getTeamColor(),
+                    R.drawable.card_hex_portrait_banned_royal_guard,
+                    R.drawable.card_hex_portrait_banned_royal_guard_b,
+                    R.drawable.card_hex_portrait_banned_royal_guard_w
+            );
+            case Vizier: return getPortraitFromTeamColor(info.getTeamColor(),
+                    R.drawable.card_hex_portrait_banned_vizier,
+                    R.drawable.card_hex_portrait_banned_vizier_b,
+                    R.drawable.card_hex_portrait_banned_vizier_w
+            );
+            case Wanderer: return getPortraitFromTeamColor(info.getTeamColor(),
+                    R.drawable.card_hex_portrait_banned_wanderer,
+                    R.drawable.card_hex_portrait_banned_wanderer_b,
+                    R.drawable.card_hex_portrait_banned_wanderer_w
+            );
+            default: throw new IllegalArgumentException("No hex portrait drawable for card: " + info.getCard());
         }
+    }
+
+    private int getPortraitFromTeamColor(@Nullable TeamColor teamColor,
+                                         int nullResId, int blackResId, int whiteResId) {
+        if (teamColor == null) {
+            return nullResId;
+        }
+
+        if (teamColor == TeamColor.Black) {
+            return blackResId;
+        }
+
+        return whiteResId;
     }
 
     @NonNull
