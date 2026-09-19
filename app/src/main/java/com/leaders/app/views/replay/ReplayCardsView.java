@@ -236,7 +236,7 @@ public final class ReplayCardsView extends ConstraintLayout {
         List<PortraitInfo> availableCardsInfos = new ArrayList<>();
 
         for (CharacterCard availableCard : SelectableCardsQuery.getAvailableCards(game, gameMode)) {
-            availableCardsInfos.add(new PortraitInfo(availableCard));
+            availableCardsInfos.add(new PortraitInfo(availableCard, false, PortraitDisplayMode.Hexagonal));
         }
 
         return availableCardsInfos;
@@ -249,7 +249,7 @@ public final class ReplayCardsView extends ConstraintLayout {
         for (Character recruitedCharacter : game.getRecruitedCharacters()) {
             CharacterCard card = recruitedCharacter.getCharacterType().getCharacterCard();
             if (card.canBeRecruited() && recruitedCards.add(card)) {
-                recruitedCardsInfos.add(new PortraitInfo(card));
+                recruitedCardsInfos.add(new PortraitInfo(card, false, PortraitDisplayMode.Hexagonal));
             }
         }
 
