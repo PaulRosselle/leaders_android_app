@@ -27,8 +27,10 @@ import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.queries.SelectableCardsQuery;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public final class ReplayCardsView extends ConstraintLayout {
@@ -86,7 +88,7 @@ public final class ReplayCardsView extends ConstraintLayout {
             case Discovery: updateDiscoveryPortraits(game); break;
             case Strategist:
             case Puzzle:
-                updateDefaultPortraits(game); break;
+                updateDefaultPortraits(game, gameMode); break;
             default: throw new IllegalStateException("No portrait update possible for game mode: " + gameMode);
         }
     }
@@ -122,32 +124,29 @@ public final class ReplayCardsView extends ConstraintLayout {
         }
     }
 
-    private void updateDefaultPortraits(@NonNull Game game) {
-        List<CharacterCard> availableCards = SelectableCardsQuery.getAvailableCards(game, GameMode.Strategist);
-        List<CharacterCard> recruitedCards = getRecruitedCards(game);
-        List<CharacterCard> bannedCards = getBannedCards(game);
+    private void updateDefaultPortraits(@NonNull Game game, @NonNull GameMode gameMode) {
+        List<PortraitInfo> availableCardsInfos = getAvailableCardsInfos(game, gameMode);
+        List<PortraitInfo> recruitedCardsInfos = getRecruitedCardsInfos(game);
+        List<PortraitInfo> bannedCardsInfos = getBanishedCardsInfos(game);
 
-        List<CharacterCard> portraitsCards = new ArrayList<>();
-        portraitsCards.addAll(availableCards);
-        portraitsCards.addAll(recruitedCards);
-        portraitsCards.addAll(bannedCards);
+        List<PortraitInfo> portraitsInfos = new ArrayList<>();
+        portraitsInfos.addAll(availableCardsInfos);
+        portraitsInfos.addAll(recruitedCardsInfos);
+        portraitsInfos.addAll(bannedCardsInfos);
 
-        if (portraitsCards.size() != portraitViews.size()) {
+        if (portraitsInfos.size() != portraitViews.size()) {
             throw new IllegalStateException(
                     "Portraits count (" + portraitViews.size() +
-                            ") not matching cards count (" + portraitsCards.size() + ")");
+                            ") not matching infos count (" + portraitsInfos.size() + ")");
         }
 
-        CharacterCardUtils.sort(getContext(), portraitsCards);
+        sortInfos(portraitsInfos);
 
         for (int i = 0; i < portraitViews.size(); i++) {
             PortraitView ptvPortrait = portraitViews.get(i);
-            CharacterCard portraitCard = portraitsCards.get(i);
-
-            ptvPortrait.setPortraitCard(portraitCard);
-
-            ptvPortrait.setUseBannedDisplay(bannedCards.contains(portraitCard));
-            ptvPortrait.setAlpha(recruitedCards.contains(portraitCard) ? RECRUITED_PORTRAIT_ALPHA : 1f);
+            PortraitInfo info = portraitsInfos.get(i);
+            ptvPortrait.setInfo(info);
+            ptvPortrait.setAlpha(recruitedCardsInfos.contains(info) ? RECRUITED_PORTRAIT_ALPHA : 1f);
         }
     }
 
@@ -216,27 +215,63 @@ public final class ReplayCardsView extends ConstraintLayout {
         scvPortraits.setLayoutParams(params);
     }
 
-    private List<CharacterCard> getRecruitedCards(@NonNull Game game) {
+    private void sortInfos(@NonNull List<PortraitInfo> portraitInfos) {
+        List<PortraitInfo> sortedInfos = new ArrayList<>();
+
+        List<CharacterCard> allCards = new ArrayList<>(Arrays.asList(CharacterCard.values()));
+        CharacterCardUtils.sort(getContext(), allCards);
+
+        for (CharacterCard card : allCards) {
+            Optional<PortraitInfo> matchingInfo = portraitInfos.stream()
+                    .filter(info -> info.getCard() == card)
+                    .findFirst();
+
+            matchingInfo.ifPresent(sortedInfos::add);
+        }
+
+        portraitInfos.clear();
+        portraitInfos.addAll(sortedInfos);
+    }
+    private List<PortraitInfo> getAvailableCardsInfos(@NonNull Game game, @NonNull GameMode gameMode) {
+        List<PortraitInfo> availableCardsInfos = new ArrayList<>();
+
+        for (CharacterCard availableCard : SelectableCardsQuery.getAvailableCards(game, gameMode)) {
+            availableCardsInfos.add(new PortraitInfo(availableCard));
+        }
+
+        return availableCardsInfos;
+    }
+
+    private List<PortraitInfo> getRecruitedCardsInfos(@NonNull Game game) {
+        List<PortraitInfo> recruitedCardsInfos = new ArrayList<>();
         Set<CharacterCard> recruitedCards = new HashSet<>();
 
         for (Character recruitedCharacter : game.getRecruitedCharacters()) {
             CharacterCard card = recruitedCharacter.getCharacterType().getCharacterCard();
-            if (card.canBeRecruited()) {
-                recruitedCards.add(card);
+            if (card.canBeRecruited() && recruitedCards.add(card)) {
+                recruitedCardsInfos.add(new PortraitInfo(card));
             }
         }
 
-        return List.copyOf(recruitedCards);
+        return recruitedCardsInfos;
     }
 
-    private List<CharacterCard> getBannedCards(@NonNull Game game) {
-        List<CharacterCard> bannedCards = new ArrayList<>();
+    private List<PortraitInfo> getBanishedCardsInfos(@NonNull Game game) {
+        List<PortraitInfo> banishedCardsInfos = new ArrayList<>();
 
         for (TeamColor teamColor : TeamColor.values()) {
-            bannedCards.addAll(game.getBanishedCards(teamColor));
+            for (CharacterCard banishedCard : game.getBanishedCards(teamColor)) {
+                banishedCardsInfos.add(new PortraitInfo(
+                        banishedCard,
+                        true,
+                        PortraitDisplayMode.Hexagonal,
+                        teamColor,
+                        null
+                ));
+            }
         }
 
-        return bannedCards;
+        return banishedCardsInfos;
     }
 
     public void setOnCardPortraitLongClick(@Nullable OnLongClickListener onLongClickListener) {

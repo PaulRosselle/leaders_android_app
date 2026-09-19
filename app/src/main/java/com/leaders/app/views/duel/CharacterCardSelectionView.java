@@ -121,6 +121,7 @@ public final class CharacterCardSelectionView extends ConstraintLayout {
                     selectableCard.getCharacterCard(),
                     selectableCard.getSelectionStatus() == CharacterCardSelectionStatus.AlreadyBanned,
                     PortraitDisplayMode.Default,
+                    selectableCard.getTeamColor(),
                     target
             ));
         }
@@ -135,7 +136,8 @@ public final class CharacterCardSelectionView extends ConstraintLayout {
         for (SelectableCharacterCard selectableCard : sortedSelectableCards) {
             portraitInfos.add(new PortraitInfo(
                     selectableCard.getCharacterCard(),
-                    selectableCard.getSelectionStatus() == CharacterCardSelectionStatus.AlreadyBanned
+                    selectableCard.getSelectionStatus() == CharacterCardSelectionStatus.AlreadyBanned,
+                    selectableCard.getTeamColor()
             ));
         }
 
