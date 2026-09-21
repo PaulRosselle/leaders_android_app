@@ -27,7 +27,7 @@
               "team_color": "Black"
             },
             "position": {
-              "x": 2,
+              "x": 4,
               "y": 4
             }
           }
@@ -40,12 +40,12 @@
             "motion_type": "Add",
             "character": {
               "uuid": "094320da-f368-4f6f-839f-cfefb6055604",
-              "character_type": "ClawLauncher",
+              "character_type": "Illusionist",
               "team_color": "Black"
             },
             "position": {
-              "x": 1,
-              "y": 1
+              "x": 3,
+              "y": 3
             }
           }
         ],
@@ -61,7 +61,7 @@
               "team_color": "Black"
             },
             "position": {
-              "x": 3,
+              "x": 5,
               "y": 4
             }
           }
@@ -78,7 +78,7 @@
               "team_color": "White"
             },
             "position": {
-              "x": 4,
+              "x": 3,
               "y": 0
             }
           }

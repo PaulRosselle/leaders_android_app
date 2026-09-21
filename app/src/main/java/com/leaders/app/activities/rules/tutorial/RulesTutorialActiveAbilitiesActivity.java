@@ -1,7 +1,6 @@
 package com.leaders.app.activities.rules.tutorial;
 
 import android.text.Spannable;
-import android.text.SpannableString;
 import android.text.style.ImageSpan;
 
 import androidx.annotation.NonNull;
@@ -11,7 +10,6 @@ import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.TutorialChapter;
 import com.leaders.app.utilities.SpannableUtils;
 
-import java.util.Collections;
 import java.util.List;
 
 public class RulesTutorialActiveAbilitiesActivity extends RulesTutorialActivity {
