@@ -225,7 +225,7 @@
     <string name="tutorial_active_abilities_before">Les personnages avec une {IMAGE_1} compétence active peuvent l\'utiliser au lieu de se déplacer d\'une case.\nL\'acrobate {IMAGE_2} peut sauter au dessus d\'un pion et l\'illusionniste {IMAGE_3} peut échanger sa place.</string>
     <string name="tutorial_active_abilities_after">Certaines compétences n\'ont pas besoin d\'être activées en consommant une action.\n\nDécouvrez cela dans le chapitre suivant.</string>
     <string name="tutorial_active_abilities_info">Restez appuyé sur un personnage pour découvrir sa compétence.\n\nLes compétences actives sont indiquées par un éclair rouge.</string>
-    <string name="tutorial_passive_abilities_before">L\'effet des compétences passives est actif en permanence et ne consomme pas d\'action pour être utilisé.</string>
+    <string name="tutorial_passive_abilities_before">Une {IMAGE_1} compétence passive est toujours active, même après que son personnage se soit déplacé.\nLe vizir {IMAGE_2} permet à votre leader {IMAGE_3} de se déplacer jusqu\'à 2 cases.</string>
     <string name="tutorial_passive_abilities_after">Une fois vos personnages joués, vous pouvez recruter de nouveaux personnages.\n\nDécouvrez cela dans le chapitre suivant.</string>
     <string name="tutorial_passive_abilities_info">Restez appuyé sur un personnage pour découvrir sa compétence.\n\nLes compétences passives sont indiquées par une boucle infinie bleue.</string>
     <string name="tutorial_recruitment_before">Chaque tour, après avoir joué vos personnages vous pouvez en recruter un nouveau. Votre adversaire à commencé, à vous de recruter.</string>
