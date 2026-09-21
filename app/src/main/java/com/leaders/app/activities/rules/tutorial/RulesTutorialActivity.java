@@ -1,6 +1,8 @@
 package com.leaders.app.activities.rules.tutorial;
 
 import android.app.AlertDialog;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.view.View;
 import android.widget.TextView;
 
@@ -82,8 +84,8 @@ public abstract class RulesTutorialActivity extends PlayableActivity implements 
         setBtnNextChapterEnabled(false);
         txvAfter.setVisibility(View.GONE);
 
-        txvBefore.setText(getChapter().getTextBeforeResId());
-        txvAfter.setText(getChapter().getTextAfterResId());
+        txvBefore.setText(getTextBeforeSpannable());
+        txvAfter.setText(getTextAfterSpannable());
 
         startHistory = JsonUtils.loadTutorialChapter(this, getChapter());
         startHistoryHash = getHistoryHash(startHistory);
@@ -136,6 +138,18 @@ public abstract class RulesTutorialActivity extends PlayableActivity implements 
     @Override
     protected void doOnBackPressed() {
         goToActivity(ActivityType.RulesMenu, ActivityTransitionType.SlideLeft);
+    }
+
+    //endregion
+
+    //region TEXT DISPLAY METHODS
+
+    protected Spannable getTextBeforeSpannable() {
+        return new SpannableString(getString(getChapter().getTextBeforeResId()));
+    }
+
+    protected Spannable getTextAfterSpannable() {
+        return new SpannableString(getString(getChapter().getTextAfterResId()));
     }
 
     //endregion

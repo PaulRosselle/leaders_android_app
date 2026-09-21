@@ -219,10 +219,10 @@
     <string name="test_out_characters">tester les personnages</string>
     <string name="online_guide">guide en ligne</string>
     <string name="extra_infos">Informations supplémentaires</string>
-    <string name="tutorial_capture_before">Pour gagner, vous devez amener deux de vos personnages sur des cases adjacentes au leader adverse. Durant votre tour, chacun de vos personnage peut se déplacer d\'une case.</string>
+    <string name="tutorial_capture_before">Pour gagner, vous devez amener deux de vos personnages sur des cases adjacentes au leader adverse {IMAGE_1}.\nDurant votre tour, chacun de vos personnage peut se déplacer d\'une case.</string>
     <string name="tutorial_capture_after">La plupart des personnages peuvent faire plus que se déplacer d\'une case.\n\nDécouvrez cela dans le chapitre suivant.</string>
     <string name="tutorial_capture_info">Les leaders sont repérables de part leur courrone et le cercle doré décorant leur pion.</string>
-    <string name="tutorial_active_abilities_before">Chaque personnage peut, une fois par tour, se déplacer d’une case ou activer sa compétence.</string>
+    <string name="tutorial_active_abilities_before">Les personnages avec une {IMAGE_1} compétence active peuvent l\'utiliser au lieu de se déplacer d\'une case.\nL\'acrobate {IMAGE_2} peut sauter au dessus d\'un pion et l\'illusionniste {IMAGE_3} peut échanger sa place.</string>
     <string name="tutorial_active_abilities_after">Certaines compétences n\'ont pas besoin d\'être activées en consommant une action.\n\nDécouvrez cela dans le chapitre suivant.</string>
     <string name="tutorial_active_abilities_info">Restez appuyé sur un personnage pour découvrir sa compétence.\n\nLes compétences actives sont indiquées par un éclair rouge.</string>
     <string name="tutorial_passive_abilities_before">L\'effet des compétences passives est actif en permanence et ne consomme pas d\'action pour être utilisé.</string>
