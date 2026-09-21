@@ -64,6 +64,7 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
     private HighlightView hlvNextPhase;
 
 
+    private boolean isGameEnded;
     private GameHistory startHistory;
 
     //region BASE ACTIVITY OVERRIDEN METHODS
@@ -436,6 +437,7 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
     @Override
     public void onGameStarted(@NonNull Game game) {
         runOnUiThread(() -> {
+            isGameEnded = false;
             GameContext gameContext = controller.getCurrentContext();
 
             initPlayerViews(gameContext);
@@ -452,6 +454,10 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
 
         clearInteractionUI(gameContext);
         showEndGame(gameContext, winner);
+
+        isGameEnded = true;
+
+        setBtnNextPhaseEnabled(true, true);
     }
 
     @Override
@@ -520,6 +526,11 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
     }
 
     private void onNextPhaseClick(View v) {
+        if (isGameEnded) {
+            goToActivity(ActivityType.RulesCharacterMenu);
+            return;
+        }
+
         GameContext gameContext = controller.getCurrentContext();
 
         if (gameContext.getGamePhase().getPhaseType() == GamePhaseType.Banishment) {
