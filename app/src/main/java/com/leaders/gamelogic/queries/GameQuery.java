@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -233,6 +232,16 @@ public final class GameQuery {
         return false;
     }
 
+    // TODO - javadoc
+    private static boolean playersTeamsAreFull(@NonNull Game game) {
+        for (TeamColor teamColor : TeamColor.values()) {
+            if (RecruitmentQuery.getRecruitedCards(game, teamColor, true).size() < RecruitmentQuery.FULL_TEAM_SIZE) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
      * Detects whether the specified team has created a barrage.
      * <p>
@@ -244,6 +253,11 @@ public final class GameQuery {
      * @return {@code true} if a barrage is detected; {@code false} otherwise
      */
     public static boolean isBarrageDetected(@NonNull Game game, @NonNull TeamColor teamColor) {
+        // A barrage is only taken into account when both players teams are full
+        if (!playersTeamsAreFull(game)) {
+            return false;
+        }
+
         List<Cell> characterCells = BoardQuery.findCharacterCells(game.getBoard(), teamColor, null);
         // A barrage requires at least four allied characters on the board.
         if (characterCells.size() < 4)

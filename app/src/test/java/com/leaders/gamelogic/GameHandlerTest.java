@@ -51,6 +51,7 @@ import com.leaders.gamelogic.interactions.InteractionResultType;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.interactions.InteractionType;
 import com.leaders.gamelogic.interactions.TargetCategory;
+import com.leaders.gamelogic.queries.RecruitmentQuery;
 
 import org.junit.Test;
 
@@ -2213,8 +2214,18 @@ public class GameHandlerTest {
                 initialPlacements.add(new RecruitmentAction(Collections.singletonList(
                         new RecruitmentActionMotion(
                                 RecruitmentMotionType.Add,
-                                Character.create(CharacterType.Archer, TeamColor.Black),
+                                Character.create(CharacterType.values()[y], TeamColor.Black),
                                 new Position(3, y)
+                        )
+                )));
+            }
+
+            for (int i = 0; i < RecruitmentQuery.FULL_TEAM_WITHOUT_LEADER_SIZE; i++) {
+                initialPlacements.add(new RecruitmentAction(Collections.singletonList(
+                        new RecruitmentActionMotion(
+                                RecruitmentMotionType.Add,
+                                Character.create(CharacterType.values()[i], TeamColor.White),
+                                new Position(5, i)
                         )
                 )));
             }
