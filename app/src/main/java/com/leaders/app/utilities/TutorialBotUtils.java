@@ -186,20 +186,17 @@ public class TutorialBotUtils {
 
     private static int getCardScore(@NonNull CharacterCard characterCard) {
         switch (characterCard) {
-            case Acrobat: return 7;
-            case Archer: return 3;
-            case Assassin: return 8;
-            case Brewmaster: return 9;
-            case Bruiser: return 2;
-            case ClawLauncher: return 10;
-            case Illusionist: return 12;
-            case Jailer: return 0;
-            case Manipulator: return 6;
-            case Protector: return 1;
-            case Rider: return 13;
-            case RoyalGuard: return 5;
-            case Vizier: return 4;
-            case Wanderer: return 11;
+            case Brewmaster: return 10;
+            case Rider: return 9;
+            case Acrobat: return 8;
+            case Wanderer: return 7;
+            case ClawLauncher: return 6;
+            case Bruiser: return 5;
+            case Assassin: return 4;
+            case Illusionist: return 3;
+            case RoyalGuard: return 2;
+            case Manipulator: return 1;
+            case Vizier: return 0;
             default: return Integer.MIN_VALUE;
         }
     }

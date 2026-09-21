@@ -34,6 +34,7 @@
     <dimen name="default_text_font_size">20dp</dimen>
     <dimen name="smaller_text_font_size">16dp</dimen>
     <dimen name="puzzle_rules_text_font_size">18dp</dimen>
+    <dimen name="image_span_default_size">20dp</dimen>
 
     <dimen name="highlighted_token" format="float">0.87</dimen>
 </resources>

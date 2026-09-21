@@ -64,6 +64,7 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
     private HighlightView hlvNextPhase;
 
 
+    private boolean isGameEnded;
     private GameHistory startHistory;
 
     //region BASE ACTIVITY OVERRIDEN METHODS
@@ -113,6 +114,8 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
 
         controller = new GameController(this);
         controller.restartGame(new GameHistory(startHistory));
+
+        showReminderDialog();
     }
 
     @Override
@@ -237,6 +240,16 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
     //endregion
 
     //region UI STATE METHODS
+
+    private void showReminderDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.alert_dialog_theme);
+
+        builder.setTitle(R.string.let_the_duel_beggin);
+        builder.setMessage(R.string.match_vs_bot_reminder);
+        builder.setPositiveButton(R.string.lets_go, null);
+
+        builder.show();
+    }
 
     private void setCardSelectorVisible(boolean visible) {
         // When recruiting, we display the cardSelector view below the player view.
@@ -424,6 +437,7 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
     @Override
     public void onGameStarted(@NonNull Game game) {
         runOnUiThread(() -> {
+            isGameEnded = false;
             GameContext gameContext = controller.getCurrentContext();
 
             initPlayerViews(gameContext);
@@ -440,6 +454,10 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
 
         clearInteractionUI(gameContext);
         showEndGame(gameContext, winner);
+
+        isGameEnded = true;
+
+        setBtnNextPhaseEnabled(true, true);
     }
 
     @Override
@@ -508,6 +526,11 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
     }
 
     private void onNextPhaseClick(View v) {
+        if (isGameEnded) {
+            goToActivity(ActivityType.RulesCharacterMenu);
+            return;
+        }
+
         GameContext gameContext = controller.getCurrentContext();
 
         if (gameContext.getGamePhase().getPhaseType() == GamePhaseType.Banishment) {
