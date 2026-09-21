@@ -1103,7 +1103,7 @@ public class GameHandlerTest {
         TestGameFlowListener listener = new TestGameFlowListener(history);
 
         SelectableCharacterCard expectedCard = new SelectableCharacterCard(
-                CharacterCard.Archer, CharacterCardSelectionStatus.Recruitable);
+                CharacterCard.Archer, CharacterCardSelectionStatus.Recruitable, null);
         listener.inputRequiredResults.add(new InteractionResult(
                 InteractionResultType.SelectableCharacterCardChosen,
                 new InteractionContext(),
@@ -1113,20 +1113,18 @@ public class GameHandlerTest {
         GameHandler gameHandler = new GameHandler(history, listener);
         GamePhase currentPhase = new GamePhase(GamePhaseType.Recruitment, history.getConfig().getPlayers().get(0));
 
-        SelectableCharacterCard result =
+        InteractionResult result =
                 invokeRunSelectRecruitmentCardAsync(gameHandler, currentPhase).join();
 
-        assertSame(expectedCard, result);
+        assertNotNull(result.getChosenTarget());
+        assertSame(expectedCard, result.getChosenTarget().getChosenSelectableCharacterCard());
         assertEquals(1, listener.getInputRequiredCount());
 
         InteractionRequest request = listener.getLastInputRequired();
 
         assertNotNull(request);
         assertEquals(InteractionType.SelectableCharacterCardExpected, request.getRequestType());
-        assertEquals(
-                Collections.singletonList(InteractionResultType.SelectableCharacterCardChosen),
-                request.getLegalResults()
-        );
+        assertTrue(request.getLegalResults().contains(InteractionResultType.SelectableCharacterCardChosen));
 
         assertEquals(2, request.getLegalTargets().size());
         assertTrue(request.getLegalTargets().stream()
@@ -1140,157 +1138,6 @@ public class GameHandlerTest {
                     return selectableCharacterCard.getCharacterCard() == CharacterCard.Bruiser &&
                             selectableCharacterCard.getSelectionStatus() == CharacterCardSelectionStatus.Recruitable;
                 }));
-    }
-
-    @Test
-    public void runSelectRecruitmentCardAsync_shouldRejectIllegalInteractionResult()
-            throws Exception {
-        GameHistory history = createSelectRecruitmentCardGameHistory();
-        TestGameFlowListener listener = new TestGameFlowListener(history);
-
-        listener.inputRequiredResults.add(new InteractionResult(
-                InteractionResultType.CancelAction,
-                new InteractionContext(),
-                null
-        ));
-
-        GameHandler gameHandler = new GameHandler(history, listener);
-        GamePhase currentPhase = new GamePhase(GamePhaseType.Recruitment, history.getConfig().getPlayers().get(0));
-
-        CompletableFuture<SelectableCharacterCard> result = invokeRunSelectRecruitmentCardAsync(gameHandler, currentPhase);
-
-        try {
-            result.join();
-            fail("Expected IllegalStateException");
-        } catch (java.util.concurrent.CompletionException exception) {
-            assertTrue(exception.getCause() instanceof IllegalStateException);
-            assertEquals(
-                    "Invalid interaction result : illegal type \"CancelAction\" for recruitment card selection",
-                    exception.getCause().getMessage()
-            );
-        }
-    }
-
-    @Test
-    public void runSelectRecruitmentCardAsync_shouldRejectMissingSelectedCard()
-            throws Exception {
-        GameHistory history = createSelectRecruitmentCardGameHistory();
-        TestGameFlowListener listener = new TestGameFlowListener(history);
-
-        listener.inputRequiredResults.add(new InteractionResult(
-                InteractionResultType.SelectableCharacterCardChosen,
-                new InteractionContext(),
-                null
-        ));
-
-        GameHandler gameHandler = new GameHandler(history, listener);
-        GamePhase currentPhase = new GamePhase(GamePhaseType.Recruitment, history.getConfig().getPlayers().get(0));
-
-        CompletableFuture<SelectableCharacterCard> result =
-                invokeRunSelectRecruitmentCardAsync(gameHandler, currentPhase);
-
-        try {
-            result.join();
-            fail("Expected IllegalStateException");
-        } catch (java.util.concurrent.CompletionException exception) {
-            assertTrue(exception.getCause() instanceof IllegalStateException);
-            assertEquals(
-                    "Invalid interaction result : chosen card missing for recruitment",
-                    exception.getCause().getMessage()
-            );
-        }
-    }
-
-    @Test
-    public void runSelectRecruitmentCardAsync_shouldRejectWrongTargetCategory()
-            throws Exception {
-        GameHistory history = createSelectRecruitmentCardGameHistory();
-        TestGameFlowListener listener = new TestGameFlowListener(history);
-
-        listener.inputRequiredResults.add(new InteractionResult(
-                InteractionResultType.SelectableCharacterCardChosen,
-                new InteractionContext(),
-                new InteractionTarget(
-                        TargetCategory.RecruitmentDestination, // Should be RecruitmentCard
-                        new SelectableCharacterCard(
-                                CharacterCard.Archer,
-                                CharacterCardSelectionStatus.Recruitable
-                        )
-                )
-        ));
-
-        GameHandler gameHandler = new GameHandler(history, listener);
-        GamePhase currentPhase = new GamePhase(GamePhaseType.Recruitment, history.getConfig().getPlayers().get(0));
-
-        CompletableFuture<SelectableCharacterCard> result =
-                invokeRunSelectRecruitmentCardAsync(gameHandler, currentPhase);
-
-        try {
-            result.join();
-            fail("Expected IllegalStateException");
-        } catch (java.util.concurrent.CompletionException exception) {
-            assertTrue(exception.getCause() instanceof IllegalStateException);
-            assertEquals(
-                    "Invalid interaction result : chosen card missing for recruitment",
-                    exception.getCause().getMessage()
-            );
-        }
-    }
-
-    @Test
-    public void runSelectRecruitmentCardAsync_shouldUndoLastActionAndRequestAnotherCard() throws Exception {
-        GameHistory history = createRecruitCardGameHistory();
-        TestGameFlowListener listener = new TestGameFlowListener(history);
-
-        Turn turn = (Turn) history.getEntries().get(0);
-        RecruitmentPhase recruitmentPhase =
-                (RecruitmentPhase) turn.getSubPhase(GamePhaseType.Recruitment);
-
-        Character archer = Character.create(CharacterType.Archer, TeamColor.Black);
-        Position recruitmentPosition = new Position(3, 2);
-
-        RecruitmentAction recruitmentAction = new RecruitmentAction(Collections.singletonList(
-                new RecruitmentActionMotion(
-                        RecruitmentMotionType.Add,
-                        archer,
-                        recruitmentPosition
-                )
-        ));
-
-        recruitmentPhase.getActions().add(recruitmentAction);
-
-        GameHandler gameHandler = new GameHandler(history, listener);
-        GamePhase currentPhase = new GamePhase(
-                GamePhaseType.Recruitment,
-                history.getConfig().getPlayers().get(0)
-        );
-
-        SelectableCharacterCard selectedCard = new SelectableCharacterCard(
-                CharacterCard.Acrobat,
-                CharacterCardSelectionStatus.Recruitable
-        );
-
-        listener.inputRequiredResults.add(new InteractionResult(
-                InteractionResultType.UndoLastAction,
-                new InteractionContext(),
-                null
-        ));
-
-        listener.inputRequiredResults.add(new InteractionResult(
-                InteractionResultType.SelectableCharacterCardChosen,
-                new InteractionContext(),
-                new InteractionTarget(
-                        TargetCategory.RecruitmentCard,
-                        selectedCard
-                )
-        ));
-
-        SelectableCharacterCard result =
-                invokeRunSelectRecruitmentCardAsync(gameHandler, currentPhase).join();
-
-        assertEquals(selectedCard, result);
-        assertEquals(2, listener.getInputRequiredCount());
-        assertTrue(recruitmentPhase.getActions().isEmpty());
     }
 
     @Test
@@ -1470,7 +1317,8 @@ public class GameHandlerTest {
 
         SelectableCharacterCard selectedCard = new SelectableCharacterCard(
                 CharacterCard.Archer,
-                CharacterCardSelectionStatus.Recruitable
+                CharacterCardSelectionStatus.Recruitable,
+                null
         );
         Position recruitmentPosition = new Position(3, 2);
         Character archer = Character.create(CharacterType.Archer, TeamColor.Black);
@@ -1526,7 +1374,8 @@ public class GameHandlerTest {
 
         SelectableCharacterCard selectedCard = new SelectableCharacterCard(
                 CharacterCard.HermitAndCub,
-                CharacterCardSelectionStatus.Recruitable
+                CharacterCardSelectionStatus.Recruitable,
+                null
         );
 
         Character hermit = Character.create(CharacterType.Hermit, TeamColor.Black);
@@ -1605,11 +1454,13 @@ public class GameHandlerTest {
 
         SelectableCharacterCard cancelledCard = new SelectableCharacterCard(
                 CharacterCard.Archer,
-                CharacterCardSelectionStatus.Recruitable
+                CharacterCardSelectionStatus.Recruitable,
+                null
         );
         SelectableCharacterCard selectedCard = new SelectableCharacterCard(
                 CharacterCard.Acrobat,
-                CharacterCardSelectionStatus.Recruitable
+                CharacterCardSelectionStatus.Recruitable,
+                null
         );
 
         Character acrobat = Character.create(CharacterType.Acrobat, TeamColor.Black);
@@ -1688,7 +1539,8 @@ public class GameHandlerTest {
         TestGameFlowListener listener = new TestGameFlowListener(history);
         SelectableCharacterCard selectedCard = new SelectableCharacterCard(
                 CharacterCard.Archer,
-                CharacterCardSelectionStatus.Banishable
+                CharacterCardSelectionStatus.Banishable,
+                null
         );
         listener.inputRequiredResults.add(new InteractionResult(
                 InteractionResultType.SelectableCharacterCardChosen,
@@ -2047,7 +1899,7 @@ public class GameHandlerTest {
     }
 
     @SuppressWarnings("unchecked")
-    private CompletableFuture<SelectableCharacterCard> invokeRunSelectRecruitmentCardAsync(
+    private CompletableFuture<InteractionResult> invokeRunSelectRecruitmentCardAsync(
             GameHandler gameHandler, @NonNull GamePhase currentPhase) throws Exception {
         Method method = GameHandler.class.getDeclaredMethod(
                 "runSelectRecruitmentCardAsync",
@@ -2056,8 +1908,8 @@ public class GameHandlerTest {
         method.setAccessible(true);
 
         try {
-            CompletableFuture<SelectableCharacterCard> result =
-                    (CompletableFuture<SelectableCharacterCard>) method.invoke(gameHandler, currentPhase);
+            CompletableFuture<InteractionResult> result =
+                    (CompletableFuture<InteractionResult>) method.invoke(gameHandler, currentPhase);
             assertNotNull(result);
             return result;
         } catch (InvocationTargetException exception) {

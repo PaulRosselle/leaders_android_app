@@ -31,7 +31,8 @@ public class InteractionResultTest {
                 TargetCategory.RecruitmentCard,
                 new SelectableCharacterCard(
                         CharacterCard.Archer,
-                        CharacterCardSelectionStatus.Recruitable
+                        CharacterCardSelectionStatus.Recruitable,
+                        null
                 ));
         Character contextCharacter = Character.create(CharacterType.Archer, TeamColor.Black);
         InteractionResult result = new InteractionResult(InteractionResultType.SelectableCharacterCardChosen,

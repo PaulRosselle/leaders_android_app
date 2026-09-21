@@ -27,7 +27,8 @@ public class InteractionRequestTest {
                 new InteractionTarget(TargetCategory.RecruitmentCard,
                         new SelectableCharacterCard(
                                 CharacterCard.Archer,
-                                CharacterCardSelectionStatus.Recruitable
+                                CharacterCardSelectionStatus.Recruitable,
+                                null
                         )));
         List<InteractionResultType> legalResults = List.of(InteractionResultType.SelectableCharacterCardChosen);
 
