@@ -219,7 +219,7 @@
     <string name="test_out_characters">tester les personnages</string>
     <string name="online_guide">guide en ligne</string>
     <string name="extra_infos">Informations supplémentaires</string>
-    <string name="tutorial_capture_before">Afin de gagner dans Leaders vous devez capturer le leader adverse. Pour cela, amenez deux de vos personnages sur des cases qui lui sont adjacentes.</string>
+    <string name="tutorial_capture_before">Pour gagner, vous devez amener deux de vos personnages sur des cases adjacentes au leader adverse. Durant votre tour, chacun de vos personnage peut se déplacer d\'une case.</string>
     <string name="tutorial_capture_after">La plupart des personnages peuvent faire plus que se déplacer d\'une case.\n\nDécouvrez cela dans le chapitre suivant.</string>
     <string name="tutorial_capture_info">Les leaders sont repérables de part leur courrone et le cercle doré décorant leur pion.</string>
     <string name="tutorial_active_abilities_before">Chaque personnage peut, une fois par tour, se déplacer d’une case ou activer sa compétence.</string>
