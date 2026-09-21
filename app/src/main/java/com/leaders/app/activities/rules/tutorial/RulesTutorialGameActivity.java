@@ -113,6 +113,8 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
 
         controller = new GameController(this);
         controller.restartGame(new GameHistory(startHistory));
+
+        showReminderDialog();
     }
 
     @Override
@@ -237,6 +239,16 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
     //endregion
 
     //region UI STATE METHODS
+
+    private void showReminderDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.alert_dialog_theme);
+
+        builder.setTitle(R.string.let_the_duel_beggin);
+        builder.setMessage(R.string.match_vs_bot_reminder);
+        builder.setPositiveButton(R.string.lets_go, null);
+
+        builder.show();
+    }
 
     private void setCardSelectorVisible(boolean visible) {
         // When recruiting, we display the cardSelector view below the player view.

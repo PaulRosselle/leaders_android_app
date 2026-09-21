@@ -260,5 +260,8 @@
     <string name="thanks">remerciements</string>
     <string name="app_adaptation">Cette application est une adaptation non officielle du jeu de société Leaders. Elle a été réalisée avec l\'aide de la fantastique communauté de Leaders.</string>
     <string name="playable_items_animation">Animation des éléments jouables</string>
+    <string name="let_the_duel_beggin">QUE LE DUEL COMMENCE !</string>
+    <string name="match_vs_bot_reminder">Pour votre première partie, vous affronter un bot.\n\nRappel : pour gagner, capturez le leader adverse avec 2 de vos personnages adjacents ou encerclez-le totalement.</string>
+    <string name="lets_go">C\'est parti</string>
 
 </resources>

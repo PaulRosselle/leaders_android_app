@@ -54,11 +54,8 @@ public class TutorialGameUtils {
             ));
         }
 
-        List<CharacterCard> recruitableCards = getRecruitableCards();
-        Collections.shuffle(recruitableCards);
-
         GameConfig gameConfig =new GameConfig(
-                players, player, GameMode.Discovery, recruitableCards,
+                players, player, GameMode.Discovery, getRecruitableCards(),
                 List.of(new RecruitmentAction(leaderRecruitmentMotions))
         );
 
@@ -70,21 +67,30 @@ public class TutorialGameUtils {
     }
 
     private static List<CharacterCard> getRecruitableCards() {
-        return new ArrayList<>(List.of(
+        List<CharacterCard> firstTurnCards = List.of(
                 CharacterCard.Acrobat,
+                CharacterCard.Rider,
+                CharacterCard.Wanderer
+        );
+
+        CharacterCard botFirstPick = CharacterCard.Brewmaster;
+
+        List<CharacterCard> remainingCharacters = new ArrayList<>(List.of(
                 CharacterCard.Archer,
                 CharacterCard.Assassin,
-                CharacterCard.Brewmaster,
                 CharacterCard.Bruiser,
                 CharacterCard.ClawLauncher,
                 CharacterCard.Illusionist,
-                CharacterCard.Jailer,
                 CharacterCard.Manipulator,
-                CharacterCard.Protector,
-                CharacterCard.Rider,
                 CharacterCard.RoyalGuard,
-                CharacterCard.Vizier,
-                CharacterCard.Wanderer
+                CharacterCard.Vizier
         ));
+        Collections.shuffle(remainingCharacters);
+
+        List<CharacterCard> recruitableCards = new ArrayList<>(firstTurnCards);
+        recruitableCards.add(botFirstPick);
+        recruitableCards.addAll(remainingCharacters);
+
+        return recruitableCards;
     }
 }
