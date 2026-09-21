@@ -23,7 +23,8 @@ public class InteractionTargetTest {
     public void constructor_shouldSetCardTarget() {
         SelectableCharacterCard expectedCard = new SelectableCharacterCard(
                 CharacterCard.Archer,
-                CharacterCardSelectionStatus.Recruitable
+                CharacterCardSelectionStatus.Recruitable,
+                null
         );
 
         InteractionTarget target = new InteractionTarget(TargetCategory.RecruitmentCard, expectedCard);
@@ -68,14 +69,16 @@ public class InteractionTargetTest {
                 TargetCategory.RecruitmentCard,
                 new SelectableCharacterCard(
                         CharacterCard.Archer,
-                        CharacterCardSelectionStatus.Recruitable
+                        CharacterCardSelectionStatus.Recruitable,
+                        null
                 )
         );
         InteractionTarget second = new InteractionTarget(
                 TargetCategory.RecruitmentCard,
                 new SelectableCharacterCard(
                         CharacterCard.Archer,
-                        CharacterCardSelectionStatus.Recruitable
+                        CharacterCardSelectionStatus.Recruitable,
+                        null
                 )
         );
 
@@ -125,14 +128,16 @@ public class InteractionTargetTest {
                 TargetCategory.RecruitmentCard,
                 new SelectableCharacterCard(
                         CharacterCard.Archer,
-                        CharacterCardSelectionStatus.Recruitable
+                        CharacterCardSelectionStatus.Recruitable,
+                        null
                 )
         );
         InteractionTarget second = new InteractionTarget(
                 TargetCategory.RecruitmentCard,
                 new SelectableCharacterCard(
                         CharacterCard.Assassin,
-                        CharacterCardSelectionStatus.Recruitable
+                        CharacterCardSelectionStatus.Recruitable,
+                        null
                 )
         );
 
@@ -145,7 +150,8 @@ public class InteractionTargetTest {
                 TargetCategory.RecruitmentCard,
                 new SelectableCharacterCard(
                         CharacterCard.Archer,
-                        CharacterCardSelectionStatus.Recruitable
+                        CharacterCardSelectionStatus.Recruitable,
+                        null
                 )
         );
         InteractionTarget characterTarget = new InteractionTarget(
@@ -167,7 +173,8 @@ public class InteractionTargetTest {
                 TargetCategory.RecruitmentCard,
                 new SelectableCharacterCard(
                         CharacterCard.Archer,
-                        CharacterCardSelectionStatus.Recruitable
+                        CharacterCardSelectionStatus.Recruitable,
+                        null
                 )
         );
 

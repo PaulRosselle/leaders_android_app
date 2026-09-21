@@ -20,16 +20,21 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Objects;
 
 public class GameQueryTest {
 
     private Game createTestGame(Board board) {
+        return createTestGame(board, new ArrayList<>());
+    }
+
+    private Game createTestGame(Board board, List<Character> recruitedCharacters) {
         // Build the minimal Game state required by the tests.
         // This state is intentionally invalid as a real game state.
         return new Game(board,
                 new ArrayList<>(), // recruitableCards
-                new ArrayList<>(), // recruitedCharacters
+                recruitedCharacters,
                 new EnumMap<>(TeamColor.class), // playerBanishedCards
                 new EnumMap<>(TeamColor.class) // playerWarnings
         );
@@ -217,9 +222,29 @@ public class GameQueryTest {
     }
 
     @Test
-    public void isBarrageDetected_shouldReturnTrueWhenChainSeparatesBoard() {
+    public void isBarrageDetected_shouldReturnFalseWhenChainSeparatesBoardBeforeRecruitmentEnd() {
         Board board = new Board();
         Game game = createTestGame(board);
+
+        for (int y = 0; y <= 6; y++) {
+            placeCharacter(game, new Position(3, y), CharacterType.Archer, TeamColor.Black);
+        }
+
+        assertFalse(GameQuery.isBarrageDetected(game, TeamColor.Black));
+    }
+
+    @Test
+    public void isBarrageDetected_shouldReturnTrueWhenChainSeparatesBoardAfterRecruitmentEnd() {
+        Board board = new Board();
+
+        List<Character> recruitedCharacters = new ArrayList<>();
+        for (TeamColor teamColor : TeamColor.values()) {
+            for (int i = 0; i < RecruitmentQuery.FULL_TEAM_SIZE; i++) {
+                recruitedCharacters.add(Character.create(CharacterType.values()[i], teamColor));
+            }
+        }
+
+        Game game = createTestGame(board, recruitedCharacters);
 
         for (int y = 0; y <= 6; y++) {
             placeCharacter(game, new Position(3, y), CharacterType.Archer, TeamColor.Black);

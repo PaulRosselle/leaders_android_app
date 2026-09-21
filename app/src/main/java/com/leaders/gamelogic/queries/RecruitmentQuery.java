@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Set;
 
 public final class RecruitmentQuery {
+    public final static int FULL_TEAM_SIZE = 5; // Takes into account the leader
+    public final static int FULL_TEAM_WITHOUT_LEADER_SIZE = FULL_TEAM_SIZE - 1;
 
     private RecruitmentQuery() {
         throw new AssertionError("Cannot instantiate utility class");
@@ -52,10 +54,8 @@ public final class RecruitmentQuery {
             return 2;
         }
 
-        // A full team is made of 5 character cards (a leader card + 4 recruited cards).
-        final int fullTeamSize = 4;
         // 1 card per phase can be recruited until the team is full.
-        return recruitmentCount < fullTeamSize ? 1 : 0;
+        return recruitmentCount < FULL_TEAM_WITHOUT_LEADER_SIZE ? 1 : 0;
     }
 
     /**
