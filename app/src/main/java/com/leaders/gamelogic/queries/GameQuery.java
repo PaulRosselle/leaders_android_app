@@ -232,7 +232,15 @@ public final class GameQuery {
         return false;
     }
 
-    // TODO - javadoc
+    /**
+     * Checks whether all teams in the given game are fully recruited.
+     *
+     * @param game the game whose teams are checked; must not be {@code null}
+     * @return {@code true} if every team has at least
+     *         {@link RecruitmentQuery#FULL_TEAM_SIZE} recruited cards,
+     *         {@code false} otherwise
+     * @throws NullPointerException if {@code game} is {@code null}
+     */
     private static boolean playersTeamsAreFull(@NonNull Game game) {
         for (TeamColor teamColor : TeamColor.values()) {
             if (RecruitmentQuery.getRecruitedCards(game, teamColor, true).size() < RecruitmentQuery.FULL_TEAM_SIZE) {
