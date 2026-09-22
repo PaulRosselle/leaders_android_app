@@ -95,7 +95,9 @@ public final class PuzzleSolverActivity extends BaseActivity {
         amvPuzzleActions = findViewById(R.id.amvPuzzleActions_actPuzzleSolver);
         vwDialogBg = findViewById(R.id.vwDialogBg_actPuzzleSolver);
 
-        amvPuzzleActions.addActionButton(R.drawable.icon_position, R.string.board_coordinates, 0, this::btnDisplayCellPosition);
+        amvPuzzleActions.addActionButton(
+                R.drawable.icon_position_off, R.string.board_coordinates, 0, this::btnDisplayCellPosition
+        );
     }
 
     @Override
@@ -422,7 +424,11 @@ public final class PuzzleSolverActivity extends BaseActivity {
     }
 
     private void btnDisplayCellPosition(View v) {
-        bdvBoard.setCellPositionVisible(!bdvBoard.isCellPositionVisible());
+        boolean positionVisible = !bdvBoard.isCellPositionVisible();
+        amvPuzzleActions.setButtonIcon(0,
+                positionVisible ? R.drawable.icon_position_off : R.drawable.icon_position
+        );
+        bdvBoard.setCellPositionVisible(positionVisible);
 
         setActionsMenuVisible(false);
     }

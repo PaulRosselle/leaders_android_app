@@ -58,13 +58,22 @@ public final class ActionsMenuView extends LinearLayout {
     }
 
     public void setButtonEnabled(int btnTag, boolean enabled) {
-        // Action buttons can be found using their tag
+        ButtonUtils.setEnabled(getButtonFromTag(btnTag), enabled);
+    }
+
+    public void setButtonIcon(int btnTag, int iconResId) {
+        getButtonFromTag(btnTag).setIconResource(iconResId);
+    }
+
+    private MaterialButton getButtonFromTag(int tag) {
         for (int i = 0; i < getChildCount(); i++) {
             MaterialButton btnChild = (MaterialButton) getChildAt(i);
-            if (Integer.parseInt(btnChild.getTag().toString()) == btnTag) {
-                ButtonUtils.setEnabled(btnChild, enabled);
+            if (Integer.parseInt(btnChild.getTag().toString()) == tag) {
+                return btnChild;
             }
         }
+
+        throw new IllegalStateException("No button found with tag=" + tag);
     }
 
     private LinearLayout.LayoutParams getButtonLP() {

@@ -411,7 +411,12 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
     }
 
     private void onDisplayCellPositionClick(View v) {
-        bdvBoard.setCellPositionVisible(!bdvBoard.isCellPositionVisible());
+        boolean positionVisible = !bdvBoard.isCellPositionVisible();
+        amvPuzzleActions.setButtonIcon(
+                PuzzlePlayerAction.DisplayCellPositions.ordinal(),
+                positionVisible ? R.drawable.icon_position_off : R.drawable.icon_position
+        );
+        bdvBoard.setCellPositionVisible(positionVisible);
         hidePuzzleActions();
     }
 

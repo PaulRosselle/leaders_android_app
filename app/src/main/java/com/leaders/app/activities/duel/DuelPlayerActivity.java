@@ -349,7 +349,12 @@ public final class DuelPlayerActivity extends PlayableActivity implements
     }
 
     private void onDisplayCellPosition(View v) {
-        bdvBoard.setCellPositionVisible(!bdvBoard.isCellPositionVisible());
+        boolean positionVisible = !bdvBoard.isCellPositionVisible();
+        amvActions.setButtonIcon(
+                DuelAction.DisplayCellPositions.ordinal(),
+                positionVisible ? R.drawable.icon_position_off : R.drawable.icon_position
+        );
+        bdvBoard.setCellPositionVisible(positionVisible);
 
         setActionsMenuVisible(false);
     }

@@ -734,7 +734,12 @@ public final class PuzzleEditorActivity extends BaseActivity {
     }
 
     private void btnDisplayCellPosition(View v) {
-        bdvBoard.setCellPositionVisible(!bdvBoard.isCellPositionVisible());
+        boolean positionVisible = !bdvBoard.isCellPositionVisible();
+        amvPuzzleActions.setButtonIcon(
+                PuzzleCreationAction.DisplayCellPositions.ordinal(),
+                positionVisible ? R.drawable.icon_position_off : R.drawable.icon_position
+        );
+        bdvBoard.setCellPositionVisible(positionVisible);
 
         setActionsMenuVisible(false);
     }
