@@ -171,6 +171,8 @@ public final class DuelPlayerActivity extends PlayableActivity implements
     protected void initDatas() {
         super.initDatas();
 
+        updateAnimatePlayableIcon();
+
         String gameDatas = getIntent().getStringExtra(ExtraUtils.EXTRA_DUEL_GAME_DATAS);
         if (gameDatas == null || gameDatas.isEmpty()) {
             throw new IllegalStateException("Invalid duel game datas: missing datas");
@@ -344,8 +346,16 @@ public final class DuelPlayerActivity extends PlayableActivity implements
             }
         }
         animatePlayableItems = !animatePlayableItems;
+        updateAnimatePlayableIcon();
 
         setActionsMenuVisible(false);
+    }
+
+    private void updateAnimatePlayableIcon() {
+        amvActions.setButtonIcon(
+                DuelAction.AnimatePlayableItems.ordinal(),
+                animatePlayableItems ? R.drawable.icon_sparkles_off : R.drawable.icon_sparkles
+        );
     }
 
     private void onDisplayCellPosition(View v) {

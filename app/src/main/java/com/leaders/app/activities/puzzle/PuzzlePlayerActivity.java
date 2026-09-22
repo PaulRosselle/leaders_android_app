@@ -148,6 +148,8 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
     protected void initDatas() {
         super.initDatas();
 
+        updateAnimatePlayableIcon();
+
         puzzleSource = PuzzleSource.valueOf(getIntent().getStringExtra(ExtraUtils.EXTRA_PUZZLE_SOURCE));
 
         if (puzzleSource == PuzzleSource.OfficialSelection) {
@@ -406,8 +408,16 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
             }
         }
         animatePlayableItems = !animatePlayableItems;
+        updateAnimatePlayableIcon();
 
         hidePuzzleActions();
+    }
+
+    private void updateAnimatePlayableIcon() {
+        amvPuzzleActions.setButtonIcon(
+                PuzzlePlayerAction.AnimatePlayableItems.ordinal(),
+                animatePlayableItems ? R.drawable.icon_sparkles_off : R.drawable.icon_sparkles
+        );
     }
 
     private void onDisplayCellPositionClick(View v) {
