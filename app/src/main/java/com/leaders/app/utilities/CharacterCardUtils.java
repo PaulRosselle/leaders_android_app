@@ -6,9 +6,11 @@ import android.content.res.Resources;
 import androidx.annotation.NonNull;
 
 import com.leaders.R;
+import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.gamelogic.enums.AbilityType;
 import com.leaders.gamelogic.enums.CharacterCard;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -109,6 +111,17 @@ public final  class CharacterCardUtils {
             case Vizier: return R.string.card_description_vizier;
             case Wanderer: return R.string.card_description_wanderer;
             default: throw new IllegalArgumentException("No name found for character card: " + characterCard);
+        }
+    }
+
+    public static List<CharacterSkinType> getSkins(@NonNull CharacterCard characterCard) {
+        switch (characterCard) {
+            case Illusionist:
+            case RoyalGuard:
+            case Vizier:
+                return List.of(CharacterSkinType.Default, CharacterSkinType.LaughingMoonSage);
+            default:
+                return Collections.singletonList(CharacterSkinType.Default);
         }
     }
 

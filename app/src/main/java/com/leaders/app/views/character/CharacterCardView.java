@@ -19,6 +19,15 @@ public class CharacterCardView extends ConstraintLayout {
     private final ImageView imvHighlight;
     private final TextView txvCardName;
 
+    @NonNull
+    private CharacterCard card;
+    @NonNull
+    private CharacterSkinType skinType;
+
+    public CharacterCardView(@NonNull Context context) {
+        this(context, null);
+    }
+
     public CharacterCardView(@NonNull Context context,
                              @NonNull CharacterCard card,
                              @NonNull CharacterSkinType skinType,
@@ -37,9 +46,15 @@ public class CharacterCardView extends ConstraintLayout {
         imvCard = findViewById(R.id.imvCard_vwCharacterCard);
         imvHighlight = findViewById(R.id.imvCardHighlight_vwCharacterCard);
         txvCardName = findViewById(R.id.txvCardName_vwCharacterCard);
+
+        card = CharacterCard.RoyalGuard;
+        skinType = CharacterSkinType.Default;
     }
 
     public void setCard(@NonNull CharacterCard card, @NonNull CharacterSkinType skinType) {
+        this.card = card;
+        this.skinType = skinType;
+
         imvCard.setImageResource(getCardResId(card, skinType));
         txvCardName.setText(CharacterCardUtils.getFormattedNameId(card));
     }
@@ -70,5 +85,15 @@ public class CharacterCardView extends ConstraintLayout {
             }
             default: throw new IllegalStateException("No card resource found for card: " + card);
         }
+    }
+
+    @NonNull
+    public CharacterCard getCard() {
+        return card;
+    }
+
+    @NonNull
+    public CharacterSkinType getSkinType() {
+        return skinType;
     }
 }

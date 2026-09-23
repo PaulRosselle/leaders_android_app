@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/transparent_black">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gdlTop_vwCharacterSkinForm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.2" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gdlBottom_vwCharacterSkinForm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.8" />
+
+    <View
+        android:id="@+id/vwDialogBg_vwCharacterSkinForm"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/round_rect"
+        app:layout_constraintBottom_toTopOf="@+id/gdlBottom_vwCharacterSkinForm"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/gdlTop_vwCharacterSkinForm" />
+
+    <TextView
+        android:id="@+id/txvTitle_vwCharacterSkinForm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="16dp"
+        android:fontFamily="sans-serif"
+        android:text="apparence des personnages"
+        android:textAllCaps="true"
+        android:textColor="@color/app_golden"
+        android:textSize="@dimen/smaller_text_font_size"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/gdlTop_vwCharacterSkinForm"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <HorizontalScrollView
+        android:id="@+id/hsvPortraits_vwCharacterSkinForm"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txvTitle_vwCharacterSkinForm"
+        app:layout_constraintVertical_bias="0.0">
+
+        <LinearLayout
+            android:id="@+id/llyPortraits_vwCharacterSkinForm"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal" />
+    </HorizontalScrollView>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rcvCards_vwCharacterSkinForm"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="8dp"
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/btnChoose_vwCharacterSkinForm"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/hsvPortraits_vwCharacterSkinForm" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnChoose_vwCharacterSkinForm"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/round_button_size"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/darker_background"
+        android:fontFamily="@font/bobby_jones_regular"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:text="choisir"
+        android:textAllCaps="true"
+        android:textColor="@color/app_golden"
+        android:textSize="@dimen/default_text_font_size"
+        app:cornerRadius="@dimen/default_corner_radius"
+        app:layout_constraintBottom_toTopOf="@+id/gdlBottom_vwCharacterSkinForm"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        app:strokeColor="@color/app_golden"
+        app:strokeWidth="@dimen/default_stroke_width" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
