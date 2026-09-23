@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat;
 
 import com.leaders.R;
 import com.leaders.app.enums.BoardOrientation;
+import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.app.views.character.CharacterDisplay;
 import com.leaders.app.views.character.CharacterDisplayPool;
 import com.leaders.app.views.character.CharacterView;
@@ -172,7 +173,10 @@ public abstract class BoardView extends ConstraintLayout {
 
                 CharacterView characterView = characterDisplay.getCharacterView();
                 characterView.setVisibility(VISIBLE);
-                characterView.setCharacter(cell.getCharacter());
+                characterView.setCharacter(
+                        cell.getCharacter(),
+                        CharacterSkinType.Default // TODO
+                );
                 characterView.bringToFront();
 
                 CellView cellView = getCellView(cellPosition);

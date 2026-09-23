@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.leaders.app.enums.AnimationSpeed;
+import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.app.views.board.BoardView;
 import com.leaders.app.views.board.CellView;
 import com.leaders.app.views.character.CharacterDisplay;
@@ -79,7 +80,10 @@ public final class RecruitmentActionAnimator extends ActionAnimator {
         CellView addCellView = boardView.getCellView(addPos);
         characterDisplay.setPosition(addCellView.getX(), addCellView.getY());
         CharacterView characterView = characterDisplay.getCharacterView();
-        characterView.setCharacter(motion.getCharacter());
+        characterView.setCharacter(
+                motion.getCharacter(),
+                CharacterSkinType.Default // TODO
+        );
         characterView.setScaleX(0f);
         characterView.setScaleY(0f);
         characterView.setAlpha(0f);

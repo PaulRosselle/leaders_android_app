@@ -16,6 +16,7 @@ import com.leaders.app.controllers.GameController;
 import com.leaders.app.entities.ReplaySave;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.AnimationSpeed;
+import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.app.enums.EndGameType;
 import com.leaders.app.enums.LeaderType;
 import com.leaders.app.utilities.ButtonUtils;
@@ -567,7 +568,10 @@ public final class DuelPlayerActivity extends PlayableActivity implements
             );
 
             if (newCharacter != null) {
-                chdNewCharacter.getCharacterView().setCharacter(newCharacter);
+                chdNewCharacter.getCharacterView().setCharacter(
+                        newCharacter,
+                        CharacterSkinType.Default // TODO
+                );
             }
             chdNewCharacter.startHighlightAnimation();
         } else {

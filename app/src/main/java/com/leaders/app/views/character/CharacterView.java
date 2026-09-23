@@ -18,6 +18,7 @@ import androidx.core.content.ContextCompat;
 import androidx.interpolator.view.animation.LinearOutSlowInInterpolator;
 
 import com.leaders.R;
+import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.TeamColor;
@@ -30,6 +31,8 @@ public final class CharacterView extends AppCompatImageView {
     private InteractionTarget target;
     @Nullable
     private CharacterType characterType;
+    @NonNull
+    private CharacterSkinType skinType;
     @NonNull
     private TeamColor teamColor;
 
@@ -47,18 +50,21 @@ public final class CharacterView extends AppCompatImageView {
             characterType = characterTypeOrd == -1 ? null : CharacterType.values()[characterTypeOrd];
             int teamColorOrd = customAttrs.getInteger(R.styleable.CharacterView_teamColor, TeamColor.Black.ordinal());
             teamColor = TeamColor.values()[teamColorOrd];
+            skinType = CharacterSkinType.Default;
 
-            setCharacter(characterType, teamColor);
+            setCharacter(characterType, skinType, teamColor);
         }
     }
 
-    public void setCharacter(@NonNull Character character) {
-        setCharacter(character.getCharacterType(), character.getTeamColor());
+    public void setCharacter(@NonNull Character character, @NonNull CharacterSkinType skinType) {
+        setCharacter(character.getCharacterType(), skinType, character.getTeamColor());
     }
 
     public void setCharacter(@Nullable CharacterType characterType,
+                             @NonNull CharacterSkinType skinType,
                              @NonNull TeamColor teamColor) {
         this.characterType = characterType;
+        this.skinType = skinType;
         this.teamColor = teamColor;
         setImageResource(getCharacterDrawableId(characterType, teamColor));
     }

@@ -11,6 +11,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.leaders.R;
 import com.leaders.app.entities.PlayerSetup;
+import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.app.enums.LeaderType;
 import com.leaders.app.utilities.TeamColorUtils;
 import com.leaders.app.views.portrait.PortraitView;
@@ -100,7 +101,11 @@ public final class PlayerSetupView extends ConstraintLayout {
 
     public void setTeamColor(TeamColor teamColor) {
         this.teamColor = teamColor;
-        chvCharacterColor.setCharacter(null, teamColor);
+        chvCharacterColor.setCharacter(
+                null,
+                CharacterSkinType.Default, // TODO
+                teamColor
+        );
     }
 
     public void setName(@NonNull String name) {

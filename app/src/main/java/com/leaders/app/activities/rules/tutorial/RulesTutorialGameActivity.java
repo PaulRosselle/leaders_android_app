@@ -15,6 +15,7 @@ import com.leaders.app.activities.PlayableActivity;
 import com.leaders.app.controllers.GameController;
 import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
+import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.app.enums.EndGameType;
 import com.leaders.app.enums.LeaderType;
 import com.leaders.app.enums.TutorialChapter;
@@ -422,7 +423,11 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
             );
 
             if (newCharacter != null) {
-                chdNewCharacter.getCharacterView().setCharacter(newCharacter);
+                // Character always use their default skin in tutorials
+                chdNewCharacter.getCharacterView().setCharacter(
+                        newCharacter,
+                        CharacterSkinType.Default
+                );
             }
             chdNewCharacter.startHighlightAnimation();
         } else {

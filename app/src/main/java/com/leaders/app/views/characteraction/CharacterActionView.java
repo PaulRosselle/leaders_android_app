@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.LinearLayoutCompat;
 
 import com.leaders.R;
+import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.app.utilities.LbeUtils;
 import com.leaders.app.views.character.CharacterView;
 import com.leaders.gamelogic.actions.CharacterAction;
@@ -46,7 +47,10 @@ public final class CharacterActionView extends LinearLayoutCompat {
                                @NonNull CharacterAction characterAction) {
         this(context, (AttributeSet) null);
 
-        chvSourceCharacter.setCharacter(characterAction.getSrcCharacter());
+        chvSourceCharacter.setCharacter(
+                characterAction.getSrcCharacter(),
+                CharacterSkinType.Default // TODO
+        );
 
         if (characterAction.getMotions().isEmpty()) {
             throw new IllegalArgumentException("No display can be loaded for an empty character action");
@@ -102,7 +106,10 @@ public final class CharacterActionView extends LinearLayoutCompat {
         imvActiveAbility.setVisibility(VISIBLE);
 
         if (abilityTarget.getCharacter() != characterAction.getSrcCharacter()) {
-            chvTargetCharacter.setCharacter(abilityTarget.getCharacter());
+            chvTargetCharacter.setCharacter(
+                    abilityTarget.getCharacter(),
+                    CharacterSkinType.Default // TODO
+            );
             chvTargetCharacter.setVisibility(VISIBLE);
         } else {
             chvTargetCharacter.setVisibility(GONE);

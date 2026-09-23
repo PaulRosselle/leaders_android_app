@@ -154,7 +154,10 @@ public final class CharacterEditorView extends ConstraintLayout {
 
             characterView.setOnClickListener(onNewCharacterClickListener);
             characterView.setOnLongClickListener(onNewCharacterLongClickListener);
-            characterView.setCharacter(character);
+            characterView.setCharacter(
+                    character,
+                    CharacterSkinType.Default // TODO
+            );
 
             // We use playable character target to link a character view with a new character
             characterView.setAsPlayableTarget(new InteractionTarget(
@@ -175,7 +178,11 @@ public final class CharacterEditorView extends ConstraintLayout {
     public void startEditCharacterMode(@NonNull Character character) {
         updateMode(EditorMode.EditCharacter);
 
-        crvSwitchColor.setCharacter(character.getCharacterType(), character.getTeamColor().getOpposite());
+        crvSwitchColor.setCharacter(
+                character.getCharacterType(),
+                CharacterSkinType.Default, // TODO
+                character.getTeamColor().getOpposite()
+        );
     }
 
     private void setViewVisible(View v, boolean visible) {
