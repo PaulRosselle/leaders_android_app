@@ -3,10 +3,15 @@ package com.leaders.app.entities;
 import androidx.annotation.NonNull;
 
 import com.leaders.app.enums.AnimationSpeed;
+import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.app.enums.HighlightColor;
+import com.leaders.gamelogic.enums.CharacterCard;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.EnumMap;
+import java.util.Map;
 
 public final class Settings {
     @NonNull
@@ -16,12 +21,14 @@ public final class Settings {
     @NonNull
     private HighlightColor highlightColor;
     private boolean animatePlayableItems;
+    private final Map<CharacterCard, CharacterSkinType> characterSkins;
 
     private Settings(){
         userName = "";
         animationSpeed = AnimationSpeed.Normal;
         highlightColor = HighlightColor.Default;
         animatePlayableItems = true;
+        characterSkins = new EnumMap<>(CharacterCard.class);
     }
 
     @NonNull
@@ -41,6 +48,17 @@ public final class Settings {
             if (joSettings.has("animate_playable_items")) {
                 settings.setAnimatePlayableItems(joSettings.getBoolean("animate_playable_items"));
             }
+            if (joSettings.has("character_skins")) {
+                JSONObject joCharacterSkins = joSettings.getJSONObject("character_skins");
+                for (CharacterCard card : CharacterCard.values()) {
+                    if (joCharacterSkins.has(card.name())) {
+                        settings.characterSkins.put(
+                                card,
+                                CharacterSkinType.valueOf(joCharacterSkins.getString(card.name()))
+                        );
+                    }
+                }
+            }
 
         } catch (JSONException e) {
             throw new RuntimeException(e);
@@ -54,9 +72,18 @@ public final class Settings {
         JSONObject joSettings = new JSONObject();
 
         joSettings.put("user_name", getUserName());
+
         joSettings.put("animation_speed", getAnimationSpeed().name());
+
         joSettings.put("highlight_color", getHighlightColor().name());
+
         joSettings.put("animate_playable_items", animatePlayableItems());
+
+        JSONObject joCharacterSkins = new JSONObject();
+        for (Map.Entry<CharacterCard, CharacterSkinType> entry : characterSkins.entrySet()) {
+            joCharacterSkins.put(entry.getKey().name(), entry.getValue());
+        }
+        joSettings.put("character_skins", joCharacterSkins);
 
         return joSettings;
     }
@@ -94,5 +121,13 @@ public final class Settings {
 
     public void setAnimatePlayableItems(boolean animatePlayableItems) {
         this.animatePlayableItems = animatePlayableItems;
+    }
+
+    public Map<CharacterCard, CharacterSkinType> getCharacterSkins() {
+        return characterSkins;
+    }
+
+    public void setCharacterSkin(@NonNull CharacterCard card, @NonNull CharacterSkinType skinType) {
+        characterSkins.put(card, skinType);
     }
 }
