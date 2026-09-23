@@ -55,9 +55,8 @@
     <TextView
         android:id="@+id/txvPlayerName_vwPlayerBottom"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_marginStart="4dp"
-        android:layout_marginBottom="6dp"
         android:fontFamily="@font/bourbon_test_regular"
         android:gravity="center"
         android:includeFontPadding="true"
@@ -67,8 +66,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/gdl31V_vwPlayerBottom"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/gdl80H_vwPlayerBottom"
         app:layout_constraintVertical_bias="1.0"
         tools:text="right player name" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gdl80H_vwPlayerBottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.8" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

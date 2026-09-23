@@ -1,6 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
+    <ImageView
+        android:id="@+id/imvCard_vwCharacterCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/character_card"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/character_card_royal_guard" />
+
+    <ImageView
+        android:id="@+id/imvCardHighlight_vwCharacterCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:importantForAccessibility="no"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/highlight_character_card"  />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gdlLeft_vwCharacterCard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.22" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gdlRight_vwCharacterCard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.779" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gdlTop_vwCharacterCard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.794" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gdlBottom_vwCharacterCard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.888" />
+
+    <TextView
+        android:id="@+id/txvCardName_vwCharacterCard"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:autoSizeMaxTextSize="60dp"
+        android:autoSizeMinTextSize="14dp"
+        android:autoSizeStepGranularity="2dp"
+        android:autoSizeTextType="uniform"
+        android:fontFamily="@font/bourbon_test_regular"
+        android:gravity="center"
+        android:text="@string/card_formatted_name_royal_guard"
+        android:textColor="@color/font"
+        app:layout_constraintBottom_toTopOf="@+id/gdlBottom_vwCharacterCard"
+        app:layout_constraintEnd_toStartOf="@+id/gdlRight_vwCharacterCard"
+        app:layout_constraintStart_toStartOf="@+id/gdlLeft_vwCharacterCard"
+        app:layout_constraintTop_toTopOf="@+id/gdlTop_vwCharacterCard" />
 </androidx.constraintlayout.widget.ConstraintLayout>
