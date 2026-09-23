@@ -264,5 +264,7 @@
     <string name="match_vs_bot_reminder">Pour votre première partie, vous affronter un bot.\n\nRappel : pour gagner, capturez le leader adverse avec 2 de vos personnages adjacents ou encerclez-le totalement.</string>
     <string name="lets_go">C\'est parti</string>
     <string name="character_card">Carte de personnage</string>
+    <string name="skin_default">ORIGINaL</string>
+    <string name="skin_laughing_moon_sage">SaGE DE La LUNE RIEUSE</string>
 
 </resources>

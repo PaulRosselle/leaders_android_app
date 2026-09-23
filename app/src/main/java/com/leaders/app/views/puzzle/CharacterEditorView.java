@@ -14,6 +14,7 @@ import androidx.constraintlayout.widget.Group;
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 import com.leaders.app.entities.PortraitInfo;
+import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.app.utilities.CharacterCardUtils;
 import com.leaders.app.views.portrait.PortraitGroupView;
 import com.leaders.app.views.character.HighlightView;
@@ -90,7 +91,10 @@ public final class CharacterEditorView extends ConstraintLayout {
             int portraitsInLineCount = Math.min(PORTRAITS_PER_GROUP, allCards.size());
             ArrayList<PortraitInfo> portraitInfos = new ArrayList<>();
             for (int i = 0; i < portraitsInLineCount; i++) {
-                portraitInfos.add(new PortraitInfo(allCards.remove(0)));
+                portraitInfos.add(new PortraitInfo(
+                        allCards.remove(0),
+                        CharacterSkinType.Default // TODO
+                ));
             }
 
             PortraitGroupView ptvPortraits = new PortraitGroupView(context, portraitInfos, PORTRAITS_PER_GROUP);

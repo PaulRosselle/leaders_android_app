@@ -13,6 +13,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.leaders.R;
 import com.leaders.app.entities.PortraitInfo;
+import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.app.enums.PortraitDisplayMode;
 import com.leaders.gamelogic.enums.AbilityType;
 import com.leaders.gamelogic.enums.CharacterCard;
@@ -106,7 +107,12 @@ public final class AbilityPortraitGroupView extends ConstraintLayout {
 
         for (CharacterCard card : CharacterCard.values()) {
             if (cardMatchGroupType(card, groupType)) {
-                portraitInfos.add(new PortraitInfo(card, false, PortraitDisplayMode.Hexagonal));
+                portraitInfos.add(new PortraitInfo(
+                        card,
+                        CharacterSkinType.Default, // TODO
+                        false,
+                        PortraitDisplayMode.Hexagonal
+                ));
             }
         }
 

@@ -93,8 +93,13 @@ public class CharacterSkinFormView extends ConstraintLayout {
             List<CharacterSkinType> skins = CharacterCardUtils.getSkins(card);
             if (skins.size() > 1) {
                 PortraitView portraitView = new PortraitView(getContext(), null);
-                // TODO - handle skin appearance
-                portraitView.setInfo(new PortraitInfo(card, false, PortraitDisplayMode.Hexagonal));
+                // TODO - recover saved appearance
+                portraitView.setInfo(new PortraitInfo(
+                        card,
+                        CharacterSkinType.Default,
+                        false,
+                        PortraitDisplayMode.Hexagonal
+                ));
                 portraitView.setOnClickListener(this::onPortraitClick);
                 portraitViews.add(portraitView);
                 llyPortraits.addView(portraitView, getPortraitLayoutParams());
@@ -140,7 +145,17 @@ public class CharacterSkinFormView extends ConstraintLayout {
         }
 
         cardAdapter.setSelectedSkinType(skinType);
+        updatePortrait(card, skinType);
         // TODO - save choice
+    }
+
+    private void updatePortrait(@NonNull CharacterCard card, @NonNull CharacterSkinType skinType) {
+        for (PortraitView ptvPortrait : portraitViews) {
+            if (ptvPortrait.getPortraitCard() == card) {
+                ptvPortrait.setPortraitSkin(skinType);
+                break;
+            }
+        }
     }
 
     private void loadCardSkins(@NonNull CharacterCard card) {

@@ -15,7 +15,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/character_card_royal_guard" />
+        app:srcCompat="@drawable/character_card_royal_guard_lms" />
 
     <ImageView
         android:id="@+id/imvCardHighlight_vwCharacterCard"
@@ -48,14 +48,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.794" />
+        app:layout_constraintGuide_percent="0.804" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/gdlBottom_vwCharacterCard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.888" />
+        app:layout_constraintGuide_percent="0.878" />
 
     <TextView
         android:id="@+id/txvCardName_vwCharacterCard"
@@ -67,7 +67,7 @@
         android:autoSizeTextType="uniform"
         android:fontFamily="@font/bourbon_test_regular"
         android:gravity="center"
-        android:text="@string/card_formatted_name_royal_guard"
+        android:text="@string/skin_laughing_moon_sage"
         android:textColor="@color/font"
         app:layout_constraintBottom_toTopOf="@+id/gdlBottom_vwCharacterCard"
         app:layout_constraintEnd_toStartOf="@+id/gdlRight_vwCharacterCard"

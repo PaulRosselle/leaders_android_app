@@ -19,6 +19,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.leaders.R;
 import com.leaders.app.entities.PortraitInfo;
+import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.app.enums.PortraitDisplayMode;
 import com.leaders.app.utilities.CharacterCardUtils;
 import com.leaders.app.views.portrait.PortraitGroupView;
@@ -119,6 +120,7 @@ public final class CharacterCardSelectionView extends ConstraintLayout {
             SelectableCharacterCard selectableCard = getSelectableCardFromTarget(target);
             portraitInfos.add(new PortraitInfo(
                     selectableCard.getCharacterCard(),
+                    CharacterSkinType.Default, // TODO
                     selectableCard.getSelectionStatus() == CharacterCardSelectionStatus.AlreadyBanned,
                     PortraitDisplayMode.Default,
                     selectableCard.getTeamColor(),
@@ -136,6 +138,7 @@ public final class CharacterCardSelectionView extends ConstraintLayout {
         for (SelectableCharacterCard selectableCard : sortedSelectableCards) {
             portraitInfos.add(new PortraitInfo(
                     selectableCard.getCharacterCard(),
+                    CharacterSkinType.Default, // TODO
                     selectableCard.getSelectionStatus() == CharacterCardSelectionStatus.AlreadyBanned,
                     selectableCard.getTeamColor()
             ));

@@ -56,7 +56,7 @@ public class CharacterCardView extends ConstraintLayout {
         this.skinType = skinType;
 
         imvCard.setImageResource(getCardResId(card, skinType));
-        txvCardName.setText(CharacterCardUtils.getFormattedNameId(card));
+        txvCardName.setText(skinType.getNameId());
     }
 
     public void setHighlighted(boolean highlighted) {

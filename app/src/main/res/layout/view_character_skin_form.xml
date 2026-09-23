@@ -71,28 +71,43 @@
             android:orientation="horizontal" />
     </HorizontalScrollView>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rcvCards_vwCharacterSkinForm"
+
+
+    <com.leaders.app.views.decoration.OrnateFrameView
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="24dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="24dp"
         android:layout_marginBottom="8dp"
-        android:clipToPadding="false"
-        android:overScrollMode="never"
-        android:orientation="horizontal"
         app:layout_constraintBottom_toTopOf="@+id/btnChoose_vwCharacterSkinForm"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/hsvPortraits_vwCharacterSkinForm" />
+        app:layout_constraintTop_toBottomOf="@+id/hsvPortraits_vwCharacterSkinForm">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rcvCards_vwCharacterSkinForm"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="2dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="2dp"
+            android:layout_marginBottom="2dp"
+            android:clipToPadding="false"
+            android:orientation="horizontal"
+            android:overScrollMode="never"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </com.leaders.app.views.decoration.OrnateFrameView>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnChoose_vwCharacterSkinForm"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/round_button_size"
         android:layout_marginBottom="16dp"
-        android:backgroundTint="@color/darker_background"
+        android:backgroundTint="@color/ultra_dark_background"
         android:fontFamily="@font/bobby_jones_regular"
         android:insetTop="0dp"
         android:insetBottom="0dp"

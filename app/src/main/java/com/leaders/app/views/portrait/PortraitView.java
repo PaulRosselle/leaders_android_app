@@ -10,6 +10,7 @@ import androidx.appcompat.widget.AppCompatImageView;
 
 import com.leaders.R;
 import com.leaders.app.entities.PortraitInfo;
+import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.app.enums.PortraitDisplayMode;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.TeamColor;
@@ -33,7 +34,7 @@ public final class PortraitView extends AppCompatImageView {
             displayMode = PortraitDisplayMode.values()[displayModeOrd];
         }
 
-        info = new PortraitInfo(CharacterCard.LeaderQueen, false, displayMode);
+        info = new PortraitInfo(CharacterCard.LeaderQueen, CharacterSkinType.Default, false, displayMode);
 
         updateDisplay();
     }
@@ -50,6 +51,11 @@ public final class PortraitView extends AppCompatImageView {
 
     public void setPortraitCard(@NonNull CharacterCard portraitCard) {
         info.setCard(portraitCard);
+        updateDisplay();
+    }
+
+    public void setPortraitSkin(@NonNull CharacterSkinType portraitSkin) {
+        info.setSkinType(portraitSkin);
         updateDisplay();
     }
 
@@ -76,7 +82,12 @@ public final class PortraitView extends AppCompatImageView {
             case Bruiser: return R.drawable.card_portrait_bruiser;
             case ClawLauncher: return R.drawable.card_portrait_claw_launcher;
             case HermitAndCub: return R.drawable.card_portrait_hermit_and_cub;
-            case Illusionist: return R.drawable.card_portrait_illusionist;
+            case Illusionist: {
+                if (info.getSkinType() == CharacterSkinType.LaughingMoonSage) {
+                    return R.drawable.card_portrait_illusionist_lms;
+                }
+                return R.drawable.card_portrait_illusionist;
+            }
             case Jailer: return R.drawable.card_portrait_jailer;
             case LeaderKing: return R.drawable.card_portrait_leader_king;
             case LeaderQueen: return R.drawable.card_portrait_leader_queen;
@@ -84,8 +95,18 @@ public final class PortraitView extends AppCompatImageView {
             case Nemesis: return R.drawable.card_portrait_nemesis;
             case Protector: return R.drawable.card_portrait_protector;
             case Rider: return R.drawable.card_portrait_rider;
-            case RoyalGuard: return R.drawable.card_portrait_royal_guard;
-            case Vizier: return R.drawable.card_portrait_vizier;
+            case RoyalGuard: {
+                if (info.getSkinType() == CharacterSkinType.LaughingMoonSage) {
+                    return R.drawable.card_portrait_royal_guard_lms;
+                }
+                return R.drawable.card_portrait_royal_guard;
+            }
+            case Vizier: {
+                if (info.getSkinType() == CharacterSkinType.LaughingMoonSage) {
+                    return R.drawable.card_portrait_vizier_lms;
+                }
+                return R.drawable.card_portrait_vizier;
+            }
             case Wanderer: return R.drawable.card_portrait_wanderer;
             default: throw new IllegalArgumentException("No portrait drawable for card: " + info.getCard());
         }
@@ -190,7 +211,12 @@ public final class PortraitView extends AppCompatImageView {
             case Bruiser: return R.drawable.card_hex_portrait_bruiser;
             case ClawLauncher: return R.drawable.card_hex_portrait_claw_launcher;
             case HermitAndCub: return R.drawable.card_hex_portrait_hermit_and_cub;
-            case Illusionist: return R.drawable.card_hex_portrait_illusionist;
+            case Illusionist: {
+                if (info.getSkinType() == CharacterSkinType.LaughingMoonSage) {
+                    return R.drawable.card_hex_portrait_illusionist_lms;
+                }
+                return R.drawable.card_hex_portrait_illusionist;
+            }
             case Jailer: return R.drawable.card_hex_portrait_jailer;
             case LeaderKing: return R.drawable.card_hex_portrait_leader_king;
             case LeaderQueen: return R.drawable.card_hex_portrait_leader_queen;
@@ -198,8 +224,18 @@ public final class PortraitView extends AppCompatImageView {
             case Nemesis: return R.drawable.card_hex_portrait_nemesis;
             case Protector: return R.drawable.card_hex_portrait_protector;
             case Rider: return R.drawable.card_hex_portrait_rider;
-            case RoyalGuard: return R.drawable.card_hex_portrait_royal_guard;
-            case Vizier: return R.drawable.card_hex_portrait_vizier;
+            case RoyalGuard: {
+                if (info.getSkinType() == CharacterSkinType.LaughingMoonSage) {
+                    return R.drawable.card_hex_portrait_royal_guard_lms;
+                }
+                return R.drawable.card_hex_portrait_royal_guard;
+            }
+            case Vizier: {
+                if (info.getSkinType() == CharacterSkinType.LaughingMoonSage) {
+                    return R.drawable.card_hex_portrait_vizier_lms;
+                }
+                return R.drawable.card_hex_portrait_vizier;
+            }
             case Wanderer: return R.drawable.card_hex_portrait_wanderer;
             default: throw new IllegalArgumentException("No portrait drawable for card: " + info.getCard());
         }
