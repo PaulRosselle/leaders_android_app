@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/transparent_black">
+    android:background="@color/transparent_black"
+    tools:ignore="SpUsage">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/gdlTop_vwCharacterSkinForm"
@@ -39,7 +40,7 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="16dp"
         android:fontFamily="sans-serif"
-        android:text="apparence des personnages"
+        android:text="@string/character_skins"
         android:textAllCaps="true"
         android:textColor="@color/app_golden"
         android:textSize="@dimen/smaller_text_font_size"
@@ -111,7 +112,7 @@
         android:fontFamily="@font/bobby_jones_regular"
         android:insetTop="0dp"
         android:insetBottom="0dp"
-        android:text="choisir"
+        android:text="@string/choose"
         android:textAllCaps="true"
         android:textColor="@color/app_golden"
         android:textSize="@dimen/default_text_font_size"

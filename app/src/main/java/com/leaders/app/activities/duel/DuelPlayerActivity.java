@@ -179,6 +179,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
         Settings settings = ((LeadersApplication) getApplication()).getSettings();
         characterSkins = settings.getCharacterSkins();
         cnvCardInfo.setCharacterSkins(characterSkins);
+        ccsvCardSelector.setCharacterSkins(characterSkins);
 
         updateAnimatePlayableIcon();
 
@@ -264,7 +265,10 @@ public final class DuelPlayerActivity extends PlayableActivity implements
         GameContext gameContext = controller.getCurrentContext();
 
         if (gameContext.getGamePhase().getPhaseType() == GamePhaseType.Banishment) {
-            controller.selectTarget(ccsvCardSelector.getSelectedTarget());
+            controller.selectTarget(Objects.requireNonNull(
+                    ccsvCardSelector.getSelectedTarget(),
+                    "Cannot end banishment phase without a valid target"
+            ));
         } else {
             controller.endPhase();
         }

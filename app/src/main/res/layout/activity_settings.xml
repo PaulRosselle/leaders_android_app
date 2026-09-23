@@ -115,6 +115,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="8dp" />
+
+            <com.leaders.app.views.settings.CharacterSkinView
+                android:id="@+id/csvSkins_actSettings"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="8dp" />
         </LinearLayout>
     </ScrollView>
 
@@ -143,8 +149,10 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.leaders.app.views.settings.CharacterSkinFormView
+        android:id="@+id/csfvSkins_actSettings"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

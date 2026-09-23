@@ -68,7 +68,11 @@ public class CharacterSkinFormView extends ConstraintLayout {
     }
 
     private void initListeners() {
+        setOnClickListener(view -> setVisibility(GONE));
         findViewById(R.id.btnChoose_vwCharacterSkinForm).setOnClickListener(this::onChooseClick);
+        findViewById(R.id.vwDialogBg_vwCharacterSkinForm).setOnClickListener(view -> {
+            // Dummy listener to intercept the click
+        });
 
         rcvCards.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override

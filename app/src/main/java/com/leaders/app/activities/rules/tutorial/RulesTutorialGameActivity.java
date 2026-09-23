@@ -547,7 +547,10 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
         GameContext gameContext = controller.getCurrentContext();
 
         if (gameContext.getGamePhase().getPhaseType() == GamePhaseType.Banishment) {
-            controller.selectTarget(ccsvCardSelector.getSelectedTarget());
+            controller.selectTarget(Objects.requireNonNull(
+                    ccsvCardSelector.getSelectedTarget(),
+                    "Cannot end banishment phase without a valid target"
+            ));
         } else {
             controller.endPhase();
         }

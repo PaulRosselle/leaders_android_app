@@ -254,5 +254,7 @@
     <string name="character_card">Character card</string>
     <string name="skin_default">ORIGINaL</string>
     <string name="skin_laughing_moon_sage">LaUGhING mOON SaGE</string>
+    <string name="choose">choose</string>
+    <string name="character_skins">character skins</string>
 
 </resources>

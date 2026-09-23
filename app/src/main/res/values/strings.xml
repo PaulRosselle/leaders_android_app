@@ -266,5 +266,7 @@
     <string name="character_card">Carte de personnage</string>
     <string name="skin_default">ORIGINaL</string>
     <string name="skin_laughing_moon_sage">SaGE DE La LUNE RIEUSE</string>
+    <string name="choose">choisir</string>
+    <string name="character_skins">apparence des personnages</string>
 
 </resources>

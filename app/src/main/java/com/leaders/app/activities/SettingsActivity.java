@@ -15,6 +15,8 @@ import com.leaders.app.enums.AnimationSpeed;
 import com.leaders.app.enums.HighlightColor;
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.views.settings.AnimationSpeedView;
+import com.leaders.app.views.settings.CharacterSkinFormView;
+import com.leaders.app.views.settings.CharacterSkinView;
 import com.leaders.app.views.settings.ContactFormView;
 import com.leaders.app.views.settings.ContactView;
 import com.leaders.app.views.settings.HighlightColorView;
@@ -29,6 +31,8 @@ public class SettingsActivity extends BaseActivity {
     private ContactView ctvContact;
     private View vwDialogBg;
     private ContactFormView cfvContact;
+    private CharacterSkinView csvSkins;
+    private CharacterSkinFormView csfvSkins;
 
     private Settings settings;
 
@@ -47,6 +51,9 @@ public class SettingsActivity extends BaseActivity {
         ctvContact = findViewById(R.id.ctvContact_actSettings);
         vwDialogBg = findViewById(R.id.vwDialogBg_actSettings);
         cfvContact = findViewById(R.id.cfvContact_actSettings);
+
+        csvSkins = findViewById(R.id.csvSkins_actSettings);
+        csfvSkins = findViewById(R.id.csfvSkins_actSettings);
     }
 
     @Override
@@ -58,8 +65,9 @@ public class SettingsActivity extends BaseActivity {
         piasAnimatePlayableItems.setOnCheckedChangeListener(this::onAnimatePlayableItemsChanged);
         hcvHighlightColor.setChangeListener(this::onColorChange);
 
-        ctvContact.setOnOpenFormClickListener(this::onOpenFormClick);
+        ctvContact.setOnOpenFormClickListener(this::onOpenContactFormClick);
         vwDialogBg.setOnClickListener(this::onDialogBgClick);
+        csvSkins.setOnOpenFormClickListener(this::onOpenSkinsFormClick);
     }
 
     @Override
@@ -136,8 +144,12 @@ public class SettingsActivity extends BaseActivity {
         JsonUtils.saveSettings(this, settings);
     }
 
-    private void onOpenFormClick(View v) {
+    private void onOpenContactFormClick(View v) {
         setContactFormVisible(true);
+    }
+
+    private void onOpenSkinsFormClick(View v) {
+        csfvSkins.setVisibility(View.VISIBLE);
     }
 
     private void onDialogBgClick(View v) {
