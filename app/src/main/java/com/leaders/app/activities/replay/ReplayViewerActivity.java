@@ -13,6 +13,7 @@ import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.animators.BanishmentActionAnimator;
+import com.leaders.app.entities.CharacterSkins;
 import com.leaders.app.entities.ReplaySave;
 import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
@@ -116,6 +117,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
         super.initViews();
 
         bdvBoard = findViewById(R.id.bdvBoard_actReplayViewer);
+        bdvBoard.setAlwaysUseDefaultSkins(true);
         rcvControls = findViewById(R.id.rcvControls_actReplayViewer);
         ravCards = findViewById(R.id.ravCards_actReplayViewer);
 
@@ -478,7 +480,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
                 actionToPlay = action;
             }
 
-            GameActionUtils.animate(bdvBoard, actionToPlay, onActionEnd, animationSpeed);
+            GameActionUtils.animate(bdvBoard, actionToPlay, onActionEnd, animationSpeed, new CharacterSkins());
         }
 
         updateCards();

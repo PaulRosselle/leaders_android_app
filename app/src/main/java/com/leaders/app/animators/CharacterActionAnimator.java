@@ -17,8 +17,8 @@ import android.view.animation.DecelerateInterpolator;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.leaders.app.entities.CharacterSkins;
 import com.leaders.app.enums.AnimationSpeed;
-import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.app.views.board.BoardView;
 import com.leaders.app.views.board.CellView;
 import com.leaders.app.views.character.CharacterDisplay;
@@ -43,8 +43,12 @@ public final class CharacterActionAnimator extends ActionAnimator {
     private static final int DURATION_FLY = 600;
     private static final int DURATION_TRANSFORM = 800;
 
-    public CharacterActionAnimator(@NonNull AnimationSpeed speed) {
+    private final CharacterSkins characterSkins;
+
+    public CharacterActionAnimator(@NonNull AnimationSpeed speed,
+                                   @NonNull CharacterSkins characterSkins) {
         super(speed);
+        this.characterSkins = characterSkins;
     }
 
     public void animate(@NonNull BoardView boardView, 
@@ -126,7 +130,7 @@ public final class CharacterActionAnimator extends ActionAnimator {
             CharacterView characterView = characterDisplay.getCharacterView();
             characterView.setCharacter(
                     target.getCharacter(),
-                    CharacterSkinType.Default // TODO
+                    characterSkins.getCharacterSkin(target.getCharacter())
             );
             characterView.setScaleX(0f);
             characterView.setScaleY(0f);
@@ -514,7 +518,7 @@ public final class CharacterActionAnimator extends ActionAnimator {
                 // Reset to a clean state for the appearance phase.
                 characterView.setCharacter(
                         destinationTarget.getCharacter(),
-                        CharacterSkinType.Default // TODO
+                        characterSkins.getCharacterSkin(destinationTarget.getCharacter())
                 );
 
                 characterView.setScaleX(0.75f);

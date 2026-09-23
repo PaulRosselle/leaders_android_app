@@ -5,8 +5,8 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.leaders.app.entities.CharacterSkins;
 import com.leaders.app.enums.AnimationSpeed;
-import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.app.views.board.BoardView;
 import com.leaders.app.views.board.CellView;
 import com.leaders.app.views.character.CharacterDisplay;
@@ -21,8 +21,12 @@ public final class RecruitmentActionAnimator extends ActionAnimator {
     private static final int DURATION_ADD = 200;
     private static final int DURATION_REMOVE = 200;
 
-    public RecruitmentActionAnimator(@NonNull AnimationSpeed speed) {
+    private final CharacterSkins characterSkins;
+
+    public RecruitmentActionAnimator(@NonNull AnimationSpeed speed,
+                                     @NonNull CharacterSkins characterSkins) {
         super(speed);
+        this.characterSkins = characterSkins;
     }
 
     public void animate(@NonNull BoardView boardView,
@@ -82,7 +86,7 @@ public final class RecruitmentActionAnimator extends ActionAnimator {
         CharacterView characterView = characterDisplay.getCharacterView();
         characterView.setCharacter(
                 motion.getCharacter(),
-                CharacterSkinType.Default // TODO
+                characterSkins.getCharacterSkin(motion.getCharacter())
         );
         characterView.setScaleX(0f);
         characterView.setScaleY(0f);

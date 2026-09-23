@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 
 import com.leaders.app.animators.CharacterActionAnimator;
 import com.leaders.app.animators.RecruitmentActionAnimator;
+import com.leaders.app.entities.CharacterSkins;
 import com.leaders.app.enums.AnimationSpeed;
 import com.leaders.app.views.board.BoardView;
 import com.leaders.gamelogic.actions.CharacterAction;
@@ -163,13 +164,17 @@ public final class GameActionUtils {
     }
 
     public static void animate(@NonNull BoardView boardView, @NonNull IGameAction action,
-                               @Nullable Runnable onAnimationEnd, @NonNull AnimationSpeed speed) {
+                               @Nullable Runnable onAnimationEnd,
+                               @NonNull AnimationSpeed speed,
+                               @NonNull CharacterSkins characterSkins) {
         switch (action.getActionType()) {
             case CharacterAction:
-                new CharacterActionAnimator(speed).animate(boardView, (CharacterAction) action, onAnimationEnd);
+                new CharacterActionAnimator(speed, characterSkins)
+                        .animate(boardView, (CharacterAction) action, onAnimationEnd);
                 break;
             case Recruitment:
-                new RecruitmentActionAnimator(speed).animate(boardView, (RecruitmentAction) action, onAnimationEnd);
+                new RecruitmentActionAnimator(speed, characterSkins)
+                        .animate(boardView, (RecruitmentAction) action, onAnimationEnd);
                 break;
             default:
                 throw new IllegalStateException("Action animation not handled for: " + action.getActionType());

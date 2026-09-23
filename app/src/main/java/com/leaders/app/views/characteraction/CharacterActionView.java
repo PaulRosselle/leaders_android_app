@@ -10,7 +10,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.LinearLayoutCompat;
 
 import com.leaders.R;
-import com.leaders.app.enums.CharacterSkinType;
+import com.leaders.app.entities.LeadersApplication;
+import com.leaders.app.entities.Settings;
 import com.leaders.app.utilities.LbeUtils;
 import com.leaders.app.views.character.CharacterView;
 import com.leaders.gamelogic.actions.CharacterAction;
@@ -32,6 +33,9 @@ public final class CharacterActionView extends LinearLayoutCompat {
     @NonNull
     private final TextView txvDestination;
 
+    @NonNull
+    private final Settings settings;
+
     public CharacterActionView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
@@ -41,6 +45,8 @@ public final class CharacterActionView extends LinearLayoutCompat {
         imvActiveAbility = findViewById(R.id.imvActiveAbility_vwCharacterAction);
         chvTargetCharacter = findViewById(R.id.chvTargetCharacter_vwCharacterAction);
         txvDestination = findViewById(R.id.txvDestination_vwCharacterAction);
+
+        settings = ((LeadersApplication) context.getApplicationContext()).getSettings();
     }
 
     public CharacterActionView(@NonNull Context context,
@@ -49,7 +55,7 @@ public final class CharacterActionView extends LinearLayoutCompat {
 
         chvSourceCharacter.setCharacter(
                 characterAction.getSrcCharacter(),
-                CharacterSkinType.Default // TODO
+                settings.getCharacterSkin(characterAction.getSrcCharacter())
         );
 
         if (characterAction.getMotions().isEmpty()) {
@@ -108,7 +114,7 @@ public final class CharacterActionView extends LinearLayoutCompat {
         if (abilityTarget.getCharacter() != characterAction.getSrcCharacter()) {
             chvTargetCharacter.setCharacter(
                     abilityTarget.getCharacter(),
-                    CharacterSkinType.Default // TODO
+                    settings.getCharacterSkin(abilityTarget.getCharacter())
             );
             chvTargetCharacter.setVisibility(VISIBLE);
         } else {

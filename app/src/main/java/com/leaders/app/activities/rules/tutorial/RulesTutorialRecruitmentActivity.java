@@ -11,6 +11,7 @@ import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 import com.leaders.app.activities.PlayableActivity;
 import com.leaders.app.controllers.GameController;
+import com.leaders.app.entities.CharacterSkins;
 import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.CharacterSkinType;
@@ -63,6 +64,8 @@ public class RulesTutorialRecruitmentActivity extends PlayableActivity implement
     @Override
     protected void initViews() {
         super.initViews();
+
+        bdvBoard.setAlwaysUseDefaultSkins(true);
 
         ccsvCardSelector = findViewById(R.id.ccsvCardSelector_actRulesTutorialRecruitment);
         chdNewCharacter = new CharacterDisplay(this, ccsvCardSelector);
@@ -132,6 +135,11 @@ public class RulesTutorialRecruitmentActivity extends PlayableActivity implement
     @Override
     protected int getEndGameViewId() {
         return R.id.egvEndGame_actRulesTutorialRecruitment;
+    }
+
+    @Override
+    protected CharacterSkins getCharacterSkins() {
+        return new CharacterSkins();
     }
 
     @Override

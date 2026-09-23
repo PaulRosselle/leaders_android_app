@@ -109,7 +109,7 @@ public final class AbilityPortraitGroupView extends ConstraintLayout {
             if (cardMatchGroupType(card, groupType)) {
                 portraitInfos.add(new PortraitInfo(
                         card,
-                        CharacterSkinType.Default, // TODO
+                        CharacterSkinType.Default,
                         false,
                         PortraitDisplayMode.Hexagonal
                 ));

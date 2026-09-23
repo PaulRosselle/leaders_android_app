@@ -9,6 +9,7 @@ import android.view.animation.LinearInterpolator;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.leaders.app.entities.CharacterSkins;
 import com.leaders.app.enums.AnimationSpeed;
 import com.leaders.app.enums.BoardOrientation;
 import com.leaders.app.animators.CharacterActionAnimator;
@@ -248,14 +249,15 @@ public final class PlayableBoardView extends BoardView {
 
     public void animateFeedback(@NonNull InteractionFeedback feedback,
                                 @NonNull AnimationSpeed animationSpeed,
+                                @NonNull CharacterSkins characterSkins,
                                 @Nullable Runnable onAnimationEnd) {
         switch (feedback.getFeedbackType()) {
             case CharacterAction:
-                new CharacterActionAnimator(animationSpeed)
+                new CharacterActionAnimator(animationSpeed, characterSkins)
                         .animate(this, feedback.getCharacterActionMotions(), onAnimationEnd);
                 break;
             case RecruitmentAction:
-                new RecruitmentActionAnimator(animationSpeed)
+                new RecruitmentActionAnimator(animationSpeed, characterSkins)
                         .animate(this, feedback.getRecruitmentActionMotions(), onAnimationEnd);
                 break;
             default:

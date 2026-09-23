@@ -13,6 +13,7 @@ import com.leaders.R;
 
 import com.leaders.app.activities.PlayableActivity;
 import com.leaders.app.controllers.GameController;
+import com.leaders.app.entities.CharacterSkins;
 import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.CharacterSkinType;
@@ -73,6 +74,8 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
     @Override
     protected void initViews() {
         super.initViews();
+
+        bdvBoard.setAlwaysUseDefaultSkins(true);
 
         ccsvCardSelector = findViewById(R.id.ccsvCardSelector_actRulesTutorialGame);
         chdNewCharacter = new CharacterDisplay(this, ccsvCardSelector);
@@ -137,6 +140,11 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
     @Override
     protected int getEndGameViewId() {
         return R.id.egvEndGame_actRulesTutorialGame;
+    }
+
+    @Override
+    protected CharacterSkins getCharacterSkins() {
+        return new CharacterSkins();
     }
 
     @Override

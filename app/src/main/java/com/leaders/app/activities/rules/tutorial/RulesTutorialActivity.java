@@ -12,6 +12,7 @@ import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 import com.leaders.app.activities.PlayableActivity;
 import com.leaders.app.controllers.GameController;
+import com.leaders.app.entities.CharacterSkins;
 import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.EndGameType;
@@ -50,6 +51,8 @@ public abstract class RulesTutorialActivity extends PlayableActivity implements 
     @Override
     protected void initViews() {
         super.initViews();
+
+        bdvBoard.setAlwaysUseDefaultSkins(true);
 
         btnInfo = findViewById(R.id.btnInfo_actRulesTutorial);
         tnvNavigation = findViewById(R.id.tnvNavigation_actRulesTutoriel);
@@ -92,6 +95,11 @@ public abstract class RulesTutorialActivity extends PlayableActivity implements 
 
         controller = new GameController(this);
         controller.restartGame(new GameHistory(startHistory));
+    }
+
+    @Override
+    protected CharacterSkins getCharacterSkins() {
+        return new CharacterSkins();
     }
 
     @Override

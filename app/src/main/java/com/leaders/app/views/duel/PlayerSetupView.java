@@ -103,7 +103,7 @@ public final class PlayerSetupView extends ConstraintLayout {
         this.teamColor = teamColor;
         chvCharacterColor.setCharacter(
                 null,
-                CharacterSkinType.Default, // TODO
+                CharacterSkinType.Default,
                 teamColor
         );
     }

@@ -104,7 +104,6 @@ public final class PuzzleSolverActivity extends BaseActivity {
     protected void initListeners() {
         super.initListeners();
 
-
         // Puzzle actions listeners
         btnPuzzleActions.setOnClickListener(v ->
                 setActionsMenuVisible(amvPuzzleActions.getVisibility() != View.VISIBLE));

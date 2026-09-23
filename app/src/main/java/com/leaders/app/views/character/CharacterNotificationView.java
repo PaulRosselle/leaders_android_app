@@ -12,6 +12,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.leaders.R;
+import com.leaders.app.entities.CharacterSkins;
 import com.leaders.app.utilities.CharacterCardUtils;
 import com.leaders.app.views.portrait.PortraitView;
 import com.leaders.gamelogic.enums.CharacterCard;
@@ -24,6 +25,9 @@ public final class CharacterNotificationView extends ConstraintLayout {
     @Nullable
     private CharacterCard characterCard;
     private int statusBarOffset;
+    @NonNull
+    private CharacterSkins characterSkins;
+
 
     public CharacterNotificationView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -36,6 +40,7 @@ public final class CharacterNotificationView extends ConstraintLayout {
 
         characterCard = null;
         statusBarOffset = 0;
+        characterSkins = new CharacterSkins();
 
         // Added shadow behind the notification
         setBackgroundResource(R.drawable.round_rect_gloden_outline_bg);
@@ -56,14 +61,19 @@ public final class CharacterNotificationView extends ConstraintLayout {
             return;
         }
 
-        ptvPortrait.setPortraitCard(this.characterCard);
-        txvTitle.setText(CharacterCardUtils.getFormattedNameId(this.characterCard));
-        txvInfo.setText(CharacterCardUtils.getDescriptionId(this.characterCard));
+        ptvPortrait.setPortraitCard(characterCard);
+        ptvPortrait.setPortraitSkin(characterSkins.getCharacterSkin(characterCard));
+        txvTitle.setText(CharacterCardUtils.getFormattedNameId(characterCard));
+        txvInfo.setText(CharacterCardUtils.getDescriptionId(characterCard));
     }
 
     @Nullable
     public CharacterCard getCharacterCard() {
         return characterCard;
+    }
+
+    public void setCharacterSkins(@NonNull CharacterSkins characterSkins) {
+        this.characterSkins = characterSkins;
     }
 
     private float getHiddenPosY() {
