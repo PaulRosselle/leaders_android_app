@@ -66,10 +66,11 @@ public final class CharacterView extends AppCompatImageView {
         this.characterType = characterType;
         this.skinType = skinType;
         this.teamColor = teamColor;
-        setImageResource(getCharacterDrawableId(characterType, teamColor));
+        setImageResource(getCharacterDrawableId(characterType, skinType, teamColor));
     }
 
     private int getCharacterDrawableId(@Nullable CharacterType characterType,
+                                       @NonNull CharacterSkinType skinType,
                                        @NonNull TeamColor teamColor) {
         boolean isWhite = teamColor == TeamColor.White;
 
@@ -86,7 +87,12 @@ public final class CharacterView extends AppCompatImageView {
             case ClawLauncher: return isWhite ? R.drawable.character_piece_claw_launcher_w : R.drawable.character_piece_claw_launcher_b;
             case Cub: return isWhite ? R.drawable.character_piece_cub_w : R.drawable.character_piece_cub_b;
             case Hermit: return isWhite ? R.drawable.character_piece_hermit_w : R.drawable.character_piece_hermit_b;
-            case Illusionist: return isWhite ? R.drawable.character_piece_illusionist_w : R.drawable.character_piece_illusionist_b;
+            case Illusionist: {
+                if (skinType == CharacterSkinType.LaughingMoonSage) {
+                    return isWhite ? R.drawable.character_piece_illusionist_lms_w : R.drawable.character_piece_illusionist_lms_b;
+                }
+                return isWhite ? R.drawable.character_piece_illusionist_w : R.drawable.character_piece_illusionist_b;
+            }
             case Jailer: return isWhite ? R.drawable.character_piece_jailer_w : R.drawable.character_piece_jailer_b;
             case LeaderKing: return isWhite ? R.drawable.character_piece_leader_king_w : R.drawable.character_piece_leader_king_b;
             case LeaderQueen: return isWhite ? R.drawable.character_piece_leader_queen_w : R.drawable.character_piece_leader_queen_b;
@@ -94,8 +100,18 @@ public final class CharacterView extends AppCompatImageView {
             case Nemesis: return isWhite ? R.drawable.character_piece_nemesis_w : R.drawable.character_piece_nemesis_b;
             case Protector: return isWhite ? R.drawable.character_piece_protector_w : R.drawable.character_piece_protector_b;
             case Rider: return isWhite ? R.drawable.rider_token_w : R.drawable.rider_token_b;
-            case RoyalGuard: return isWhite ? R.drawable.character_piece_royal_guard_w : R.drawable.character_piece_royal_guard_b;
-            case Vizier: return isWhite ? R.drawable.character_piece_vizier_w : R.drawable.character_piece_vizier_b;
+            case RoyalGuard: {
+                if (skinType == CharacterSkinType.LaughingMoonSage) {
+                    return isWhite ? R.drawable.character_piece_royal_guard_lms_w : R.drawable.character_piece_royal_guard_lms_b;
+                }
+                return isWhite ? R.drawable.character_piece_royal_guard_w : R.drawable.character_piece_royal_guard_b;
+            }
+            case Vizier: {
+                if (skinType == CharacterSkinType.LaughingMoonSage) {
+                    return isWhite ? R.drawable.character_piece_vizier_lms_w : R.drawable.character_piece_vizier_lms_b;
+                }
+                return isWhite ? R.drawable.character_piece_vizier_w : R.drawable.character_piece_vizier_b;
+            }
             case Wanderer: return isWhite ? R.drawable.character_piece_wanderer_w : R.drawable.character_piece_wanderer_b;
             default: throw new IllegalArgumentException("No drawable found for character: " + characterType);
         }
@@ -159,12 +175,16 @@ public final class CharacterView extends AppCompatImageView {
     }
 
     public void animateSetCharacter(@Nullable CharacterType characterType,
+                                    @NonNull CharacterSkinType skinType,
                                     @NonNull TeamColor teamColor,
                                     int duration,
                                     @Nullable Runnable onAnimationEnd) {
         Drawable[] drawables = new Drawable[2];
         drawables[0] = getDrawable();
-        drawables[1] = AppCompatResources.getDrawable(getContext(), getCharacterDrawableId(characterType, teamColor));
+        drawables[1] = AppCompatResources.getDrawable(
+                getContext(),
+                getCharacterDrawableId(characterType, skinType, teamColor)
+        );
         TransitionDrawable fadeTransition = new TransitionDrawable(drawables);
         fadeTransition.setCrossFadeEnabled(true);
         setImageDrawable(fadeTransition);

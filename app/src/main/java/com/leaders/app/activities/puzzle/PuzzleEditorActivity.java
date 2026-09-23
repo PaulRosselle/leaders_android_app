@@ -19,6 +19,7 @@ import com.leaders.app.entities.Settings;
 import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.AnimationSpeed;
+import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.app.enums.PuzzleSource;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.JsonUtils;
@@ -470,7 +471,11 @@ public final class PuzzleEditorActivity extends BaseActivity {
         CharacterType characterType = character.getCharacterType();
 
         int duration = (int) (200 * settings.getAnimationSpeed().getMultiplier());
-        characterDisplay.getCharacterView().animateSetCharacter(characterType, newTeamColor, duration, () -> {
+        characterDisplay.getCharacterView().animateSetCharacter(
+                characterType,
+                CharacterSkinType.Default, // TODO
+                newTeamColor,
+                duration, () -> {
             board.getCell(position).setCharacter(Character.transform(character, characterType, newTeamColor));
             onAnimationEnd.run();
         });
