@@ -123,11 +123,22 @@ public final class Settings {
         this.animatePlayableItems = animatePlayableItems;
     }
 
+    @NonNull
     public Map<CharacterCard, CharacterSkinType> getCharacterSkins() {
         return characterSkins;
     }
 
+    @NonNull
+    public CharacterSkinType getCharacterSkin(@NonNull CharacterCard card) {
+        CharacterSkinType characterSkin = characterSkins.get(card);
+        return characterSkin != null ? characterSkin : CharacterSkinType.Default;
+    }
+
     public void setCharacterSkin(@NonNull CharacterCard card, @NonNull CharacterSkinType skinType) {
-        characterSkins.put(card, skinType);
+        if (skinType == CharacterSkinType.Default) {
+            characterSkins.remove(card);
+        } else {
+            characterSkins.put(card, skinType);
+        }
     }
 }

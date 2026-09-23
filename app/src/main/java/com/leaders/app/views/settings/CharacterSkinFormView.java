@@ -14,10 +14,13 @@ import androidx.recyclerview.widget.LinearSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.leaders.R;
+import com.leaders.app.entities.LeadersApplication;
 import com.leaders.app.entities.PortraitInfo;
+import com.leaders.app.entities.Settings;
 import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.app.enums.PortraitDisplayMode;
 import com.leaders.app.utilities.CharacterCardUtils;
+import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.views.character.CharacterCardAdapter;
 import com.leaders.app.views.character.CharacterCardView;
 import com.leaders.app.views.portrait.PortraitView;
@@ -38,6 +41,8 @@ public class CharacterSkinFormView extends ConstraintLayout {
     private final LinearLayoutManager cardLayoutManager;
     private CharacterCardAdapter cardAdapter;
 
+    private final Settings settings;
+
     public CharacterSkinFormView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
@@ -49,6 +54,8 @@ public class CharacterSkinFormView extends ConstraintLayout {
         portraitViews = new ArrayList<>();
         cardSnapHelper = new LinearSnapHelper();
         cardLayoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
+
+        settings = ((LeadersApplication) context.getApplicationContext()).getSettings();
 
         initViews();
         initListeners();
@@ -89,14 +96,15 @@ public class CharacterSkinFormView extends ConstraintLayout {
     }
 
     private void initPortraits() {
+        Context context = getContext();
+
         for (CharacterCard card : CharacterCard.values()) {
             List<CharacterSkinType> skins = CharacterCardUtils.getSkins(card);
             if (skins.size() > 1) {
-                PortraitView portraitView = new PortraitView(getContext(), null);
-                // TODO - recover saved appearance
+                PortraitView portraitView = new PortraitView(context, null);
                 portraitView.setInfo(new PortraitInfo(
                         card,
-                        CharacterSkinType.Default,
+                        settings.getCharacterSkin(card),
                         false,
                         PortraitDisplayMode.Hexagonal
                 ));
@@ -146,7 +154,9 @@ public class CharacterSkinFormView extends ConstraintLayout {
 
         cardAdapter.setSelectedSkinType(skinType);
         updatePortrait(card, skinType);
-        // TODO - save choice
+
+        settings.setCharacterSkin(card, skinType);
+        JsonUtils.saveSettings(getContext(), settings);
     }
 
     private void updatePortrait(@NonNull CharacterCard card, @NonNull CharacterSkinType skinType) {
@@ -166,7 +176,7 @@ public class CharacterSkinFormView extends ConstraintLayout {
             cardSkinMap.add(Map.entry(card, skinType));
         }
 
-        cardAdapter = new CharacterCardAdapter(cardSkinMap, CharacterSkinType.Default);
+        cardAdapter = new CharacterCardAdapter(cardSkinMap, settings.getCharacterSkin(card));
         rcvCards.setAdapter(cardAdapter);
     }
 
