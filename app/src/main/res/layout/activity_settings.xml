@@ -37,7 +37,7 @@
         app:icon="@drawable/icon_back"
         app:iconGravity="textStart"
         app:iconPadding="0dp"
-        app:iconSize="@dimen/round_button_icon_size"
+        app:iconSize="@dimen/back_button_icon_size"
         app:iconTint="@color/font"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="1:1"
@@ -52,6 +52,7 @@
         android:id="@+id/txvTitle_actSettings"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:fontFamily="@font/bourbon_test_regular"
         android:text="@string/settings"
         android:textAllCaps="false"
@@ -73,8 +74,10 @@
         android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnBack_actSettings">
+        app:layout_constraintTop_toBottomOf="@+id/btnBack_actSettings"
+        app:layout_constraintVertical_bias="0.0">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -112,6 +115,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="8dp" />
+
+            <com.leaders.app.views.settings.CharacterSkinView
+                android:id="@+id/csvSkins_actSettings"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="8dp" />
         </LinearLayout>
     </ScrollView>
 
@@ -133,6 +142,16 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.leaders.app.views.settings.CharacterSkinFormView
+        android:id="@+id/csfvSkins_actSettings"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

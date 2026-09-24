@@ -13,7 +13,9 @@ import androidx.constraintlayout.widget.Group;
 
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
+import com.leaders.app.entities.LeadersApplication;
 import com.leaders.app.entities.PortraitInfo;
+import com.leaders.app.entities.Settings;
 import com.leaders.app.utilities.CharacterCardUtils;
 import com.leaders.app.views.portrait.PortraitGroupView;
 import com.leaders.app.views.character.HighlightView;
@@ -54,12 +56,15 @@ public final class CharacterEditorView extends ConstraintLayout {
     private CharacterView crvSwitchColor;
     private MaterialButton btnRemove;
 
+    private final Settings settings;
 
 
     public CharacterEditorView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
         inflate(context, R.layout.view_character_editor, this);
+
+        settings = ((LeadersApplication) context.getApplicationContext()).getSettings();
 
         initViews();
     }
@@ -90,7 +95,8 @@ public final class CharacterEditorView extends ConstraintLayout {
             int portraitsInLineCount = Math.min(PORTRAITS_PER_GROUP, allCards.size());
             ArrayList<PortraitInfo> portraitInfos = new ArrayList<>();
             for (int i = 0; i < portraitsInLineCount; i++) {
-                portraitInfos.add(new PortraitInfo(allCards.remove(0)));
+                CharacterCard card = allCards.remove(0);
+                portraitInfos.add(new PortraitInfo(card, settings.getCharacterSkin(card)));
             }
 
             PortraitGroupView ptvPortraits = new PortraitGroupView(context, portraitInfos, PORTRAITS_PER_GROUP);
@@ -150,7 +156,7 @@ public final class CharacterEditorView extends ConstraintLayout {
 
             characterView.setOnClickListener(onNewCharacterClickListener);
             characterView.setOnLongClickListener(onNewCharacterLongClickListener);
-            characterView.setCharacter(character);
+            characterView.setCharacter(character, settings.getCharacterSkin(character));
 
             // We use playable character target to link a character view with a new character
             characterView.setAsPlayableTarget(new InteractionTarget(
@@ -171,7 +177,11 @@ public final class CharacterEditorView extends ConstraintLayout {
     public void startEditCharacterMode(@NonNull Character character) {
         updateMode(EditorMode.EditCharacter);
 
-        crvSwitchColor.setCharacter(character.getCharacterType(), character.getTeamColor().getOpposite());
+        crvSwitchColor.setCharacter(
+                character.getCharacterType(),
+                settings.getCharacterSkin(character.getCharacterType()),
+                character.getTeamColor().getOpposite()
+        );
     }
 
     private void setViewVisible(View v, boolean visible) {

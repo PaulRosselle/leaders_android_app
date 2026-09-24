@@ -3,7 +3,11 @@ package com.leaders.app.entities;
 import androidx.annotation.NonNull;
 
 import com.leaders.app.enums.AnimationSpeed;
+import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.app.enums.HighlightColor;
+import com.leaders.gamelogic.entities.Character;
+import com.leaders.gamelogic.enums.CharacterCard;
+import com.leaders.gamelogic.enums.CharacterType;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,12 +20,14 @@ public final class Settings {
     @NonNull
     private HighlightColor highlightColor;
     private boolean animatePlayableItems;
+    private CharacterSkins characterSkins;
 
     private Settings(){
         userName = "";
         animationSpeed = AnimationSpeed.Normal;
         highlightColor = HighlightColor.Default;
         animatePlayableItems = true;
+        characterSkins = new CharacterSkins();
     }
 
     @NonNull
@@ -41,6 +47,9 @@ public final class Settings {
             if (joSettings.has("animate_playable_items")) {
                 settings.setAnimatePlayableItems(joSettings.getBoolean("animate_playable_items"));
             }
+            if (joSettings.has("character_skins")) {
+                settings.characterSkins = CharacterSkins.fromJson(joSettings.getJSONObject("character_skins"));
+            }
 
         } catch (JSONException e) {
             throw new RuntimeException(e);
@@ -57,6 +66,7 @@ public final class Settings {
         joSettings.put("animation_speed", getAnimationSpeed().name());
         joSettings.put("highlight_color", getHighlightColor().name());
         joSettings.put("animate_playable_items", animatePlayableItems());
+        joSettings.put("character_skins", characterSkins.toJson());
 
         return joSettings;
     }
@@ -94,5 +104,29 @@ public final class Settings {
 
     public void setAnimatePlayableItems(boolean animatePlayableItems) {
         this.animatePlayableItems = animatePlayableItems;
+    }
+
+    @NonNull
+    public CharacterSkins getCharacterSkins() {
+        return characterSkins;
+    }
+
+    @NonNull
+    public CharacterSkinType getCharacterSkin(@NonNull CharacterCard card) {
+        return characterSkins.getCharacterSkin(card);
+    }
+
+    @NonNull
+    public CharacterSkinType getCharacterSkin(@NonNull Character character) {
+        return characterSkins.getCharacterSkin(character.getCharacterType());
+    }
+
+    @NonNull
+    public CharacterSkinType getCharacterSkin(@NonNull CharacterType characterType) {
+        return characterSkins.getCharacterSkin(characterType.getCharacterCard());
+    }
+
+    public void setCharacterSkin(@NonNull CharacterCard card, @NonNull CharacterSkinType skinType) {
+        characterSkins.setCharacterSkin(card, skinType);
     }
 }

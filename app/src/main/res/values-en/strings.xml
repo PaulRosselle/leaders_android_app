@@ -251,5 +251,10 @@
     <string name="let_the_duel_beggin">LET THE DUEL BEGGIN !</string>
     <string name="match_vs_bot_reminder">For your first game, you will fight against a bot.\n\nReminder: to win, capture the opponent\'s leader with 2 adjacent allies or surround him completely.</string>
     <string name="lets_go">Let\'s go</string>
+    <string name="character_card">Character card</string>
+    <string name="skin_default">ORIGINaL</string>
+    <string name="skin_laughing_moon_sage">LaUGhING mOON SaGE</string>
+    <string name="choose">choose</string>
+    <string name="character_skins">character skins</string>
 
 </resources>

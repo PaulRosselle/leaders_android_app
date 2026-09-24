@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 
 import com.google.android.material.button.MaterialButton;
 import com.leaders.app.controllers.GameController;
+import com.leaders.app.entities.CharacterSkins;
 import com.leaders.app.entities.LeadersApplication;
 import com.leaders.app.entities.Settings;
 import com.leaders.app.enums.AnimationSpeed;
@@ -46,6 +47,7 @@ public abstract class PlayableActivity extends BaseActivity
 
     protected AnimationSpeed animationSpeed;
     protected boolean animatePlayableItems;
+
     protected GameController controller;
 
 
@@ -101,6 +103,8 @@ public abstract class PlayableActivity extends BaseActivity
     protected boolean overrideOnBackPressed() {
         return true;
     }
+
+    protected abstract CharacterSkins getCharacterSkins();
 
     //endregion
 
@@ -250,7 +254,9 @@ public abstract class PlayableActivity extends BaseActivity
     @Override
     public void onFeedback(@NonNull InteractionFeedback feedback,
                            @NonNull GameController.InteractionCompletion completion) {
-        runOnUiThread(() -> bdvBoard.animateFeedback(feedback, animationSpeed, completion::complete));
+        runOnUiThread(() -> bdvBoard.animateFeedback(
+                feedback, animationSpeed, getCharacterSkins(), completion::complete
+        ));
     }
 
     @Override

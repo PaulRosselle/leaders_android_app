@@ -13,8 +13,10 @@ import com.leaders.R;
 
 import com.leaders.app.activities.PlayableActivity;
 import com.leaders.app.controllers.GameController;
+import com.leaders.app.entities.CharacterSkins;
 import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
+import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.app.enums.EndGameType;
 import com.leaders.app.enums.LeaderType;
 import com.leaders.app.enums.TutorialChapter;
@@ -72,6 +74,8 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
     @Override
     protected void initViews() {
         super.initViews();
+
+        bdvBoard.setAlwaysUseDefaultSkins(true);
 
         ccsvCardSelector = findViewById(R.id.ccsvCardSelector_actRulesTutorialGame);
         chdNewCharacter = new CharacterDisplay(this, ccsvCardSelector);
@@ -136,6 +140,11 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
     @Override
     protected int getEndGameViewId() {
         return R.id.egvEndGame_actRulesTutorialGame;
+    }
+
+    @Override
+    protected CharacterSkins getCharacterSkins() {
+        return new CharacterSkins();
     }
 
     @Override
@@ -422,7 +431,11 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
             );
 
             if (newCharacter != null) {
-                chdNewCharacter.getCharacterView().setCharacter(newCharacter);
+                // Character always use their default skin in tutorials
+                chdNewCharacter.getCharacterView().setCharacter(
+                        newCharacter,
+                        CharacterSkinType.Default
+                );
             }
             chdNewCharacter.startHighlightAnimation();
         } else {
@@ -534,7 +547,10 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
         GameContext gameContext = controller.getCurrentContext();
 
         if (gameContext.getGamePhase().getPhaseType() == GamePhaseType.Banishment) {
-            controller.selectTarget(ccsvCardSelector.getSelectedTarget());
+            controller.selectTarget(Objects.requireNonNull(
+                    ccsvCardSelector.getSelectedTarget(),
+                    "Cannot end banishment phase without a valid target"
+            ));
         } else {
             controller.endPhase();
         }

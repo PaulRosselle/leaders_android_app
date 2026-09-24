@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 
 import com.leaders.R;
 import com.leaders.app.entities.Contributor;
+import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.app.views.character.CharacterView;
 
 public class ContributorView extends LinearLayout {
@@ -33,7 +34,7 @@ public class ContributorView extends LinearLayout {
     public ContributorView(@NonNull Context context, @NonNull Contributor contributor) {
         this(context, (AttributeSet) null);
 
-        chvCharacter.setCharacter(contributor.getCharacterType(), contributor.getTeamColor());
+        chvCharacter.setCharacter(contributor.getCharacterType(), CharacterSkinType.Default, contributor.getTeamColor());
         txvName.setText(contributor.getName());
         txvAlpha.setVisibility(contributor.hasContributedToAlpha() ? View.VISIBLE : View.INVISIBLE);
         txvBeta.setVisibility(contributor.hasContributedToBeta() ? View.VISIBLE : View.INVISIBLE);

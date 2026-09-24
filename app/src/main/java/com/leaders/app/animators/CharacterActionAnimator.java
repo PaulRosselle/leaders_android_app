@@ -17,6 +17,7 @@ import android.view.animation.DecelerateInterpolator;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.leaders.app.entities.CharacterSkins;
 import com.leaders.app.enums.AnimationSpeed;
 import com.leaders.app.views.board.BoardView;
 import com.leaders.app.views.board.CellView;
@@ -42,8 +43,12 @@ public final class CharacterActionAnimator extends ActionAnimator {
     private static final int DURATION_FLY = 600;
     private static final int DURATION_TRANSFORM = 800;
 
-    public CharacterActionAnimator(@NonNull AnimationSpeed speed) {
+    private final CharacterSkins characterSkins;
+
+    public CharacterActionAnimator(@NonNull AnimationSpeed speed,
+                                   @NonNull CharacterSkins characterSkins) {
         super(speed);
+        this.characterSkins = characterSkins;
     }
 
     public void animate(@NonNull BoardView boardView, 
@@ -123,7 +128,10 @@ public final class CharacterActionAnimator extends ActionAnimator {
             CellView destCellView = boardView.getCellView(destPos);
             characterDisplay.setPosition(destCellView.getX(), destCellView.getY());
             CharacterView characterView = characterDisplay.getCharacterView();
-            characterView.setCharacter(target.getCharacter());
+            characterView.setCharacter(
+                    target.getCharacter(),
+                    characterSkins.getCharacterSkin(target.getCharacter())
+            );
             characterView.setScaleX(0f);
             characterView.setScaleY(0f);
             characterView.setAlpha(0f);
@@ -508,7 +516,10 @@ public final class CharacterActionAnimator extends ActionAnimator {
             @Override
             public void onAnimationEnd(Animator animation) {
                 // Reset to a clean state for the appearance phase.
-                characterView.setCharacter(destinationTarget.getCharacter());
+                characterView.setCharacter(
+                        destinationTarget.getCharacter(),
+                        characterSkins.getCharacterSkin(destinationTarget.getCharacter())
+                );
 
                 characterView.setScaleX(0.75f);
                 characterView.setScaleY(0.75f);

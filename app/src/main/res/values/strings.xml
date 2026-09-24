@@ -263,5 +263,10 @@
     <string name="let_the_duel_beggin">QUE LE DUEL COMMENCE !</string>
     <string name="match_vs_bot_reminder">Pour votre première partie, vous affronter un bot.\n\nRappel : pour gagner, capturez le leader adverse avec 2 de vos personnages adjacents ou encerclez-le totalement.</string>
     <string name="lets_go">C\'est parti</string>
+    <string name="character_card">Carte de personnage</string>
+    <string name="skin_default">ORIGINaL</string>
+    <string name="skin_laughing_moon_sage">SaGE DE La LUNE RIEUSE</string>
+    <string name="choose">choisir</string>
+    <string name="character_skins">apparence des personnages</string>
 
 </resources>

@@ -11,7 +11,10 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 
 import com.leaders.R;
+import com.leaders.app.entities.LeadersApplication;
+import com.leaders.app.entities.Settings;
 import com.leaders.app.enums.BoardOrientation;
+import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.app.views.character.CharacterDisplay;
 import com.leaders.app.views.character.CharacterDisplayPool;
 import com.leaders.app.views.character.CharacterView;
@@ -41,9 +44,12 @@ public abstract class BoardView extends ConstraintLayout {
     @NonNull
     protected BoardOrientation orientation;
     protected boolean isCellPositionVisible;
+    protected boolean alwaysUseDefaultSkins;
 
     private OnCharacterDisplayClickListener onCharacterDisplayClickListener;
     private OnLongClickListener onCharacterLongClickListener;
+
+    private final Settings settings;
 
 
     public BoardView(@NonNull Context context, @Nullable AttributeSet attrs) {
@@ -52,6 +58,7 @@ public abstract class BoardView extends ConstraintLayout {
         cellViews = new ArrayList<>();
         cellViewsMap = new HashMap<>();
         characterDisplayMap = new HashMap<>();
+        settings = ((LeadersApplication) context.getApplicationContext()).getSettings();
 
         inflate(context, R.layout.view_board, this);
 
@@ -61,6 +68,7 @@ public abstract class BoardView extends ConstraintLayout {
 
         setOrientation(BoardOrientation.Default);
         isCellPositionVisible = false;
+        alwaysUseDefaultSkins = false;
 
         // Allow us to control better children animations using PropertyAnimators
         LayoutTransition boardTransition = getLayoutTransition();
@@ -172,7 +180,11 @@ public abstract class BoardView extends ConstraintLayout {
 
                 CharacterView characterView = characterDisplay.getCharacterView();
                 characterView.setVisibility(VISIBLE);
-                characterView.setCharacter(cell.getCharacter());
+                characterView.setCharacter(
+                        cell.getCharacter(),
+                        alwaysUseDefaultSkins ? CharacterSkinType.Default :
+                                settings.getCharacterSkin(cell.getCharacter())
+                );
                 characterView.bringToFront();
 
                 CellView cellView = getCellView(cellPosition);
@@ -258,6 +270,10 @@ public abstract class BoardView extends ConstraintLayout {
         } else {
             imvBoard.setForeground(null);
         }
+    }
+
+    public final void setAlwaysUseDefaultSkins(boolean alwaysUseDefaultSkins) {
+        this.alwaysUseDefaultSkins = alwaysUseDefaultSkins;
     }
 
     public final boolean isCellPositionVisible() {

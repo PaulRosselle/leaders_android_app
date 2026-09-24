@@ -18,6 +18,7 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.leaders.R;
+import com.leaders.app.entities.CharacterSkins;
 import com.leaders.app.entities.PortraitInfo;
 import com.leaders.app.enums.PortraitDisplayMode;
 import com.leaders.app.utilities.CharacterCardUtils;
@@ -33,6 +34,7 @@ import com.leaders.gamelogic.interactions.InteractionTarget;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -55,11 +57,15 @@ public final class CharacterCardSelectionView extends ConstraintLayout {
 
     private int portraitsPerGroup;
     private int portraitSpacing;
+    @Nullable
     private List<InteractionTarget> targets;
+    @Nullable
     private InteractionTarget selectedTarget;
 
-    private OnLongClickListener onPortraitLongClickListener;
+    @NonNull
+    private CharacterSkins characterSkins;
 
+    private OnLongClickListener onPortraitLongClickListener;
     private OnCardSelectedListener onCardSelectedListener;
 
     public CharacterCardSelectionView(@NonNull Context context, @Nullable AttributeSet attrs) {
@@ -67,6 +73,7 @@ public final class CharacterCardSelectionView extends ConstraintLayout {
 
         targets = null;
         selectedTarget = null;
+        characterSkins = new CharacterSkins();
 
         inflate(context, R.layout.view_character_card_selection, this);
 
@@ -103,6 +110,7 @@ public final class CharacterCardSelectionView extends ConstraintLayout {
         updatePortraitsFromCards(selectableCards);
     }
 
+    @Nullable
     public InteractionTarget getSelectedTarget() {
         return selectedTarget;
     }
@@ -119,6 +127,7 @@ public final class CharacterCardSelectionView extends ConstraintLayout {
             SelectableCharacterCard selectableCard = getSelectableCardFromTarget(target);
             portraitInfos.add(new PortraitInfo(
                     selectableCard.getCharacterCard(),
+                    characterSkins.getCharacterSkin(selectableCard.getCharacterCard()),
                     selectableCard.getSelectionStatus() == CharacterCardSelectionStatus.AlreadyBanned,
                     PortraitDisplayMode.Default,
                     selectableCard.getTeamColor(),
@@ -136,6 +145,7 @@ public final class CharacterCardSelectionView extends ConstraintLayout {
         for (SelectableCharacterCard selectableCard : sortedSelectableCards) {
             portraitInfos.add(new PortraitInfo(
                     selectableCard.getCharacterCard(),
+                    characterSkins.getCharacterSkin(selectableCard.getCharacterCard()),
                     selectableCard.getSelectionStatus() == CharacterCardSelectionStatus.AlreadyBanned,
                     selectableCard.getTeamColor()
             ));
@@ -178,7 +188,12 @@ public final class CharacterCardSelectionView extends ConstraintLayout {
         llyPortraits.addView(portraitsGroupView, getPortraitsGroupLP());
     }
 
+    @NonNull
     private List<InteractionTarget> getSortedTargets() {
+        if (targets == null) {
+            return Collections.emptyList();
+        }
+
         // Portrait targets are sorted based on their card sort order
         List<CharacterCard> allCards = new ArrayList<>(Arrays.asList(CharacterCard.values()));
         Context context = getContext();
@@ -206,6 +221,7 @@ public final class CharacterCardSelectionView extends ConstraintLayout {
         return sortedTargets;
     }
 
+    @NonNull
     private List<SelectableCharacterCard> getSortedSelectableCards(@NonNull List<SelectableCharacterCard> selectableCards) {
         // Portrait selectable cards are sorted based on their card sort order
         List<CharacterCard> allCards = new ArrayList<>(Arrays.asList(CharacterCard.values()));
@@ -367,6 +383,10 @@ public final class CharacterCardSelectionView extends ConstraintLayout {
         layoutParams.weight = 1;
 
         return layoutParams;
+    }
+
+    public void setCharacterSkins(@NonNull CharacterSkins characterSkins) {
+        this.characterSkins = characterSkins;
     }
 
     public void setOnPortraitLongClickListener(OnLongClickListener onPortraitLongClickListener) {

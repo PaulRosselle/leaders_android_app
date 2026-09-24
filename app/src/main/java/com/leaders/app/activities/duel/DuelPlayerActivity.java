@@ -13,7 +13,10 @@ import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 import com.leaders.app.activities.PlayableActivity;
 import com.leaders.app.controllers.GameController;
+import com.leaders.app.entities.CharacterSkins;
+import com.leaders.app.entities.LeadersApplication;
 import com.leaders.app.entities.ReplaySave;
+import com.leaders.app.entities.Settings;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.AnimationSpeed;
 import com.leaders.app.enums.EndGameType;
@@ -113,6 +116,8 @@ public final class DuelPlayerActivity extends PlayableActivity implements
     private MaterialButton btnCards;
     private MaterialButton btnNextPhase;
     private HighlightView hlvNextPhase;
+
+    private CharacterSkins characterSkins;
     
 
     //region BASE ACTIVITY OVERRIDEN METHODS
@@ -171,6 +176,11 @@ public final class DuelPlayerActivity extends PlayableActivity implements
     protected void initDatas() {
         super.initDatas();
 
+        Settings settings = ((LeadersApplication) getApplication()).getSettings();
+        characterSkins = settings.getCharacterSkins();
+        cnvCardInfo.setCharacterSkins(characterSkins);
+        ccsvCardSelector.setCharacterSkins(characterSkins);
+
         updateAnimatePlayableIcon();
 
         String gameDatas = getIntent().getStringExtra(ExtraUtils.EXTRA_DUEL_GAME_DATAS);
@@ -212,6 +222,11 @@ public final class DuelPlayerActivity extends PlayableActivity implements
     }
 
     @Override
+    protected CharacterSkins getCharacterSkins() {
+        return characterSkins;
+    }
+
+    @Override
     protected int getLayoutResId() {
         return R.layout.activity_duel_player;
     }
@@ -250,7 +265,10 @@ public final class DuelPlayerActivity extends PlayableActivity implements
         GameContext gameContext = controller.getCurrentContext();
 
         if (gameContext.getGamePhase().getPhaseType() == GamePhaseType.Banishment) {
-            controller.selectTarget(ccsvCardSelector.getSelectedTarget());
+            controller.selectTarget(Objects.requireNonNull(
+                    ccsvCardSelector.getSelectedTarget(),
+                    "Cannot end banishment phase without a valid target"
+            ));
         } else {
             controller.endPhase();
         }
@@ -567,7 +585,10 @@ public final class DuelPlayerActivity extends PlayableActivity implements
             );
 
             if (newCharacter != null) {
-                chdNewCharacter.getCharacterView().setCharacter(newCharacter);
+                chdNewCharacter.getCharacterView().setCharacter(
+                        newCharacter,
+                        characterSkins.getCharacterSkin(newCharacter)
+                );
             }
             chdNewCharacter.startHighlightAnimation();
         } else {

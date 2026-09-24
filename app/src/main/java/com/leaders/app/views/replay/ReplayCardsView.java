@@ -15,6 +15,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.leaders.R;
 import com.leaders.app.entities.PortraitInfo;
+import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.app.enums.PortraitDisplayMode;
 import com.leaders.app.utilities.CharacterCardUtils;
 import com.leaders.app.views.portrait.PortraitGroupView;
@@ -161,6 +162,7 @@ public final class ReplayCardsView extends ConstraintLayout {
             for (int j = 0; j < portraitsPerGroup; j++) {
                 portraitsInfos.add(new PortraitInfo(
                         CharacterCard.Nemesis,
+                        CharacterSkinType.Default,
                         false,
                         PortraitDisplayMode.Hexagonal
                 ));
@@ -236,7 +238,12 @@ public final class ReplayCardsView extends ConstraintLayout {
         List<PortraitInfo> availableCardsInfos = new ArrayList<>();
 
         for (CharacterCard availableCard : SelectableCardsQuery.getAvailableCards(game, gameMode)) {
-            availableCardsInfos.add(new PortraitInfo(availableCard, false, PortraitDisplayMode.Hexagonal));
+            availableCardsInfos.add(new PortraitInfo(
+                    availableCard,
+                    CharacterSkinType.Default,
+                    false,
+                    PortraitDisplayMode.Hexagonal
+            ));
         }
 
         return availableCardsInfos;
@@ -249,7 +256,12 @@ public final class ReplayCardsView extends ConstraintLayout {
         for (Character recruitedCharacter : game.getRecruitedCharacters()) {
             CharacterCard card = recruitedCharacter.getCharacterType().getCharacterCard();
             if (card.canBeRecruited() && recruitedCards.add(card)) {
-                recruitedCardsInfos.add(new PortraitInfo(card, false, PortraitDisplayMode.Hexagonal));
+                recruitedCardsInfos.add(new PortraitInfo(
+                        card,
+                        CharacterSkinType.Default,
+                        false,
+                        PortraitDisplayMode.Hexagonal
+                ));
             }
         }
 
@@ -263,6 +275,7 @@ public final class ReplayCardsView extends ConstraintLayout {
             for (CharacterCard banishedCard : game.getBanishedCards(teamColor)) {
                 banishedCardsInfos.add(new PortraitInfo(
                         banishedCard,
+                        CharacterSkinType.Default,
                         true,
                         PortraitDisplayMode.Hexagonal,
                         teamColor,

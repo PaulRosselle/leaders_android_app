@@ -11,6 +11,9 @@ import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 import com.leaders.app.activities.PlayableActivity;
 import com.leaders.app.controllers.GameController;
+import com.leaders.app.entities.CharacterSkins;
+import com.leaders.app.entities.LeadersApplication;
+import com.leaders.app.entities.Settings;
 import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.AnimationSpeed;
@@ -101,6 +104,8 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
     private List<? extends PuzzleSave> puzzleSaves;
     private PuzzleSave puzzleSave;
 
+    private CharacterSkins characterSkins;
+
 
     //region BASE ACTIVITY OVERRIDEN METHODS
 
@@ -147,6 +152,10 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
     @Override
     protected void initDatas() {
         super.initDatas();
+
+        Settings settings = ((LeadersApplication) getApplication()).getSettings();
+        characterSkins = settings.getCharacterSkins();
+        cnvCardInfo.setCharacterSkins(characterSkins);
 
         updateAnimatePlayableIcon();
 
@@ -209,6 +218,11 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
     @Override
     protected int getEndGameViewId() {
         return R.id.egvEndGame_actPuzzlePlayer;
+    }
+
+    @Override
+    protected CharacterSkins getCharacterSkins() {
+        return characterSkins;
     }
 
     @Override

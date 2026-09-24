@@ -3,6 +3,7 @@ package com.leaders.app.entities;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.app.enums.PortraitDisplayMode;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.TeamColor;
@@ -11,6 +12,8 @@ import com.leaders.gamelogic.interactions.InteractionTarget;
 public final class PortraitInfo {
     @NonNull
     private CharacterCard card;
+    @NonNull
+    private CharacterSkinType skinType;
     @Nullable
     private TeamColor teamColor;
     private boolean isBanned;
@@ -19,28 +22,36 @@ public final class PortraitInfo {
     @Nullable
     private InteractionTarget target;
 
-    public PortraitInfo(@NonNull CharacterCard card, boolean isBanned,
+    public PortraitInfo(@NonNull CharacterCard card,
+                        @NonNull CharacterSkinType skinType,
+                        boolean isBanned,
                         @NonNull PortraitDisplayMode displayMode,
                         @Nullable TeamColor teamColor,
                         @Nullable InteractionTarget target) {
         this.card = card;
+        this.skinType = skinType;
         this.isBanned = isBanned;
         this.teamColor = teamColor;
         this.displayMode = displayMode;
         this.target = target;
     }
 
-    public PortraitInfo(@NonNull CharacterCard card, boolean isBanned,
+    public PortraitInfo(@NonNull CharacterCard card,
+                        @NonNull CharacterSkinType skinType,
+                        boolean isBanned,
                         @NonNull PortraitDisplayMode displayMode) {
-        this(card, isBanned, displayMode, null, null);
+        this(card, skinType, isBanned, displayMode, null, null);
     }
 
-    public PortraitInfo(@NonNull CharacterCard card, boolean isBanned, @Nullable TeamColor teamColor) {
-        this(card, isBanned, PortraitDisplayMode.Default, teamColor, null);
+    public PortraitInfo(@NonNull CharacterCard card,
+                        @NonNull CharacterSkinType skinType,
+                        boolean isBanned, @Nullable TeamColor teamColor) {
+        this(card, skinType, isBanned, PortraitDisplayMode.Default, teamColor, null);
     }
 
-    public PortraitInfo(@NonNull CharacterCard card) {
-        this(card, false, PortraitDisplayMode.Default, null, null);
+    public PortraitInfo(@NonNull CharacterCard card,
+                        @NonNull CharacterSkinType skinType) {
+        this(card, skinType, false, PortraitDisplayMode.Default, null, null);
     }
 
     @NonNull
@@ -50,6 +61,15 @@ public final class PortraitInfo {
 
     public void setCard(@NonNull CharacterCard card) {
         this.card = card;
+    }
+
+    @NonNull
+    public CharacterSkinType getSkinType() {
+        return skinType;
+    }
+
+    public void setSkinType(@NonNull CharacterSkinType skinType) {
+        this.skinType = skinType;
     }
 
     public boolean isBanned() {
