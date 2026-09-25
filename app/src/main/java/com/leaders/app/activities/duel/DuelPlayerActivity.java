@@ -439,7 +439,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
             float dpRatio = getResources().getDisplayMetrics().density;
             int boardHeight = bdvBoard.getMeasuredHeight();
             float playerHeaderHeight = boardHeight * (72f / 1177f);
-            int boardMargin = 16;
+            int boardMargin = 8;
             int playerViewMargin = boardMargin + 8;
 
             boardParams.topMargin = (int) (playerHeaderHeight + boardMargin * dpRatio);
