@@ -106,18 +106,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/pbvPlayer_actRulesTutorialGame" />
 
-    <com.leaders.app.views.board.PlayableBoardView
-        android:id="@+id/bdvBoard_actRulesTutorialGame"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:animateLayoutChanges="true"
-        app:layout_constraintBottom_toTopOf="@+id/btnReset_actRulesTutorialGame"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnBack_actRulesTutorialGame" />
-
     <com.leaders.app.views.duel.PlayerTopView
         android:id="@+id/ptvBot_actRulesTutorialGame"
         android:layout_width="0dp"
@@ -134,15 +122,26 @@
         android:id="@+id/pbvPlayer_actRulesTutorialGame"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:layout_marginBottom="16dp"
         android:animateLayoutChanges="true"
         app:layout_constraintBottom_toTopOf="@+id/btnUndoLastAction_actRulesTutorialGame"
-        app:layout_constraintEnd_toStartOf="@+id/gdl50V_actRulesTutorialGame"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnBack_actRulesTutorialGame"
         app:layout_constraintVertical_bias="1.0" />
+
+    <com.leaders.app.views.board.PlayableBoardView
+        android:id="@+id/bdvBoard_actRulesTutorialGame"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:animateLayoutChanges="true"
+        app:layout_constraintBottom_toTopOf="@+id/btnReset_actRulesTutorialGame"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnBack_actRulesTutorialGame" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnReset_actRulesTutorialGame"

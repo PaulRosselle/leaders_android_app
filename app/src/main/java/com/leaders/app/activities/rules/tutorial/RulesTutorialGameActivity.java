@@ -412,6 +412,8 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
                                   boolean canChangeSelectableCardsVisibility) {
         boolean lockSelectableCardsView = gamePhase.getPhaseType() == GamePhaseType.Recruitment ||
                 gamePhase.getPhaseType() == GamePhaseType.Banishment;
+        ccsvCardSelector.applyTurnPhase(gamePhase.getPhaseType());
+        pbvPlayer.setInfo(gamePhase.getPhaseType());
 
         if (canChangeSelectableCardsVisibility) {
             setCardSelectorVisible(lockSelectableCardsView);
@@ -466,6 +468,7 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
         GameContext gameContext = controller.getCurrentContext();
 
         clearInteractionUI(gameContext);
+        pbvPlayer.setInfo(R.string.game_ended, R.drawable.player_bottom_bg_info);
         showEndGame(gameContext, winner);
 
         isGameEnded = true;

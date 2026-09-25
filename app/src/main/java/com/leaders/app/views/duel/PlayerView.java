@@ -23,6 +23,7 @@ import com.leaders.gamelogic.entities.Player;
 public abstract class PlayerView extends ConstraintLayout {
     private static final int WARNING_ANIMATION_DURATION = 3000;
 
+    private final ImageView imvTeam;
     private final ImageView imvLeader;
     private final ImageView imvWarning;
     private final TextView txvName;
@@ -33,6 +34,7 @@ public abstract class PlayerView extends ConstraintLayout {
 
         inflate(context, getLayoutResId(), this);
 
+        imvTeam = findViewById(getImvTeamResId());
         imvLeader = findViewById(getImvLeaderResId());
         imvWarning = findViewById(getImvWarningResId());
         txvName = findViewById(getTxvPlayerNameResId());
@@ -55,6 +57,7 @@ public abstract class PlayerView extends ConstraintLayout {
 
     protected abstract int getLayoutResId();
 
+    protected abstract int getImvTeamResId();
     protected abstract int getImvLeaderResId();
     protected abstract int getImvWarningResId();
 
@@ -69,7 +72,7 @@ public abstract class PlayerView extends ConstraintLayout {
     public void setPlayer(@NonNull Player player, @NonNull LeaderType leaderType) {
         txvName.setText(player.getName());
         imvLeader.setImageResource(getLeaderResId(leaderType));
-        imvLeader.setBackgroundResource(getBackgroundResId(player));
+        imvTeam.setImageResource(getBackgroundResId(player));
     }
 
     public void onWarningClick() {

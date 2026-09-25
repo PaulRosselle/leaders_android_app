@@ -7182,7 +7182,7 @@
                   "motion_type": "Add",
                   "character": {
                     "uuid": "ecd20e83-6334-4fae-b790-4f058c290c24",
-                    "character_type": "LeaderKing",
+                    "character_type": "LeaderQueen",
                     "team_color": "Black"
                   },
                   "position": {
@@ -7222,6 +7222,23 @@
                   "position": {
                     "x": 5,
                     "y": 2
+                  }
+                }
+              ],
+              "type": "Recruitment"
+            },
+            {
+              "motions": [
+                {
+                  "motion_type": "Add",
+                  "character": {
+                    "uuid": "8c6e8c63-f52f-412c-b22e-acf51fc68323",
+                    "character_type": "Wanderer",
+                    "team_color": "White"
+                  },
+                  "position": {
+                    "x": 5,
+                    "y": 3
                   }
                 }
               ],
@@ -7318,7 +7335,7 @@
                   "motion_type": "Add",
                   "character": {
                     "uuid": "e4fcc806-62af-4d68-8cad-9c8f208d4479",
-                    "character_type": "LeaderQueen",
+                    "character_type": "LeaderKing",
                     "team_color": "White"
                   },
                   "position": {

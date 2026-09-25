@@ -7,13 +7,6 @@
     tools:ignore="SpUsage">
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/gdl69V_vwPlayerTop"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.69" />
-
-    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/gdl02H_vwPlayerTop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -32,10 +25,11 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <ImageView
-        android:id="@+id/imvLeader_vwPlayerTop"
+        android:id="@+id/imvTeam_vwPlayerTop"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
+        android:importantForAccessibility="no"
         android:rotationY="180"
         android:scaleType="fitStart"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -43,9 +37,23 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0"
-        android:background="@drawable/player_top_bg_b"
-        app:srcCompat="@drawable/player_top_queen"
-        android:importantForAccessibility="no" />
+        app:srcCompat="@drawable/player_top_bg_b" />
+
+    <ImageView
+        android:id="@+id/imvLeader_vwPlayerTop"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:adjustViewBounds="true"
+        android:importantForAccessibility="no"
+        android:rotationY="180"
+        android:scaleType="fitEnd"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/player_top_queen" />
 
     <ImageView
         android:id="@+id/imvWarning_vwPlayerTop"
@@ -74,7 +82,7 @@
         android:textColor="@color/font"
         android:textSize="@dimen/default_text_font_size"
         app:layout_constraintBottom_toTopOf="@+id/gdl20H_vwPlayerTop"
-        app:layout_constraintEnd_toStartOf="@+id/gdl69V_vwPlayerTop"
+        app:layout_constraintEnd_toStartOf="@+id/imvLeader_vwPlayerTop"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/gdl02H_vwPlayerTop"
