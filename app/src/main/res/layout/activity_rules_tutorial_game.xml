@@ -18,12 +18,30 @@
         app:layout_constraintGuide_begin="0dp" />
 
     <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gdl25V_actRulesTutorialGame"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintGuide_percent="0.25"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/gdl50V_actRulesTutorialGame"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintGuide_percent="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gdl75V_actRulesTutorialGame"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintGuide_percent="0.75"
         app:layout_constraintStart_toStartOf="parent" />
 
     <com.leaders.app.views.decoration.DecorativeBackgroundView
@@ -144,6 +162,29 @@
         app:layout_constraintTop_toBottomOf="@+id/btnBack_actRulesTutorialGame" />
 
     <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnCards_actRulesTutorialGame"
+        android:layout_width="@dimen/round_button_size"
+        android:layout_height="@dimen/round_button_size"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/darker_background"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        app:icon="@drawable/icon_cards"
+        app:iconGravity="textStart"
+        app:iconPadding="0dp"
+        app:iconSize="@dimen/round_button_icon_size"
+        app:iconTint="@color/font"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toStartOf="@+id/gdl50V_actRulesTutorialGame"
+        app:layout_constraintStart_toStartOf="@+id/gdl25V_actRulesTutorialGame"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        app:strokeColor="@color/font"
+        app:strokeWidth="1dp"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnReset_actRulesTutorialGame"
         android:layout_width="@dimen/round_button_size"
         android:layout_height="@dimen/round_button_size"
@@ -158,7 +199,7 @@
         app:backgroundTint="@color/darker_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintEnd_toStartOf="@+id/gdl50V_actRulesTutorialGame"
+        app:layout_constraintEnd_toStartOf="@+id/gdl25V_actRulesTutorialGame"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0"
@@ -181,8 +222,8 @@
         app:iconTint="@color/font"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdl75V_actRulesTutorialGame"
+        app:layout_constraintStart_toStartOf="@+id/gdl50V_actRulesTutorialGame"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0"
         app:strokeColor="@color/font"
@@ -206,7 +247,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/gdl50V_actRulesTutorialGame"
+        app:layout_constraintStart_toStartOf="@+id/gdl75V_actRulesTutorialGame"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0"
         app:strokeColor="@color/font"
