@@ -268,5 +268,9 @@
     <string name="skin_laughing_moon_sage">SaGE DE La LUNE RIEUSE</string>
     <string name="choose">choisir</string>
     <string name="character_skins">apparence des personnages</string>
+    <string name="play_characters">jouez vos personnages</string>
+    <string name="recruit_character">recrutez un personnage</string>
+    <string name="ban_character">bannissez un personnage</string>
+    <string name="game_ended">partie terminÉe</string>
 
 </resources>

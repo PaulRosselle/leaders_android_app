@@ -256,5 +256,9 @@
     <string name="skin_laughing_moon_sage">LaUGhING mOON SaGE</string>
     <string name="choose">choose</string>
     <string name="character_skins">character skins</string>
+    <string name="play_characters">play your characters</string>
+    <string name="recruit_character">recruit a character</string>
+    <string name="ban_character">ban a character</string>
+    <string name="game_ended">game ended</string>
 
 </resources>

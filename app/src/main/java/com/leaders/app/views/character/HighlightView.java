@@ -20,8 +20,10 @@ public final class HighlightView extends AppCompatImageView {
     public HighlightView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
-        Settings settings = ((LeadersApplication) context.getApplicationContext()).getSettings();
-        setImageResource(settings.getHighlightColor().getOutlineResId());
+        if (!isInEditMode()) {
+            Settings settings = ((LeadersApplication) context.getApplicationContext()).getSettings();
+            setImageResource(settings.getHighlightColor().getOutlineResId());
+        }
 
         animator = ObjectAnimator.ofFloat(this, ROTATION, 0f, 360f);
         animator.setDuration(HIGHLIGHT_ANIMATION_DURATION);

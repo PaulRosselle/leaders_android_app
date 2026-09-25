@@ -61,6 +61,8 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
     private PlayerBottomView pbvPlayer;
     private PlayerTopView ptvBot;
 
+
+    private MaterialButton btnCards;
     private MaterialButton btnReset;
     private MaterialButton btnNextPhase;
     private HighlightView hlvNextPhase;
@@ -86,6 +88,7 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
         pbvPlayer = findViewById(R.id.pbvPlayer_actRulesTutorialGame);
         ptvBot = findViewById(R.id.ptvBot_actRulesTutorialGame);
 
+        btnCards = findViewById(R.id.btnCards_actRulesTutorialGame);
         btnReset = findViewById(R.id.btnReset_actRulesTutorialGame);
         btnNextPhase = findViewById(R.id.btnNextPhase_actRulesTutorialGame);
         hlvNextPhase = findViewById(R.id.hlvNextPhase_actRulesTutorialGame);
@@ -106,6 +109,7 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
         btnInfo.setOnClickListener(this::onInfoClick);
         tnvNavigation.setNavigator(this);
 
+        btnCards.setOnClickListener(this::onCardsClick);
         btnReset.setOnClickListener(this::onResetClick);
         btnNextPhase.setOnClickListener(this::onNextPhaseClick);
     }
@@ -410,9 +414,12 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
 
     private void applyPhaseChange(@NonNull GamePhase gamePhase,
                                   boolean canChangeSelectableCardsVisibility) {
+        ccsvCardSelector.applyTurnPhase(gamePhase.getPhaseType());
+        pbvPlayer.setInfo(gamePhase.getPhaseType());
+
         boolean lockSelectableCardsView = gamePhase.getPhaseType() == GamePhaseType.Recruitment ||
                 gamePhase.getPhaseType() == GamePhaseType.Banishment;
-
+        ButtonUtils.setEnabled(btnCards, !lockSelectableCardsView);
         if (canChangeSelectableCardsVisibility) {
             setCardSelectorVisible(lockSelectableCardsView);
         }
@@ -466,6 +473,8 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
         GameContext gameContext = controller.getCurrentContext();
 
         clearInteractionUI(gameContext);
+        ButtonUtils.setEnabled(btnCards, true);
+        pbvPlayer.setInfo(R.string.game_ended, R.drawable.player_bottom_bg_info);
         showEndGame(gameContext, winner);
 
         isGameEnded = true;
@@ -511,6 +520,10 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
     //endregion
 
     //region VIEW LISTENER METHODS
+
+    private void onCardsClick(View v) {
+        setCardSelectorVisible(ccsvCardSelector.getVisibility() != View.VISIBLE);
+    }
 
     private boolean onPortraitLongClick(View v) {
         showCardDescriptionNotification(((PortraitView) v).getPortraitCard());

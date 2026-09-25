@@ -22,6 +22,11 @@ public final class PlayerTopView extends PlayerView {
     }
 
     @Override
+    protected int getImvTeamResId() {
+        return R.id.imvTeam_vwPlayerTop;
+    }
+
+    @Override
     protected int getImvLeaderResId() {
         return R.id.imvLeader_vwPlayerTop;
     }

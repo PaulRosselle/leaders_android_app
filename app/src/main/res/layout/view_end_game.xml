@@ -54,6 +54,7 @@
         android:background="@drawable/end_game_victory_subtitle_bg"
         android:fontFamily="@font/bourbon_test_regular"
         android:gravity="center"
+        android:maxLines="1"
         android:paddingStart="16dp"
         android:paddingTop="0dp"
         android:paddingEnd="16dp"

@@ -6,6 +6,7 @@ import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
+import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
@@ -19,21 +20,24 @@ public final class OrnateFrameView extends ConstraintLayout {
         inflate(context, R.layout.view_ornate_frame, this);
 
         try (TypedArray customAttrs = context.obtainStyledAttributes(attrs, R.styleable.OrnateFrameView)) {
-            int colorId = customAttrs.getResourceId(R.styleable.OrnateFrameView_colorTint, R.color.app_golden);
-            ColorStateList colorTintList = AppCompatResources.getColorStateList(context, colorId);
-
-            ImageView[] imvCorners = new ImageView[] {
-                    findViewById(R.id.imvCornerBg1_vwOrnateFrame),
-                    findViewById(R.id.imvCornerBg2_vwOrnateFrame),
-                    findViewById(R.id.imvCornerBg3_vwOrnateFrame),
-                    findViewById(R.id.imvCornerBg4_vwOrnateFrame)
-            };
-            for (ImageView imvCorner : imvCorners) {
-                imvCorner.setImageTintList(colorTintList);
-            }
-
-            ImageView imvRectLines = findViewById(R.id.imvRectLines_vwOrnateFrame);
-            imvRectLines.setImageTintList(colorTintList);
+            setColorTint(customAttrs.getResourceId(R.styleable.OrnateFrameView_colorTint, R.color.app_golden));
         }
+    }
+
+    public void setColorTint(@ColorRes int colorId) {
+        ColorStateList colorTintList = AppCompatResources.getColorStateList(getContext(), colorId);
+
+        ImageView[] imvCorners = new ImageView[] {
+                findViewById(R.id.imvCornerBg1_vwOrnateFrame),
+                findViewById(R.id.imvCornerBg2_vwOrnateFrame),
+                findViewById(R.id.imvCornerBg3_vwOrnateFrame),
+                findViewById(R.id.imvCornerBg4_vwOrnateFrame)
+        };
+        for (ImageView imvCorner : imvCorners) {
+            imvCorner.setImageTintList(colorTintList);
+        }
+
+        ImageView imvRectLines = findViewById(R.id.imvRectLines_vwOrnateFrame);
+        imvRectLines.setImageTintList(colorTintList);
     }
 }

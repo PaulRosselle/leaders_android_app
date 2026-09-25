@@ -58,7 +58,11 @@ public abstract class BoardView extends ConstraintLayout {
         cellViews = new ArrayList<>();
         cellViewsMap = new HashMap<>();
         characterDisplayMap = new HashMap<>();
-        settings = ((LeadersApplication) context.getApplicationContext()).getSettings();
+        if (isInEditMode()) {
+            settings = new Settings();
+        } else {
+            settings = ((LeadersApplication) context.getApplicationContext()).getSettings();
+        }
 
         inflate(context, R.layout.view_board, this);
 

@@ -439,7 +439,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
             float dpRatio = getResources().getDisplayMetrics().density;
             int boardHeight = bdvBoard.getMeasuredHeight();
             float playerHeaderHeight = boardHeight * (72f / 1177f);
-            int boardMargin = 16;
+            int boardMargin = 8;
             int playerViewMargin = boardMargin + 8;
 
             boardParams.topMargin = (int) (playerHeaderHeight + boardMargin * dpRatio);
@@ -563,6 +563,8 @@ public final class DuelPlayerActivity extends PlayableActivity implements
         String playerName = gamePhase.getPhasePlayer().getName();
         int playerTurnFormat = isPlayerNameFirstCharVowel(playerName) ? R.string.player_turn_vowel : R.string.player_turn_consonant;
         txvPlayerTurn.setText(String.format(getString(playerTurnFormat), playerName));
+        ccsvCardSelector.applyTurnPhase(gamePhase.getPhaseType());
+        pbvCurrentPlayer.setInfo(gamePhase.getPhaseType());
 
         boolean lockSelectableCardsView = gamePhase.getPhaseType() == GamePhaseType.Recruitment ||
                 gamePhase.getPhaseType() == GamePhaseType.Banishment;
@@ -685,6 +687,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
 
         clearInteractionUI(gameContext);
         ButtonUtils.setEnabled(btnCards, true);
+        pbvCurrentPlayer.setInfo(R.string.game_ended, R.drawable.player_bottom_bg_info);
         showEndGame(gameContext, winner);
     }
 

@@ -88,12 +88,36 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/btnUndoLastAction_actDuelPlayer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/pbvCurrentPlayer_actDuelPlayer" />
+
+    <com.leaders.app.views.duel.PlayerTopView
+        android:id="@+id/ptvOpposingPlayer_actDuelPlayer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/gdl50V_actDuelPlayer"
+        app:layout_constraintTop_toBottomOf="@+id/btnBack_actDuelPlayer"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.duel.PlayerBottomView
+        android:id="@+id/pbvCurrentPlayer_actDuelPlayer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:animateLayoutChanges="true"
+        app:layout_constraintBottom_toTopOf="@+id/btnUndoLastAction_actDuelPlayer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnBack_actDuelPlayer"
+        app:layout_constraintVertical_bias="1.0" />
 
     <com.leaders.app.views.board.PlayableBoardView
         android:id="@+id/bdvBoard_actDuelPlayer"
@@ -106,32 +130,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnBack_actDuelPlayer" />
-
-    <com.leaders.app.views.duel.PlayerTopView
-        android:id="@+id/ptvOpposingPlayer_actDuelPlayer"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/gdl50V_actDuelPlayer"
-        app:layout_constraintTop_toBottomOf="@+id/btnBack_actDuelPlayer"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <com.leaders.app.views.duel.PlayerBottomView
-        android:id="@+id/pbvCurrentPlayer_actDuelPlayer"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="16dp"
-        android:animateLayoutChanges="true"
-        app:layout_constraintBottom_toTopOf="@+id/btnUndoLastAction_actDuelPlayer"
-        app:layout_constraintEnd_toStartOf="@+id/gdl50V_actDuelPlayer"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnBack_actDuelPlayer"
-        app:layout_constraintVertical_bias="1.0" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnCards_actDuelPlayer"
@@ -206,9 +204,18 @@
 
     <TextView
         android:id="@+id/txvPlayerTurn_actDuelPlayer"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:autoSizeMaxTextSize="@dimen/default_text_font_size"
+        android:autoSizeMinTextSize="14dp"
+        android:autoSizeStepGranularity="1dp"
+        android:autoSizeTextType="uniform"
         android:fontFamily="@font/futura"
+        android:gravity="center"
+        android:maxLines="1"
+        android:ellipsize="none"
         android:textAllCaps="true"
         android:textColor="@color/app_golden"
         android:textSize="@dimen/default_text_font_size"

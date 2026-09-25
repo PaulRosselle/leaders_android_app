@@ -22,7 +22,7 @@ public final class Settings {
     private boolean animatePlayableItems;
     private CharacterSkins characterSkins;
 
-    private Settings(){
+    public Settings(){
         userName = "";
         animationSpeed = AnimationSpeed.Normal;
         highlightColor = HighlightColor.Default;

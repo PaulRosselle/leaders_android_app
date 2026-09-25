@@ -22,6 +22,7 @@ import com.leaders.app.entities.CharacterSkins;
 import com.leaders.app.entities.PortraitInfo;
 import com.leaders.app.enums.PortraitDisplayMode;
 import com.leaders.app.utilities.CharacterCardUtils;
+import com.leaders.app.views.decoration.OrnateFrameView;
 import com.leaders.app.views.portrait.PortraitGroupView;
 import com.leaders.app.views.portrait.PortraitView;
 import com.leaders.app.views.decoration.FrameShineView;
@@ -29,6 +30,7 @@ import com.leaders.gamelogic.entities.SelectableCharacterCard;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterCardSelectionStatus;
 import com.leaders.gamelogic.enums.GameMode;
+import com.leaders.gamelogic.enums.GamePhaseType;
 import com.leaders.gamelogic.interactions.InteractionResultType;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 
@@ -46,6 +48,7 @@ public final class CharacterCardSelectionView extends ConstraintLayout {
         void onNotSelectableCardClick();
     }
 
+    private final OrnateFrameView ofvPortraits;
     private final LinearLayout llyPortraits;
     private final ScrollView scvPortraits;
     private final FrameShineView fsvShineEffect;
@@ -79,6 +82,7 @@ public final class CharacterCardSelectionView extends ConstraintLayout {
 
         llyPortraits = findViewById(R.id.llyPortraits_vwCharacterCardSelection);
         scvPortraits = findViewById(R.id.scvPortraits_vwCharacterCardSelection);
+        ofvPortraits = findViewById(R.id.ofvForeground_vwCharacterCardSelection);
         fsvShineEffect = findViewById(R.id.fsvShineEffect_vwCharacterCardSelection);
 
         applyGameModeParams(GameMode.Discovery);
@@ -96,6 +100,12 @@ public final class CharacterCardSelectionView extends ConstraintLayout {
             portraitSpacing = 2;
             params.height = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT;
         }
+    }
+
+    public void applyTurnPhase(@NonNull GamePhaseType gamePhaseType) {
+        ofvPortraits.setColorTint(gamePhaseType == GamePhaseType.Banishment ?
+                R.color.app_red : R.color.app_golden
+        );
     }
 
     public void applyTargets(@NonNull List<InteractionTarget> targets) {
