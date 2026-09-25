@@ -374,7 +374,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
 
             saveProgress(isVictory);
             showEndGame(winnerColor, isVictory);
-            setNextPuzzleVisible(isVictory);
+            setNextPuzzleVisible(isVictory && hasNextPuzzle());
         });
     }
 
@@ -458,19 +458,21 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
         txvAuthorName.setText(String.format(getString(R.string.by_author), authorName));
     }
 
-    private void updatePuzzleActions() {
-        boolean hasNextPuzzle = false;
-        boolean hasPreviousPuzzle = false;
-        if (puzzleSource != PuzzleSource.Editor) {
-            int puzzleIdx = puzzleSaves.indexOf(puzzleSave);
-            if (puzzleIdx != -1) {
-                hasNextPuzzle = puzzleIdx < puzzleSaves.size() - 1;
-                hasPreviousPuzzle = puzzleIdx > 0;
-            }
-        }
+    private boolean hasNextPuzzle() {
+        int puzzleIdx = puzzleSaves.indexOf(puzzleSave);
+        return puzzleSource != PuzzleSource.Editor &&
+                puzzleIdx != -1 &&
+                puzzleIdx < puzzleSaves.size() - 1;
+    }
 
-        amvPuzzleActions.setButtonEnabled(PuzzlePlayerAction.GoToNextPuzzle.ordinal(), hasNextPuzzle);
-        amvPuzzleActions.setButtonEnabled(PuzzlePlayerAction.GoToPreviousPuzzle.ordinal(), hasPreviousPuzzle);
+    private boolean hasPreviousPuzzle() {
+        int puzzleIdx = puzzleSaves.indexOf(puzzleSave);
+        return puzzleSource != PuzzleSource.Editor && puzzleIdx > 0;
+    }
+
+    private void updatePuzzleActions() {
+        amvPuzzleActions.setButtonEnabled(PuzzlePlayerAction.GoToNextPuzzle.ordinal(), hasNextPuzzle());
+        amvPuzzleActions.setButtonEnabled(PuzzlePlayerAction.GoToPreviousPuzzle.ordinal(), hasPreviousPuzzle());
     }
 
     private void setAnimationSpeedVisible(boolean visible) {
