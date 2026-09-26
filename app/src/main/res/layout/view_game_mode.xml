@@ -92,6 +92,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         android:fontFamily="@font/bobby_jones_condensed"
         android:justificationMode="inter_word"
         android:text="@string/discovery_mode_summary"
