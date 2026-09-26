@@ -14,8 +14,7 @@ import com.leaders.app.enums.LeaderType;
 import com.leaders.app.utilities.DuelStartUtils;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.views.duel.PlayerSetupView;
-import com.leaders.app.views.character.HighlightView;
-import com.leaders.app.views.character.CharacterView;
+import com.leaders.app.views.duel.setup.FirstPlayerView;
 import com.leaders.app.views.duel.setup.GameModeView;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.enums.TeamColor;
@@ -31,11 +30,8 @@ import java.util.Random;
 
 public final class DuelSetupActivity extends BaseActivity implements PlayerSetupView.PlayerSetupWatcher {
     private PlayerSetupView psvFirst, psvSecond;
-    private CharacterView chvTeamBlack, chvTeamWhite;
-    private HighlightView hlvTeamColorHighlight;
     private GameModeView gmvGameMode;
-
-    private TeamColor firstTeamColor;
+    private FirstPlayerView fpvFirstPlayer;
 
     //region BASE ACTIVITY OVERRIDEN METHODS
 
@@ -46,10 +42,7 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
         psvFirst = findViewById(R.id.psvFirst_actDuelSetup);
         psvSecond = findViewById(R.id.psvSecond_actDuelSetup);
 
-        chvTeamBlack = findViewById(R.id.chvTeamBlack_actDuelSetup);
-        chvTeamWhite = findViewById(R.id.chvTeamWhite_actDuelSetup);
-        hlvTeamColorHighlight = findViewById(R.id.hlvTeamColorHighlight_actDuelSetup);
-
+        fpvFirstPlayer = findViewById(R.id.fpvFirstPlayer_actDuelSetup);
         gmvGameMode = findViewById(R.id.gmvGameMode_actDuelSetup);
     }
 
@@ -59,9 +52,6 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
 
         psvFirst.setPlayerSetupWatcher(this);
         psvSecond.setPlayerSetupWatcher(this);
-
-        chvTeamBlack.setOnClickListener(this::onFirstPlayerTeamClick);
-        chvTeamWhite.setOnClickListener(this::onFirstPlayerTeamClick);
 
         (findViewById(R.id.btnStartGame_actDuelSetup)).setOnClickListener(this::onStartGameClick);
     }
@@ -73,8 +63,6 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
         Settings settings = ((LeadersApplication) getApplication()).getSettings();
         // First player setup is always loaded with the username
         psvFirst.setName(settings.getUserName());
-
-        firstTeamColor = null;
 
         Random random = new Random();
 
@@ -88,10 +76,6 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
         Collections.shuffle(leaderTypes);
         psvFirst.setLeaderType(leaderTypes.remove(0));
         psvSecond.setLeaderType(leaderTypes.remove(0));
-
-        // First player initialization needs to wait until team color views are loaded
-        hlvTeamColorHighlight.post(() ->
-                updateFirstTeamColor(random.nextBoolean() ? chvTeamBlack : chvTeamWhite));
     }
 
     @Override
@@ -133,30 +117,11 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
 
     //endregion
 
-    private void updateFirstTeamColor(@NonNull CharacterView characterView) {
-        if (characterView.getTeamColor() == firstTeamColor) {
-            return;
-        }
-
-        CharacterView otherChv = characterView == chvTeamBlack ? chvTeamWhite : chvTeamBlack;
-
-        characterView.scaleForHighlight(true, true);
-        otherChv.scaleForHighlight(false, true);
-
-        this.firstTeamColor = characterView.getTeamColor();
-        hlvTeamColorHighlight.setX(characterView.getX());
-        hlvTeamColorHighlight.setY(characterView.getY());
-    }
-
     private PlayerSetupView getOtherPlayerSetup(@NonNull PlayerSetupView playerSetupView) {
         return playerSetupView == psvFirst ? psvSecond : psvFirst;
     }
 
     //region VIEWS LISTENERS
-
-    private void onFirstPlayerTeamClick(View v) {
-        updateFirstTeamColor((CharacterView) v);
-    }
 
     @Override
     public void onLeaderTypeChanged(@NonNull PlayerSetupView playerSetupView,
@@ -182,7 +147,7 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
         }
 
         GameHistory gameHistory = DuelStartUtils.getDefaultHistory(
-                playerSetups, firstTeamColor, gmvGameMode.getGameMode(),
+                playerSetups, fpvFirstPlayer.getTeam().getTeamColor(), gmvGameMode.getGameMode(),
                 DuelStartUtils.getDefaultRecruitableCards()
         );
 

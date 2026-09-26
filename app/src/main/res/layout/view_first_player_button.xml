@@ -6,8 +6,8 @@
     android:layout_height="wrap_content"
     tools:ignore="SpUsage">
 
-    <Button
-        android:id="@+id/button"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnBackground_vwFirstPlayerButton"
         android:layout_width="match_parent"
         android:layout_height="@dimen/round_button_size"
         android:backgroundTint="@color/darker_background"
@@ -35,7 +35,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/imvTeamOutline_vwFirstPlayerButton"
         app:layout_constraintEnd_toEndOf="@+id/imvTeamOutline_vwFirstPlayerButton"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/button"
+        app:layout_constraintStart_toEndOf="@+id/btnBackground_vwFirstPlayerButton"
         app:layout_constraintStart_toStartOf="@+id/imvTeamOutline_vwFirstPlayerButton"
         app:layout_constraintTop_toTopOf="@+id/imvTeamOutline_vwFirstPlayerButton"
         app:layout_constraintVertical_bias="0.0"
@@ -59,9 +59,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:fontFamily="@font/bourbon_test_regular"
-        android:text="noir"
+        android:text="@string/black_name"
         android:textColor="@color/font"
-        android:textSize="@dimen/default_text_font_size"
+        android:textSize="18dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/imvTeamOutline_vwFirstPlayerButton"

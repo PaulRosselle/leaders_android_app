@@ -272,5 +272,6 @@
     <string name="recruit_character">recrutez un personnage</string>
     <string name="ban_character">bannissez un personnage</string>
     <string name="game_ended">partie terminÉe</string>
+    <string name="random">alÉatoire</string>
 
 </resources>

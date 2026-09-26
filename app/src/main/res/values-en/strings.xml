@@ -260,5 +260,6 @@
     <string name="recruit_character">recruit a character</string>
     <string name="ban_character">ban a character</string>
     <string name="game_ended">game ended</string>
+    <string name="random">random</string>
 
 </resources>
