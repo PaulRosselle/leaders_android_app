@@ -209,7 +209,7 @@
     <string name="character_menu_title">CharacterS</string>
     <string name="learn_using_the_tutorial">learn with the tutorial</string>
     <string name="test_out_characters">test out characters</string>
-    <string name="online_guide">online guide</string>
+    <string name="online_guide">official website guide</string>
     <string name="extra_infos">Additionnal informations</string>
     <string name="tutorial_capture_before">To win, bring two of your characters adjacent to the opponent\'s leader {IMAGE_1}.\nOn your turn, each of your characters may move by 1 space.</string>
     <string name="tutorial_capture_after">Most characters can do more than just move one space.\n\nDiscover how in the next chapter.</string>

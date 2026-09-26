@@ -24,4 +24,7 @@
     <color name="player_white">#F7F4F0</color>
     <color name="player_name">#CF8300</color>
     <color name="ripple_effect">#77FFFFFF</color>
+    <color name="cyan_ripple_effect">#333ABF97</color>
+    <color name="golden_ripple_effect">#33F9B235</color>
+    <color name="red_ripple_effect">#33F14A40</color>
 </resources>

@@ -6,17 +6,17 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
-import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.enums.ActivityType;
+import com.leaders.app.views.rules.RulesMenuButtonView;
 
 public final class RulesMenuActivity extends BaseActivity {
     private static final String OFFICIAL_GUIDE_URL = "https://www.leadersthegame.com/rules";
 
-    private MaterialButton btnTutorial;
-    private MaterialButton btnCharacters;
-    private MaterialButton btnOnlineGuide;
+    private RulesMenuButtonView btnTutorial;
+    private RulesMenuButtonView btnCharacters;
+    private RulesMenuButtonView btnOnlineGuide;
 
 
     //region BASE ACTIVITY OVERRIDEN METHODS
