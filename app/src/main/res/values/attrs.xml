@@ -12,6 +12,16 @@
         <attr name="textResId" format="reference|string"/>
     </declare-styleable>
 
+    <declare-styleable name="RulesMenuButtonView">
+        <attr name="characterResId" format="reference"/>
+        <attr name="titleResId" format="reference"/>
+        <attr name="titleAlignemnt" format="enum">
+            <enum name="Left" value="0" />
+            <enum name="Right" value="1" />
+        </attr>
+        <attr name="rippleColorResId" format="reference"/>
+    </declare-styleable>
+
     <declare-styleable name="OrnateFrameView">
         <attr name="colorTint" format="reference"/>
     </declare-styleable>

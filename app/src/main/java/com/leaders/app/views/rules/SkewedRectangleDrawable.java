@@ -11,10 +11,10 @@ import android.graphics.drawable.Drawable;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 
-public class SkewedBackgroundDrawable extends Drawable {
+public class SkewedRectangleDrawable extends Drawable {
     public enum CutSide {
-        LEFT,
-        RIGHT
+        Left,
+        Right
     }
 
     @NonNull
@@ -35,11 +35,11 @@ public class SkewedBackgroundDrawable extends Drawable {
     @ColorInt
     private int strokeColor;
 
-    public SkewedBackgroundDrawable(@ColorInt int fillColor,
-                                    @ColorInt int strokeColor,
-                                    float cutSize,
-                                    @NonNull CutSide cutSide,
-                                    float strokeWidth) {
+    public SkewedRectangleDrawable(@ColorInt int fillColor,
+                                   @ColorInt int strokeColor,
+                                   float cutSize,
+                                   @NonNull CutSide cutSide,
+                                   float strokeWidth) {
         this.fillColor = fillColor;
         this.strokeColor = strokeColor;
         this.cutSize = cutSize;
@@ -83,13 +83,13 @@ public class SkewedBackgroundDrawable extends Drawable {
         path.reset();
 
         switch (cutSide) {
-            case RIGHT: {
+            case Right: {
                 path.moveTo(left, top);
                 path.lineTo(right - actualCutSize, top);
                 path.lineTo(right, bottom);
                 path.lineTo(left, bottom);
             } break;
-            case LEFT: {
+            case Left: {
                 path.moveTo(left + actualCutSize, top);
                 path.lineTo(right, top);
                 path.lineTo(right, bottom);

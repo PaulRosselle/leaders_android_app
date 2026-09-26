@@ -217,7 +217,7 @@
     <string name="character_menu_title">PersonnageS</string>
     <string name="learn_using_the_tutorial">apprendre avec le tutoriel</string>
     <string name="test_out_characters">tester les personnages</string>
-    <string name="online_guide">guide en ligne</string>
+    <string name="online_guide">guide sur le site officiel</string>
     <string name="extra_infos">Informations supplémentaires</string>
     <string name="tutorial_capture_before">Pour gagner, vous devez amener deux de vos personnages sur des cases adjacentes au leader adverse {IMAGE_1}.\nDurant votre tour, chacun de vos personnage peut se déplacer d\'une case.</string>
     <string name="tutorial_capture_after">La plupart des personnages peuvent faire plus que se déplacer d\'une case.\n\nDécouvrez cela dans le chapitre suivant.</string>
