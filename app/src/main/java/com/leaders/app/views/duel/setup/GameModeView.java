@@ -2,6 +2,7 @@ package com.leaders.app.views.duel.setup;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -30,7 +31,14 @@ public class GameModeView extends ConstraintLayout {
         btnStrategist = findViewById(R.id.btnStrategist_vwGameMode);
         txvSummary = findViewById(R.id.txvSummary_vwGameMode);
 
+        btnDiscovery.setOnClickListener(this::onButtonClick);
+        btnStrategist.setOnClickListener(this::onButtonClick);
+
         setGameMode(GameMode.Discovery);
+    }
+
+    private void onButtonClick(View v) {
+        setGameMode(v == btnDiscovery ? GameMode.Discovery : GameMode.Strategist);
     }
 
     public void setGameMode(@NonNull GameMode gameMode) {
