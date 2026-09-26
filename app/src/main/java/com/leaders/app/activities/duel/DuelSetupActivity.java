@@ -1,14 +1,9 @@
 package com.leaders.app.activities.duel;
 
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.view.View;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.content.res.AppCompatResources;
-
-import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.entities.LeadersApplication;
@@ -19,10 +14,9 @@ import com.leaders.app.enums.LeaderType;
 import com.leaders.app.utilities.DuelStartUtils;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.views.duel.PlayerSetupView;
-import com.leaders.app.views.character.HighlightView;
-import com.leaders.app.views.character.CharacterView;
+import com.leaders.app.views.duel.setup.FirstPlayerView;
+import com.leaders.app.views.duel.setup.GameModeView;
 import com.leaders.gamelogic.entities.GameHistory;
-import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
 
@@ -36,13 +30,8 @@ import java.util.Random;
 
 public final class DuelSetupActivity extends BaseActivity implements PlayerSetupView.PlayerSetupWatcher {
     private PlayerSetupView psvFirst, psvSecond;
-    private CharacterView chvTeamBlack, chvTeamWhite;
-    private HighlightView hlvTeamColorHighlight;
-    private MaterialButton btnGameModeDiscovery, btnGameModeStrategist;
-    private TextView txvGameModeSummary;
-
-    private TeamColor firstTeamColor;
-    private GameMode gameMode;
+    private GameModeView gmvGameMode;
+    private FirstPlayerView fpvFirstPlayer;
 
     //region BASE ACTIVITY OVERRIDEN METHODS
 
@@ -53,13 +42,8 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
         psvFirst = findViewById(R.id.psvFirst_actDuelSetup);
         psvSecond = findViewById(R.id.psvSecond_actDuelSetup);
 
-        chvTeamBlack = findViewById(R.id.chvTeamBlack_actDuelSetup);
-        chvTeamWhite = findViewById(R.id.chvTeamWhite_actDuelSetup);
-        hlvTeamColorHighlight = findViewById(R.id.hlvTeamColorHighlight_actDuelSetup);
-
-        btnGameModeDiscovery = findViewById(R.id.btnGameModeDiscovery_actDuelSetup);
-        btnGameModeStrategist = findViewById(R.id.btnGameModeStrategist_actDuelSetup);
-        txvGameModeSummary = findViewById(R.id.txvGameModeSummary_actDuelSetup);
+        fpvFirstPlayer = findViewById(R.id.fpvFirstPlayer_actDuelSetup);
+        gmvGameMode = findViewById(R.id.gmvGameMode_actDuelSetup);
     }
 
     @Override
@@ -68,12 +52,6 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
 
         psvFirst.setPlayerSetupWatcher(this);
         psvSecond.setPlayerSetupWatcher(this);
-
-        chvTeamBlack.setOnClickListener(this::onFirstPlayerTeamClick);
-        chvTeamWhite.setOnClickListener(this::onFirstPlayerTeamClick);
-
-        btnGameModeDiscovery.setOnClickListener(this::onGameModeClick);
-        btnGameModeStrategist.setOnClickListener(this::onGameModeClick);
 
         (findViewById(R.id.btnStartGame_actDuelSetup)).setOnClickListener(this::onStartGameClick);
     }
@@ -85,9 +63,6 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
         Settings settings = ((LeadersApplication) getApplication()).getSettings();
         // First player setup is always loaded with the username
         psvFirst.setName(settings.getUserName());
-
-        firstTeamColor = null;
-        gameMode = null;
 
         Random random = new Random();
 
@@ -101,13 +76,6 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
         Collections.shuffle(leaderTypes);
         psvFirst.setLeaderType(leaderTypes.remove(0));
         psvSecond.setLeaderType(leaderTypes.remove(0));
-
-        // Game mode
-        updateGameMode(btnGameModeDiscovery);
-
-        // First player initialization needs to wait until team color views are loaded
-        hlvTeamColorHighlight.post(() ->
-                updateFirstTeamColor(random.nextBoolean() ? chvTeamBlack : chvTeamWhite));
     }
 
     @Override
@@ -149,56 +117,11 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
 
     //endregion
 
-    private void updateFirstTeamColor(@NonNull CharacterView characterView) {
-        if (characterView.getTeamColor() == firstTeamColor) {
-            return;
-        }
-
-        CharacterView otherChv = characterView == chvTeamBlack ? chvTeamWhite : chvTeamBlack;
-
-        characterView.scaleForHighlight(true, true);
-        otherChv.scaleForHighlight(false, true);
-
-        this.firstTeamColor = characterView.getTeamColor();
-        hlvTeamColorHighlight.setX(characterView.getX());
-        hlvTeamColorHighlight.setY(characterView.getY());
-    }
-
-    private void updateGameMode(@NonNull MaterialButton btnGameMode) {
-        boolean isDiscovery = btnGameMode == btnGameModeDiscovery;
-        GameMode newGameMode = isDiscovery ? GameMode.Discovery : GameMode.Strategist;
-
-        if (newGameMode == gameMode) {
-            return;
-        }
-
-        this.gameMode = newGameMode;
-        // We initialize color state lists for selected and unselected buttons
-        ColorStateList selectedColor = AppCompatResources.getColorStateList(this, R.color.selected_golden);
-        ColorStateList unselectedColor = AppCompatResources.getColorStateList(this, R.color.darker_background);
-
-        // Then we update the buttons appearances based on the selected gameMode
-        btnGameMode.setBackgroundTintList(selectedColor);
-        MaterialButton btnOtherGameMode = isDiscovery ? btnGameModeStrategist : btnGameModeDiscovery;
-        btnOtherGameMode.setBackgroundTintList(unselectedColor);
-
-        // Finally we update the game mode summary
-        txvGameModeSummary.setText(isDiscovery ? R.string.discovery_mode_summary : R.string.strategist_mode_summary);
-    }
-
     private PlayerSetupView getOtherPlayerSetup(@NonNull PlayerSetupView playerSetupView) {
         return playerSetupView == psvFirst ? psvSecond : psvFirst;
     }
 
     //region VIEWS LISTENERS
-
-    private void onFirstPlayerTeamClick(View v) {
-        updateFirstTeamColor((CharacterView) v);
-    }
-
-    private void onGameModeClick(View v) {
-        updateGameMode((MaterialButton) v);
-    }
 
     @Override
     public void onLeaderTypeChanged(@NonNull PlayerSetupView playerSetupView,
@@ -224,7 +147,7 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
         }
 
         GameHistory gameHistory = DuelStartUtils.getDefaultHistory(
-                playerSetups, firstTeamColor, gameMode,
+                playerSetups, fpvFirstPlayer.getTeam().getTeamColor(), gmvGameMode.getGameMode(),
                 DuelStartUtils.getDefaultRecruitableCards()
         );
 
