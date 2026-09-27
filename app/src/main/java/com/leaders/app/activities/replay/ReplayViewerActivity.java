@@ -124,6 +124,7 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
         txvReplayName = findViewById(R.id.txvReplayName_actReplayViewer);
         ptvTopPlayer = findViewById(R.id.ptvTopPlayer_actReplayViewer);
         pbvBottomPlayer = findViewById(R.id.pbvBottomPlayer_actReplayViewer);
+        pbvBottomPlayer.setInfoVisible(false);
         ptvBannedPortrait = findViewById(R.id.ptvBannedPortrait_actReplayViewer);
 
         btnActions = findViewById(R.id.btnActions_actReplayViewer);
