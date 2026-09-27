@@ -2,29 +2,24 @@ package com.leaders.app.entities;
 
 import androidx.annotation.NonNull;
 
-import com.leaders.gamelogic.enums.CharacterType;
-import com.leaders.gamelogic.enums.TeamColor;
+import com.leaders.app.enums.ContributorAvatar;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Contributor {
     @NonNull
-    private final TeamColor teamColor;
-    @NonNull
-    private final CharacterType characterType;
+    private final ContributorAvatar avatar;
     @NonNull
     private final String name;
     private final boolean hasContributedToAlpha;
     private final boolean hasContributedToBeta;
 
-    private Contributor(@NonNull TeamColor teamColor,
-                       @NonNull CharacterType characterType,
-                       @NonNull String name,
-                       boolean hasContributedToAlpha,
-                       boolean hasContributedToBeta) {
-        this.teamColor = teamColor;
-        this.characterType = characterType;
+    private Contributor(@NonNull ContributorAvatar avatar,
+                        @NonNull String name,
+                        boolean hasContributedToAlpha,
+                        boolean hasContributedToBeta) {
+        this.avatar = avatar;
         this.name = name;
         this.hasContributedToAlpha = hasContributedToAlpha;
         this.hasContributedToBeta = hasContributedToBeta;
@@ -35,8 +30,7 @@ public class Contributor {
         JSONObject joContributor = new JSONObject();
 
         try {
-            joContributor.put("team_color", teamColor.name());
-            joContributor.put("character_type", characterType.name());
+            joContributor.put("avatar", avatar.name());
             joContributor.put("name", name);
             joContributor.put("has_contributed_to_alpha", hasContributedToAlpha);
             joContributor.put("has_contributed_to_beta", hasContributedToBeta);
@@ -49,8 +43,7 @@ public class Contributor {
 
     public static Contributor getFromJson(@NonNull JSONObject joContributor) throws JSONException {
         return new Contributor(
-                TeamColor.valueOf(joContributor.getString("team_color")),
-                CharacterType.valueOf(joContributor.getString("character_type")),
+                ContributorAvatar.valueOf(joContributor.getString("avatar")),
                 joContributor.getString("name"),
                 joContributor.getBoolean("has_contributed_to_alpha"),
                 joContributor.getBoolean("has_contributed_to_beta")
@@ -58,13 +51,8 @@ public class Contributor {
     }
 
     @NonNull
-    public TeamColor getTeamColor() {
-        return teamColor;
-    }
-
-    @NonNull
-    public CharacterType getCharacterType() {
-        return characterType;
+    public ContributorAvatar getAvatar() {
+        return avatar;
     }
 
     @NonNull
