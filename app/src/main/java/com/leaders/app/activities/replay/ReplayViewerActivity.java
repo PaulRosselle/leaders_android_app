@@ -321,13 +321,9 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
 
     private void showCardDescriptionNotification(@NonNull CharacterCard characterCard) {
         if (cnvCardInfo.getCharacterCard() == characterCard) {
-            cnvCardInfo.setCharacterCard(null);
             cnvCardInfo.hide();
         } else {
-            cnvCardInfo.setCharacterCard(characterCard);
-            if (cnvCardInfo.getVisibility() != View.VISIBLE) {
-                cnvCardInfo.show();
-            }
+            cnvCardInfo.show(characterCard);
         }
     }
 
