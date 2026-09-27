@@ -89,6 +89,11 @@ public final class PlayerBottomView extends PlayerView {
         imvInfoBg.setImageResource(infoBgResId);
     }
 
+    public void setInfoVisible(boolean infoVisible) {
+        txvInfo.setVisibility(infoVisible ? VISIBLE : INVISIBLE);
+        imvInfoBg.setVisibility(infoVisible ? VISIBLE : INVISIBLE);
+    }
+
     private int getInfoResId(@NonNull GamePhaseType gamePhaseType) {
         switch (gamePhaseType) {
             case Banishment: return R.string.ban_character;

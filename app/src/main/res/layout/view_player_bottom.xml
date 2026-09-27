@@ -72,7 +72,7 @@
         android:textColor="@color/font"
         android:textSize="@dimen/default_text_font_size"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/gdl50V_actPlayerBottom"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/imvLeader_vwPlayerBottom"
         app:layout_constraintTop_toTopOf="@+id/imvInfo_vwPlayerBottom"
