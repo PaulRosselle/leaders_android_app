@@ -305,13 +305,9 @@ public final class PuzzleEditorActivity extends BaseActivity {
 
     private void showCardDescriptionNotification(@NonNull CharacterCard characterCard) {
         if (cnvCardInfo.getCharacterCard() == characterCard) {
-            cnvCardInfo.setCharacterCard(null);
             cnvCardInfo.hide();
         } else {
-            cnvCardInfo.setCharacterCard(characterCard);
-            if (cnvCardInfo.getVisibility() != View.VISIBLE) {
-                cnvCardInfo.show();
-            }
+            cnvCardInfo.show(characterCard);
         }
     }
 

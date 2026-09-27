@@ -19,6 +19,9 @@ import com.leaders.gamelogic.enums.CharacterCard;
 
 public final class CharacterNotificationView extends ConstraintLayout {
     private static final int VISIBILITY_ANIMATION_DURATION = 200;
+    private static final int HIDE_DELAY = 5000;
+
+    private final Runnable hideRunnable;
 
     private final PortraitView ptvPortrait;
     private final TextView txvTitle, txvInfo;
@@ -31,6 +34,8 @@ public final class CharacterNotificationView extends ConstraintLayout {
 
     public CharacterNotificationView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+
+        hideRunnable = this::hide;
 
         inflate(context, R.layout.view_character_notification, this);
 
@@ -54,7 +59,7 @@ public final class CharacterNotificationView extends ConstraintLayout {
         });
     }
 
-    public void setCharacterCard(@Nullable CharacterCard characterCard) {
+    private void setCharacterCard(@Nullable CharacterCard characterCard) {
         this.characterCard = characterCard;
         // When no card is displayed, child views aren't updated
         if (characterCard == null) {
@@ -80,17 +85,30 @@ public final class CharacterNotificationView extends ConstraintLayout {
         return - getHeight() - statusBarOffset - ((MarginLayoutParams) getLayoutParams()).topMargin;
     }
 
-    public void show() {
-        setTranslationY(getHiddenPosY());
-        setVisibility(VISIBLE);
-        animate().translationY(0).setDuration(VISIBILITY_ANIMATION_DURATION).start();
+    public void show(@Nullable CharacterCard characterCard) {
+        setCharacterCard(characterCard);
+
+        if (getVisibility() != VISIBLE) {
+            setTranslationY(getHiddenPosY());
+            setVisibility(VISIBLE);
+            animate().translationY(0).setDuration(VISIBILITY_ANIMATION_DURATION).start();
+        }
+
+        removeCallbacks(hideRunnable);
+        postDelayed(hideRunnable, HIDE_DELAY);
     }
 
     public void hide() {
-        animate().translationY(getHiddenPosY()).setDuration(VISIBILITY_ANIMATION_DURATION)
-                .withEndAction(() -> {
-            setVisibility(GONE);
-            setTranslationY(0f);
-        }).start();
+        setCharacterCard(null);
+
+        if (getVisibility() != GONE) {
+            animate().translationY(getHiddenPosY()).setDuration(VISIBILITY_ANIMATION_DURATION)
+                    .withEndAction(() -> {
+                        setVisibility(GONE);
+                        setTranslationY(0f);
+                    }).start();
+        }
+
+        removeCallbacks(hideRunnable);
     }
 }
