@@ -228,7 +228,6 @@
     <string name="tutorial_surround_info">Press and hold a character to discover its ability.\n\nCharacters that cannot capture are still counted when surrounding a leader.</string>
     <string name="second_player_recruitment">The second player recruits a second time during their first turn.\nThis rule helps offset the advantage of going first.\n\nYou can now recruit another character.</string>
     <string name="new_rule">New rule!</string>
-    <string name="tutorial_capture_game_vs_bot">Press and hold a character to discover its ability.\n\nTo win, you must bring two of your characters onto squares adjacent to the opposing leader.</string>
     <string name="restart_game_vs_bot">Would you like to restart this match?</string>
     <string name="player">player</string>
     <string name="barry_the_bot">BaRRy the Bot</string>
@@ -261,5 +260,6 @@
     <string name="ban_character">ban a character</string>
     <string name="game_ended">game ended</string>
     <string name="random">random</string>
-
+    <string name="help">Help</string>
+    <string name="help_message">Press and hold a character to display their ability.\n\nThe \"{IMAGE_1}\" button cancels your last action.\nClicking on a non-interactive element cancels the current action.\nThe \"{IMAGE_2}\" button ends the current game phase.\n\nReminder: To win, capture the opposing leader by placing 2 of your characters on spaces adjacent to theirs, or by completely surrounding them.\nEach of your characters has one action per turn. You do not have to play all of them during your turn.</string>
 </resources>

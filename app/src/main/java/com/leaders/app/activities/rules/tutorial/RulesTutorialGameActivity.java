@@ -21,6 +21,7 @@ import com.leaders.app.enums.EndGameType;
 import com.leaders.app.enums.LeaderType;
 import com.leaders.app.enums.TutorialChapter;
 import com.leaders.app.utilities.ButtonUtils;
+import com.leaders.app.utilities.HelpUtils;
 import com.leaders.app.utilities.TutorialBotUtils;
 import com.leaders.app.utilities.TutorialGameUtils;
 import com.leaders.app.views.character.CharacterDisplay;
@@ -55,7 +56,7 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
     private CharacterCardSelectionView ccsvCardSelector;
     private CharacterDisplay chdNewCharacter;
 
-    private MaterialButton btnInfo;
+    private MaterialButton btnHelp;
     private TutorialNavigationView tnvNavigation;
 
     private PlayerBottomView pbvPlayer;
@@ -82,7 +83,7 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
         ccsvCardSelector = findViewById(R.id.ccsvCardSelector_actRulesTutorialGame);
         chdNewCharacter = new CharacterDisplay(this, ccsvCardSelector);
 
-        btnInfo = findViewById(R.id.btnInfo_actRulesTutorialGame);
+        btnHelp = findViewById(R.id.btnHelp_actRulesTutorialGame);
         tnvNavigation = findViewById(R.id.tnvNavigation_actRulesTutorialGame);
 
         pbvPlayer = findViewById(R.id.pbvPlayer_actRulesTutorialGame);
@@ -106,7 +107,7 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
         ccsvCardSelector.setOnCardSelectedListener(this);
         ccsvCardSelector.setOnPortraitLongClickListener(this::onPortraitLongClick);
 
-        btnInfo.setOnClickListener(this::onInfoClick);
+        btnHelp.setOnClickListener(this::onHelpClick);
         tnvNavigation.setNavigator(this);
 
         btnCards.setOnClickListener(this::onCardsClick);
@@ -530,15 +531,8 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
         return true;
     }
 
-    private void onInfoClick(View v) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.alert_dialog_theme);
-
-        builder.setIcon(getChapter().getInfoIconResId());
-        builder.setTitle(R.string.extra_infos);
-        builder.setMessage(getChapter().getInfoTextResId());
-        builder.setPositiveButton(R.string.ok, null);
-
-        builder.show();
+    private void onHelpClick(View v) {
+        HelpUtils.getHelpDialog(this).show();
     }
 
     private void onResetClick(View v) {
