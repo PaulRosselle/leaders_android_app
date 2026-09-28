@@ -50,7 +50,7 @@ import com.leaders.gamelogic.enums.WarningType;
 import java.util.List;
 import java.util.Objects;
 
-public class ReplayViewerActivity extends BaseActivity implements ReplayControlsView.ReplayControlsListener {
+public final class ReplayViewerActivity extends BaseActivity implements ReplayControlsView.ReplayControlsListener {
     private enum ReplayViewerAction {
         ChangeAnimationSpeed,
         ChangePlayerPerspective,
@@ -462,11 +462,18 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
     }
 
     @Override
-    public void onActionPlayed(@NonNull IGameAction action, boolean playInReverse, @NonNull Runnable onActionEnd) {
-        if (!GameActionUtils.isAnimatable(action)) {
-            return;
-        }
+    public void onStepPlayed(@Nullable IGameAction action, boolean playInReverse, @NonNull Runnable onActionEnd) {
+        updateCards();
+        updatePlayerWarnings();
 
+        if (action != null && GameActionUtils.isAnimatable(action)) {
+            playAction(action, playInReverse, onActionEnd);
+        } else {
+            onActionEnd.run();
+        }
+    }
+
+    private void playAction(@NonNull IGameAction action, boolean playInReverse, @NonNull Runnable onActionEnd) {
         if (action instanceof BanishmentAction) {
             animateBanishment((BanishmentAction) action, playInReverse, onActionEnd);
         } else {
@@ -479,9 +486,6 @@ public class ReplayViewerActivity extends BaseActivity implements ReplayControls
 
             GameActionUtils.animate(bdvBoard, actionToPlay, onActionEnd, animationSpeed, new CharacterSkins());
         }
-
-        updateCards();
-        updatePlayerWarnings();
     }
 
     //endregion
