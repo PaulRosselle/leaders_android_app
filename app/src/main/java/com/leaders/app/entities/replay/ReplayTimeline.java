@@ -2,37 +2,35 @@ package com.leaders.app.entities.replay;
 
 import androidx.annotation.NonNull;
 
-import com.leaders.gamelogic.actions.IGameAction;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class ReplayTimeline {
+public final class ReplayTimeline {
     @NonNull
     private final List<ReplaySegment> segments;
 
     @NonNull
-    private final List<IGameAction> actions;
+    private final List<ReplayStep> steps;
 
     @NonNull
-    private final Map<Integer, ReplaySegment> actionSegments;
+    private final Map<Integer, ReplaySegment> stepSegments;
 
     public ReplayTimeline(@NonNull List<ReplaySegment> segments) {
         this.segments = segments;
 
 
-        actions = new ArrayList<>();
-        actionSegments = new HashMap<>();
+        steps = new ArrayList<>();
+        stepSegments = new HashMap<>();
 
         for (ReplaySegment segment : segments) {
-            for (IGameAction action : segment.getPlayableActions()) {
-                int actionIndex = actions.size();
+            for (ReplayStep step : segment.getSteps()) {
+                int actionIndex = steps.size();
 
-                actions.add(action);
-                actionSegments.put(actionIndex, segment);
+                steps.add(step);
+                stepSegments.put(actionIndex, segment);
             }
         }
     }
@@ -43,17 +41,18 @@ public class ReplayTimeline {
     }
 
     @NonNull
-    public ReplaySegment getSegmentForAction(int actionIndex) {
-        return Objects.requireNonNull(actionSegments.get(actionIndex),
-                "No segment found for action index: " + actionIndex );
+    public ReplaySegment getStepSegment(int stepIndex) {
+        return Objects.requireNonNull(stepSegments.get(stepIndex),
+                "No segment found for step index: " + stepIndex
+        );
     }
 
     @NonNull
-    public IGameAction getAction(int actionIndex) {
-        return actions.get(actionIndex);
+    public ReplayStep getStep(int stepIndex) {
+        return steps.get(stepIndex);
     }
 
-    public int getActionCount() {
-        return actions.size();
+    public int getStepCount() {
+        return steps.size();
     }
 }
