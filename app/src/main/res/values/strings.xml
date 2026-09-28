@@ -236,7 +236,6 @@
     <string name="tutorial_surround_info">Restez appuyé sur un personnage pour découvrir sa compétence.\n\nLes personnages ne pouvant pas capturer sont quand même pris en compte pour un encerclement.</string>
     <string name="second_player_recruitment">Le deuxième joueur recrute une seconde fois lors de son premier tour.\nCette règle permet de compenser l\'avantage qu\'a le premier joueur en commençant.\n\nVous pouvez donc recruter un autre personnage.</string>
     <string name="new_rule">Nouvelle règle !</string>
-    <string name="tutorial_capture_game_vs_bot">Restez appuyé sur un personnage pour découvrir sa compétence.\n\nPour gagner, vous devez amener deux de vos personnages sur des cases adjacentes au leader adverse.</string>
     <string name="restart_game_vs_bot">Voulez-vous recommencer la partie ?</string>
     <string name="player">joueur</string>
     <string name="barry_the_bot">BaRRy le Bot</string>
@@ -273,5 +272,7 @@
     <string name="ban_character">bannissez un personnage</string>
     <string name="game_ended">partie terminÉe</string>
     <string name="random">alÉatoire</string>
+    <string name="help">Aide</string>
+    <string name="help_message">Restez appuyé sur un personnage pour afficher sa compétence.\n\nLe bouton \"{IMAGE_1}\" annule votre dernière action.\nCliquer sur un élément non-interactif annule l\'action en cours.\n\nRappel : Pour gagner, capturez le leader adverse en plaçant 2 de vos personnages sur des cases adjacentes à la sienne, ou encerclez-le complètement.\nChacun de vos personnage dispose d\'une action par tour. Vous n\'êtes pas obligé de tous les jouer pendant votre tour.</string>
 
 </resources>

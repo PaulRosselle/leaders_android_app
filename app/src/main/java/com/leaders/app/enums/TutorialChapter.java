@@ -61,7 +61,6 @@ public enum TutorialChapter {
             case PassiveAbilities: return R.string.tutorial_passive_abilities_info;
             case Recruitment: return R.string.tutorial_recruitment_info;
             case SurroundLeader: return R.string.tutorial_surround_info;
-            case GameVsBot: return R.string.tutorial_capture_game_vs_bot;
             default: throw new IllegalStateException("No info text found for chapter: " + this);
         }
     }

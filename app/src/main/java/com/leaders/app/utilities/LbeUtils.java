@@ -13,7 +13,7 @@ import com.leaders.gamelogic.enums.CharacterType;
 
 import java.util.NoSuchElementException;
 
-public class LbeUtils {
+public final class LbeUtils {
     public static final String DEFAULT_URL = "https://mthbrt.github.io/Leaders-editor/#";
     public static final String HEADER_WHITE = "white=";
     public static final String HEADER_BLACK = "black=";

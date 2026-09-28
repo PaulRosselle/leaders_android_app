@@ -23,6 +23,7 @@ import com.leaders.app.enums.EndGameType;
 import com.leaders.app.enums.LeaderType;
 import com.leaders.app.utilities.ButtonUtils;
 import com.leaders.app.utilities.ExtraUtils;
+import com.leaders.app.utilities.HelpUtils;
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.utilities.TeamColorUtils;
 import com.leaders.app.views.ActionsMenuView;
@@ -67,7 +68,8 @@ public final class DuelPlayerActivity extends PlayableActivity implements
         SaveAsReplay,
         ChangeAnimationSpeed,
         AnimatePlayableItems,
-        DisplayCellPositions;
+        DisplayCellPositions,
+        Help;
 
         private int getIconResId() {
             switch (this) {
@@ -75,6 +77,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
                 case ChangeAnimationSpeed: return R.drawable.icon_speed;
                 case AnimatePlayableItems: return R.drawable.icon_sparkles;
                 case DisplayCellPositions: return R.drawable.icon_position;
+                case Help: return R.drawable.icon_question;
                 default: throw new IllegalStateException("No icon found for puzzle action: " + this);
             }
         }
@@ -85,6 +88,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
                 case ChangeAnimationSpeed: return R.string.animation_speed;
                 case AnimatePlayableItems: return R.string.playable_items_animation;
                 case DisplayCellPositions: return R.string.board_coordinates;
+                case Help: return R.string.help;
                 default: throw new IllegalStateException("No text found for puzzle action: " + this);
             }
         }
@@ -95,6 +99,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
                 case ChangeAnimationSpeed: return activity::onChangeAnimationSpeedClick;
                 case AnimatePlayableItems: return activity::onAnimatePlayableItems;
                 case DisplayCellPositions: return activity::onDisplayCellPosition;
+                case Help: return activity::onHelpClick;
                 default: throw new IllegalStateException("No click listener found for puzzle action: " + this);
             }
         }
@@ -384,6 +389,11 @@ public final class DuelPlayerActivity extends PlayableActivity implements
         );
         bdvBoard.setCellPositionVisible(positionVisible);
 
+        setActionsMenuVisible(false);
+    }
+
+    private void onHelpClick(View v) {
+        HelpUtils.getHelpDialog(this).show();
         setActionsMenuVisible(false);
     }
 
