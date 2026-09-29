@@ -172,7 +172,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnBack_actRulesTutorialGame"
+        app:layout_constraintTop_toTopOf="@+id/ptvBot_actRulesTutorialGame"
         app:layout_constraintVertical_bias="1.0" />
 
     <com.leaders.app.views.board.PlayableBoardView
@@ -185,7 +185,7 @@
         app:layout_constraintBottom_toTopOf="@+id/btnReset_actRulesTutorialGame"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnBack_actRulesTutorialGame" />
+        app:layout_constraintTop_toTopOf="@+id/ptvBot_actRulesTutorialGame" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnCards_actRulesTutorialGame"
