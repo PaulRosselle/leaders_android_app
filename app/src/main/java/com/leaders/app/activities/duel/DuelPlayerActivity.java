@@ -1,13 +1,11 @@
 package com.leaders.app.activities.duel;
 
-import android.animation.LayoutTransition;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
@@ -21,12 +19,14 @@ import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.AnimationSpeed;
 import com.leaders.app.enums.EndGameType;
 import com.leaders.app.enums.LeaderType;
+import com.leaders.app.utilities.AlignmentUtils;
 import com.leaders.app.utilities.ButtonUtils;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.HelpUtils;
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.utilities.TeamColorUtils;
 import com.leaders.app.views.ActionsMenuView;
+import com.leaders.app.views.duel.PlayerHaloView;
 import com.leaders.app.views.portrait.PortraitView;
 import com.leaders.app.views.character.CharacterDisplay;
 import com.leaders.app.views.character.HighlightView;
@@ -58,6 +58,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -107,6 +108,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
 
     private CharacterCardSelectionView ccsvCardSelector;
     private PlayerBottomView pbvCurrentPlayer;
+    private PlayerHaloView phvCurrentPlayer;
     private PlayerTopView ptvOpposingPlayer;
     private TextView txvPlayerTurn;
 
@@ -135,6 +137,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
         chdNewCharacter = new CharacterDisplay(this, ccsvCardSelector);
 
         pbvCurrentPlayer = findViewById(R.id.pbvCurrentPlayer_actDuelPlayer);
+        phvCurrentPlayer = findViewById(R.id.phvCurrentPlayer_actDuelPlayer);
         ptvOpposingPlayer = findViewById(R.id.ptvOpposingPlayer_actDuelPlayer);
         txvPlayerTurn = findViewById(R.id.txvPlayerTurn_actDuelPlayer);
 
@@ -435,42 +438,14 @@ public final class DuelPlayerActivity extends PlayableActivity implements
     //region UI STATE METHODS
 
     private void setCardSelectorVisible(boolean visible) {
-        // When recruiting, we display the cardSelector view below the current player view.
-        // The layout transition is animated for both the board and current player view
-        bdvBoard.getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
-        pbvCurrentPlayer.getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
-
-        ConstraintLayout.LayoutParams boardParams = (ConstraintLayout.LayoutParams) bdvBoard.getLayoutParams();
-        ConstraintLayout.LayoutParams playerViewParams = (ConstraintLayout.LayoutParams) pbvCurrentPlayer.getLayoutParams();
-        // When recruiting, every view is aligned on top of each other
-        if (visible) {
-            boardParams.verticalBias = 0f;
-            playerViewParams.verticalBias = 0f;
-            float dpRatio = getResources().getDisplayMetrics().density;
-            int boardHeight = bdvBoard.getMeasuredHeight();
-            float playerHeaderHeight = boardHeight * (72f / 1177f);
-            int boardMargin = 8;
-            int playerViewMargin = boardMargin + 8;
-
-            boardParams.topMargin = (int) (playerHeaderHeight + boardMargin * dpRatio);
-            playerViewParams.topMargin = (int) (boardHeight - pbvCurrentPlayer.getMeasuredHeight() +
-                    playerHeaderHeight * 2 + playerViewMargin * dpRatio);
-            ccsvCardSelector.show(true);
-
-            // By default, each playerView is on a vertical extremity while the board is centered
-        } else {
-            boardParams.verticalBias = 0.5f;
-            playerViewParams.verticalBias = 1f;
-            boardParams.topMargin = 0;
-            playerViewParams.topMargin = 0;
-            ccsvCardSelector.hide();
-        }
-        bdvBoard.setLayoutParams(boardParams);
-        pbvCurrentPlayer.setLayoutParams(playerViewParams);
-
-        // The requestLayout calls start the layout transition animation
-        bdvBoard.requestLayout();
-        pbvCurrentPlayer.requestLayout();
+        AlignmentUtils.alignBoardView(
+                visible,
+                bdvBoard,
+                pbvCurrentPlayer,
+                Collections.singletonList(phvCurrentPlayer),
+                visible ? Collections.singletonList(ccsvCardSelector) : Collections.emptyList()
+        );
+        ccsvCardSelector.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     private void showEndGame(@NonNull GameContext gameContext, @NonNull Player winner) {
