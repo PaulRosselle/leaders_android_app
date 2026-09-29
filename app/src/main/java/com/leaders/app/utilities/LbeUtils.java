@@ -80,8 +80,10 @@ public final class LbeUtils {
                 String.valueOf(Board.getRowCount(position.getX()) - position.getY());
     }
 
-    public static Position getPositionFromExportStr(@NonNull Context context, @NonNull String exportStr) {
-        final String errorMsg = String.format(context.getString(R.string.invalid_lbe_url_position), exportStr);
+    public static Position getPositionFromExportStr(@Nullable Context context, @NonNull String exportStr) {
+        final String errorMsg = String.format(context != null ?
+                context.getString(R.string.invalid_lbe_url_position) : "Invalid position: %s", exportStr
+        );
         if (exportStr.length() != 2) {
             throw new IllegalArgumentException(errorMsg);
         }
