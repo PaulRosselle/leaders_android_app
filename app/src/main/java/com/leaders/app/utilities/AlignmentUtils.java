@@ -24,29 +24,32 @@ public class AlignmentUtils {
                                       @NonNull BoardView bdvBoard,
                                       @NonNull PlayerBottomView pbvPlayer,
                                       @NonNull List<View> boundedViews,
-                                      @NonNull List<View> fadingViews) {
-        ConstraintLayout parent = (ConstraintLayout) bdvBoard.getParent();
-        TransitionSet transition = new TransitionSet();
+                                      @NonNull List<View> fadingViews,
+                                      boolean animateTransition) {
+        if (animateTransition) {
+            ConstraintLayout parent = (ConstraintLayout) bdvBoard.getParent();
+            TransitionSet transition = new TransitionSet();
 
-        ChangeBounds changeBounds = new ChangeBounds();
-        changeBounds.addTarget(bdvBoard);
-        changeBounds.addTarget(pbvPlayer);
-        for (View boundedView : boundedViews) {
-            changeBounds.addTarget(boundedView);
-        }
-        changeBounds.excludeTarget(R.id.txvPlayerName_vwPlayerBottom, true);
-        transition.addTransition(changeBounds);
-
-        if (!fadingViews.isEmpty()) {
-            Fade fade = new Fade();
-            for (View fadingView : fadingViews) {
-                fade.addTarget(fadingView);
+            ChangeBounds changeBounds = new ChangeBounds();
+            changeBounds.addTarget(bdvBoard);
+            changeBounds.addTarget(pbvPlayer);
+            for (View boundedView : boundedViews) {
+                changeBounds.addTarget(boundedView);
             }
-            transition.addTransition(fade);
-        }
+            changeBounds.excludeTarget(R.id.txvPlayerName_vwPlayerBottom, true);
+            transition.addTransition(changeBounds);
 
-        transition.setDuration(300);
-        TransitionManager.beginDelayedTransition(parent, transition);
+            if (!fadingViews.isEmpty()) {
+                Fade fade = new Fade();
+                for (View fadingView : fadingViews) {
+                    fade.addTarget(fadingView);
+                }
+                transition.addTransition(fade);
+            }
+
+            transition.setDuration(300);
+            TransitionManager.beginDelayedTransition(parent, transition);
+        }
 
         ConstraintLayout.LayoutParams boardParams = (ConstraintLayout.LayoutParams) bdvBoard.getLayoutParams();
         ConstraintLayout.LayoutParams playerViewParams = (ConstraintLayout.LayoutParams) pbvPlayer.getLayoutParams();

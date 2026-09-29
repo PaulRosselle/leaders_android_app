@@ -443,7 +443,8 @@ public final class DuelPlayerActivity extends PlayableActivity implements
                 bdvBoard,
                 pbvCurrentPlayer,
                 Collections.singletonList(phvCurrentPlayer),
-                visible ? Collections.singletonList(ccsvCardSelector) : Collections.emptyList()
+                visible ? Collections.singletonList(ccsvCardSelector) : Collections.emptyList(),
+                true
         );
         ccsvCardSelector.setVisibility(visible ? View.VISIBLE : View.GONE);
     }

@@ -278,7 +278,8 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
                 bdvBoard,
                 pbvPlayer,
                 Collections.singletonList(phvPlayer),
-                visible ? Collections.singletonList(ccsvCardSelector) : Collections.emptyList()
+                visible ? Collections.singletonList(ccsvCardSelector) : Collections.emptyList(),
+                true
         );
         ccsvCardSelector.setVisibility(visible ? View.VISIBLE : View.GONE);
     }

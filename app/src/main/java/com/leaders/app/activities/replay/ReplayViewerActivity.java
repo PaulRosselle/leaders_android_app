@@ -1,13 +1,11 @@
 package com.leaders.app.activities.replay;
 
-import android.animation.LayoutTransition;
 import android.content.Intent;
 import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
@@ -19,12 +17,14 @@ import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.AnimationSpeed;
 import com.leaders.app.enums.LeaderType;
+import com.leaders.app.utilities.AlignmentUtils;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.GameActionUtils;
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.utilities.TeamColorUtils;
 import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.board.ReadOnlyBoardView;
+import com.leaders.app.views.duel.PlayerHaloView;
 import com.leaders.app.views.portrait.PortraitView;
 import com.leaders.app.views.character.CharacterNotificationView;
 import com.leaders.app.views.character.CharacterView;
@@ -47,6 +47,7 @@ import com.leaders.gamelogic.enums.RecruitmentMotionType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.enums.WarningType;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -97,6 +98,9 @@ public final class ReplayViewerActivity extends BaseActivity implements ReplayCo
     private PlayerBottomView pbvBottomPlayer;
     private PortraitView ptvBannedPortrait;
 
+    private PlayerHaloView phvTopPlayer;
+    private PlayerHaloView phvBottomPlayer;
+
     private MaterialButton btnActions;
     private ActionsMenuView amvActions;
     private CharacterNotificationView cnvCardInfo;
@@ -126,6 +130,9 @@ public final class ReplayViewerActivity extends BaseActivity implements ReplayCo
         pbvBottomPlayer = findViewById(R.id.pbvBottomPlayer_actReplayViewer);
         pbvBottomPlayer.setInfoVisible(false);
         ptvBannedPortrait = findViewById(R.id.ptvBannedPortrait_actReplayViewer);
+
+        phvTopPlayer = findViewById(R.id.phvTopPlayer_actReplayViewer);
+        phvBottomPlayer = findViewById(R.id.phvBottomPlayer_actReplayViewer);
 
         btnActions = findViewById(R.id.btnActions_actReplayViewer);
         amvActions = findViewById(R.id.amvActions_actReplayViewer);
@@ -192,7 +199,7 @@ public final class ReplayViewerActivity extends BaseActivity implements ReplayCo
         return R.id.gdlRoot_actReplayViewer;
     }
 
-    @Nullable
+    @NonNull
     @Override
     protected Integer getBtnBackResId() {
         return R.id.btnBack_actReplayViewer;
@@ -227,44 +234,15 @@ public final class ReplayViewerActivity extends BaseActivity implements ReplayCo
     //endregion
 
     public void realignBoardView(boolean alignBottom, boolean animate) {
-        if (animate) {
-            bdvBoard.getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
-            pbvBottomPlayer.getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
-        }
+        AlignmentUtils.alignBoardView(
+                alignBottom,
+                bdvBoard,
+                pbvBottomPlayer,
+                Collections.singletonList(phvBottomPlayer),
+                alignBottom ? Collections.singletonList(ravCards) : Collections.emptyList(),
+                animate
+        );
 
-        ConstraintLayout.LayoutParams boardParams = (ConstraintLayout.LayoutParams) bdvBoard.getLayoutParams();
-        ConstraintLayout.LayoutParams playerViewParams = (ConstraintLayout.LayoutParams) pbvBottomPlayer.getLayoutParams();
-
-        if (alignBottom) {
-            boardParams.verticalBias = 0f;
-            playerViewParams.verticalBias = 0f;
-
-            float dpRatio = getResources().getDisplayMetrics().density;
-            int boardHeight = bdvBoard.getMeasuredHeight();
-            float playerHeaderHeight = boardHeight * (72f / 1177f);
-
-            int boardMargin = 16;
-            int playerViewMargin = boardMargin + 8;
-
-            boardParams.topMargin = (int) (playerHeaderHeight + boardMargin * dpRatio);
-            playerViewParams.topMargin = (int) (boardHeight - pbvBottomPlayer.getMeasuredHeight() +
-                    playerHeaderHeight * 2 + playerViewMargin * dpRatio);
-
-            bdvBoard.setLayoutParams(boardParams);
-            pbvBottomPlayer.setLayoutParams(playerViewParams);
-
-        } else {
-            boardParams.verticalBias = 0.5f;
-            playerViewParams.verticalBias = 1f;
-            boardParams.topMargin = 0;
-            playerViewParams.topMargin = 0;
-        }
-
-        if (animate) {
-            // The requestLayout calls start the layout transition animation
-            bdvBoard.requestLayout();
-            pbvBottomPlayer.requestLayout();
-        }
     }
 
     //region UI UPDATE METHODS
@@ -338,12 +316,16 @@ public final class ReplayViewerActivity extends BaseActivity implements ReplayCo
         }
     }
 
-
-    private void updatePlayerWarnings() {
-        updatePlayerWarnings(rcvControls.getReplayGame());
+    private void updatePlayers() {
+        updatePlayers(rcvControls.getReplayGame());
     }
 
-    private void updatePlayerWarnings(@NonNull Game game) {
+    private void updatePlayers(@NonNull Game game) {
+        boolean isCurrentPlayerPerspective = playerPerspective == rcvControls.getReplayCurrentTeam();
+
+        phvTopPlayer.setVisibility(isCurrentPlayerPerspective ? View.GONE : View.VISIBLE);
+        phvBottomPlayer.setVisibility(isCurrentPlayerPerspective ? View.VISIBLE : View.INVISIBLE);
+
         ptvTopPlayer.setWarningVisible(
                 game.getPlayerWarningCount(playerPerspective.getOpposite(), WarningType.Barrage) > 0
         );
@@ -358,11 +340,9 @@ public final class ReplayViewerActivity extends BaseActivity implements ReplayCo
         realignBoardView(showCards, true);
 
         if (showCards) {
-            ravCards.show(true);
             updateCards();
-        } else {
-            ravCards.hide();
         }
+        ravCards.setVisibility(showCards ? View.VISIBLE : View.GONE);
     }
 
 
@@ -420,7 +400,7 @@ public final class ReplayViewerActivity extends BaseActivity implements ReplayCo
 
     private void onChangeBoardOrientationClick(View v) {
         setPlayerPerspective(playerPerspective.getOpposite());
-        updatePlayerWarnings();
+        updatePlayers();
         setActionsVisible(false);
     }
 
@@ -458,13 +438,13 @@ public final class ReplayViewerActivity extends BaseActivity implements ReplayCo
     public void onReplayLoaded(@NonNull Game game) {
         bdvBoard.setBoard(game.getBoard());
         updateCards(game);
-        updatePlayerWarnings(game);
+        updatePlayers(game);
     }
 
     @Override
     public void onStepPlayed(@Nullable IGameAction action, boolean playInReverse, @NonNull Runnable onActionEnd) {
         updateCards();
-        updatePlayerWarnings();
+        updatePlayers();
 
         if (action != null && GameActionUtils.isAnimatable(action)) {
             playAction(action, playInReverse, onActionEnd);

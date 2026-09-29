@@ -106,6 +106,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnBack_actReplayViewer" />
 
+    <com.leaders.app.views.duel.PlayerHaloView
+        android:id="@+id/phvTopPlayer_actReplayViewer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="-16dp"
+        android:layout_marginTop="-8dp"
+        android:layout_marginBottom="-8dp"
+        android:rotation="180"
+        app:layout_constraintBottom_toBottomOf="@+id/ptvTopPlayer_actReplayViewer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/ptvTopPlayer_actReplayViewer"
+        app:layout_constraintTop_toTopOf="@+id/ptvTopPlayer_actReplayViewer" />
+
     <com.leaders.app.views.duel.PlayerTopView
         android:id="@+id/ptvTopPlayer_actReplayViewer"
         android:layout_width="0dp"
@@ -117,6 +130,19 @@
         app:layout_constraintStart_toStartOf="@+id/gdl50V_actReplayViewer"
         app:layout_constraintTop_toBottomOf="@+id/btnBack_actReplayViewer"
         app:layout_constraintVertical_bias="0.0" />
+
+    <com.leaders.app.views.duel.PlayerHaloView
+        android:id="@+id/phvBottomPlayer_actReplayViewer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="-8dp"
+        android:layout_marginEnd="-16dp"
+        android:layout_marginBottom="-8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/pbvBottomPlayer_actReplayViewer"
+        app:layout_constraintEnd_toStartOf="@+id/gdl50V_actReplayViewer"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/pbvBottomPlayer_actReplayViewer" />
 
     <com.leaders.app.views.duel.PlayerBottomView
         android:id="@+id/pbvBottomPlayer_actReplayViewer"
