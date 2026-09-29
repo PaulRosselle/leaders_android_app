@@ -1,6 +1,7 @@
 package com.leaders.app.entities.replay;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.historyentries.IHistoryEntry;
@@ -110,6 +111,14 @@ public final class ReplayTimelineController {
 
     private boolean isSameSegment(int firstIndex, int secondIndex) {
         return timeline.getStepSegment(firstIndex) == timeline.getStepSegment(secondIndex);
+    }
+
+    @NonNull
+    public ReplaySegment getStepSegment(int stepIndex) {
+        if (isOutOfBounds(stepIndex)) {
+            throw new IllegalArgumentException("Invalid step index: " + stepIndex);
+        }
+        return timeline.getStepSegment(stepIndex);
     }
 
     public void reset() {

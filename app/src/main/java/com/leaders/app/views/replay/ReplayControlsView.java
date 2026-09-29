@@ -16,10 +16,12 @@ import com.leaders.app.entities.ReplaySave;
 import com.leaders.app.entities.replay.ReplayStep;
 import com.leaders.app.entities.replay.ReplayTimelineController;
 import com.leaders.app.utilities.ButtonUtils;
+import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.actions.WarningAction;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
+import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.factories.GameActionHandlerFactory;
 import com.leaders.gamelogic.factories.GameFactory;
 
@@ -155,8 +157,29 @@ public final class ReplayControlsView extends ConstraintLayout {
         return startHistory;
     }
 
+    @NonNull
     public Game getReplayGame() {
         return getGame();
+    }
+
+    @NonNull
+    public TeamColor getReplayCurrentTeam() {
+        ReplayTimelineController controller = getTimelineController();
+
+        // At the start of the replay, we return the first player team
+        int currentStepIndex = controller.getCurrentStepIndex();
+        if (currentStepIndex == ReplayTimelineController.START_INDEX) {
+            return getStartHistory().getConfig().getFirstPlayer().getTeamColor();
+        }
+
+        // If the step is associated with a character action, we return the character's team
+        ReplayStep currentStep = controller.getStep(currentStepIndex);
+        if (currentStep.getAction() instanceof CharacterAction) {
+            return ((CharacterAction) currentStep.getAction()).getSrcCharacter().getTeamColor();
+        }
+
+        // In any other case, we return the step team
+        return controller.getStepSegment(currentStepIndex).getTeamColor();
     }
 
     public void loadReplay(@NonNull ReplaySave replaySave) {
