@@ -1,79 +1,98 @@
 {
   "contributors": [
     {
-      "team_color": "Black",
-      "character_type": "LeaderKing",
-      "name": "Hugo Fresnoy",
+      "avatar": "Acrobat",
+      "name": "Hugo Frénoy",
       "has_contributed_to_alpha": true,
       "has_contributed_to_beta": true
     },
     {
-      "team_color": "White",
-      "character_type": "Jailer",
+      "avatar": "RoyalGuard",
+      "name": "Mathieu Brt",
+      "has_contributed_to_alpha": true,
+      "has_contributed_to_beta": true
+    },
+    {
+      "avatar": "Jailer",
       "name": "BatTotoro",
       "has_contributed_to_alpha": true,
-      "has_contributed_to_beta": false
+      "has_contributed_to_beta": true
     },
     {
-      "team_color": "Black",
-      "character_type": "Nemesis",
-      "name": "RalzMaw",
-      "has_contributed_to_alpha": true,
-      "has_contributed_to_beta": false
-    },
-    {
-      "team_color": "White",
-      "character_type": "Vizier",
+      "avatar": "Vizier",
       "name": "Meygavox",
       "has_contributed_to_alpha": true,
-      "has_contributed_to_beta": false
+      "has_contributed_to_beta": true
     },
     {
-      "team_color": "Black",
-      "character_type": "RoyalGuard",
-      "name": "Mathieu Brt.",
+      "avatar": "Brewmaster",
+      "name": "RalzMaw",
       "has_contributed_to_alpha": true,
       "has_contributed_to_beta": true
     },
     {
-      "team_color": "Black",
-      "character_type": "LeaderQueen",
-      "name": "Lyriade",
+      "avatar": "LeaderQueen",
+      "name": "Elise",
       "has_contributed_to_alpha": true,
       "has_contributed_to_beta": true
     },
     {
-      "team_color": "White",
-      "character_type": "ClawLauncher",
+      "avatar": "ClawLauncher",
       "name": "Makito",
       "has_contributed_to_alpha": true,
       "has_contributed_to_beta": true
     },
     {
-      "team_color": "Black",
-      "character_type": "Bruiser",
+      "avatar": "Nemesis",
+      "name": "Frohid",
+      "has_contributed_to_alpha": false,
+      "has_contributed_to_beta": true
+    },
+    {
+      "avatar": "Protector",
+      "name": "Le MaraiCHEH",
+      "has_contributed_to_alpha": false,
+      "has_contributed_to_beta": true
+    },
+    {
+      "avatar": "Frog",
+      "name": "Peter",
+      "has_contributed_to_alpha": false,
+      "has_contributed_to_beta": true
+    },
+    {
+      "avatar": "Wanderer",
+      "name": "Phylosophy",
+      "has_contributed_to_alpha": false,
+      "has_contributed_to_beta": true
+    },
+    {
+      "avatar": "Assassin",
       "name": "Poncho Vila",
       "has_contributed_to_alpha": false,
       "has_contributed_to_beta": true
     },
     {
-      "team_color": "Black",
-      "character_type": "Acrobat",
+      "avatar": "Archer",
+      "name": "Riaphou",
+      "has_contributed_to_alpha": false,
+      "has_contributed_to_beta": true
+    },
+    {
+      "avatar": "Rider",
       "name": "Shusaku",
       "has_contributed_to_alpha": false,
       "has_contributed_to_beta": true
     },
     {
-      "team_color": "Black",
-      "character_type": "Assassin",
-      "name": "slww",
+      "avatar": "Tactician",
+      "name": "Thibs",
       "has_contributed_to_alpha": false,
       "has_contributed_to_beta": true
     },
     {
-      "team_color": "Black",
-      "character_type": "Hermit",
-      "name": "Thibs",
+      "avatar": "LeaderVermillion",
+      "name": "Zhayrgh",
       "has_contributed_to_alpha": false,
       "has_contributed_to_beta": true
     }

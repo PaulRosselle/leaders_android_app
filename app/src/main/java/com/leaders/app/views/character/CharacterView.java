@@ -99,7 +99,7 @@ public final class CharacterView extends AppCompatImageView {
             case Manipulator: return isWhite ? R.drawable.character_piece_manipulator_w : R.drawable.character_piece_manipulator_b;
             case Nemesis: return isWhite ? R.drawable.character_piece_nemesis_w : R.drawable.character_piece_nemesis_b;
             case Protector: return isWhite ? R.drawable.character_piece_protector_w : R.drawable.character_piece_protector_b;
-            case Rider: return isWhite ? R.drawable.rider_token_w : R.drawable.rider_token_b;
+            case Rider: return isWhite ? R.drawable.character_piece_rider_w : R.drawable.character_piece_rider_b;
             case RoyalGuard: {
                 if (skinType == CharacterSkinType.LaughingMoonSage) {
                     return isWhite ? R.drawable.character_piece_royal_guard_lms_w : R.drawable.character_piece_royal_guard_lms_b;
