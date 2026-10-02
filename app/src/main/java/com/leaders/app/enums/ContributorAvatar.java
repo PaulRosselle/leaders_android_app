@@ -4,6 +4,7 @@ import com.leaders.R;
 
 public enum ContributorAvatar {
     Acrobat,
+    Archer,
     Assassin,
     Brewmaster,
     ClawLauncher,
@@ -15,6 +16,7 @@ public enum ContributorAvatar {
     LeaderVermillion,
     Nemesis,
     Protector,
+    Rider,
     RoyalGuard,
     Tactician,
     Vizier,
@@ -23,6 +25,7 @@ public enum ContributorAvatar {
     public int getDrawableResId() {
         switch (this) {
             case Acrobat: return R.drawable.character_piece_acrobat_w;
+            case Archer: return R.drawable.character_piece_archer_w;
             case Assassin: return R.drawable.character_piece_assassin_w;
             case Brewmaster: return R.drawable.character_piece_brewmaster_w;
             case ClawLauncher: return R.drawable.character_piece_claw_launcher_w;
@@ -34,6 +37,7 @@ public enum ContributorAvatar {
             case LeaderVermillion: return R.drawable.character_piece_leader_vermillion_w;
             case Nemesis: return R.drawable.character_piece_nemesis_w;
             case Protector: return R.drawable.character_piece_protector_w;
+            case Rider: return R.drawable.character_piece_rider_w;
             case RoyalGuard: return R.drawable.character_piece_royal_guard_w;
             case Tactician: return R.drawable.character_piece_tactician_w;
             case Vizier: return R.drawable.character_piece_vizier_w;

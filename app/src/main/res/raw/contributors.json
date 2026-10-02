@@ -1,7 +1,7 @@
 {
   "contributors": [
     {
-      "avatar": "LeaderKing",
+      "avatar": "Acrobat",
       "name": "Hugo Frénoy",
       "has_contributed_to_alpha": true,
       "has_contributed_to_beta": true
@@ -73,7 +73,13 @@
       "has_contributed_to_beta": true
     },
     {
-      "avatar": "Acrobat",
+      "avatar": "Archer",
+      "name": "Riaphou",
+      "has_contributed_to_alpha": false,
+      "has_contributed_to_beta": true
+    },
+    {
+      "avatar": "Rider",
       "name": "Shusaku",
       "has_contributed_to_alpha": false,
       "has_contributed_to_beta": true
