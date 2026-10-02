@@ -1,16 +1,12 @@
 package com.leaders.app.entities.replay;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
-import com.leaders.gamelogic.actions.IGameAction;
-import com.leaders.gamelogic.actions.WarningAction;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.historyentries.IHistoryEntry;
-import com.leaders.gamelogic.historyentries.segments.BanishmentPhase;
-import com.leaders.gamelogic.historyentries.segments.Turn;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public final class ReplayTimelineController {
@@ -20,120 +16,112 @@ public final class ReplayTimelineController {
     @NonNull
     private final ReplayTimeline timeline;
 
-    private int currentActionIndex = START_INDEX;
+    private int currentStepIndex = START_INDEX;
 
 
     public ReplayTimelineController(@NonNull GameHistory gameHistory) {
         List<ReplaySegment> segments = new ArrayList<>();
 
         for (IHistoryEntry historyEntry : gameHistory.getEntries()) {
-            if (historyEntry instanceof Turn) {
-                segments.add(new ReplaySegment((Turn) historyEntry));
-            } else if (historyEntry instanceof BanishmentPhase) {
-                segments.add(new ReplaySegment((BanishmentPhase) historyEntry));
-            }
+            segments.add(new ReplaySegment(historyEntry));
         }
 
         timeline = new ReplayTimeline(segments);
     }
 
-    public int getCurrentActionIndex() {
-        return currentActionIndex;
+    public int getCurrentStepIndex() {
+        return currentStepIndex;
     }
 
     @NonNull
-    public IGameAction getAction(int actionIndex) {
-        return timeline.getAction(actionIndex);
+    public ReplayStep getStep(int stepIndex) {
+        return timeline.getStep(stepIndex);
     }
 
-    public int getActionCount() {
-        return timeline.getActionCount();
+    public int getStepCount() {
+        return timeline.getStepCount();
     }
 
-    public boolean hasNextAction() {
-        return currentActionIndex < timeline.getActionCount() - 1;
+    public boolean hasNextStep() {
+        return currentStepIndex < timeline.getStepCount() - 1;
     }
 
-    public boolean hasPreviousAction() {
-        return currentActionIndex >= 0;
-    }
-
-    public List<WarningAction> getWarningActions() {
-        return getWarningActions(currentActionIndex);
-    }
-
-    public List<WarningAction> getWarningActions(int actionIndex) {
-        if (isOutOfBounds(actionIndex) || !isAtTurnEnd(actionIndex)) {
-            return Collections.emptyList();
-        }
-
-        return timeline.getSegmentForAction(actionIndex).getWarningActions();
+    public boolean hasPreviousStep() {
+        return currentStepIndex >= 0;
     }
 
     @NonNull
-    public IGameAction moveToNextAction() {
-        if (!hasNextAction()) {
-            throw new IllegalStateException("No next action");
+    public ReplayStep moveToNextStep() {
+        if (!hasNextStep()) {
+            throw new IllegalStateException("No next step");
         }
 
-        currentActionIndex++;
+        currentStepIndex++;
 
-        return timeline.getAction(currentActionIndex);
+        return timeline.getStep(currentStepIndex);
     }
 
     @NonNull
-    public IGameAction moveToPreviousAction() {
-        if (!hasPreviousAction()) {
-            throw new IllegalStateException("No previous action");
+    public ReplayStep moveToPreviousStep() {
+        if (!hasPreviousStep()) {
+            throw new IllegalStateException("No previous step");
         }
 
-        IGameAction action = timeline.getAction(currentActionIndex);
-        currentActionIndex--;
+        ReplayStep step = timeline.getStep(currentStepIndex);
+        currentStepIndex--;
 
-        return action;
+        return step;
     }
 
-    public void jumpTo(int actionIndex) {
-        if (isOutOfBounds(actionIndex)) {
-            throw new IllegalArgumentException("Invalid action index: " + actionIndex);
+    public void jumpTo(int stepIndex) {
+        if (isOutOfBounds(stepIndex)) {
+            throw new IllegalArgumentException("Invalid step index: " + stepIndex);
         }
 
-        currentActionIndex = actionIndex;
+        currentStepIndex = stepIndex;
     }
 
-    public boolean isOutOfBounds(int actionIndex) {
-        return actionIndex < START_INDEX || actionIndex >= timeline.getActionCount();
+    public boolean isOutOfBounds(int stepIndex) {
+        return stepIndex < START_INDEX || stepIndex >= timeline.getStepCount();
     }
 
-    public boolean isAtTurnEnd(int actionIndex) {
-        if (actionIndex == START_INDEX) {
+    public boolean isAtTurnEnd(int stepIndex) {
+        if (stepIndex == START_INDEX) {
             return false;
         }
 
-        if (actionIndex >= timeline.getActionCount() - 1) {
+        if (stepIndex >= timeline.getStepCount() - 1) {
             return true;
         }
 
-        return !isSameSegment(actionIndex, actionIndex + 1);
+        return !isSameSegment(stepIndex, stepIndex + 1);
     }
 
     public boolean isAtTurnEnd() {
-        return isAtTurnEnd(currentActionIndex);
+        return isAtTurnEnd(currentStepIndex);
     }
 
     public boolean isAtTurnStart() {
-        if (currentActionIndex == START_INDEX || currentActionIndex < 1) {
+        if (currentStepIndex == START_INDEX || currentStepIndex < 1) {
             return true;
         }
 
-        return !isSameSegment(currentActionIndex, currentActionIndex - 1);
+        return !isSameSegment(currentStepIndex, currentStepIndex - 1);
     }
 
     private boolean isSameSegment(int firstIndex, int secondIndex) {
-        return timeline.getSegmentForAction(firstIndex) == timeline.getSegmentForAction(secondIndex);
+        return timeline.getStepSegment(firstIndex) == timeline.getStepSegment(secondIndex);
+    }
+
+    @NonNull
+    public ReplaySegment getStepSegment(int stepIndex) {
+        if (isOutOfBounds(stepIndex)) {
+            throw new IllegalArgumentException("Invalid step index: " + stepIndex);
+        }
+        return timeline.getStepSegment(stepIndex);
     }
 
     public void reset() {
-        currentActionIndex = START_INDEX;
+        currentStepIndex = START_INDEX;
     }
 }

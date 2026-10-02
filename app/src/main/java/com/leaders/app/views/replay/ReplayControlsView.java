@@ -13,18 +13,20 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 import com.leaders.app.entities.ReplaySave;
+import com.leaders.app.entities.replay.ReplayStep;
 import com.leaders.app.entities.replay.ReplayTimelineController;
 import com.leaders.app.utilities.ButtonUtils;
+import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.actions.WarningAction;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
+import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.factories.GameActionHandlerFactory;
 import com.leaders.gamelogic.factories.GameFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -32,7 +34,7 @@ public final class ReplayControlsView extends ConstraintLayout {
     public interface ReplayControlsListener {
 
         void onReplayLoaded(@NonNull Game game);
-        void onActionPlayed(@NonNull IGameAction action, boolean playInReverse, @NonNull Runnable onActionEnd);
+        void onStepPlayed(@Nullable IGameAction action, boolean playInReverse, @NonNull Runnable onActionEnd);
     }
 
     private enum ActionPlayMode {
@@ -155,8 +157,29 @@ public final class ReplayControlsView extends ConstraintLayout {
         return startHistory;
     }
 
+    @NonNull
     public Game getReplayGame() {
         return getGame();
+    }
+
+    @NonNull
+    public TeamColor getReplayCurrentTeam() {
+        ReplayTimelineController controller = getTimelineController();
+
+        // At the start of the replay, we return the first player team
+        int currentStepIndex = controller.getCurrentStepIndex();
+        if (currentStepIndex == ReplayTimelineController.START_INDEX) {
+            return getStartHistory().getConfig().getFirstPlayer().getTeamColor();
+        }
+
+        // If the step is associated with a character action, we return the character's team
+        ReplayStep currentStep = controller.getStep(currentStepIndex);
+        if (currentStep.getAction() instanceof CharacterAction) {
+            return ((CharacterAction) currentStep.getAction()).getSrcCharacter().getTeamColor();
+        }
+
+        // In any other case, we return the step team
+        return controller.getStepSegment(currentStepIndex).getTeamColor();
     }
 
     public void loadReplay(@NonNull ReplaySave replaySave) {
@@ -184,7 +207,7 @@ public final class ReplayControlsView extends ConstraintLayout {
         pendingJumpActionIndex = null;
 
         skbReplay.setProgress(0);
-        skbReplay.setMax(timelineController.getActionCount());
+        skbReplay.setMax(timelineController.getStepCount());
 
         updateControlsState();
     }
@@ -205,13 +228,13 @@ public final class ReplayControlsView extends ConstraintLayout {
 
     private void onPreviousActionClick(View v) {
         playMode = ActionPlayMode.SingleAction;
-        playPreviousAction();
+        playPreviousStep();
     }
 
     private void onNextActionClick(View v) {
         playMode = ActionPlayMode.SingleAction;
         if (!actionInProgress) {
-            playNextAction();
+            playNextStep();
         } else {
             playDirection = ActionPlayDirection.Forward;
         }
@@ -220,7 +243,7 @@ public final class ReplayControlsView extends ConstraintLayout {
     private void onPreviousTurnClick(View v) {
         playMode = ActionPlayMode.SingleTurn;
         if (!actionInProgress) {
-            playPreviousAction();
+            playPreviousStep();
         } else {
             playDirection = ActionPlayDirection.Backward;
         }
@@ -228,7 +251,7 @@ public final class ReplayControlsView extends ConstraintLayout {
 
     private void onNextTurnClick(View v) {
         playMode = ActionPlayMode.SingleTurn;
-        playNextAction();
+        playNextStep();
     }
 
     private boolean onButtonLongClick(View v) {
@@ -251,14 +274,14 @@ public final class ReplayControlsView extends ConstraintLayout {
     private void doPlay() {
         ReplayTimelineController controller = getTimelineController();
 
-        if (!controller.hasNextAction()) {
+        if (!controller.hasNextStep()) {
             doJumpToAction(ReplayTimelineController.START_INDEX);
         }
 
         playMode = ActionPlayMode.Playing;
         playDirection = ActionPlayDirection.Forward;
 
-        playNextAction();
+        playNextStep();
     }
 
     public void doPause() {
@@ -271,8 +294,8 @@ public final class ReplayControlsView extends ConstraintLayout {
     private void updateControlsState() {
         ReplayTimelineController controller = getTimelineController();
 
-        boolean hasNextAction = controller.hasNextAction();
-        boolean hasPreviousAction = controller.hasPreviousAction();
+        boolean hasNextAction = controller.hasNextStep();
+        boolean hasPreviousAction = controller.hasPreviousStep();
 
         int enabledStrokeColor = R.color.font;
         int disabledStrokeColor = R.color.darker_font;
@@ -311,7 +334,7 @@ public final class ReplayControlsView extends ConstraintLayout {
     private void notifyTimelinePositionChanged() {
         ReplayTimelineController controller = getTimelineController();
 
-        skbReplay.setProgress(controller.getCurrentActionIndex() + 1);
+        skbReplay.setProgress(controller.getCurrentStepIndex() + 1);
 
         updateControlsState();
     }
@@ -348,9 +371,9 @@ public final class ReplayControlsView extends ConstraintLayout {
 
         if (keepPlaying) {
             if (playForward) {
-                playNextAction();
+                playNextStep();
             } else {
-                playPreviousAction();
+                playPreviousStep();
             }
         } else if (mustPause) {
             doPause();
@@ -359,14 +382,14 @@ public final class ReplayControlsView extends ConstraintLayout {
 
     //region ACTION PLAYER METHODS
 
-    private void playNextAction() {
+    private void playNextStep() {
         if (actionInProgress) {
             return;
         }
 
         ReplayTimelineController controller = getTimelineController();
 
-        if (!controller.hasNextAction()) {
+        if (!controller.hasNextStep()) {
             doPause();
             return;
         }
@@ -374,10 +397,12 @@ public final class ReplayControlsView extends ConstraintLayout {
         actionInProgress = true;
         playDirection = ActionPlayDirection.Forward;
 
-        IGameAction actionToPlay = controller.moveToNextAction();
-        GameActionHandlerFactory.create(game, actionToPlay).doAction();
 
-        for (WarningAction warningAction : controller.getWarningActions()) {
+        ReplayStep stepToPlay = controller.moveToNextStep();
+        if (stepToPlay.getAction() != null) {
+            GameActionHandlerFactory.create(game, stepToPlay.getAction()).doAction();
+        }
+        for (WarningAction warningAction : stepToPlay.getWarningActions()) {
             GameActionHandlerFactory.create(game, warningAction).doAction();
         }
 
@@ -386,17 +411,17 @@ public final class ReplayControlsView extends ConstraintLayout {
         if (controlsListener == null) {
             throw new IllegalStateException("Listener required to play actions");
         }
-        controlsListener.onActionPlayed(actionToPlay, false, this::doOnActionEnd);
+        controlsListener.onStepPlayed(stepToPlay.getAction(), false, this::doOnActionEnd);
     }
 
-    private void playPreviousAction() {
+    private void playPreviousStep() {
         if (actionInProgress) {
             return;
         }
 
         ReplayTimelineController controller = getTimelineController();
 
-        if (!controller.hasPreviousAction()) {
+        if (!controller.hasPreviousStep()) {
             doPause();
             return;
         }
@@ -404,20 +429,21 @@ public final class ReplayControlsView extends ConstraintLayout {
         actionInProgress = true;
         playDirection = ActionPlayDirection.Backward;
 
-        // We undo warning actions before moving to the previous one
-        for (WarningAction warningAction : controller.getWarningActions()) {
+
+        ReplayStep stepToReverse = controller.moveToPreviousStep();
+        for (WarningAction warningAction : stepToReverse.getWarningActions()) {
             GameActionHandlerFactory.create(game, warningAction).undoAction();
         }
-
-        IGameAction actionToReverse = controller.moveToPreviousAction();
-        GameActionHandlerFactory.create(game, actionToReverse).undoAction();
+        if (stepToReverse.getAction() != null) {
+            GameActionHandlerFactory.create(game, stepToReverse.getAction()).undoAction();
+        }
 
         notifyTimelinePositionChanged();
 
         if (controlsListener == null) {
             throw new IllegalStateException("Listener required to play actions");
         }
-        controlsListener.onActionPlayed(actionToReverse, true, this::doOnActionEnd);
+        controlsListener.onStepPlayed(stepToReverse.getAction(), true, this::doOnActionEnd);
     }
 
     private void jumpToAction(int jumpActionIndex) {
@@ -432,25 +458,25 @@ public final class ReplayControlsView extends ConstraintLayout {
     private void doJumpToAction(int jumpActionIndex) {
         ReplayTimelineController controller = getTimelineController();
 
-        if (jumpActionIndex == controller.getCurrentActionIndex()) {
+        if (jumpActionIndex == controller.getCurrentStepIndex()) {
             return;
         }
 
         Game jumpGame = GameFactory.create(getStartHistory());
 
         for (int i = 0; i <= jumpActionIndex; i++) {
-            IGameAction action = controller.getAction(i);
-            GameActionHandlerFactory.create(jumpGame, action).doAction();
-
-            List<WarningAction> warningActions = controller.getWarningActions(i);
-            for (WarningAction warningAction : warningActions) {
+            ReplayStep step = controller.getStep(i);
+            if (step.getAction() != null) {
+                GameActionHandlerFactory.create(jumpGame, step.getAction()).doAction();
+            }
+            for (WarningAction warningAction : step.getWarningActions()) {
                 GameActionHandlerFactory.create(jumpGame, warningAction).doAction();
             }
         }
 
         game = jumpGame;
-
         controller.jumpTo(jumpActionIndex);
+
         notifyTimelinePositionChanged();
 
         if (controlsListener == null) {

@@ -7,7 +7,7 @@ import androidx.annotation.NonNull;
 import com.leaders.R;
 import com.leaders.gamelogic.enums.GameMode;
 
-public class GameModeUtils {
+public final class GameModeUtils {
     private GameModeUtils(){
         throw new AssertionError("Cannot instantiate utility class");
     }

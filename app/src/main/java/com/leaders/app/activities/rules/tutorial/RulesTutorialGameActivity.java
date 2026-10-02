@@ -1,12 +1,10 @@
 package com.leaders.app.activities.rules.tutorial;
 
-import android.animation.LayoutTransition;
 import android.app.AlertDialog;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
@@ -20,13 +18,16 @@ import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.app.enums.EndGameType;
 import com.leaders.app.enums.LeaderType;
 import com.leaders.app.enums.TutorialChapter;
+import com.leaders.app.utilities.AlignmentUtils;
 import com.leaders.app.utilities.ButtonUtils;
+import com.leaders.app.utilities.HelpUtils;
 import com.leaders.app.utilities.TutorialBotUtils;
 import com.leaders.app.utilities.TutorialGameUtils;
 import com.leaders.app.views.character.CharacterDisplay;
 import com.leaders.app.views.character.HighlightView;
 import com.leaders.app.views.duel.CharacterCardSelectionView;
 import com.leaders.app.views.duel.PlayerBottomView;
+import com.leaders.app.views.duel.PlayerHaloView;
 import com.leaders.app.views.duel.PlayerTopView;
 import com.leaders.app.views.portrait.PortraitView;
 import com.leaders.app.views.rules.TutorialNavigationView;
@@ -46,6 +47,7 @@ import com.leaders.gamelogic.interactions.InteractionType;
 import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -55,11 +57,14 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
     private CharacterCardSelectionView ccsvCardSelector;
     private CharacterDisplay chdNewCharacter;
 
-    private MaterialButton btnInfo;
+    private MaterialButton btnHelp;
     private TutorialNavigationView tnvNavigation;
 
     private PlayerBottomView pbvPlayer;
     private PlayerTopView ptvBot;
+
+    private PlayerHaloView phvPlayer;
+    private PlayerHaloView phvBot;
 
 
     private MaterialButton btnCards;
@@ -82,11 +87,14 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
         ccsvCardSelector = findViewById(R.id.ccsvCardSelector_actRulesTutorialGame);
         chdNewCharacter = new CharacterDisplay(this, ccsvCardSelector);
 
-        btnInfo = findViewById(R.id.btnInfo_actRulesTutorialGame);
+        btnHelp = findViewById(R.id.btnHelp_actRulesTutorialGame);
         tnvNavigation = findViewById(R.id.tnvNavigation_actRulesTutorialGame);
 
         pbvPlayer = findViewById(R.id.pbvPlayer_actRulesTutorialGame);
         ptvBot = findViewById(R.id.ptvBot_actRulesTutorialGame);
+
+        phvPlayer = findViewById(R.id.phvPlayer_actRulesTutorialGame);
+        phvBot = findViewById(R.id.phvBot_actRulesTutorialGame);
 
         btnCards = findViewById(R.id.btnCards_actRulesTutorialGame);
         btnReset = findViewById(R.id.btnReset_actRulesTutorialGame);
@@ -106,7 +114,7 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
         ccsvCardSelector.setOnCardSelectedListener(this);
         ccsvCardSelector.setOnPortraitLongClickListener(this::onPortraitLongClick);
 
-        btnInfo.setOnClickListener(this::onInfoClick);
+        btnHelp.setOnClickListener(this::onHelpClick);
         tnvNavigation.setNavigator(this);
 
         btnCards.setOnClickListener(this::onCardsClick);
@@ -265,42 +273,15 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
     }
 
     private void setCardSelectorVisible(boolean visible) {
-        // When recruiting, we display the cardSelector view below the player view.
-        // The layout transition is animated for both the board and player view
-        bdvBoard.getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
-        pbvPlayer.getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
-
-        ConstraintLayout.LayoutParams boardParams = (ConstraintLayout.LayoutParams) bdvBoard.getLayoutParams();
-        ConstraintLayout.LayoutParams playerViewParams = (ConstraintLayout.LayoutParams) pbvPlayer.getLayoutParams();
-        // When recruiting, every view is aligned on top of each other
-        if (visible) {
-            boardParams.verticalBias = 0f;
-            playerViewParams.verticalBias = 0f;
-            float dpRatio = getResources().getDisplayMetrics().density;
-            int boardHeight = bdvBoard.getMeasuredHeight();
-            float playerHeaderHeight = boardHeight * (72f / 1177f);
-            int boardMargin = 16;
-            int playerViewMargin = boardMargin + 8;
-
-            boardParams.topMargin = (int) (playerHeaderHeight + boardMargin * dpRatio);
-            playerViewParams.topMargin = (int) (boardHeight - pbvPlayer.getMeasuredHeight() +
-                    playerHeaderHeight * 2 + playerViewMargin * dpRatio);
-            ccsvCardSelector.show(true);
-
-            // By default, each playerView is on a vertical extremity while the board is centered
-        } else {
-            boardParams.verticalBias = 0.5f;
-            playerViewParams.verticalBias = 1f;
-            boardParams.topMargin = 0;
-            playerViewParams.topMargin = 0;
-            ccsvCardSelector.hide();
-        }
-        bdvBoard.setLayoutParams(boardParams);
-        pbvPlayer.setLayoutParams(playerViewParams);
-
-        // The requestLayout calls start the layout transition animation
-        bdvBoard.requestLayout();
-        pbvPlayer.requestLayout();
+        AlignmentUtils.alignBoardView(
+                visible,
+                bdvBoard,
+                pbvPlayer,
+                Collections.singletonList(phvPlayer),
+                visible ? Collections.singletonList(ccsvCardSelector) : Collections.emptyList(),
+                true
+        );
+        ccsvCardSelector.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     private void showEndGame(@NonNull GameContext gameContext, @NonNull Player winner) {
@@ -383,6 +364,8 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
         Board board = gameContext.getBoard();
         pbvPlayer.setPlayer(player, getPlayerLeaderType(player, board));
         ptvBot.setPlayer(bot, getPlayerLeaderType(bot, board));
+
+        updateCurrentPlayer(isBotPlaying(gameContext));
     }
 
     private LeaderType getPlayerLeaderType(@NonNull Player player, @NonNull Board board) {
@@ -398,6 +381,13 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
 
         pbvPlayer.setWarningVisible(playerHasWarnings(getPlayer(gameContext), warningStates));
         ptvBot.setWarningVisible(playerHasWarnings(getBot(gameContext), warningStates));
+
+        updateCurrentPlayer(isBotPlaying(gameContext));
+    }
+
+    private void updateCurrentPlayer(boolean isBotPlaying) {
+        phvBot.setVisibility(isBotPlaying ? View.VISIBLE : View.GONE);
+        phvPlayer.setVisibility(isBotPlaying ? View.INVISIBLE : View.VISIBLE);
     }
 
     private boolean playerHasWarnings(@NonNull Player player,
@@ -530,15 +520,8 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
         return true;
     }
 
-    private void onInfoClick(View v) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.alert_dialog_theme);
-
-        builder.setIcon(getChapter().getInfoIconResId());
-        builder.setTitle(R.string.extra_infos);
-        builder.setMessage(getChapter().getInfoTextResId());
-        builder.setPositiveButton(R.string.ok, null);
-
-        builder.show();
+    private void onHelpClick(View v) {
+        HelpUtils.getHelpDialog(this).show();
     }
 
     private void onResetClick(View v) {
