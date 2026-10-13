@@ -35,6 +35,7 @@ import com.leaders.gamelogic.historyentries.segments.ActionsPhase;
 import com.leaders.gamelogic.queries.GameHistoryQuery;
 import com.leaders.puzzlelogic.serializers.SerializationContext;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
+import com.leaders.puzzlelogic.utilities.CharactersPermutationUtils;
 import com.leaders.puzzlelogic.utilities.solver.PuzzleSolverUtils;
 import com.leaders.puzzlelogic.utilities.solver.SolutionComparatorUtils;
 
@@ -226,7 +227,7 @@ public final class PuzzleSolverActivity extends BaseActivity {
         TeamColor activeTeam = ((ActionsPhase) currentPhase).getTurnTeamColor();
         List<Character> characters = getActiveTeamCharacters(baseGame, activeTeam);
 
-        long permutationCount = PuzzleSolverUtils.getPermutationCount(characters);
+        long permutationCount = CharactersPermutationUtils.getPermutationCount(characters);
         if (permutationCount == 0) {
             throw new IllegalStateException("Invalid puzzle : no playable character");
         }
