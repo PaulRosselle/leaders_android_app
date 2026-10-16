@@ -232,7 +232,7 @@ public final class PuzzleSolverActivity extends BaseActivity {
             throw new IllegalStateException("Invalid puzzle : no playable character");
         }
 
-        int workerCount = Math.max(1, Runtime.getRuntime().availableProcessors() - 2);
+        int workerCount = Math.max(1, Runtime.getRuntime().availableProcessors() - 1);
         workerCount = (int) Math.min(workerCount, permutationCount);
 
         solutionQueue = new LinkedBlockingQueue<>();
@@ -241,6 +241,9 @@ public final class PuzzleSolverActivity extends BaseActivity {
 
         pgbSolutionsSearch.setVisibility(View.VISIBLE);
         txvSolutionsFound.setText(R.string.searching_solution);
+
+        solutionConsumerThread = new Thread(this::consumeSolutions, "PuzzleSolverConsumer");
+        solutionConsumerThread.start();
 
         // nextPermutation is incremented within "runSolverWorker"
         AtomicLong nextPermutation = new AtomicLong(0);
@@ -253,9 +256,6 @@ public final class PuzzleSolverActivity extends BaseActivity {
                     nextPermutation
             ));
         }
-
-        solutionConsumerThread = new Thread(this::consumeSolutions, "PuzzleSolverConsumer");
-        solutionConsumerThread.start();
     }
 
     @NonNull
@@ -281,16 +281,16 @@ public final class PuzzleSolverActivity extends BaseActivity {
                                  long permutationCount,
                                  @NonNull AtomicLong nextPermutation) {
         try {
+            // Each worker must use its own copy of the game history and projection since
+            // the solver simulates action then backtrack to explore every possible action
+            Game workerGame = new Game(baseGame);
+            GameHistory workerHistory = new GameHistory(puzzleGameHistory);
+
             while (!Thread.currentThread().isInterrupted()) {
                 long permutationIndex = nextPermutation.getAndIncrement();
                 if (permutationIndex >= permutationCount) {
                     break;
                 }
-
-                // Each worker must use its own copy of the game history and projection since
-                // the solver simulates action then backtrack to explore every possible action
-                Game workerGame = new Game(baseGame);
-                GameHistory workerHistory = new GameHistory(puzzleGameHistory);
 
                 PuzzleSolverUtils.solve(
                         workerGame,
