@@ -1,7 +1,6 @@
 package com.leaders.puzzlelogic.utilities.solver;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.entities.Character;
@@ -9,20 +8,15 @@ import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.PlayableCharacter;
 import com.leaders.gamelogic.enums.TeamColor;
-import com.leaders.gamelogic.factories.CharacterActionResolverFactory;
 import com.leaders.gamelogic.factories.GameActionHandlerFactory;
 import com.leaders.gamelogic.handlers.GameActionHandler;
 import com.leaders.gamelogic.historyentries.IPhase;
 import com.leaders.gamelogic.historyentries.segments.ActionsPhase;
-import com.leaders.gamelogic.interactions.CharacterActionBuilder;
-import com.leaders.gamelogic.interactions.InteractionFeedback;
-import com.leaders.gamelogic.interactions.InteractionRequest;
-import com.leaders.gamelogic.interactions.InteractionResult;
-import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.queries.GameHistoryQuery;
 import com.leaders.gamelogic.queries.GameQuery;
 import com.leaders.gamelogic.queries.PlayabilityQuery;
-import com.leaders.gamelogic.resolvers.CharacterActionResolver;
+import com.leaders.puzzlelogic.utilities.CharactersPermutationUtils;
+import com.leaders.puzzlelogic.utilities.GameSearchUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +27,6 @@ import java.util.concurrent.BlockingQueue;
  */
 public final class PuzzleSolverUtils {
     public static final int MAX_PLAYER_CHARACTER_COUNT = 10;
-    private static final int MAX_RESOLVER_INTERACTION_DEPTH = 2;
 
     private PuzzleSolverUtils(){
         throw new AssertionError("Cannot instantiate utility class");
@@ -62,7 +55,7 @@ public final class PuzzleSolverUtils {
         ActionsPhase actionsPhase = (ActionsPhase) phase;
 
         search(game, history, actionsPhase,
-                getPermutation(characters, permutationIndex),
+                CharactersPermutationUtils.getPermutation(characters, permutationIndex),
                 new QueueSolutionCollector(solutions)
         );
     }
@@ -115,7 +108,9 @@ public final class PuzzleSolverUtils {
         // PLAYABLE CHARACTER : we play the remaining characters in order.
         } else if (!remainingCharacters.isEmpty()) {
             Character character = remainingCharacters.get(0);
-            PlayableCharacter playableCharacter = findPlayableCharacterById(playableCharacters, character);
+            PlayableCharacter playableCharacter = GameSearchUtils.findPlayableCharacterById(
+                    playableCharacters, character
+            );
 
             if (playableCharacter != null) {
                 remainingCharacters.remove(0);
@@ -155,7 +150,7 @@ public final class PuzzleSolverUtils {
             search(game, history, actionsPhase, remainingCharacters, collector);
         }
 
-        List<CharacterAction> actions = enumerateActions(game, history, playableCharacter.getCharacter());
+        List<CharacterAction> actions = GameSearchUtils.enumerateActions(game, history, playableCharacter.getCharacter());
 
         for (CharacterAction action : actions) {
             GameActionHandler handler = GameActionHandlerFactory.create(game, action);
@@ -194,7 +189,7 @@ public final class PuzzleSolverUtils {
                                                         @NonNull List<Character> remainingCharacters,
                                                         @NonNull PlayableCharacter playableCharacter,
                                                         @NonNull ISolutionCollector collector) throws InterruptedException {
-        List<CharacterAction> actions = enumerateActions(game, history, playableCharacter.getCharacter());
+        List<CharacterAction> actions = GameSearchUtils.enumerateActions(game, history, playableCharacter.getCharacter());
 
         List<List<CharacterAction>> solutions = new ArrayList<>();
 
@@ -276,164 +271,5 @@ public final class PuzzleSolverUtils {
     private static boolean isOpponentCharacter(@NonNull ActionsPhase actionsPhase,
                                                @NonNull Character character) {
         return character.getTeamColor() != actionsPhase.getTurnTeamColor();
-    }
-
-    /**
-     * Finds a playable character by its character identifier.
-     *
-     * @param playableCharacters the playable characters to search
-     * @param character the character to find
-     * @return the corresponding playable character, or {@code null} if none
-     *         matches the specified character
-     */
-    @Nullable
-    private static PlayableCharacter findPlayableCharacterById(@NonNull List<PlayableCharacter> playableCharacters,
-                                                               @NonNull Character character) {
-        for (PlayableCharacter playableCharacter : playableCharacters) {
-            if (character.getId() == playableCharacter.getCharacter().getId()) {
-                return playableCharacter;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns all legal actions available to the specified character in the current game state.
-     *
-     * @param game the current game state
-     * @param history the game history used to determine legal actions
-     * @param character the character whose actions are enumerated
-     * @return the list of legal actions available to the character
-     */
-    @NonNull
-    private static List<CharacterAction> enumerateActions(@NonNull Game game,
-                                                          @NonNull GameHistory history,
-                                                          @NonNull Character character) {
-        CharacterActionResolver resolver =
-                CharacterActionResolverFactory.create(game, history, character);
-
-        CharacterActionBuilder builder = new CharacterActionBuilder(character);
-
-        List<CharacterAction> actions = new ArrayList<>();
-
-        enumerateResolverState(resolver, builder, actions, 0);
-
-        return actions;
-    }
-
-
-    /**
-     * Enumerates all legal action variants resulting from the interaction
-     * sequence exposed by the resolver.
-     *
-     * @param resolver the resolver determining the next interaction and feedback
-     * @param builder the current action being constructed
-     * @param actions the collection receiving the completed actions
-     */
-    private static void enumerateResolverState(@NonNull CharacterActionResolver resolver,
-                                               @NonNull CharacterActionBuilder builder,
-                                               @NonNull List<CharacterAction> actions,
-                                               int depth) {
-        if (depth > MAX_RESOLVER_INTERACTION_DEPTH) {
-            throw new IllegalStateException(
-                    "Resolver interaction flow did not terminate: "
-                            + resolver.getClass().getSimpleName()
-            );
-        }
-
-        InteractionRequest request = resolver.getNextInteraction(builder);
-
-        if (request == null) {
-            actions.add(resolver.buildAction(builder));
-            return;
-        }
-
-        for (InteractionTarget target : request.getLegalTargets()) {
-            InteractionResult result =
-                    new InteractionResult(
-                            target.getCategory().getResultType(),
-                            request.getContext(),
-                            target
-                    );
-
-            CharacterActionBuilder next = new CharacterActionBuilder(builder);
-
-            next.addResult(result);
-
-            InteractionFeedback feedback = resolver.getNextFeedback(next);
-
-            if (feedback != null) {
-                next.addFeedback(feedback);
-            }
-
-            enumerateResolverState(resolver, next, actions, depth + 1);
-        }
-    }
-
-    /**
-     * Returns the total number of permutations of {@code characters}.
-     *
-     * @param characters the elements to permute
-     * @return the number of permutations, {@code characters.size()!}
-     * @throws IllegalArgumentException if the number of permutations exceeds
-     *                                  {@link Long#MAX_VALUE}
-     */
-    public static long getPermutationCount(@NonNull List<Character> characters) {
-        return factorial(characters.size());
-    }
-
-    /**
-     * Returns the permutation of {@code characters} identified by {@code index}
-     * in lexicographic order.
-     *
-     * @param characters the elements to permute
-     * @param index the zero-based permutation index, in {@code [0, n!)}
-     * @return the permutation corresponding to {@code index}
-     * @throws IllegalArgumentException if {@code index} is outside the valid range
-     */
-    @NonNull
-    private static List<Character> getPermutation(@NonNull List<Character> characters,
-                                                  long index) {
-        int size = characters.size();
-
-        if (index < 0 || index >= factorial(size)) {
-            throw new IllegalArgumentException("Invalid permutation index: " + index);
-        }
-
-        List<Character> remaining = new ArrayList<>(characters);
-        List<Character> permutation = new ArrayList<>(size);
-
-        for (int position = size - 1; position >= 0; position--) {
-            long blockSize = factorial(position);
-
-            int selectedIndex = (int) (index / blockSize);
-            index %= blockSize;
-
-            permutation.add(remaining.remove(selectedIndex));
-        }
-
-        return permutation;
-    }
-
-    /**
-     * Returns the factorial of {@code value}.
-     *
-     * @param value a non-negative integer
-     * @return {@code value!}
-     * @throws IllegalArgumentException if the result exceeds {@link Long#MAX_VALUE}
-     */
-    private static long factorial(int value) {
-        long result = 1;
-
-        for (int i = 2; i <= value; i++) {
-            if (Long.MAX_VALUE / i < result) {
-                throw new IllegalArgumentException("Factorial exceeds long range: " + value);
-            }
-
-            result *= i;
-        }
-
-        return result;
     }
 }

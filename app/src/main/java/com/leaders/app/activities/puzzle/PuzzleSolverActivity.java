@@ -35,6 +35,7 @@ import com.leaders.gamelogic.historyentries.segments.ActionsPhase;
 import com.leaders.gamelogic.queries.GameHistoryQuery;
 import com.leaders.puzzlelogic.serializers.SerializationContext;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
+import com.leaders.puzzlelogic.utilities.CharactersPermutationUtils;
 import com.leaders.puzzlelogic.utilities.solver.PuzzleSolverUtils;
 import com.leaders.puzzlelogic.utilities.solver.SolutionComparatorUtils;
 
@@ -226,12 +227,12 @@ public final class PuzzleSolverActivity extends BaseActivity {
         TeamColor activeTeam = ((ActionsPhase) currentPhase).getTurnTeamColor();
         List<Character> characters = getActiveTeamCharacters(baseGame, activeTeam);
 
-        long permutationCount = PuzzleSolverUtils.getPermutationCount(characters);
+        long permutationCount = CharactersPermutationUtils.getPermutationCount(characters);
         if (permutationCount == 0) {
             throw new IllegalStateException("Invalid puzzle : no playable character");
         }
 
-        int workerCount = Math.max(1, Runtime.getRuntime().availableProcessors() - 2);
+        int workerCount = Math.max(1, Runtime.getRuntime().availableProcessors() - 1);
         workerCount = (int) Math.min(workerCount, permutationCount);
 
         solutionQueue = new LinkedBlockingQueue<>();
@@ -240,6 +241,9 @@ public final class PuzzleSolverActivity extends BaseActivity {
 
         pgbSolutionsSearch.setVisibility(View.VISIBLE);
         txvSolutionsFound.setText(R.string.searching_solution);
+
+        solutionConsumerThread = new Thread(this::consumeSolutions, "PuzzleSolverConsumer");
+        solutionConsumerThread.start();
 
         // nextPermutation is incremented within "runSolverWorker"
         AtomicLong nextPermutation = new AtomicLong(0);
@@ -252,9 +256,6 @@ public final class PuzzleSolverActivity extends BaseActivity {
                     nextPermutation
             ));
         }
-
-        solutionConsumerThread = new Thread(this::consumeSolutions, "PuzzleSolverConsumer");
-        solutionConsumerThread.start();
     }
 
     @NonNull
@@ -280,16 +281,16 @@ public final class PuzzleSolverActivity extends BaseActivity {
                                  long permutationCount,
                                  @NonNull AtomicLong nextPermutation) {
         try {
+            // Each worker must use its own copy of the game history and projection since
+            // the solver simulates action then backtrack to explore every possible action
+            Game workerGame = new Game(baseGame);
+            GameHistory workerHistory = new GameHistory(puzzleGameHistory);
+
             while (!Thread.currentThread().isInterrupted()) {
                 long permutationIndex = nextPermutation.getAndIncrement();
                 if (permutationIndex >= permutationCount) {
                     break;
                 }
-
-                // Each worker must use its own copy of the game history and projection since
-                // the solver simulates action then backtrack to explore every possible action
-                Game workerGame = new Game(baseGame);
-                GameHistory workerHistory = new GameHistory(puzzleGameHistory);
 
                 PuzzleSolverUtils.solve(
                         workerGame,
