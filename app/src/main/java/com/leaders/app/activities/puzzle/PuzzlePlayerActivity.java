@@ -26,15 +26,11 @@ import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.character.HighlightView;
 import com.leaders.app.views.settings.AnimationSpeedView;
-import com.leaders.gamelogic.actions.CharacterAction;
-import com.leaders.gamelogic.actions.CharacterActionMotion;
-import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.Player;
-import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.interactions.InteractionRequest;
@@ -384,41 +380,45 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
 
     //region AUTO PLAY
 
-    private boolean canAutoPlay(@NonNull Character character) {
-        // TODO - comment
-        return character.getCharacterType() == CharacterType.Nemesis &&
+    private boolean canAutoPlay(@NonNull InteractionRequest request) {
+        return enemyNemesisMustPlay(request) || isEnemyNemesisPlaying(request);
+    }
+
+    private boolean enemyNemesisMustPlay(@NonNull InteractionRequest request) {
+        return request.getRequestType() == InteractionType.PlayableCharacterExpected &&
+                request.getLegalTargets().size() == 1 &&
+                Objects.requireNonNull(
+                        request.getLegalTargets().get(0).getChosenPlayableCharacter(),
+                        "Invalid playable character request target"
+                ).isMandatory();
+    }
+
+    private boolean isEnemyNemesisPlaying(@NonNull InteractionRequest request) {
+        Character character;
+        return (character = request.getContext().getCharacter()) != null &&
+                character.getCharacterType() == CharacterType.Nemesis &&
                 character.getTeamColor() != PuzzleEditionUtils.getPuzzlePlayerTeamColor();
     }
 
-    private void startAutoPlay(@NonNull Character character) {
-        NemesisBlocker blocker = new NemesisBlocker(
-                controller.getHistory(),
-                character,
-                this
-        );
-        blocker.start();
-    }
-
-    @NonNull
-    private InteractionTarget getTargetFromNemesisAction(@NonNull CharacterAction action) {
-        // TODO - refactor
-        CharacterActionMotion motion = Objects.requireNonNull(action.getMotions().get(action.getMotions().size() - 1), "Nemesis motion missing");
-        CharacterActionTarget target = Objects.requireNonNull(motion.getTargets().get(0), "Nemesis target missing");
-        Position destPos = Objects.requireNonNull(target.getDestPos(), "Nemesis destination missing");
-
-        return Objects.requireNonNull(bdvBoard.getCellView(destPos).getTarget(), "Nemesis target not found at destination");
+    private void startAutoPlay(@NonNull InteractionRequest request) {
+        if (enemyNemesisMustPlay(request)) {
+            controller.selectTarget(request.getLegalTargets().get(0));
+        } else {
+            NemesisBlocker blocker = new NemesisBlocker(controller.getHistory(), request, this);
+            blocker.start();
+        }
     }
 
     @Override
-    public void onBlockingActionFound(@NonNull CharacterAction action) {
-        controller.selectTarget(getTargetFromNemesisAction(action));
+    public void onBlockingActionFound(@NonNull InteractionTarget target) {
+        controller.selectTarget(target);
     }
 
     @Override
-    public void onSearchCompletedWithoutResult(@Nullable CharacterAction defaultAction) {
+    public void onSearchCompletedWithoutResult(@Nullable InteractionTarget defaultTarget) {
         // TODO - handle null case
-        if (defaultAction != null) {
-            controller.selectTarget(getTargetFromNemesisAction(defaultAction));
+        if (defaultTarget != null) {
+            controller.selectTarget(defaultTarget);
         }
     }
 
@@ -434,17 +434,10 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     @Override
     public void onInteractionRequired(@NonNull InteractionRequest request) {
         runOnUiThread(() -> {
-            super.onInteractionRequired(request);
-            // TODO - handle another way
-            if (request.getRequestType() == InteractionType.PlayableCharacterExpected &&
-                request.getLegalTargets().size() == 1 &&
-                    request.getLegalTargets().get(0).getChosenPlayableCharacter().isMandatory()) {
-                controller.selectTarget(request.getLegalTargets().get(0));
-            }
-
-            Character character = request.getContext().getCharacter();
-            if (character != null && canAutoPlay(character)) {
-                startAutoPlay(character);
+            if (canAutoPlay(request)) {
+                startAutoPlay(request);
+            } else {
+                super.onInteractionRequired(request);
             }
         });
     }

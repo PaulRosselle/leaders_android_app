@@ -4,11 +4,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.leaders.gamelogic.actions.CharacterAction;
+import com.leaders.gamelogic.interactions.InteractionTarget;
 
 public interface NemesisBlockerCallback {
-    void onBlockingActionFound(@NonNull CharacterAction action);
+    void onBlockingActionFound(@NonNull InteractionTarget target);
 
-    void onSearchCompletedWithoutResult(@Nullable CharacterAction defaultAction);
+    void onSearchCompletedWithoutResult(@Nullable InteractionTarget defaultTarget);
 
     void onSearchCancelled();
 }

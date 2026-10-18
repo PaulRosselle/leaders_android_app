@@ -4,12 +4,18 @@ package com.leaders.puzzlelogic.entities.blocker;
 import androidx.annotation.NonNull;
 
 import com.leaders.gamelogic.actions.CharacterAction;
+import com.leaders.gamelogic.actions.CharacterActionMotion;
+import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
+import com.leaders.gamelogic.entities.Position;
+import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.factories.GameFactory;
 import com.leaders.gamelogic.historyentries.IPhase;
 import com.leaders.gamelogic.historyentries.segments.ActionsPhase;
+import com.leaders.gamelogic.interactions.InteractionRequest;
+import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.queries.CharacterAbilityQuery;
 import com.leaders.gamelogic.queries.GameHistoryQuery;
 import com.leaders.puzzlelogic.utilities.CharactersPermutationUtils;
@@ -18,13 +24,16 @@ import com.leaders.puzzlelogic.utilities.blocker.NemesisBlockerUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public final class NemesisBlocker {
     private final Game game;
     private final GameHistory gameHistory;
+
     private final List<CharacterAction> nemesisActions;
+    private final List<InteractionTarget> nemesisTargets;
     private final List<Character> opponentCharacters;
     private final long permutationCount;
     private final NemesisBlockerCallback callback;
@@ -37,10 +46,16 @@ public final class NemesisBlocker {
     private boolean started;
 
     public NemesisBlocker(@NonNull GameHistory gameHistory,
-                          @NonNull Character nemesis,
+                          @NonNull InteractionRequest request,
                           @NonNull NemesisBlockerCallback callback) {
         this.game = GameFactory.create(gameHistory);
         this.gameHistory = gameHistory;
+
+        Character nemesis = request.getContext().getCharacter();
+        if (nemesis == null || nemesis.getCharacterType() != CharacterType.Nemesis) {
+            throw new IllegalArgumentException("Nemesis blocked require a Nemesis request");
+        }
+        nemesisTargets = request.getLegalTargets();
 
         this.nemesisActions = GameSearchUtils.enumerateActions(game, gameHistory, nemesis);
         this.opponentCharacters = searchOpponentCharacters(game, gameHistory, nemesis);
@@ -83,7 +98,7 @@ public final class NemesisBlocker {
     private void startSimpleSearch() {
         // Since the Nemesis is forced to move, a search is not needed with a single action
         if (nemesisActions.size() == 1) {
-            callback.onBlockingActionFound(nemesisActions.get(0));
+            callback.onBlockingActionFound(getTargetFromAction(nemesisActions.get(0)));
             return;
         }
 
@@ -112,14 +127,16 @@ public final class NemesisBlocker {
             }
             if (canBlock) {
                 callbackDelivered = true;
-                callback.onBlockingActionFound(nemesisAction);
+                callback.onBlockingActionFound(getTargetFromAction(nemesisAction));
                 return;
             }
         }
 
         // By default, the first nemesis action is returned
         callbackDelivered = true;
-        callback.onSearchCompletedWithoutResult(nemesisActions.isEmpty() ? null : nemesisActions.get(0));
+        callback.onSearchCompletedWithoutResult(
+                nemesisActions.isEmpty() ? null : getTargetFromAction(nemesisActions.get(0))
+        );
     }
 
     private void startCoordinatedSearch() {
@@ -190,14 +207,14 @@ public final class NemesisBlocker {
         switch (finalStatus) {
             case FOUND: {
                 if (winningAction != null) {
-                    callback.onBlockingActionFound(winningAction);
+                    callback.onBlockingActionFound(getTargetFromAction(winningAction));
                 }
             } break;
 
             case COMPLETED_WITHOUT_RESULT: {
                 // By default, the first nemesis action is returned
                 callback.onSearchCompletedWithoutResult(
-                        nemesisActions.isEmpty() ? null : nemesisActions.get(0)
+                        nemesisActions.isEmpty() ? null : getTargetFromAction(nemesisActions.get(0))
                 );
             } break;
 
@@ -210,6 +227,7 @@ public final class NemesisBlocker {
         }
     }
 
+    @NonNull
     private List<Character> searchOpponentCharacters(@NonNull Game game,
                                                      @NonNull GameHistory gameHistory,
                                                      @NonNull Character nemesis) {
@@ -232,5 +250,28 @@ public final class NemesisBlocker {
         }
 
         return characters;
+    }
+
+    private InteractionTarget getTargetFromAction(@NonNull CharacterAction nemesisAction) {
+        CharacterActionMotion lastMotion = Objects.requireNonNull(
+                nemesisAction.getMotions().get(nemesisAction.getMotions().size() - 1),
+                "Motion missing for Nemesis action"
+        );
+        CharacterActionTarget motionTarget = Objects.requireNonNull(
+                lastMotion.getTargets().get(0),
+                "Target missing for Nemesis action"
+        );
+        Position destPos = Objects.requireNonNull(
+                motionTarget.getDestPos(),
+                "Destination missing for Nemesis action"
+        );
+
+        for (InteractionTarget nemesisTarget : nemesisTargets) {
+            if (destPos.equals(nemesisTarget.getChosenPosition())) {
+                return nemesisTarget;
+            }
+        }
+
+        throw new IllegalStateException("No target found matching Nemesis action");
     }
 }
