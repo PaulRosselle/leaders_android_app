@@ -27,16 +27,13 @@ import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.character.HighlightView;
 import com.leaders.app.views.puzzle.NemesisBlockerView;
 import com.leaders.app.views.settings.AnimationSpeedView;
-import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.Player;
-import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionTarget;
-import com.leaders.gamelogic.interactions.InteractionType;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
 import com.leaders.puzzlelogic.entities.OfficialPuzzleSave;
 import com.leaders.puzzlelogic.entities.PuzzleSave;
@@ -52,7 +49,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public final class PuzzlePlayerActivity extends PlayableActivity implements NemesisBlockerCallback {
     private enum PuzzlePlayerAction {
@@ -167,6 +163,8 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
 
         btnReset.setOnClickListener(this::onResetClick);
         btnNextPuzzle.setOnClickListener(this::onNextPuzzleClick);
+
+        nbvBlocker.setOnInterruptClickListener(this::onBlockerInterruptClick);
     }
 
     @Override
@@ -328,6 +326,12 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
 
     //region INTERACTION UI METHODS
 
+    @Override
+    protected void clearInteractionUI(@NonNull GameContext gameContext) {
+        super.clearInteractionUI(gameContext);
+        nbvBlocker.clear();
+    }
+
     private void showEndGame(@NonNull TeamColor winnerColor, boolean isVictory) {
         GameContext gameContext = controller.getCurrentContext();
 
@@ -386,31 +390,11 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
 
     //region AUTO PLAY
 
-    private boolean canAutoPlay(@NonNull InteractionRequest request) {
-        return enemyNemesisMustPlay(request) || isEnemyNemesisPlaying(request);
-    }
-
-    private boolean enemyNemesisMustPlay(@NonNull InteractionRequest request) {
-        return request.getRequestType() == InteractionType.PlayableCharacterExpected &&
-                request.getLegalTargets().size() == 1 &&
-                Objects.requireNonNull(
-                        request.getLegalTargets().get(0).getChosenPlayableCharacter(),
-                        "Invalid playable character request target"
-                ).isMandatory();
-    }
-
-    private boolean isEnemyNemesisPlaying(@NonNull InteractionRequest request) {
-        Character character;
-        return (character = request.getContext().getCharacter()) != null &&
-                character.getCharacterType() == CharacterType.Nemesis &&
-                character.getTeamColor() != PuzzleEditionUtils.getPuzzlePlayerTeamColor();
-    }
-
-    private void startAutoPlay(@NonNull InteractionRequest request) {
-        if (enemyNemesisMustPlay(request)) {
+    private void startAutoBlock(@NonNull InteractionRequest request) {
+        if (nbvBlocker.canAutoSelectNemesis(request)) {
             controller.selectTarget(request.getLegalTargets().get(0));
         } else {
-            NemesisBlocker blocker = new NemesisBlocker(controller.getHistory(), request, this);
+            NemesisBlocker blocker = nbvBlocker.initBlocker(controller.getHistory(), request, this);
             if (blocker.canBeInterrupted()) {
                 setBlockerVisible(true);
             }
@@ -436,7 +420,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
 
     @Override
     public void onSearchCancelled() {
-        // TODO
+        super.onInteractionRequired(nbvBlocker.getRequest());
         setBlockerVisible(false);
     }
 
@@ -448,7 +432,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     }
 
     private void onBlockerInterruptClick(View v) {
-        // TODO
+        nbvBlocker.shutdownBlocker();
     }
 
     //endregion
@@ -458,8 +442,8 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     @Override
     public void onInteractionRequired(@NonNull InteractionRequest request) {
         runOnUiThread(() -> {
-            if (canAutoPlay(request)) {
-                startAutoPlay(request);
+            if (nbvBlocker.canAutoBlock(request)) {
+                startAutoBlock(request);
             } else {
                 super.onInteractionRequired(request);
             }
@@ -591,4 +575,10 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     }
 
     //endregion
+
+    @Override
+    protected void onDestroy() {
+        nbvBlocker.shutdownBlocker();
+        super.onDestroy();
+    }
 }
