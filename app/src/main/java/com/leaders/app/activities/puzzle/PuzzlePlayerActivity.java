@@ -25,6 +25,7 @@ import com.leaders.app.utilities.HelpUtils;
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.character.HighlightView;
+import com.leaders.app.views.puzzle.NemesisBlockerView;
 import com.leaders.app.views.settings.AnimationSpeedView;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.GameContext;
@@ -113,6 +114,8 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     private TextView txvPuzzleName;
     private TextView txvAuthorName;
 
+    private NemesisBlockerView nbvBlocker;
+    private View vwBlockerBg;
 
     private PuzzleSource puzzleSource;
     private List<? extends PuzzleSave> puzzleSaves;
@@ -144,6 +147,9 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
 
         txvPuzzleName = findViewById(R.id.txvPuzzleName_actPuzzlePlayer);
         txvAuthorName = findViewById(R.id.txvAuthorName_actPuzzlePlayer);
+
+        nbvBlocker = findViewById(R.id.nbvBlocker_actPuzzlePlayer);
+        vwBlockerBg = findViewById(R.id.vwBlockerBg_actPuzzlePlayer);
     }
 
     @Override
@@ -405,6 +411,9 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
             controller.selectTarget(request.getLegalTargets().get(0));
         } else {
             NemesisBlocker blocker = new NemesisBlocker(controller.getHistory(), request, this);
+            if (blocker.canBeInterrupted()) {
+                setBlockerVisible(true);
+            }
             blocker.start();
         }
     }
@@ -412,6 +421,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     @Override
     public void onBlockingActionFound(@NonNull InteractionTarget target) {
         controller.selectTarget(target);
+        setBlockerVisible(false);
     }
 
     @Override
@@ -421,10 +431,23 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
             throw new IllegalStateException("No default target found for Nemesis");
         }
         controller.selectTarget(defaultTarget);
+        setBlockerVisible(false);
     }
 
     @Override
     public void onSearchCancelled() {
+        // TODO
+        setBlockerVisible(false);
+    }
+
+    private void setBlockerVisible(boolean visible) {
+        runOnUiThread(() -> {
+            nbvBlocker.setVisibility(visible ? View.VISIBLE : View.GONE);
+            vwBlockerBg.setVisibility(visible ? View.VISIBLE : View.GONE);
+        });
+    }
+
+    private void onBlockerInterruptClick(View v) {
         // TODO
     }
 
