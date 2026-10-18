@@ -126,11 +126,10 @@ public class NemesisBlockerUtils {
                                           @NonNull BooleanSupplier shouldCancel) throws InterruptedException {
         checkCancellation(shouldCancel);
 
-        TeamColor currentTeam = actionsPhase.getTurnTeamColor();
-        TeamColor opponentTeam = currentTeam.getOpposite();
+        TeamColor opponentTeam = actionsPhase.getTurnTeamColor();
 
         // Before exploring new actions, we check if the game isn't already won
-        TeamColor winnerTeam = GameQuery.getWinnerTeam(game, currentTeam);
+        TeamColor winnerTeam = GameQuery.getWinnerTeam(game, opponentTeam);
         if (winnerTeam != null) {
             return winnerTeam == opponentTeam;
         }

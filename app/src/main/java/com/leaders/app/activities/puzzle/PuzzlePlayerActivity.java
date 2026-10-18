@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
@@ -25,14 +26,25 @@ import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.character.HighlightView;
 import com.leaders.app.views.settings.AnimationSpeedView;
+import com.leaders.gamelogic.actions.CharacterAction;
+import com.leaders.gamelogic.actions.CharacterActionMotion;
+import com.leaders.gamelogic.actions.CharacterActionTarget;
+import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.Player;
+import com.leaders.gamelogic.entities.Position;
+import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.TeamColor;
+import com.leaders.gamelogic.interactions.InteractionRequest;
+import com.leaders.gamelogic.interactions.InteractionTarget;
+import com.leaders.gamelogic.interactions.InteractionType;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
 import com.leaders.puzzlelogic.entities.OfficialPuzzleSave;
 import com.leaders.puzzlelogic.entities.PuzzleSave;
+import com.leaders.puzzlelogic.entities.blocker.NemesisBlocker;
+import com.leaders.puzzlelogic.entities.blocker.NemesisBlockerCallback;
 import com.leaders.puzzlelogic.enums.PuzzleCategory;
 import com.leaders.puzzlelogic.serializers.SerializationContext;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
@@ -43,8 +55,9 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-public final class PuzzlePlayerActivity extends PlayableActivity {
+public final class PuzzlePlayerActivity extends PlayableActivity implements NemesisBlockerCallback {
     private enum PuzzlePlayerAction {
         GoToPreviousPuzzle,
         GoToNextPuzzle,
@@ -369,7 +382,72 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
 
     //endregion
 
+    //region AUTO PLAY
+
+    private boolean canAutoPlay(@NonNull Character character) {
+        // TODO - comment
+        return character.getCharacterType() == CharacterType.Nemesis &&
+                character.getTeamColor() != PuzzleEditionUtils.getPuzzlePlayerTeamColor();
+    }
+
+    private void startAutoPlay(@NonNull Character character) {
+        NemesisBlocker blocker = new NemesisBlocker(
+                controller.getHistory(),
+                character,
+                this
+        );
+        blocker.start();
+    }
+
+    @NonNull
+    private InteractionTarget getTargetFromNemesisAction(@NonNull CharacterAction action) {
+        // TODO - refactor
+        CharacterActionMotion motion = Objects.requireNonNull(action.getMotions().get(action.getMotions().size() - 1), "Nemesis motion missing");
+        CharacterActionTarget target = Objects.requireNonNull(motion.getTargets().get(0), "Nemesis target missing");
+        Position destPos = Objects.requireNonNull(target.getDestPos(), "Nemesis destination missing");
+
+        return Objects.requireNonNull(bdvBoard.getCellView(destPos).getTarget(), "Nemesis target not found at destination");
+    }
+
+    @Override
+    public void onBlockingActionFound(@NonNull CharacterAction action) {
+        controller.selectTarget(getTargetFromNemesisAction(action));
+    }
+
+    @Override
+    public void onSearchCompletedWithoutResult(@Nullable CharacterAction defaultAction) {
+        // TODO - handle null case
+        if (defaultAction != null) {
+            controller.selectTarget(getTargetFromNemesisAction(defaultAction));
+        }
+    }
+
+    @Override
+    public void onSearchCancelled() {
+        // TODO
+    }
+
+    //endregion
+
     //region CONTROLLER METHODS
+
+    @Override
+    public void onInteractionRequired(@NonNull InteractionRequest request) {
+        runOnUiThread(() -> {
+            super.onInteractionRequired(request);
+            // TODO - handle another way
+            if (request.getRequestType() == InteractionType.PlayableCharacterExpected &&
+                request.getLegalTargets().size() == 1 &&
+                    request.getLegalTargets().get(0).getChosenPlayableCharacter().isMandatory()) {
+                controller.selectTarget(request.getLegalTargets().get(0));
+            }
+
+            Character character = request.getContext().getCharacter();
+            if (character != null && canAutoPlay(character)) {
+                startAutoPlay(character);
+            }
+        });
+    }
 
     @Override
     public void onGameEnded(@NonNull Player winner) {
