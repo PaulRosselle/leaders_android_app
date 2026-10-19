@@ -329,7 +329,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     @Override
     protected void clearInteractionUI(@NonNull GameContext gameContext) {
         super.clearInteractionUI(gameContext);
-        nbvBlocker.clear();
+        nbvBlocker.shutdownBlocker();
     }
 
     private void showEndGame(@NonNull TeamColor winnerColor, boolean isVictory) {
@@ -391,15 +391,11 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     //region AUTO PLAY
 
     private void startAutoBlock(@NonNull InteractionRequest request) {
-        if (nbvBlocker.canAutoSelectNemesis(request)) {
-            controller.selectTarget(request.getLegalTargets().get(0));
-        } else {
-            NemesisBlocker blocker = nbvBlocker.initBlocker(controller.getHistory(), request, this);
-            if (blocker.canBeInterrupted()) {
-                setBlockerVisible(true);
-            }
-            blocker.start();
+        NemesisBlocker blocker = nbvBlocker.initBlocker(controller.getHistory(), request, this);
+        if (blocker.canBeInterrupted()) {
+            setBlockerVisible(true);
         }
+        blocker.start();
     }
 
     @Override
