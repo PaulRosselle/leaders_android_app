@@ -30,6 +30,7 @@ import com.leaders.gamelogic.historyentries.segments.BanishmentPhase;
 import com.leaders.gamelogic.historyentries.segments.Turn;
 import com.leaders.gamelogic.historyentries.segments.TurnEndPhase;
 import com.leaders.gamelogic.interactions.CharacterActionBuilder;
+import com.leaders.gamelogic.interactions.CharacterActionResult;
 import com.leaders.gamelogic.interactions.IGameFlowListener;
 import com.leaders.gamelogic.interactions.InteractionContext;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
@@ -41,6 +42,7 @@ import com.leaders.gamelogic.interactions.InteractionType;
 import com.leaders.gamelogic.interactions.PhaseExecutionResult;
 import com.leaders.gamelogic.interactions.RecruitmentActionBuilder;
 import com.leaders.gamelogic.interactions.TargetCategory;
+import com.leaders.gamelogic.queries.AutoPlayQuery;
 import com.leaders.gamelogic.queries.BanishmentQuery;
 import com.leaders.gamelogic.queries.GameHistoryQuery;
 import com.leaders.gamelogic.queries.GameQuery;
@@ -299,7 +301,15 @@ public final class GameHandler {
             switch (result.getResultType()) {
                 case PlayableCharacterChosen:
                     return runPlayCharacterAsync(currentPhase, getPlayableCharacterFromResult(result))
-                            .thenCompose(ignored -> runActionsPhaseAsync(currentPhase));
+                            .thenCompose(actionResult -> {
+                                // The cancellation of an auto-action requires to undo the last action
+                                if (actionResult == CharacterActionResult.Cancelled &&
+                                        AutoPlayQuery.canAutoPlayCharacter(getGameMode(), result)) {
+                                    return undoLastAction()
+                                            .thenCompose(ignored -> runActionsPhaseAsync(currentPhase));
+                                }
+                                return runActionsPhaseAsync(currentPhase);
+                            });
                 case UndoLastAction:
                     return undoLastAction()
                             .thenCompose(ignored -> runActionsPhaseAsync(currentPhase));
@@ -428,6 +438,25 @@ public final class GameHandler {
     }
 
     /**
+     * Automatically selects the only legal character.
+     *
+     * @param legalTargets the legal interaction targets, containing exactly one element
+     * @return a completed future containing the character selection result
+     * @throws IllegalArgumentException if {@code legalTargets} does not contain exactly one element
+     */
+    private CompletableFuture<InteractionResult> autoSelectCharacter(@NonNull List<InteractionTarget> legalTargets) {
+        if (legalTargets.size() != 1) {
+            throw new IllegalArgumentException("Auto select requires exactly one character");
+        }
+
+        return CompletableFuture.completedFuture(new InteractionResult(
+                InteractionResultType.PlayableCharacterChosen,
+                new InteractionContext(),
+                legalTargets.get(0)
+        ));
+    }
+
+    /**
      * Requests the player to select one of the currently playable characters.
      * Determines the legal interaction results from the current game state.
      *
@@ -456,6 +485,10 @@ public final class GameHandler {
                 legalResults
         );
 
+        if (AutoPlayQuery.canAutoSelectCharacter(getGameMode(), request)) {
+            return autoSelectCharacter(legalTargets);
+        }
+
         return gameFlowListener.onInputRequired(request);
     }
 
@@ -467,8 +500,8 @@ public final class GameHandler {
      * @return a future completed when the action has been resolved or canceled
      * @throws IllegalArgumentException if the playable character is missing
      */
-    private CompletableFuture<Void> runPlayCharacterAsync(@NonNull GamePhase currentPhase,
-                                                          @Nullable PlayableCharacter playableCharacter) {
+    private CompletableFuture<CharacterActionResult> runPlayCharacterAsync(@NonNull GamePhase currentPhase,
+                                                                           @Nullable PlayableCharacter playableCharacter) {
         if (playableCharacter == null) {
             throw new IllegalArgumentException("A playable character is required to resolve an action");
         }
@@ -498,14 +531,14 @@ public final class GameHandler {
      * @return a future completed when the action has been resolved or canceled
      */
     @NonNull
-    private CompletableFuture<Void> resolveCharacterActionAsync(@NonNull GamePhase currentPhase,
-                                                                @NonNull CharacterActionBuilder builder,
-                                                                @NonNull CharacterActionResolver resolver) {
+    private CompletableFuture<CharacterActionResult> resolveCharacterActionAsync(@NonNull GamePhase currentPhase,
+                                                                                 @NonNull CharacterActionBuilder builder,
+                                                                                 @NonNull CharacterActionResolver resolver) {
         checkStopped();
 
         // Cancellation stops the resolution before the action is applied to the game.
         if (builder.isBuildCancelled()) {
-            return CompletableFuture.completedFuture(null);
+            return CompletableFuture.completedFuture(CharacterActionResult.Cancelled);
         }
 
         InteractionRequest request = resolver.getNextInteraction(builder);
@@ -514,7 +547,7 @@ public final class GameHandler {
         if (request == null) {
             CharacterAction action = resolver.buildAction(builder);
             doAction(currentPhase, action);
-            return CompletableFuture.completedFuture(null);
+            return CompletableFuture.completedFuture(CharacterActionResult.Resolved);
         }
 
         // Request the next input required to continue resolving the action.
@@ -818,24 +851,40 @@ public final class GameHandler {
     }
 
     /**
-     * Undoes the last action of the current phase.
+     * Returns the current game phase.
      *
+     * @return the current phase, which is never {@code null}
      * @throws IllegalStateException if no current phase exists or the current phase has no actions
      */
-    private CompletableFuture<Void> undoLastAction() {
-        // We don't use "getCurrentPhaseLastAction" to access the last action
-        // since we also need to access the phase actions list to undo it
+    @NonNull
+    private IPhase getCurrentPhase() {
         IPhase currentPhase = GameHistoryQuery.findCurrentPhase(currentHistory);
         if (currentPhase == null || currentPhase.getActions().isEmpty()) {
             throw new IllegalStateException("Cannot undo an action outside of a game phase or within an empty phase");
         }
+        return currentPhase;
+    }
 
-        List<IGameAction> actions = currentPhase.getActions();
-        IGameAction lastAction = actions.get(actions.size() - 1);
-        actions.remove(actions.size() - 1);
+    /**
+     * Undoes the last player action and any subsequent automatic actions in the current phase.
+     *
+     * @return a future completed when the undo operation has been processed
+     */
+    private CompletableFuture<Void> undoLastAction() {
+        // We don't use "getCurrentPhaseLastAction" to access the last action
+        // since we also need to access the phase actions list to undo it
+        List<IGameAction> actions = getCurrentPhase().getActions();
 
-        GameActionHandler actionHandler = GameActionHandlerFactory.create(currentGame, lastAction);
-        actionHandler.undoAction();
+        boolean playerActionUndone = false;
+        while (!playerActionUndone && !actions.isEmpty()) {
+            int lastActionIndex = actions.size() - 1;
+            IGameAction lastAction = actions.get(lastActionIndex);
+            playerActionUndone = !AutoPlayQuery.isAutoAction(getGameMode(), lastAction);
+            actions.remove(lastActionIndex);
+
+            GameActionHandler actionHandler = GameActionHandlerFactory.create(currentGame, lastAction);
+            actionHandler.undoAction();
+        }
 
         return gameFlowListener.onActionUndone(currentGame);
     }

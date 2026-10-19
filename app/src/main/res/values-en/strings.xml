@@ -262,4 +262,7 @@
     <string name="random">random</string>
     <string name="help">Help</string>
     <string name="help_message">Press and hold a character to display their ability.\n\nThe \"{IMAGE_1}\" button cancels your last action.\nClicking on a non-interactive element cancels the current action.\nThe \"{IMAGE_2}\" button ends the current game phase.\n\nReminder: To win, capture the opposing leader by placing 2 of your characters on spaces adjacent to theirs, or by completely surrounding them.\nEach of your characters has one action per turn. You do not have to play all of them during your turn.</string>
+    <string name="enemy_nemesis_must_play">Enemy Nemesis must play</string>
+    <string name="interrupt">Interrupt</string>
+    <string name="searching_for_a_move_able_to_block_you">Searching for a move to block you…</string>
 </resources>

@@ -81,6 +81,9 @@ public final class PlayabilityQuery {
         List<Cell> characterCells = BoardQuery.findCharacterCells(game.getBoard(), null, null);
         for (Cell characterCell : characterCells) {
             Character character = characterCell.getCharacter();
+            if (character == null) {
+                throw new IllegalStateException("No character found within character cell at: " + characterCell.getPosition());
+            }
             // If there is a character forced to play immediately, we return them alone
             if (CharacterAbilityQuery.mustActNow(actionsPhase, character) &&
                 hasValidAction(game, gameHistory, character)) {

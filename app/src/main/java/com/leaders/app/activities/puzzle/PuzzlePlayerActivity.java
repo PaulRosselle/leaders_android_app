@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
@@ -24,15 +25,20 @@ import com.leaders.app.utilities.HelpUtils;
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.character.HighlightView;
+import com.leaders.app.views.puzzle.NemesisBlockerView;
 import com.leaders.app.views.settings.AnimationSpeedView;
 import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.enums.TeamColor;
+import com.leaders.gamelogic.interactions.InteractionRequest;
+import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
 import com.leaders.puzzlelogic.entities.OfficialPuzzleSave;
 import com.leaders.puzzlelogic.entities.PuzzleSave;
+import com.leaders.puzzlelogic.entities.blocker.NemesisBlocker;
+import com.leaders.puzzlelogic.entities.blocker.NemesisBlockerCallback;
 import com.leaders.puzzlelogic.enums.PuzzleCategory;
 import com.leaders.puzzlelogic.serializers.SerializationContext;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
@@ -44,7 +50,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class PuzzlePlayerActivity extends PlayableActivity {
+public final class PuzzlePlayerActivity extends PlayableActivity implements NemesisBlockerCallback {
     private enum PuzzlePlayerAction {
         GoToPreviousPuzzle,
         GoToNextPuzzle,
@@ -104,6 +110,8 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
     private TextView txvPuzzleName;
     private TextView txvAuthorName;
 
+    private NemesisBlockerView nbvBlocker;
+    private View vwBlockerBg;
 
     private PuzzleSource puzzleSource;
     private List<? extends PuzzleSave> puzzleSaves;
@@ -135,6 +143,9 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
 
         txvPuzzleName = findViewById(R.id.txvPuzzleName_actPuzzlePlayer);
         txvAuthorName = findViewById(R.id.txvAuthorName_actPuzzlePlayer);
+
+        nbvBlocker = findViewById(R.id.nbvBlocker_actPuzzlePlayer);
+        vwBlockerBg = findViewById(R.id.vwBlockerBg_actPuzzlePlayer);
     }
 
     @Override
@@ -152,6 +163,8 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
 
         btnReset.setOnClickListener(this::onResetClick);
         btnNextPuzzle.setOnClickListener(this::onNextPuzzleClick);
+
+        nbvBlocker.setOnInterruptClickListener(this::onBlockerInterruptClick);
     }
 
     @Override
@@ -313,6 +326,12 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
 
     //region INTERACTION UI METHODS
 
+    @Override
+    protected void clearInteractionUI(@NonNull GameContext gameContext) {
+        super.clearInteractionUI(gameContext);
+        nbvBlocker.shutdownBlocker();
+    }
+
     private void showEndGame(@NonNull TeamColor winnerColor, boolean isVictory) {
         GameContext gameContext = controller.getCurrentContext();
 
@@ -369,7 +388,63 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
 
     //endregion
 
+    //region AUTO PLAY
+
+    private void startAutoBlock(@NonNull InteractionRequest request) {
+        NemesisBlocker blocker = nbvBlocker.initBlocker(controller.getHistory(), request, this);
+        if (blocker.canBeInterrupted()) {
+            setBlockerVisible(true);
+        }
+        blocker.start();
+    }
+
+    @Override
+    public void onBlockingActionFound(@NonNull InteractionTarget target) {
+        controller.selectTarget(target);
+        setBlockerVisible(false);
+    }
+
+    @Override
+    public void onSearchCompletedWithoutResult(@Nullable InteractionTarget defaultTarget) {
+        // When no action is possible, autoplay should not be started
+        if (defaultTarget == null) {
+            throw new IllegalStateException("No default target found for Nemesis");
+        }
+        controller.selectTarget(defaultTarget);
+        setBlockerVisible(false);
+    }
+
+    @Override
+    public void onSearchCancelled() {
+        super.onInteractionRequired(nbvBlocker.getRequest());
+        setBlockerVisible(false);
+    }
+
+    private void setBlockerVisible(boolean visible) {
+        runOnUiThread(() -> {
+            nbvBlocker.setVisibility(visible ? View.VISIBLE : View.GONE);
+            vwBlockerBg.setVisibility(visible ? View.VISIBLE : View.GONE);
+        });
+    }
+
+    private void onBlockerInterruptClick(View v) {
+        nbvBlocker.shutdownBlocker();
+    }
+
+    //endregion
+
     //region CONTROLLER METHODS
+
+    @Override
+    public void onInteractionRequired(@NonNull InteractionRequest request) {
+        runOnUiThread(() -> {
+            if (nbvBlocker.canAutoBlock(request)) {
+                startAutoBlock(request);
+            } else {
+                super.onInteractionRequired(request);
+            }
+        });
+    }
 
     @Override
     public void onGameEnded(@NonNull Player winner) {
@@ -496,4 +571,10 @@ public final class PuzzlePlayerActivity extends PlayableActivity {
     }
 
     //endregion
+
+    @Override
+    protected void onDestroy() {
+        nbvBlocker.shutdownBlocker();
+        super.onDestroy();
+    }
 }
