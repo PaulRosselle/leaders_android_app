@@ -46,8 +46,7 @@ public class NemesisBlockerView extends ConstraintLayout {
 
         request = null;
         nemesisBlocker = null;
-
-        // TODO - handle resources in xml
+        
         // TODO - handle blocker cancelling
     }
 
