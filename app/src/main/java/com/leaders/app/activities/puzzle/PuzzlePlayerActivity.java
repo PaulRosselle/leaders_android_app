@@ -116,6 +116,8 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     private PuzzleSource puzzleSource;
     private List<? extends PuzzleSave> puzzleSaves;
     private PuzzleSave puzzleSave;
+    @Nullable
+    private InteractionRequest blockerRequest;
 
     private CharacterSkins characterSkins;
 
@@ -329,6 +331,10 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     @Override
     protected void clearInteractionUI(@NonNull GameContext gameContext) {
         super.clearInteractionUI(gameContext);
+
+        // Request is cleared to ensure "onInteractionRequired"
+        // won't be called again after the interaction clear
+        blockerRequest = null;
         nbvBlocker.shutdownBlocker();
     }
 
@@ -391,16 +397,22 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     //region AUTO PLAY
 
     private void startAutoBlock(@NonNull InteractionRequest request) {
+        blockerRequest = request;
         NemesisBlocker blocker = nbvBlocker.initBlocker(controller.getHistory(), request, this);
+
         if (blocker.canBeInterrupted()) {
             setBlockerVisible(true);
         }
+
         blocker.start();
     }
 
     @Override
     public void onBlockingActionFound(@NonNull InteractionTarget target) {
+        blockerRequest = null;
+
         controller.selectTarget(target);
+
         setBlockerVisible(false);
     }
 
@@ -410,14 +422,24 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
         if (defaultTarget == null) {
             throw new IllegalStateException("No default target found for Nemesis");
         }
+        blockerRequest = null;
+
         controller.selectTarget(defaultTarget);
+
         setBlockerVisible(false);
     }
 
     @Override
     public void onSearchCancelled() {
-        super.onInteractionRequired(nbvBlocker.getRequest());
+        InteractionRequest request = blockerRequest;
+        blockerRequest = null;
+
         setBlockerVisible(false);
+
+        // On autoplay cancellation, the request is reapplied so the user can play manually
+        if (request != null) {
+            super.onInteractionRequired(request);
+        }
     }
 
     private void setBlockerVisible(boolean visible) {
@@ -574,6 +596,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
 
     @Override
     protected void onDestroy() {
+        blockerRequest = null;
         nbvBlocker.shutdownBlocker();
         super.onDestroy();
     }
