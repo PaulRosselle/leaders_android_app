@@ -20,8 +20,6 @@ import com.leaders.puzzlelogic.entities.blocker.NemesisBlocker;
 import com.leaders.puzzlelogic.entities.blocker.NemesisBlockerCallback;
 
 public class NemesisBlockerView extends ConstraintLayout {
-    @Nullable
-    private InteractionRequest request;
     private final MaterialButton btnInterrupt;
     private NemesisBlocker nemesisBlocker;
 
@@ -40,7 +38,6 @@ public class NemesisBlockerView extends ConstraintLayout {
         setOutlineProvider(ViewOutlineProvider.BACKGROUND);
         setElevation(getResources().getDisplayMetrics().density * 8);
 
-        request = null;
         nemesisBlocker = null;
     }
 
@@ -49,7 +46,6 @@ public class NemesisBlockerView extends ConstraintLayout {
     }
 
     public void clear() {
-        request = null;
         nemesisBlocker = null;
     }
 
@@ -57,17 +53,8 @@ public class NemesisBlockerView extends ConstraintLayout {
     public NemesisBlocker initBlocker(@NonNull GameHistory gameHistory,
                                       @NonNull InteractionRequest request,
                                       @NonNull NemesisBlockerCallback callback) {
-        this.request = request;
         nemesisBlocker = new NemesisBlocker(gameHistory, request, callback);
         return nemesisBlocker;
-    }
-
-    @NonNull
-    public InteractionRequest getRequest() {
-        if (request == null || nemesisBlocker == null) {
-            throw new IllegalStateException("Request not initialized");
-        }
-        return request;
     }
 
     public void shutdownBlocker() {
