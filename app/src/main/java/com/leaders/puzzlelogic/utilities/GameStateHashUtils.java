@@ -20,8 +20,6 @@ import java.util.stream.Collectors;
 
 public final class GameStateHashUtils {
     private static final String GLOBAL_SEPARATOR = ";";
-    private static final String CELL_SEPARATOR = "_";
-    private static final String INNER_SEPARATOR = "+";
 
     private GameStateHashUtils(){
         throw new AssertionError("Cannot instantiate utility class");
@@ -61,7 +59,6 @@ public final class GameStateHashUtils {
 
         for (Cell characterCell : characterCells) {
             builder.append(createCellHash(characterCell));
-            builder.append(CELL_SEPARATOR);
         }
 
         return builder.toString();
@@ -92,7 +89,6 @@ public final class GameStateHashUtils {
 
         for (Cell turnCharacterCell : turnCharacterCells) {
             builder.append(createCellHash(turnCharacterCell));
-            builder.append(CELL_SEPARATOR);
         }
 
         return builder.toString();
@@ -113,7 +109,6 @@ public final class GameStateHashUtils {
 
         for (PlayableCharacter playableCharacter : playableCharacters) {
             builder.append(createPlayableCharacterHash(playableCharacter));
-            builder.append(CELL_SEPARATOR);
         }
 
         return builder.toString();
@@ -131,7 +126,6 @@ public final class GameStateHashUtils {
 
         if (cell.getCharacter() != null) {
             builder.append(createCharacterHash(cell.getCharacter()));
-            builder.append(INNER_SEPARATOR);
         }
         builder.append(createPositionHash(cell.getPosition()));
 
@@ -146,7 +140,8 @@ public final class GameStateHashUtils {
      * @throws NullPointerException if {@code character} is {@code null}
      */
     private static String createCharacterHash(@NonNull Character character) {
-        return String.valueOf(character.getCharacterType().ordinal());
+        final String CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        return String.valueOf(CHARS.charAt(character.getCharacterType().ordinal()));
     }
 
     /**
@@ -157,7 +152,9 @@ public final class GameStateHashUtils {
      * @throws NullPointerException if {@code position} is {@code null}
      */
     private static String createPositionHash(@NonNull Position position) {
-        return String.format("%s%s", position.getX(), position.getY());
+        final int[] COLUMN_OFFSETS = {0, 4, 9, 15, 22, 28, 33};
+        final String CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        return String.valueOf(CHARS.charAt(COLUMN_OFFSETS[position.getX()] + position.getY() + 1));
     }
 
     /**
@@ -169,13 +166,10 @@ public final class GameStateHashUtils {
      * @throws NullPointerException if {@code playableCharacter} is {@code null}
      */
     private static String createPlayableCharacterHash(@NonNull PlayableCharacter playableCharacter) {
-        return String.format("%s%s%s%sM%s%sC%s",
+        return String.format("%s%s%s%s",
                 createCharacterHash(playableCharacter.getCharacter()),
-                INNER_SEPARATOR,
                 createPositionHash(playableCharacter.getPosition()),
-                INNER_SEPARATOR,
                 playableCharacter.isMandatory() ? "1" : "0",
-                INNER_SEPARATOR,
                 playableCharacter.canUseActiveAbility() ? "1" : "0"
         );
     }

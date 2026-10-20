@@ -60,8 +60,11 @@ public final class LbeUtils {
         return String.valueOf(getCharacterExportId(character.getCharacterType()));
     }
 
-    public static CharacterType getCharacterTypeFromExportStr(@NonNull Context context, @NonNull String exportStr) {
-        final String errorMsg = String.format(context.getString(R.string.invalid_lbe_url_character), exportStr);
+    public static CharacterType getCharacterTypeFromExportStr(@Nullable Context context, @NonNull String exportStr) {
+        final String errorMsg = String.format(context != null ?
+                context.getString(R.string.invalid_lbe_url_character) : "Invalid character in LBE URL: %s",
+                exportStr
+        );
         try {
             int characterExportId = Integer.parseInt(exportStr);
             for (CharacterType characterType : CharacterType.values()) {
@@ -80,8 +83,11 @@ public final class LbeUtils {
                 String.valueOf(Board.getRowCount(position.getX()) - position.getY());
     }
 
-    public static Position getPositionFromExportStr(@NonNull Context context, @NonNull String exportStr) {
-        final String errorMsg = String.format(context.getString(R.string.invalid_lbe_url_position), exportStr);
+    public static Position getPositionFromExportStr(@Nullable Context context, @NonNull String exportStr) {
+        final String errorMsg = String.format(context != null ?
+                context.getString(R.string.invalid_lbe_url_position) : "Invalid position in LBE URL: %s",
+                exportStr
+        );
         if (exportStr.length() != 2) {
             throw new IllegalArgumentException(errorMsg);
         }

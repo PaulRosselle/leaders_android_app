@@ -38,7 +38,46 @@ dependencies {
     implementation("androidx.documentfile:documentfile:1.1.0")
     implementation("com.google.android.material:material:1.14.0")
     implementation("androidx.constraintlayout:constraintlayout:2.2.2")
+    implementation("org.json:json:20260814")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.3.0")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
+}
+
+tasks.register<JavaExec>("runNemesisMovesSearch") {
+    description = "Run the NemesisMovesSearch algorithm."
+    dependsOn("compileDebugJavaWithJavac")
+
+    val classFile = fileTree(layout.buildDirectory).matching {
+        include("**/NemesisMovesSearch.class")
+    }
+
+    doFirst {
+        val matches = classFile.files
+        check(matches.isNotEmpty()) {
+            "NemesisMovesSearch.class introuvable : vérifie la compilation."
+        }
+
+        val classFilePath = matches.first()
+        var root = classFilePath.parentFile
+
+        repeat(
+            "com.leaders.puzzlelogic.entities.blocker"
+                .split(".").size
+        ) {
+            root = root.parentFile
+        }
+
+        classpath = files(
+            root,
+            configurations.getByName("debugRuntimeClasspath")
+        )
+
+        println("Classe trouvée : $classFilePath")
+        println("Classpath classes : $root")
+    }
+
+    mainClass.set(
+        "com.leaders.puzzlelogic.entities.blocker.NemesisMovesSearch"
+    )
 }
