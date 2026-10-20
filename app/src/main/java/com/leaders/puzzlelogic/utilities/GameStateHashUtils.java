@@ -20,6 +20,9 @@ import java.util.stream.Collectors;
 
 public final class GameStateHashUtils {
     private static final String GLOBAL_SEPARATOR = ";";
+    private static final String CHARACTER_HASH_RANGE = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    private static final String POSITION_HASH_RANGE = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    private static final int[] POSITION_COLUMN_OFFSETS = {0, 4, 9, 15, 22, 28, 33};
 
     private GameStateHashUtils(){
         throw new AssertionError("Cannot instantiate utility class");
@@ -140,8 +143,7 @@ public final class GameStateHashUtils {
      * @throws NullPointerException if {@code character} is {@code null}
      */
     private static String createCharacterHash(@NonNull Character character) {
-        final String CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-        return String.valueOf(CHARS.charAt(character.getCharacterType().ordinal()));
+        return String.valueOf(CHARACTER_HASH_RANGE.charAt(character.getCharacterType().ordinal()));
     }
 
     /**
@@ -152,9 +154,7 @@ public final class GameStateHashUtils {
      * @throws NullPointerException if {@code position} is {@code null}
      */
     private static String createPositionHash(@NonNull Position position) {
-        final int[] COLUMN_OFFSETS = {0, 4, 9, 15, 22, 28, 33};
-        final String CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-        return String.valueOf(CHARS.charAt(COLUMN_OFFSETS[position.getX()] + position.getY() + 1));
+        return String.valueOf(POSITION_HASH_RANGE.charAt(POSITION_COLUMN_OFFSETS[position.getX()] + position.getY() + 1));
     }
 
     /**

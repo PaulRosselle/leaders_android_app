@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
+import java.util.stream.Collectors;
 
 /**
  * Discovers game states in which the Nemesis has a move
@@ -91,8 +92,10 @@ public final class NemesisMovesUtils {
         // The hash represents the state before the next action.
         String stateHash = GameStateHashUtils.createHash(game, history);
 
+        String explorationKey = createExplorationKey(stateHash, remainingCharacters);
+
         // This state has already been fully evaluated.
-        if (!exploredStates.add(stateHash)) {
+        if (!exploredStates.add(explorationKey)) {
             return;
         }
 
@@ -186,7 +189,6 @@ public final class NemesisMovesUtils {
                                              @NonNull Map<String, CharacterAction> blockingMoves,
                                              @NonNull Set<String> exploredStates,
                                              @NonNull BooleanSupplier shouldCancel) throws InterruptedException {
-
         if (!playableCharacter.isMandatory()) {
             search(game, history, actionsPhase, permutation,
                     remainingCharacters, blockingMoves, exploredStates, shouldCancel
@@ -277,6 +279,15 @@ public final class NemesisMovesUtils {
         if (Thread.currentThread().isInterrupted() || shouldCancel.getAsBoolean()) {
             throw new InterruptedException("Nemesis moves search cancelled");
         }
+    }
+
+    @NonNull
+    private static String createExplorationKey(@NonNull String stateHash,
+                                               @NonNull List<Character> remainingCharacters) {
+        return stateHash + "|" +
+                remainingCharacters.stream()
+                        .map(character -> character.getId().toString())
+                        .collect(Collectors.joining(","));
     }
 }
 

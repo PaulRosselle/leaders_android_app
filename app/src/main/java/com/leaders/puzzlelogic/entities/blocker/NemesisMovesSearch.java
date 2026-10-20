@@ -5,13 +5,10 @@ import androidx.annotation.NonNull;
 import com.leaders.app.utilities.LbeUtils;
 import com.leaders.app.utilities.PuzzleImportUtils;
 import com.leaders.gamelogic.actions.CharacterAction;
-import com.leaders.gamelogic.actions.CharacterActionMotion;
-import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
-import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.factories.GameFactory;
@@ -109,7 +106,7 @@ public final class NemesisMovesSearch {
             for (Map.Entry<String, CharacterAction> entry : blockingMoves.entrySet()) {
                 jsonObject.put(
                         entry.getKey(),
-                        LbeUtils.getPositionExportStr(getNemesisDestination(entry.getValue()))
+                        LbeUtils.getPositionExportStr(NemesisBlocker.getNemesisDestination(entry.getValue()))
                 );
             }
         } catch (JSONException e) {
@@ -117,21 +114,5 @@ public final class NemesisMovesSearch {
         }
 
         return jsonObject;
-    }
-
-    @NonNull
-    private static Position getNemesisDestination(@NonNull CharacterAction nemesisAction) {
-        CharacterActionMotion lastMotion = Objects.requireNonNull(
-                nemesisAction.getMotions().get(nemesisAction.getMotions().size() - 1),
-                "Motion missing for Nemesis action"
-        );
-        CharacterActionTarget motionTarget = Objects.requireNonNull(
-                lastMotion.getTargets().get(0),
-                "Target missing for Nemesis action"
-        );
-        return Objects.requireNonNull(
-                motionTarget.getDestPos(),
-                "Destination missing for Nemesis action"
-        );
     }
 }

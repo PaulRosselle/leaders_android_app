@@ -253,6 +253,27 @@ public final class NemesisBlocker {
     }
 
     private InteractionTarget getTargetFromAction(@NonNull CharacterAction nemesisAction) {
+        return getNemesisTargetFromDestination(nemesisTargets, getNemesisDestination(nemesisAction));
+    }
+
+    @NonNull
+    public static InteractionTarget getNemesisTargetFromDestination(@NonNull List<InteractionTarget> targets,
+                                                                    @NonNull Position destination) {
+        for (InteractionTarget nemesisTarget : targets) {
+            if (destination.equals(nemesisTarget.getChosenPosition())) {
+                return nemesisTarget;
+            }
+        }
+
+        throw new IllegalStateException("No target found matching Nemesis destination: " + destination);
+    }
+
+    @NonNull
+    public static Position getNemesisDestination(@NonNull CharacterAction nemesisAction) {
+        if (nemesisAction.getSrcCharacter().getCharacterType() != CharacterType.Nemesis) {
+            throw new IllegalArgumentException("Nemesis action required");
+        }
+
         CharacterActionMotion lastMotion = Objects.requireNonNull(
                 nemesisAction.getMotions().get(nemesisAction.getMotions().size() - 1),
                 "Motion missing for Nemesis action"
@@ -261,17 +282,9 @@ public final class NemesisBlocker {
                 lastMotion.getTargets().get(0),
                 "Target missing for Nemesis action"
         );
-        Position destPos = Objects.requireNonNull(
+        return Objects.requireNonNull(
                 motionTarget.getDestPos(),
                 "Destination missing for Nemesis action"
         );
-
-        for (InteractionTarget nemesisTarget : nemesisTargets) {
-            if (destPos.equals(nemesisTarget.getChosenPosition())) {
-                return nemesisTarget;
-            }
-        }
-
-        throw new IllegalStateException("No target found matching Nemesis action");
     }
 }

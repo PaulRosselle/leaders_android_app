@@ -345,6 +345,15 @@ public final class JsonUtils {
         }
     }
 
+    public static JSONObject loadNemesisMoves(@NonNull Context context) {
+        try (InputStream fisNemesisMoves = context.getResources().openRawResource(R.raw.nemesis_moves)) {
+            return openJsonFile(fisNemesisMoves);
+
+        } catch (IOException | JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     //endregion
 
     //region REPLAY SAVE METHODS
