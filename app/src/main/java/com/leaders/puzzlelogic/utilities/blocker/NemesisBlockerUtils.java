@@ -21,7 +21,7 @@ import com.leaders.puzzlelogic.utilities.GameSearchUtils;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
-public class NemesisBlockerUtils {
+public final class NemesisBlockerUtils {
     private NemesisBlockerUtils(){
         throw new AssertionError("Cannot instantiate utility class");
     }
