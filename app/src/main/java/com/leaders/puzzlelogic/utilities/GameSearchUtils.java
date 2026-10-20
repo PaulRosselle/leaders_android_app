@@ -19,7 +19,7 @@ import com.leaders.gamelogic.resolvers.CharacterActionResolver;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GameSearchUtils {
+public final class GameSearchUtils {
     private static final int MAX_RESOLVER_INTERACTION_DEPTH = 2;
 
     private GameSearchUtils(){

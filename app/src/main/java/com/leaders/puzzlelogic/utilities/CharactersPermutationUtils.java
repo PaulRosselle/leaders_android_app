@@ -7,7 +7,7 @@ import com.leaders.gamelogic.entities.Character;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CharactersPermutationUtils {
+public final class CharactersPermutationUtils {
     private CharactersPermutationUtils(){
         throw new AssertionError("Cannot instantiate utility class");
     }
