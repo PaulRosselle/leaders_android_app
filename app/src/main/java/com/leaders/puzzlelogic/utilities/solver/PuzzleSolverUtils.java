@@ -103,7 +103,7 @@ public final class PuzzleSolverUtils {
             return false;
         }
 
-        boolean found = false;
+        boolean solutionFound = false;
 
         List<PlayableCharacter> playableCharacters = PlayabilityQuery.getPlayableCharacters(game, history);
 
@@ -119,10 +119,10 @@ public final class PuzzleSolverUtils {
 
             try {
                 if (isOpponentCharacter(actionsPhase, character)) {
-                    found = exploreOpponentCharacterActions(game, history, actionsPhase,
+                    solutionFound = exploreOpponentCharacterActions(game, history, actionsPhase,
                             remainingCharacters, playableCharacter, collector, deadEndStates);
                 } else {
-                    found = explorePlayerCharacterActions(game, history, actionsPhase,
+                    solutionFound = explorePlayerCharacterActions(game, history, actionsPhase,
                             remainingCharacters, playableCharacter, collector, deadEndStates);
                 }
             } finally {
@@ -142,7 +142,7 @@ public final class PuzzleSolverUtils {
                 remainingCharacters.remove(0);
 
                 try {
-                    found = explorePlayerCharacterActions(game, history, actionsPhase,
+                    solutionFound = explorePlayerCharacterActions(game, history, actionsPhase,
                             remainingCharacters, playableCharacter, collector, deadEndStates);
                 } finally {
                     remainingCharacters.add(0, character);
@@ -151,11 +151,11 @@ public final class PuzzleSolverUtils {
         }
 
         // Only reached after a complete exploration: an interruption leaves no entry.
-        if (!found) {
+        if (!solutionFound) {
             deadEndStates.add(nodeKey);
         }
 
-        return found;
+        return solutionFound;
     }
 
     /**
