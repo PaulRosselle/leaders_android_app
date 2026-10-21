@@ -27,11 +27,35 @@ import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
 
 /**
- * Discovers game states in which the Nemesis has a move
- * that prevents the player from winning.
- * <p>
- * Each state is evaluated at most once per exploredStates set.
- * Only states with a blocking move are stored in blockingMoves.
+ * Discovers game states in which the Nemesis has a move that prevents the
+ * player from winning.
+ *
+ * <p>The search is split in two independent concerns:</p>
+ * <ul>
+ *   <li><b>Enumeration</b>: {@code search} walks the reachable states following
+ *   the requested character permutation. It only decides <i>which states are
+ *   visited</i>.</li>
+ *   <li><b>Proof</b>: {@link NemesisBlockerUtils#canBlock} decides whether a Nemesis
+ *   action blocks the player. It is exhaustive and independent from any
+ *   permutation.</li>
+ * </ul>
+ *
+ * <h2>Shared sets</h2>
+ * <ul>
+ *   <li>{@code losingStates} (hash only): states from which the player cannot win.
+ *   This is a fact about the game, valid for every permutation and every caller.
+ *   Must be thread-safe if shared between threads.</li>
+ *   <li>{@code exploredStates} (hash + remaining characters): enumeration nodes
+ *   already visited. It depends on the permutation and must belong to a single
+ *   exploration. It is cleared if the search is interrupted, because nodes are
+ *   marked before being fully visited.</li>
+ *   <li>{@code nemesisEvaluated} (hash only): Nemesis states whose actions have
+ *   been completely evaluated. Entries are only added after a complete
+ *   evaluation, so an interruption never leaves a wrong entry.</li>
+ * </ul>
+ *
+ * <p>The supplied {@link Game} and {@link GameHistory} are mutated during the
+ * search (and restored). Never use the same instances from another thread.</p>
  */
 public final class NemesisMovesUtils {
 
@@ -40,16 +64,39 @@ public final class NemesisMovesUtils {
     }
 
     /**
+     * Discovers blocking moves without cross-checking the results.
+     *
+     * @see #solve(Game, GameHistory, List, long, Map, Set, Set, Set, BooleanSupplier, boolean)
+     */
+    public static void solve(@NonNull Game game,
+                             @NonNull GameHistory history,
+                             @NonNull List<Character> characters,
+                             long permutationIndex,
+                             @NonNull Map<String, CharacterAction> blockingMoves,
+                             @NonNull Set<String> exploredStates,
+                             @NonNull Set<String> nemesisEvaluated,
+                             @NonNull Set<String> losingStates,
+                             @NonNull BooleanSupplier shouldCancel) throws InterruptedException {
+        solve(game, history, characters, permutationIndex, blockingMoves,
+                exploredStates, nemesisEvaluated, losingStates, shouldCancel, false);
+    }
+
+    /**
      * Discovers blocking moves while exploring the reachable game states.
      *
      * @param game current game state
-     * @param history current game history
-     * @param characters player characters in permutation order
-     * @param permutationIndex index of the permutation to use
-     * @param blockingMoves map associating each blocking state hash
-     *                      with its first discovered blocking action
-     * @param exploredStates hashes of states already evaluated
+     * @param history current game history (current phase must be an ActionsPhase)
+     * @param characters player characters defining the enumeration order
+     * @param permutationIndex index of the permutation used for the enumeration
+     * @param blockingMoves receives, for each Nemesis state, its first blocking action
+     * @param exploredStates enumeration nodes already visited (one exploration only)
+     * @param nemesisEvaluated Nemesis states already fully evaluated
+     * @param losingStates memoization of the exhaustive proof, shareable between searches
      * @param shouldCancel cancellation signal
+     * @param verifyResults if true, every reported result is cross-checked with an
+     *                      unmemoized brute-force search; throws
+     *                      {@link IllegalStateException} on any mismatch. Exponential
+     *                      cost: intended for debug builds and tests only.
      * @throws IllegalArgumentException if the current phase is not an ActionsPhase
      * @throws InterruptedException if the search is interrupted or canceled
      */
@@ -59,7 +106,10 @@ public final class NemesisMovesUtils {
                              long permutationIndex,
                              @NonNull Map<String, CharacterAction> blockingMoves,
                              @NonNull Set<String> exploredStates,
-                             @NonNull BooleanSupplier shouldCancel) throws InterruptedException {
+                             @NonNull Set<String> nemesisEvaluated,
+                             @NonNull Set<String> losingStates,
+                             @NonNull BooleanSupplier shouldCancel,
+                             boolean verifyResults) throws InterruptedException {
         checkCancellation(shouldCancel);
 
         IPhase phase = GameHistoryQuery.findCurrentPhase(history);
@@ -67,211 +117,291 @@ public final class NemesisMovesUtils {
             throw new IllegalArgumentException("NemesisMovesUtils requires an ActionsPhase");
         }
 
-        ActionsPhase actionsPhase = (ActionsPhase) phase;
+        SearchContext ctx = new SearchContext(
+                game, history, (ActionsPhase) phase, blockingMoves,
+                exploredStates, nemesisEvaluated, losingStates, shouldCancel, verifyResults
+        );
 
         List<Character> permutation = CharactersPermutationUtils.getPermutation(characters, permutationIndex);
 
-        search(game, history, actionsPhase, permutation, new ArrayList<>(permutation),
-                blockingMoves, exploredStates, shouldCancel
-        );
+        try {
+            search(ctx, new ArrayList<>(permutation));
+        } catch (InterruptedException e) {
+            // Nodes are marked before being fully visited: this set is no longer reliable.
+            exploredStates.clear();
+            throw e;
+        }
     }
 
-    /**
-     * Explores reachable states recursively.
-     */
-    private static void search(@NonNull Game game,
-                               @NonNull GameHistory history,
-                               @NonNull ActionsPhase actionsPhase,
-                               @NonNull List<Character> permutation,
-                               @NonNull List<Character> remainingCharacters,
-                               @NonNull Map<String, CharacterAction> blockingMoves,
-                               @NonNull Set<String> exploredStates,
-                               @NonNull BooleanSupplier shouldCancel) throws InterruptedException {
-        checkCancellation(shouldCancel);
+    private static void search(@NonNull SearchContext searchContext,
+                               @NonNull List<Character> remainingCharacters) throws InterruptedException {
+        checkCancellation(searchContext.shouldCancel);
 
         // The hash represents the state before the next action.
-        String stateHash = GameStateHashUtils.createHash(game, history);
+        String stateHash = GameStateHashUtils.createHash(searchContext.game, searchContext.history);
 
-        String explorationKey = createExplorationKey(stateHash, remainingCharacters);
-
-        // This state has already been fully evaluated.
-        if (!exploredStates.add(explorationKey)) {
+        if (!searchContext.exploredStates.add(createExplorationKey(stateHash, remainingCharacters))) {
             return;
         }
 
-        // No further actions can be explored after the game is decided.
-        TeamColor playerTeam = actionsPhase.getTurnTeamColor();
-
-        if (GameQuery.getWinnerTeam(game, playerTeam) != null) {
+        // Nothing to explore once the game is decided.
+        if (GameQuery.getWinnerTeam(searchContext.game, searchContext.actionsPhase.getTurnTeamColor()) != null) {
             return;
         }
 
-        List<PlayableCharacter> playableCharacters = PlayabilityQuery.getPlayableCharacters(game, history);
+        List<PlayableCharacter> playableCharacters =
+                PlayabilityQuery.getPlayableCharacters(searchContext.game, searchContext.history);
 
-        // Mandatory characters always have priority.
+        // A mandatory character always has priority over the requested order.
         if (playableCharacters.size() == 1 && playableCharacters.get(0).isMandatory()) {
-
-            PlayableCharacter playableCharacter = playableCharacters.get(0);
-            Character character = playableCharacter.getCharacter();
-            int characterIndex = remainingCharacters.indexOf(character);
-
-            if (characterIndex != -1) {
-                remainingCharacters.remove(characterIndex);
-            }
-
-            try {
-                if (isNemesisCharacter(actionsPhase, character)) {
-                    exploreNemesisActions(game, history, actionsPhase,
-                            permutation, remainingCharacters, playableCharacter,
-                            stateHash, blockingMoves, exploredStates, shouldCancel
-                    );
-                } else {
-                    explorePlayerActions(game, history, actionsPhase,
-                            permutation, remainingCharacters, playableCharacter,
-                            blockingMoves, exploredStates, shouldCancel
-                    );
-                }
-            } finally {
-                if (characterIndex != -1) {
-                    remainingCharacters.add(characterIndex, character);
-                }
-            }
-
+            exploreMandatoryCharacter(searchContext, remainingCharacters, playableCharacters.get(0), stateHash);
             return;
         }
 
-        // Follow the requested player-character order.
-        // Characters that cannot play are skipped.
-        List<Character> skippedCharacters = new ArrayList<>();
+        exploreNextPlayerCharacter(searchContext, remainingCharacters, playableCharacters);
+    }
+
+    private static void exploreMandatoryCharacter(@NonNull SearchContext searchContext,
+                                                  @NonNull List<Character> remainingCharacters,
+                                                  @NonNull PlayableCharacter playableCharacter,
+                                                  @NonNull String stateHash) throws InterruptedException {
+        Character character = playableCharacter.getCharacter();
+        int characterIndex = remainingCharacters.indexOf(character);
+
+        if (characterIndex != -1) {
+            remainingCharacters.remove(characterIndex);
+        }
 
         try {
-            while (!remainingCharacters.isEmpty()) {
-                Character character = remainingCharacters.get(0);
-
-                PlayableCharacter playableCharacter = GameSearchUtils.findPlayableCharacterById(
-                        playableCharacters, character
-                );
-
-                if (playableCharacter != null) {
-                    remainingCharacters.remove(0);
-
-                    try {
-                        explorePlayerActions(game, history, actionsPhase,
-                                permutation, remainingCharacters, playableCharacter,
-                                blockingMoves, exploredStates, shouldCancel
-                        );
-                    } finally {
-                        remainingCharacters.add(0, character);
-                    }
-
-                    return;
-                }
-
-                skippedCharacters.add(remainingCharacters.remove(0));
+            if (isNemesisCharacter(searchContext.actionsPhase, character)) {
+                exploreNemesisActions(searchContext, remainingCharacters, playableCharacter, stateHash);
+            } else {
+                explorePlayerActions(searchContext, remainingCharacters, playableCharacter);
             }
         } finally {
-            for (int i = skippedCharacters.size() - 1; i >= 0; i--) {
-                remainingCharacters.add(0, skippedCharacters.get(i));
+            if (characterIndex != -1) {
+                remainingCharacters.add(characterIndex, character);
             }
         }
     }
 
     /**
-     * Explores player actions, including the option to skip an optional
-     * character's action.
+     * Follows the requested order: the first remaining character that is playable
+     * in the current state is explored.
+     *
+     * <p>Characters that are not playable <i>right now</i> stay in the list, so they
+     * remain candidates in the following states (they may become playable after
+     * another character acted). Only the character being explored is removed.</p>
      */
-    private static void explorePlayerActions(@NonNull Game game,
-                                             @NonNull GameHistory history,
-                                             @NonNull ActionsPhase actionsPhase,
-                                             @NonNull List<Character> permutation,
+    private static void exploreNextPlayerCharacter(@NonNull SearchContext searchContext,
+                                                   @NonNull List<Character> remainingCharacters,
+                                                   @NonNull List<PlayableCharacter> playableCharacters) throws InterruptedException {
+        for (int i = 0; i < remainingCharacters.size(); i++) {
+            Character character = remainingCharacters.get(i);
+
+            PlayableCharacter playableCharacter = GameSearchUtils.findPlayableCharacterById(playableCharacters, character);
+
+            if (playableCharacter == null) {
+                continue;
+            }
+
+            remainingCharacters.remove(i);
+            try {
+                explorePlayerActions(searchContext, remainingCharacters, playableCharacter);
+            } finally {
+                remainingCharacters.add(i, character);
+            }
+            return;
+        }
+    }
+
+    /**
+     * Explores the actions of a player character, including the option to skip
+     * an optional character.
+     */
+    private static void explorePlayerActions(@NonNull SearchContext ctx,
                                              @NonNull List<Character> remainingCharacters,
-                                             @NonNull PlayableCharacter playableCharacter,
-                                             @NonNull Map<String, CharacterAction> blockingMoves,
-                                             @NonNull Set<String> exploredStates,
-                                             @NonNull BooleanSupplier shouldCancel) throws InterruptedException {
+                                             @NonNull PlayableCharacter playableCharacter) throws InterruptedException {
         if (!playableCharacter.isMandatory()) {
-            search(game, history, actionsPhase, permutation,
-                    remainingCharacters, blockingMoves, exploredStates, shouldCancel
-            );
+            search(ctx, remainingCharacters);
         }
 
         List<CharacterAction> actions = GameSearchUtils.enumerateActions(
-                game, history, playableCharacter.getCharacter()
+                ctx.game, ctx.history, playableCharacter.getCharacter()
         );
 
         for (CharacterAction action : actions) {
-            checkCancellation(shouldCancel);
-
-            GameActionHandler handler = GameActionHandlerFactory.create(game, action);
-
-            handler.doAction();
-            actionsPhase.getActions().add(action);
-
-            try {
-                search(game, history, actionsPhase, permutation,
-                        remainingCharacters, blockingMoves, exploredStates, shouldCancel
-                );
-            } finally {
-                actionsPhase.getActions().remove(actionsPhase.getActions().size() - 1);
-                handler.undoAction();
-            }
+            checkCancellation(ctx.shouldCancel);
+            applyThenSearch(ctx, action, remainingCharacters);
         }
     }
 
     /**
-     * Evaluates the blocking actions of a mandatory Nemesis character.
-     * <p>
-     * The first action that prevents every winning continuation for the
-     * player is stored. All legal actions are still explored afterward
-     * to discover other reachable states.
+     * Evaluates the current Nemesis state (once), then explores every Nemesis
+     * action to discover the following states.
      */
-    private static void exploreNemesisActions(@NonNull Game game,
-                                              @NonNull GameHistory history,
-                                              @NonNull ActionsPhase actionsPhase,
-                                              @NonNull List<Character> permutation,
+    private static void exploreNemesisActions(@NonNull SearchContext searchContext,
                                               @NonNull List<Character> remainingCharacters,
                                               @NonNull PlayableCharacter playableCharacter,
-                                              @NonNull String stateHash,
-                                              @NonNull Map<String, CharacterAction> blockingMoves,
-                                              @NonNull Set<String> exploredStates,
-                                              @NonNull BooleanSupplier shouldCancel) throws InterruptedException {
+                                              @NonNull String stateHash) throws InterruptedException {
         List<CharacterAction> actions = GameSearchUtils.enumerateActions(
-                game, history, playableCharacter.getCharacter()
+                searchContext.game, searchContext.history, playableCharacter.getCharacter()
         );
 
-        // Find the first blocking action for this state.
-        if (!blockingMoves.containsKey(stateHash)) {
-            for (CharacterAction action : actions) {
-                checkCancellation(shouldCancel);
+        if (!searchContext.nemesisEvaluated.contains(stateHash)) {
+            evaluateNemesisState(searchContext, stateHash, actions);
+        }
 
-                if (NemesisBlockerUtils.canBlock(game, history, action, permutation, shouldCancel)) {
-                    blockingMoves.putIfAbsent(stateHash, action);
-                    break;
+        for (CharacterAction action : actions) {
+            checkCancellation(searchContext.shouldCancel);
+            applyThenSearch(searchContext, action, remainingCharacters);
+        }
+    }
+
+    private static void applyThenSearch(@NonNull SearchContext searchContext,
+                                        @NonNull CharacterAction action,
+                                        @NonNull List<Character> remainingCharacters) throws InterruptedException {
+        GameActionHandler handler = GameActionHandlerFactory.create(searchContext.game, action);
+
+        handler.doAction();
+        searchContext.actionsPhase.getActions().add(action);
+
+        try {
+            search(searchContext, remainingCharacters);
+        } finally {
+            searchContext.actionsPhase.getActions().remove(searchContext.actionsPhase.getActions().size() - 1);
+            handler.undoAction();
+        }
+    }
+
+
+    /**
+     * Looks for a blocking action in the current Nemesis state.
+     *
+     * <p>A blocking action is only reported when another action of the same state
+     * leaves the player a winning continuation. Otherwise, the state is either lost
+     * or won for the player whatever the Nemesis does, so there is nothing
+     * interesting to report.</p>
+     */
+    private static void evaluateNemesisState(@NonNull SearchContext searchContext,
+                                             @NonNull String stateHash,
+                                             @NonNull List<CharacterAction> actions) throws InterruptedException {
+        CharacterAction firstBlockingAction = null;
+        CharacterAction firstWinningAlternative = null;
+
+        for (CharacterAction action : actions) {
+            checkCancellation(searchContext.shouldCancel);
+
+            if (NemesisBlockerUtils.canBlock(
+                    searchContext.game, searchContext.history, action,
+                    searchContext.losingStates, searchContext.shouldCancel)) {
+                if (firstBlockingAction == null) {
+                    firstBlockingAction = action;
+                }
+            } else if (firstWinningAlternative == null) {
+                firstWinningAlternative = action;
+            }
+
+            if (firstBlockingAction != null && firstWinningAlternative != null) {
+                break;
+            }
+        }
+
+        if (firstBlockingAction != null && firstWinningAlternative != null) {
+            if (searchContext.verifyResults) {
+                verifyBlockingMove(searchContext, stateHash, firstBlockingAction, firstWinningAlternative);
+            }
+            searchContext.blockingMoves.putIfAbsent(stateHash, firstBlockingAction);
+        }
+
+        // Only marked after a complete evaluation: an interruption leaves no entry.
+        searchContext.nemesisEvaluated.add(stateHash);
+    }
+
+    /**
+     * Cross-checks a result against a brute-force search that shares nothing with
+     * {@link NemesisBlockerUtils} (no {@code losingStates}, no state hash).
+     * A failure points to an incomplete {@code createHash}, a wrong
+     * {@code getPlayableCharacters}, or a bug in the proof.
+     */
+    private static void verifyBlockingMove(@NonNull SearchContext searchContext,
+                                           @NonNull String stateHash,
+                                           @NonNull CharacterAction blockingAction,
+                                           @NonNull CharacterAction winningAlternative) throws InterruptedException {
+        if (applyThenBruteForce(searchContext, blockingAction)) {
+            throw new IllegalStateException(
+                    "Invalid blocking move: the player can still win after " + blockingAction
+                            + " (state " + stateHash + ")");
+        }
+        if (!applyThenBruteForce(searchContext, winningAlternative)) {
+            throw new IllegalStateException(
+                    "Invalid alternative: no player victory found after " + winningAlternative
+                            + " although the proof reported one (state " + stateHash + ")");
+        }
+    }
+
+    private static boolean applyThenBruteForce(@NonNull SearchContext searchContext,
+                                               @NonNull CharacterAction action) throws InterruptedException {
+        GameActionHandler handler = GameActionHandlerFactory.create(searchContext.game, action);
+
+        handler.doAction();
+        searchContext.actionsPhase.getActions().add(action);
+
+        try {
+            return bruteForcePlayerCanWin(searchContext);
+        } finally {
+            searchContext.actionsPhase.getActions().remove(searchContext.actionsPhase.getActions().size() - 1);
+            handler.undoAction();
+        }
+    }
+
+    /**
+     * Unmemoized AND/OR search: the Nemesis picks (AND), the player picks any
+     * playable character and any action (OR).
+     */
+    private static boolean bruteForcePlayerCanWin(@NonNull SearchContext searchContext) throws InterruptedException {
+        checkCancellation(searchContext.shouldCancel);
+
+        TeamColor playerTeam = searchContext.actionsPhase.getTurnTeamColor();
+        TeamColor winner = GameQuery.getWinnerTeam(searchContext.game, playerTeam);
+        if (winner != null) {
+            return winner == playerTeam;
+        }
+
+        List<PlayableCharacter> playable = PlayabilityQuery.getPlayableCharacters(searchContext.game, searchContext.history);
+
+        if (playable.size() == 1 && playable.get(0).isMandatory()
+                && isNemesisCharacter(searchContext.actionsPhase, playable.get(0).getCharacter())) {
+            List<CharacterAction> actions = GameSearchUtils.enumerateActions(
+                    searchContext.game, searchContext.history, playable.get(0).getCharacter()
+            );
+            if (actions.isEmpty()) {
+                return false;
+            }
+            for (CharacterAction action : actions) {
+                if (!applyThenBruteForce(searchContext, action)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        for (PlayableCharacter playableCharacter : playable) {
+            if (isNemesisCharacter(searchContext.actionsPhase, playableCharacter.getCharacter())) {
+                continue;
+            }
+            for (CharacterAction action : GameSearchUtils.enumerateActions(
+                    searchContext.game, searchContext.history, playableCharacter.getCharacter())) {
+                if (applyThenBruteForce(searchContext, action)) {
+                    return true;
                 }
             }
         }
-
-        // Explore every legal action to discover subsequent states.
-        for (CharacterAction action : actions) {
-            checkCancellation(shouldCancel);
-
-            GameActionHandler handler = GameActionHandlerFactory.create(game, action);
-
-            handler.doAction();
-            actionsPhase.getActions().add(action);
-
-            try {
-                search(game, history, actionsPhase, permutation,
-                        remainingCharacters, blockingMoves, exploredStates, shouldCancel
-                );
-            } finally {
-                actionsPhase.getActions().remove(actionsPhase.getActions().size() - 1);
-                handler.undoAction();
-            }
-        }
+        return false;
     }
 
-    private static boolean isNemesisCharacter(@NonNull ActionsPhase actionsPhase, @NonNull Character character) {
+    private static boolean isNemesisCharacter(@NonNull ActionsPhase actionsPhase,
+                                              @NonNull Character character) {
         return character.getTeamColor() != actionsPhase.getTurnTeamColor();
     }
 
@@ -289,5 +419,40 @@ public final class NemesisMovesUtils {
                         .map(character -> character.getId().toString())
                         .collect(Collectors.joining(","));
     }
-}
 
+    /**
+     * Immutable bundle of the arguments that stay the same during a whole search.
+     * Only used to keep the private method signatures short.
+     */
+    private static final class SearchContext {
+        final Game game;
+        final GameHistory history;
+        final ActionsPhase actionsPhase;
+        final Map<String, CharacterAction> blockingMoves;
+        final Set<String> exploredStates;
+        final Set<String> nemesisEvaluated;
+        final Set<String> losingStates;
+        final BooleanSupplier shouldCancel;
+        final boolean verifyResults;
+
+        SearchContext(@NonNull Game game,
+                      @NonNull GameHistory history,
+                      @NonNull ActionsPhase actionsPhase,
+                      @NonNull Map<String, CharacterAction> blockingMoves,
+                      @NonNull Set<String> exploredStates,
+                      @NonNull Set<String> nemesisEvaluated,
+                      @NonNull Set<String> losingStates,
+                      @NonNull BooleanSupplier shouldCancel,
+                      boolean verifyResults) {
+            this.game = game;
+            this.history = history;
+            this.actionsPhase = actionsPhase;
+            this.blockingMoves = blockingMoves;
+            this.exploredStates = exploredStates;
+            this.nemesisEvaluated = nemesisEvaluated;
+            this.losingStates = losingStates;
+            this.shouldCancel = shouldCancel;
+            this.verifyResults = verifyResults;
+        }
+    }
+}

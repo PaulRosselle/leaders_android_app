@@ -401,13 +401,13 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     //region AUTO PLAY
 
     private void startAutoBlock(@NonNull InteractionRequest request) {
-        // TODO - comment
+        // If the puzzles have auto moves registered, we play them directly
         if (nemesisMoves != null) {
             controller.selectTarget(nemesisMoves.getBlockingTarget(controller.getHistory(), request));
             return;
         }
 
-        // TODO - comment
+        // Without registered moves, we start an auto blocker which will search for a blocking move
         blockerRequest = request;
         NemesisBlocker blocker = nbvBlocker.initBlocker(controller.getHistory(), request, this);
 

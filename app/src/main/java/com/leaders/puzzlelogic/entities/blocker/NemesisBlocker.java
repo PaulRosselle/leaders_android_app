@@ -18,13 +18,14 @@ import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.queries.CharacterAbilityQuery;
 import com.leaders.gamelogic.queries.GameHistoryQuery;
-import com.leaders.puzzlelogic.utilities.CharactersPermutationUtils;
 import com.leaders.puzzlelogic.utilities.GameSearchUtils;
 import com.leaders.puzzlelogic.utilities.blocker.NemesisBlockerUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -35,8 +36,8 @@ public final class NemesisBlocker {
     private final List<CharacterAction> nemesisActions;
     private final List<InteractionTarget> nemesisTargets;
     private final List<Character> opponentCharacters;
-    private final long permutationCount;
     private final NemesisBlockerCallback callback;
+    private final Set<String> losingStates;
 
     private final NemesisBlockerCoordinator coordinator;
     private boolean callbackDelivered;
@@ -59,17 +60,12 @@ public final class NemesisBlocker {
 
         this.nemesisActions = GameSearchUtils.enumerateActions(game, gameHistory, nemesis);
         this.opponentCharacters = searchOpponentCharacters(game, gameHistory, nemesis);
+        this.losingStates = ConcurrentHashMap.newKeySet();
 
         this.callback = callback;
         this.callbackDelivered = false;
 
-        permutationCount = CharactersPermutationUtils.getPermutationCount(opponentCharacters);
-
-        List<ActionCandidate> candidates = new ArrayList<>();
-        for (int i = 0; i < nemesisActions.size(); i++) {
-            candidates.add(new ActionCandidate(nemesisActions.get(i), i, permutationCount));
-        }
-        this.coordinator = new NemesisBlockerCoordinator(candidates);
+        this.coordinator = new NemesisBlockerCoordinator(nemesisActions);
     }
 
     public boolean canBeInterrupted() {
@@ -95,35 +91,25 @@ public final class NemesisBlocker {
         }
     }
 
+    /**
+     * Searches for a blocking action and notifies the callback of the result.
+     *
+     * @throws IllegalStateException if the search is interrupted unexpectedly
+     */
     private void startSimpleSearch() {
-        // Since the Nemesis is forced to move, a search is not needed with a single action
         if (nemesisActions.size() == 1) {
+            callbackDelivered = true;
             callback.onBlockingActionFound(getTargetFromAction(nemesisActions.get(0)));
             return;
         }
 
-        // Simple search iterates through Nemesis action to find one that can block the opponent
-        // victory for every permutation. It is run in a single thread and cannot be interrupted
         for (CharacterAction nemesisAction : nemesisActions) {
-            boolean canBlock = true;
+            boolean canBlock;
             try {
-                // Without permutation, we only check the current state of the game
-                if (permutationCount <= 1) {
-                    canBlock = NemesisBlockerUtils.canBlock(
-                            game, gameHistory, nemesisAction, opponentCharacters, () -> false
-                    );
-                } else {
-                    for (int permutationIndex = 0; permutationIndex < permutationCount; permutationIndex++) {
-                            if (!NemesisBlockerUtils.canBlock(
-                                    game, gameHistory, nemesisAction,
-                                    opponentCharacters, permutationIndex, () -> false)) {
-                                canBlock = false;
-                                break;
-                            }
-                    }
-                }
+                canBlock = NemesisBlockerUtils.canBlock(
+                        game, gameHistory, nemesisAction, losingStates, () -> false);
             } catch (InterruptedException e) {
-                throw new IllegalStateException("Invalid context for interuption" + e);
+                throw new IllegalStateException("Invalid context for interruption", e);
             }
             if (canBlock) {
                 callbackDelivered = true;
@@ -132,11 +118,9 @@ public final class NemesisBlocker {
             }
         }
 
-        // By default, the first nemesis action is returned
         callbackDelivered = true;
         callback.onSearchCompletedWithoutResult(
-                nemesisActions.isEmpty() ? null : getTargetFromAction(nemesisActions.get(0))
-        );
+                nemesisActions.isEmpty() ? null : getTargetFromAction(nemesisActions.get(0)));
     }
 
     private void startCoordinatedSearch() {
@@ -147,18 +131,14 @@ public final class NemesisBlocker {
 
             if (!alreadyFinished) {
                 int availableProcessors = Runtime.getRuntime().availableProcessors();
-                int workerCount = Math.max(1, availableProcessors - 1);
+                int workerCount = Math.max(1, Math.min(availableProcessors - 1, nemesisActions.size()));
 
                 executor = Executors.newFixedThreadPool(workerCount);
 
                 for (int i = 0; i < workerCount; i++) {
                     executor.execute(new NemesisBlockerWorker(
-                            coordinator,
-                            game,
-                            gameHistory,
-                            nemesisActions,
-                            opponentCharacters,
-                            this::onCoordinatorChanged
+                            coordinator, game, gameHistory,
+                            nemesisActions, losingStates, this::onCoordinatorChanged
                     ));
                 }
             }
