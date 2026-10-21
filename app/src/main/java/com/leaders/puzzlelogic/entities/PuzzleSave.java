@@ -31,10 +31,10 @@ public abstract class PuzzleSave {
 
     protected PuzzleSave(@NonNull JSONObject joPuzzleSave) throws JSONException {
         this(
-                joPuzzleSave.getString("name"),
+                joPuzzleSave.has("name") ? joPuzzleSave.getString("name") : "",
                 PuzzleLifetime.valueOf(joPuzzleSave.getString("lifetime")),
                 joPuzzleSave.getJSONObject("datas"),
-                joPuzzleSave.getBoolean("solved")
+                joPuzzleSave.has("solved") && joPuzzleSave.getBoolean("solved")
         );
     }
 
@@ -42,10 +42,8 @@ public abstract class PuzzleSave {
     @CallSuper
     public JSONObject getAsJson() throws JSONException {
         JSONObject joPuzzleSave = new JSONObject();
-        joPuzzleSave.put("name", getName());
         joPuzzleSave.put("lifetime", getLifetime().name());
         joPuzzleSave.put("datas", datas);
-        joPuzzleSave.put("solved", isSolved());
         return joPuzzleSave;
     }
 

@@ -30,7 +30,9 @@ public final class CustomPuzzleSave extends PuzzleSave {
     @Override
     public JSONObject getAsJson() throws JSONException {
         JSONObject joPuzzleSave = super.getAsJson();
+        joPuzzleSave.put("name", getName());
         joPuzzleSave.put("author", author);
+        joPuzzleSave.put("solved", isSolved());
         return joPuzzleSave;
     }
 
