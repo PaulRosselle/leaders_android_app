@@ -96,25 +96,25 @@ public final class NemesisBlockerUtils {
 
         if (playable.size() == 1 && playable.get(0).isMandatory()
                 && playable.get(0).getCharacter().getTeamColor() != team) {
-            // Le Nemesis choisit : le joueur doit gagner contre TOUTES ses actions (AND).
+            // Nemesis actions : the player must win against all her actions (AND).
             result = true;
             List<CharacterAction> actions = GameSearchUtils.enumerateActions(
                     game, history, playable.get(0).getCharacter());
             if (actions.isEmpty()) result = false;
-            for (CharacterAction a : actions) {
-                if (!applyAndCheck(game, history, phase, a, losingStates, shouldCancel)) {
+            for (CharacterAction action : actions) {
+                if (!applyAndCheck(game, history, phase, action, losingStates, shouldCancel)) {
                     result = false;
                     break;
                 }
             }
         } else {
-            // Le joueur choisit : n'importe quel personnage jouable, n'importe quelle action (OR).
+            // Ally actions : any action can lead to the player victory (OR).
             result = false;
             outer:
-            for (PlayableCharacter pc : playable) {
-                if (pc.getCharacter().getTeamColor() != team) continue;
-                for (CharacterAction a : GameSearchUtils.enumerateActions(game, history, pc.getCharacter())) {
-                    if (applyAndCheck(game, history, phase, a, losingStates, shouldCancel)) {
+            for (PlayableCharacter playableCharacter : playable) {
+                if (playableCharacter.getCharacter().getTeamColor() != team) continue;
+                for (CharacterAction action : GameSearchUtils.enumerateActions(game, history, playableCharacter.getCharacter())) {
+                    if (applyAndCheck(game, history, phase, action, losingStates, shouldCancel)) {
                         result = true;
                         break outer;
                     }

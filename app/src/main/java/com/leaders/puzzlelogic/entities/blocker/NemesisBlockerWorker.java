@@ -4,7 +4,6 @@ package com.leaders.puzzlelogic.entities.blocker;
 import androidx.annotation.NonNull;
 
 import com.leaders.gamelogic.actions.CharacterAction;
-import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.puzzlelogic.utilities.blocker.NemesisBlockerUtils;
@@ -17,7 +16,7 @@ final class NemesisBlockerWorker implements Runnable {
     private final Game game;
     private final GameHistory gameHistory;
     private final List<CharacterAction> nemesisActions;
-    private final Set<String> losingStates; // partagé, concurrent
+    private final Set<String> losingStates; // Shared and concurrent
     private final Runnable endCallback;
 
     NemesisBlockerWorker(@NonNull NemesisBlockerCoordinator coordinator,
@@ -27,8 +26,11 @@ final class NemesisBlockerWorker implements Runnable {
                          @NonNull Set<String> losingStates,
                          @NonNull Runnable endCallback) {
         this.coordinator = coordinator;
-        this.game = new Game(game);                      // copies privées par worker
+
+        // Each worker use its own copy of the game and history to test out actions
+        this.game = new Game(game);
         this.gameHistory = new GameHistory(gameHistory);
+
         this.nemesisActions = nemesisActions;
         this.losingStates = losingStates;
         this.endCallback = endCallback;
@@ -50,7 +52,7 @@ final class NemesisBlockerWorker implements Runnable {
                     coordinator.reportResult(index, blocks);
                 } catch (InterruptedException e) {
                     if (coordinator.isSuperseded(index) && !Thread.currentThread().isInterrupted()) {
-                        continue; // candidat devenu inutile, pas une interruption du worker
+                        continue; // Invalid candidate, not a worker interuption
                     }
                     Thread.currentThread().interrupt();
                     break;
