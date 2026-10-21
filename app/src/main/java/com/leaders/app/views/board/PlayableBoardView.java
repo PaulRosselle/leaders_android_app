@@ -114,12 +114,12 @@ public final class PlayableBoardView extends BoardView {
                 destCellView.setAsRecruitmentDestinationTarget(target, orientation);
                 break;
             case MovementDestination: {
-                UUID characterID = Objects.requireNonNull(context.getCharacter(),
-                        "Invalid destination context : source character missing").getId();
-                Position sourcePos = BoardQuery.getCellByCharacterId(board, characterID).getPosition();
+                UUID characterID = Objects.requireNonNull(context.getTargetCharacter(),
+                        "Invalid destination context : target character missing").getId();
+                Position originPos = BoardQuery.getCellByCharacterId(board, characterID).getPosition();
 
-                CellView sourceCellView = getCellView(sourcePos);
-                destCellView.setAsMovementDestinationTarget(target, sourceCellView);
+                CellView originCellView = getCellView(originPos);
+                destCellView.setAsMovementDestinationTarget(target, originCellView);
             } break;
 
             case ActiveAbilityDestination:

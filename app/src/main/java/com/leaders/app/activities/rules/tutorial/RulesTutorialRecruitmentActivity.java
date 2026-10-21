@@ -213,7 +213,7 @@ public class RulesTutorialRecruitmentActivity extends PlayableActivity implement
         if (request.getRequestType() == InteractionType.PositionExpected &&
                 gameContext.getGamePhase().getPhaseType() == GamePhaseType.Recruitment) {
             ccsvCardSelector.setPortraitsVisible(false);
-            setNewCharacterVisible(request.getContext().getCharacter(), true);
+            setNewCharacterVisible(request.getContext().getTargetCharacter(), true);
         } else if (hasRecruitedCharacter(gameContext)) {
             showSecondRecruitmentDialog();
         }

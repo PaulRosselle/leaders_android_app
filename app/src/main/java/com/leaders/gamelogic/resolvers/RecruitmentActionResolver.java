@@ -128,7 +128,7 @@ public final class RecruitmentActionResolver {
         return InteractionFeedback.createForRecruitmentAction(
                 List.of(new RecruitmentActionMotion(
                         RecruitmentMotionType.Add,
-                        Objects.requireNonNull(result.getContext().getCharacter(),
+                        Objects.requireNonNull(result.getContext().getTargetCharacter(),
                                 "A character is required for a recruitment result context to be valid"),
                         getRecruitmentPosition(result)
                 ))
