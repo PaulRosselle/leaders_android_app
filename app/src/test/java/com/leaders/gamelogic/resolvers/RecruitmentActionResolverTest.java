@@ -71,10 +71,10 @@ public class RecruitmentActionResolverTest {
                 request.getRequestType()
         );
         assertNotNull(request.getContext());
-        assertNotNull(request.getContext().getCharacter());
+        assertNotNull(request.getContext().getTargetCharacter());
         assertEquals(
                 CharacterType.getCharacterTypesMatchingCard(card).get(0),
-                request.getContext().getCharacter().getCharacterType()
+                request.getContext().getTargetCharacter().getCharacterType()
         );
 
         assertTrue(
@@ -134,9 +134,9 @@ public class RecruitmentActionResolverTest {
         assertNotNull(request);
         assertNotNull(request.getContext());
 
-        assertNotNull(request.getContext().getCharacter());
+        assertNotNull(request.getContext().getTargetCharacter());
         CharacterType expectedType = CharacterType.getCharacterTypesMatchingCard(card).get(1);
-        assertEquals(expectedType, request.getContext().getCharacter().getCharacterType());
+        assertEquals(expectedType, request.getContext().getTargetCharacter().getCharacterType());
     }
 
     @Test

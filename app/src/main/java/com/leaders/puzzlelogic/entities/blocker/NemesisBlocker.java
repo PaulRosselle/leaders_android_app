@@ -52,7 +52,7 @@ public final class NemesisBlocker {
         this.game = GameFactory.create(gameHistory);
         this.gameHistory = gameHistory;
 
-        Character nemesis = request.getContext().getCharacter();
+        Character nemesis = request.getContext().getTargetCharacter();
         if (nemesis == null || nemesis.getCharacterType() != CharacterType.Nemesis) {
             throw new IllegalArgumentException("Nemesis blocked require a Nemesis request");
         }

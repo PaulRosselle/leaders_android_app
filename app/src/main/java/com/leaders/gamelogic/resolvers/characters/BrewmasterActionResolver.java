@@ -177,7 +177,7 @@ public final class BrewmasterActionResolver extends CharacterActionResolver {
                 "A Brewmaster target position must contain an ally");
         return new InteractionRequest(
                 InteractionType.PositionExpected,
-                new InteractionContext(targetedAlly), // Here the request has for subjet the target
+                new InteractionContext(character, targetedAlly),
                 legalTargets,
                 List.of(InteractionResultType.PositionChosen, InteractionResultType.CancelAction)
         );
@@ -236,7 +236,7 @@ public final class BrewmasterActionResolver extends CharacterActionResolver {
             Position destPos = destination.getPosition();
             destBuilder.addResult(new InteractionResult(
                     InteractionResultType.PositionChosen,
-                    new InteractionContext(target), // Here the result has for subjet the target
+                    new InteractionContext(character, target),
                     new InteractionTarget(TargetCategory.ActiveAbilityDestination, destPos)
             ));
             destBuilder.addFeedback(InteractionFeedback.createForCharacterAction(

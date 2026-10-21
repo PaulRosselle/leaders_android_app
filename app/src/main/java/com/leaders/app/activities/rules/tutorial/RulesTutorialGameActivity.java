@@ -238,7 +238,7 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
         if (request.getRequestType() == InteractionType.PositionExpected &&
                 gameContext.getGamePhase().getPhaseType() == GamePhaseType.Recruitment) {
             ccsvCardSelector.setPortraitsVisible(false);
-            setNewCharacterVisible(request.getContext().getCharacter(), true);
+            setNewCharacterVisible(request.getContext().getTargetCharacter(), true);
         }
 
         applyPlayerChange(gameContext);

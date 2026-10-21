@@ -171,7 +171,7 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
                 "A Manipulator target position must contain an enemy");
         return new InteractionRequest(
                 InteractionType.PositionExpected,
-                new InteractionContext(targetedEnemy), // Here the request has for subjet the target
+                new InteractionContext(character, targetedEnemy),
                 legalTargets,
                 List.of(InteractionResultType.PositionChosen, InteractionResultType.CancelAction)
         );
@@ -241,7 +241,7 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
             CharacterActionBuilder destinationBuilder = new CharacterActionBuilder(targetBuilder);
             destinationBuilder.addResult(new InteractionResult(
                     InteractionResultType.PositionChosen,
-                    new InteractionContext(target), // Here the result has for subjet the target
+                    new InteractionContext(character, target),
                     new InteractionTarget(TargetCategory.ActiveAbilityDestination, destination)
             ));
 

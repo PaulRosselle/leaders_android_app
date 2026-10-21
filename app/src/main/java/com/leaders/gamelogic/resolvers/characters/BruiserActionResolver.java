@@ -173,7 +173,7 @@ public final class BruiserActionResolver extends CharacterActionResolver {
                 "A Bruiser target position must contain an enemy");
         return new InteractionRequest(
                 InteractionType.PositionExpected,
-                new InteractionContext(targetedEnemy), // Here the request has for subjet the target
+                new InteractionContext(character, targetedEnemy),
                 legalTargets,
                 List.of(InteractionResultType.PositionChosen, InteractionResultType.CancelAction)
         );
@@ -253,7 +253,7 @@ public final class BruiserActionResolver extends CharacterActionResolver {
                 CharacterActionBuilder destinationBuilder = new CharacterActionBuilder(targetBuilder);
                 destinationBuilder.addResult(new InteractionResult(
                         InteractionResultType.PositionChosen,
-                        new InteractionContext(target), // Here the result subject is the target
+                        new InteractionContext(character, target),
                         new InteractionTarget(TargetCategory.ActiveAbilityDestination, pushDestPos)
                 ));
 

@@ -123,7 +123,7 @@ public class TutorialBotUtils {
     }
 
     private static boolean isLeaderRequest(@NonNull InteractionRequest request) {
-        Character character = request.getContext().getCharacter();
+        Character character = request.getContext().getTargetCharacter();
         return character != null && character.getCharacterType().getCharacterCard().isLeader();
     }
 

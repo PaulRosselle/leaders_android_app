@@ -51,7 +51,7 @@ public final class AutoPlayQuery {
                                                @NonNull InteractionRequest request) {
         return gameMode == GameMode.Puzzle &&
                 request.getRequestType() == InteractionType.PositionExpected &&
-                isAutoCharacter(request.getContext().getCharacter());
+                isAutoCharacter(request.getContext().getSourceCharacter());
     }
 
     /**
@@ -72,7 +72,7 @@ public final class AutoPlayQuery {
             case PlayableCharacterChosen:
                 return isAutoPlayableCharacter(getPlayableCharacterFromTarget(result.getChosenTarget()));
             case PositionChosen:
-                return isAutoCharacter(result.getContext().getCharacter());
+                return isAutoCharacter(result.getContext().getSourceCharacter());
             default:
                 return false;
         }

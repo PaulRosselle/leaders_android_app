@@ -7,18 +7,33 @@ import androidx.annotation.Nullable;
 
 public final class InteractionContext {
     @Nullable
-    private final Character character;
+    private final Character sourceCharacter;
+    @Nullable
+    private final Character targetCharacter;
 
     public InteractionContext() {
-        this.character = null;
+        this.sourceCharacter = null;
+        this.targetCharacter = null;
     }
 
-    public InteractionContext(@NonNull Character character) {
-        this.character = character;
+    public InteractionContext(@NonNull Character sourceAndTargetCharacter) {
+        this.sourceCharacter = sourceAndTargetCharacter;
+        this.targetCharacter = sourceAndTargetCharacter;
+    }
+
+    public InteractionContext(@NonNull Character sourceCharacter,
+                              @NonNull Character targetCharacter) {
+        this.sourceCharacter = sourceCharacter;
+        this.targetCharacter = targetCharacter;
     }
 
     @Nullable
-    public Character getCharacter() {
-        return character;
+    public Character getSourceCharacter() {
+        return sourceCharacter;
+    }
+
+    @Nullable
+    public Character getTargetCharacter() {
+        return targetCharacter;
     }
 }

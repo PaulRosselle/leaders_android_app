@@ -147,7 +147,7 @@ public abstract class PlayableActivity extends BaseActivity
 
         bdvBoard.highlightPlayableCharacters(
                 gameContext.getPlayableCharacters(),
-                request.getContext().getCharacter(),
+                request.getContext().getTargetCharacter(),
                 gameContext.getBoard()
         );
 

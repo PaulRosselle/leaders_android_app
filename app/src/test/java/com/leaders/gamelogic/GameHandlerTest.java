@@ -786,7 +786,7 @@ public class GameHandlerTest {
         assertEquals(InteractionType.PositionExpected, request.getRequestType());
         assertEquals(
                 characters.get(0),
-                request.getContext().getCharacter()
+                request.getContext().getTargetCharacter()
         );
         assertTrue(request.getLegalResults().contains(InteractionResultType.PositionChosen));
         assertTrue(request.getLegalResults().contains(InteractionResultType.CancelAction));
