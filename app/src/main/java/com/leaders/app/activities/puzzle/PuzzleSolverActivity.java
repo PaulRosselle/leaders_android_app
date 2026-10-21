@@ -44,7 +44,9 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -77,6 +79,7 @@ public final class PuzzleSolverActivity extends BaseActivity {
     private Thread solutionConsumerThread;
     private CountDownLatch solverWorkersLatch;
     private BlockingQueue<List<CharacterAction>> solutionQueue;
+    private Set<String> deadEndStates;
 
     @Nullable
     private List<CharacterAction> displayedSolution;
@@ -236,6 +239,7 @@ public final class PuzzleSolverActivity extends BaseActivity {
         workerCount = (int) Math.min(workerCount, permutationCount);
 
         solutionQueue = new LinkedBlockingQueue<>();
+        deadEndStates = ConcurrentHashMap.newKeySet();
         solverWorkersLatch = new CountDownLatch(workerCount);
         solverExecutor = Executors.newFixedThreadPool(workerCount);
 
@@ -297,7 +301,8 @@ public final class PuzzleSolverActivity extends BaseActivity {
                         workerHistory,
                         characters,
                         permutationIndex,
-                        solutionQueue
+                        solutionQueue,
+                        deadEndStates
                 );
             }
         } catch (InterruptedException e) {
