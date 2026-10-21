@@ -31,7 +31,7 @@ public final class PuzzleImportUtils {
         throw new AssertionError("Cannot instantiate utility class");
     }
 
-    public static GameHistory getFromLbeUrl(@NonNull Context context, @NonNull String lbeUrl) {
+    public static GameHistory getFromLbeUrl(@Nullable Context context, @NonNull String lbeUrl) {
         List<IGameAction> initialActions = new ArrayList<>();
         for (TeamColor teamColor : TeamColor.values()) {
             for (Cell characterCell : getTeamCharacterCells(context, lbeUrl, teamColor)) {
@@ -47,7 +47,7 @@ public final class PuzzleImportUtils {
         return PuzzleEditionUtils.getDefaultHistory(initialActions);
     }
 
-    private static List<Cell> getTeamCharacterCells(@NonNull Context context,
+    private static List<Cell> getTeamCharacterCells(@Nullable Context context,
                                                     @NonNull String lbeUrl,
                                                     @NonNull TeamColor teamColor) {
         // First we get the header separator associated with the player color

@@ -5,113 +5,71 @@ import androidx.annotation.NonNull;
 
 import com.leaders.gamelogic.actions.CharacterAction;
 
-import java.util.ArrayDeque;
-import java.util.Collection;
-import java.util.Deque;
+import java.util.BitSet;
+import java.util.List;
 
 final class NemesisBlockerCoordinator {
     enum SearchStatus {
-        RUNNING,
-        FOUND,
-        COMPLETED_WITHOUT_RESULT,
-        CANCELLED
-    }
+        RUNNING, FOUND, COMPLETED_WITHOUT_RESULT, CANCELLED }
 
-    private final Deque<ActionCandidate> candidates = new ArrayDeque<>();
+    private final List<CharacterAction> actions;
+    private final BitSet completed = new BitSet();
 
     private SearchStatus status = SearchStatus.RUNNING;
-    private ActionCandidate winningCandidate;
+    private int nextIndex = 0;
+    private int bestIndex = -1; // Smallest blocking action index found
 
-    NemesisBlockerCoordinator(@NonNull Collection<ActionCandidate> initialCandidates) {
-        candidates.addAll(initialCandidates);
-
-        if (candidates.isEmpty()) {
+    NemesisBlockerCoordinator(@NonNull List<CharacterAction> actions) {
+        this.actions = actions;
+        if (actions.isEmpty()) {
             status = SearchStatus.COMPLETED_WITHOUT_RESULT;
         }
     }
 
     /**
-     * Returns the current candidate without removing it from the queue.
+     * Claims the next action index for processing.
      *
-     * @return the current candidate, or {@code null} if the search is no longer running
-     * or no candidates remain.
+     * @return the next available index, or {@code -1} if no index can be claimed
      */
-    synchronized ActionCandidate getCurrentCandidate() {
-        if (status != SearchStatus.RUNNING) {
-            return null;
-        }
-
-        removeInvalidatedHead();
-
-        if (candidates.isEmpty()) {
-            status = SearchStatus.COMPLETED_WITHOUT_RESULT;
-            notifyAll();
-            return null;
-        }
-
-        return candidates.peekFirst();
+    synchronized int claimNext() {
+        if (status != SearchStatus.RUNNING) return -1;
+        if (nextIndex >= actions.size()) return -1;
+        if (bestIndex != -1 && nextIndex > bestIndex) return -1;
+        return nextIndex++;
     }
 
     /**
-     * Processes a candidate's permutation result.
+     * Checks whether the search for the given action index can be skipped.
      *
-     * @param candidate the candidate whose result is reported
-     * @param candidateStatus the candidate's updated status
+     * @param index the action index to check
+     * @return {@code true} if the search is no longer running or a better result has been found, otherwise {@code false}
      */
-    synchronized void reportResult(@NonNull ActionCandidate candidate,
-                                   @NonNull ActionCandidate.Status candidateStatus) {
-        // No result to report while the search is running
-        if (status != SearchStatus.RUNNING) {
-            return;
+    synchronized boolean isSuperseded(int index) {
+        return status != SearchStatus.RUNNING || (bestIndex != -1 && index > bestIndex);
+    }
+
+    /**
+     * Reports the result of evaluating an action.
+     *
+     * @param index the index of the evaluated action
+     * @param blocks {@code true} if the action blocks the threat, otherwise {@code false}
+     */
+    synchronized void reportResult(int index, boolean blocks) {
+        if (status != SearchStatus.RUNNING) return;
+
+        completed.set(index);
+        if (blocks && (bestIndex == -1 || index < bestIndex)) {
+            bestIndex = index;
         }
 
-        // Once a candidate is invalidated, it is removed from the list so
-        // the workers can continue the search with the next one
-        if (candidateStatus == ActionCandidate.Status.INVALIDATED) {
-            if (candidates.peekFirst() == candidate) {
-                candidates.removeFirst();
-            } else {
-                candidates.remove(candidate);
-            }
-
-            removeInvalidatedHead();
-
-            if (candidates.isEmpty()) {
-                status = SearchStatus.COMPLETED_WITHOUT_RESULT;
-            }
-
-            notifyAll();
-            return;
-        }
-
-        // We only take into account the current candidate
-        if (candidateStatus == ActionCandidate.Status.FOUND &&
-                candidates.peekFirst() == candidate) {
-            winningCandidate = candidate;
-            status = SearchStatus.FOUND;
+        // Ends when all indexes are resolved or strickly below the limit
+        int limit = bestIndex == -1 ? actions.size() : bestIndex;
+        if (completed.nextClearBit(0) >= limit) {
+            status = bestIndex == -1 ? SearchStatus.COMPLETED_WITHOUT_RESULT : SearchStatus.FOUND;
             notifyAll();
         }
     }
 
-    /**
-     * Removes all invalidated candidates from the head of the queue.
-     */
-    private void removeInvalidatedHead() {
-        if (candidates.isEmpty()) {
-            return;
-        }
-
-        ActionCandidate firstCandidate = candidates.peekFirst();
-        if (firstCandidate != null &&
-                firstCandidate.getStatus() == ActionCandidate.Status.INVALIDATED) {
-            candidates.removeFirst();
-            removeInvalidatedHead();
-        }
-    }
-
-    /**
-     * Interupt global search.
-     */
     synchronized void cancel() {
         if (status == SearchStatus.RUNNING) {
             status = SearchStatus.CANCELLED;
@@ -119,15 +77,10 @@ final class NemesisBlockerCoordinator {
         }
     }
 
-    synchronized SearchStatus getStatus() {
-        return status;
-    }
+    synchronized SearchStatus getStatus() { return status; }
+    synchronized boolean isFinished() { return status != SearchStatus.RUNNING; }
 
     synchronized CharacterAction getWinningAction() {
-        return winningCandidate != null ? winningCandidate.action : null;
-    }
-
-    synchronized boolean isFinished() {
-        return status != SearchStatus.RUNNING;
+        return bestIndex != -1 ? actions.get(bestIndex) : null;
     }
 }

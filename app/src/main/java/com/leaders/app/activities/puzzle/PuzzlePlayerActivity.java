@@ -39,6 +39,7 @@ import com.leaders.puzzlelogic.entities.OfficialPuzzleSave;
 import com.leaders.puzzlelogic.entities.PuzzleSave;
 import com.leaders.puzzlelogic.entities.blocker.NemesisBlocker;
 import com.leaders.puzzlelogic.entities.blocker.NemesisBlockerCallback;
+import com.leaders.puzzlelogic.entities.blocker.NemesisMoves;
 import com.leaders.puzzlelogic.enums.PuzzleCategory;
 import com.leaders.puzzlelogic.serializers.SerializationContext;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
@@ -116,6 +117,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     private PuzzleSource puzzleSource;
     private List<? extends PuzzleSave> puzzleSaves;
     private PuzzleSave puzzleSave;
+    private NemesisMoves nemesisMoves;
     @Nullable
     private InteractionRequest blockerRequest;
 
@@ -217,6 +219,8 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
 
         controller = new GameController(this);
         controller.startGame(puzzleGameHistory);
+
+        nemesisMoves = NemesisMoves.loadForPuzzle(this, puzzleSave);
         updatePuzzleInfos();
     }
 
@@ -397,6 +401,13 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     //region AUTO PLAY
 
     private void startAutoBlock(@NonNull InteractionRequest request) {
+        // If the puzzles have auto moves registered, we play them directly
+        if (nemesisMoves != null) {
+            controller.selectTarget(nemesisMoves.getBlockingTarget(controller.getHistory(), request));
+            return;
+        }
+
+        // Without registered moves, we start an auto blocker which will search for a blocking move
         blockerRequest = request;
         NemesisBlocker blocker = nbvBlocker.initBlocker(controller.getHistory(), request, this);
 
@@ -504,6 +515,8 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
 
     private void loadPuzzle(@NonNull PuzzleSave puzzleSave) {
         this.puzzleSave = puzzleSave;
+        nemesisMoves = NemesisMoves.loadForPuzzle(this, puzzleSave);
+
         restartPuzzle();
         updatePuzzleInfos();
         hidePuzzleActions();
