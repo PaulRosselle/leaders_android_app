@@ -98,7 +98,7 @@ public class TutorialBotUtils {
 
         Position enemyLeaderPos = getEnemyLeaderPos(controller);
 
-        boolean isLeaderRequest = isLeaderRequest(request);
+        boolean isLeaderRequest = isEnemyLeaderRequest(request);
 
         // We select the closest position to the enemy leader
         for (InteractionTarget target : getShuffledTargets(request)) {
@@ -122,9 +122,11 @@ public class TutorialBotUtils {
         }
     }
 
-    private static boolean isLeaderRequest(@NonNull InteractionRequest request) {
+    private static boolean isEnemyLeaderRequest(@NonNull InteractionRequest request) {
         Character character = request.getContext().getTargetCharacter();
-        return character != null && character.getCharacterType().getCharacterCard().isLeader();
+        return character != null && 
+                character.getCharacterType().getCharacterCard().isLeader() &&
+                character.getTeamColor() == TutorialGameUtils.getPlayerTeamColor().getOpposite();
     }
 
     private static boolean isBetterTargetPosition(@NonNull InteractionTarget target,
@@ -144,7 +146,10 @@ public class TutorialBotUtils {
     private static Position getEnemyLeaderPos(@NonNull GameController controller) {
         GameContext gameContext = controller.getCurrentContext();
 
-        Cell enemyLeaderCell = BoardQuery.findLeaderCell(gameContext.getBoard(), TutorialGameUtils.getPlayerTeamColor());
+        Cell enemyLeaderCell = BoardQuery.findLeaderCell(
+                gameContext.getBoard(),
+                TutorialGameUtils.getPlayerTeamColor().getOpposite()
+        );
         if (enemyLeaderCell == null) {
             throw new IllegalStateException("Enemy leader not found");
         }
