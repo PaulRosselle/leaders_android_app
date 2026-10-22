@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.puzzlelogic.enums.PuzzleCategory;
+import com.leaders.puzzlelogic.enums.PuzzleDifficulty;
 import com.leaders.puzzlelogic.enums.PuzzleLifetime;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
 
@@ -16,8 +17,9 @@ public final class CustomPuzzleSave extends PuzzleSave {
 
     public CustomPuzzleSave(@NonNull String name, @NonNull String author,
                             @NonNull PuzzleLifetime lifetime,
+                            @NonNull PuzzleDifficulty difficulty,
                             @NonNull JSONObject datas, boolean solved) {
-        super(name, lifetime, datas, solved);
+        super(name, lifetime, difficulty, datas, solved);
         this.author = author;
     }
 
@@ -51,8 +53,10 @@ public final class CustomPuzzleSave extends PuzzleSave {
     public static CustomPuzzleSave getDefault(@NonNull GameHistory gameHistory) {
         GameHistorySerializer serializer = new GameHistorySerializer();
         try {
-            return new CustomPuzzleSave("", "", PuzzleLifetime.ActionsPhase,
-                    serializer.getAsJson(gameHistory), false);
+            return new CustomPuzzleSave("", "",
+                    PuzzleLifetime.ActionsPhase, PuzzleDifficulty.Medium,
+                    serializer.getAsJson(gameHistory), false
+            );
         } catch (JSONException e) {
             throw new RuntimeException("Invalid default puzzle :" + e);
         }

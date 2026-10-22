@@ -3,6 +3,7 @@
     {
       "id": 1,
       "lifetime": "ActionsPhase",
+      "difficulty": "Medium",
       "datas": {
         "config": {
           "players": [
@@ -233,6 +234,7 @@
     {
       "id": 2,
       "lifetime": "ActionsPhase",
+      "difficulty": "Medium",
       "datas": {
         "config": {
           "players": [
@@ -463,6 +465,7 @@
     {
       "id": 3,
       "lifetime": "ActionsPhase",
+      "difficulty": "Medium",
       "datas": {
         "config": {
           "players": [
@@ -710,6 +713,7 @@
     {
       "id": 4,
       "lifetime": "ActionsPhase",
+      "difficulty": "Medium",
       "datas":{
         "config": {
           "players": [
@@ -940,6 +944,7 @@
     {
       "id": 5,
       "lifetime": "ActionsPhase",
+      "difficulty": "Medium",
       "datas":{
         "config": {
           "players": [
@@ -1187,6 +1192,7 @@
     {
       "id": 6,
       "lifetime": "ActionsPhase",
+      "difficulty": "Hard",
       "datas": {
         "config": {
           "players": [
@@ -1434,6 +1440,7 @@
     {
       "id": 7,
       "lifetime": "ActionsPhase",
+      "difficulty": "Hard",
       "datas": {
         "config": {
           "players": [
@@ -1664,6 +1671,7 @@
     {
       "id": 8,
       "lifetime": "ActionsPhase",
+      "difficulty": "Medium",
       "datas": {
         "config": {
           "players": [
@@ -1911,6 +1919,7 @@
     {
       "id": 9,
       "lifetime": "ActionsPhase",
+      "difficulty": "Medium",
       "datas": {
         "config": {
           "players": [
@@ -2158,6 +2167,7 @@
     {
       "id": 10,
       "lifetime": "ActionsPhase",
+      "difficulty": "Medium",
       "datas": {
         "config": {
           "players": [
@@ -2405,6 +2415,7 @@
     {
       "id": 11,
       "lifetime": "ActionsPhase",
+      "difficulty": "Medium",
       "datas": {
         "config": {
           "players": [
@@ -2652,6 +2663,7 @@
     {
       "id": 12,
       "lifetime": "ActionsPhase",
+      "difficulty": "Medium",
       "datas": {
         "config": {
           "players": [
@@ -2899,6 +2911,7 @@
     {
       "id": 13,
       "lifetime": "ActionsPhase",
+      "difficulty": "Hard",
       "datas": {
         "config": {
           "players": [
@@ -3146,6 +3159,7 @@
     {
       "id": 14,
       "lifetime": "ActionsPhase",
+      "difficulty": "Hard",
       "datas": {
         "config": {
           "players": [
@@ -3393,6 +3407,7 @@
     {
       "id": 15,
       "lifetime": "ActionsPhase",
+      "difficulty": "Medium",
       "datas": {
         "config": {
           "players": [
@@ -3640,6 +3655,7 @@
     {
       "id": 16,
       "lifetime": "ActionsPhase",
+      "difficulty": "Hard",
       "datas": {
         "config": {
           "players": [
@@ -3887,6 +3903,7 @@
     {
       "id": 17,
       "lifetime": "ActionsPhase",
+      "difficulty": "Medium",
       "datas": {
         "config": {
           "players": [
@@ -4134,6 +4151,7 @@
     {
       "id": 18,
       "lifetime": "ActionsPhase",
+      "difficulty": "Hard",
       "datas": {
         "config": {
           "players": [
@@ -4381,6 +4399,7 @@
     {
       "id": 19,
       "lifetime": "ActionsPhase",
+      "difficulty": "Medium",
       "datas": {
         "config": {
           "players": [
@@ -4628,6 +4647,7 @@
     {
       "id": 20,
       "lifetime": "ActionsPhase",
+      "difficulty": "Extreme",
       "datas": {
         "config": {
           "players": [
@@ -4875,6 +4895,7 @@
     {
       "id": 21,
       "lifetime": "ActionsPhase",
+      "difficulty": "Hard",
       "datas": {
         "config": {
           "players": [
@@ -5122,6 +5143,7 @@
     {
       "id": 22,
       "lifetime": "ActionsPhase",
+      "difficulty": "Extreme",
       "datas": {
         "config": {
           "players": [
@@ -5369,6 +5391,7 @@
     {
       "id": 23,
       "lifetime": "ActionsPhase",
+      "difficulty": "Medium",
       "datas": {
         "config": {
           "players": [
@@ -5616,6 +5639,7 @@
     {
       "id": 24,
       "lifetime": "ActionsPhase",
+      "difficulty": "Medium",
       "datas": {
         "config": {
           "players": [
@@ -5863,6 +5887,7 @@
     {
       "id": 25,
       "lifetime": "ActionsPhase",
+      "difficulty": "Hard",
       "datas": {
         "config": {
           "players": [
@@ -6110,6 +6135,7 @@
     {
       "id": 26,
       "lifetime": "ActionsPhase",
+      "difficulty": "Hard",
       "datas": {
         "config": {
           "players": [
@@ -6340,6 +6366,7 @@
     {
       "id": 27,
       "lifetime": "ActionsPhase",
+      "difficulty": "Hard",
       "datas": {
         "config": {
           "players": [
@@ -6587,6 +6614,7 @@
     {
       "id": 28,
       "lifetime": "ActionsPhase",
+      "difficulty": "Medium",
       "datas": {
         "config": {
           "players": [
@@ -6817,6 +6845,7 @@
     {
       "id": 29,
       "lifetime": "ActionsPhase",
+      "difficulty": "Extreme",
       "datas": {
         "config": {
           "players": [
@@ -7064,6 +7093,7 @@
     {
       "id": 30,
       "lifetime": "ActionsPhase",
+      "difficulty": "Hard",
       "datas": {
         "config": {
           "players": [
@@ -7311,6 +7341,7 @@
     {
       "id": 31,
       "lifetime": "ActionsPhase",
+      "difficulty": "Hard",
       "datas": {
         "config": {
           "players": [
@@ -7575,6 +7606,7 @@
     {
       "id": 32,
       "lifetime": "ActionsPhase",
+      "difficulty": "Extreme",
       "datas": {
         "config": {
           "players": [
@@ -7805,6 +7837,7 @@
     {
       "id": 33,
       "lifetime": "ActionsPhase",
+      "difficulty": "Hard",
       "datas": {
         "config": {
           "players": [
@@ -8035,6 +8068,7 @@
     {
       "id": 34,
       "lifetime": "ActionsPhase",
+      "difficulty": "Hard",
       "datas": {
         "config": {
           "players": [
@@ -8282,6 +8316,7 @@
     {
       "id": 35,
       "lifetime": "ActionsPhase",
+      "difficulty": "Hard",
       "datas": {
         "config": {
           "players": [
@@ -8529,6 +8564,7 @@
     {
       "id": 36,
       "lifetime": "ActionsPhase",
+      "difficulty": "Hard",
       "datas": {
         "config": {
           "players": [

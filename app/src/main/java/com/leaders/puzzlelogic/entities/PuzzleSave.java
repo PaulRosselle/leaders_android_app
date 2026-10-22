@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.puzzlelogic.enums.PuzzleCategory;
+import com.leaders.puzzlelogic.enums.PuzzleDifficulty;
 import com.leaders.puzzlelogic.enums.PuzzleLifetime;
 import com.leaders.puzzlelogic.serializers.SerializationContext;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
@@ -18,13 +19,18 @@ public abstract class PuzzleSave {
     @NonNull
     private final PuzzleLifetime lifetime;
     @NonNull
+    private final PuzzleDifficulty difficulty;
+    @NonNull
     protected JSONObject datas;
     private boolean solved;
 
-    protected PuzzleSave(@NonNull String name, @NonNull PuzzleLifetime lifetime,
+    protected PuzzleSave(@NonNull String name,
+                         @NonNull PuzzleLifetime lifetime,
+                         @NonNull PuzzleDifficulty difficulty,
                          @NonNull JSONObject datas, boolean solved) {
         this.name = name;
         this.lifetime = lifetime;
+        this.difficulty = difficulty;
         this.datas = datas;
         this.solved = solved;
     }
@@ -33,6 +39,7 @@ public abstract class PuzzleSave {
         this(
                 joPuzzleSave.has("name") ? joPuzzleSave.getString("name") : "",
                 PuzzleLifetime.valueOf(joPuzzleSave.getString("lifetime")),
+                PuzzleDifficulty.valueOf(joPuzzleSave.getString("difficulty")),
                 joPuzzleSave.getJSONObject("datas"),
                 joPuzzleSave.has("solved") && joPuzzleSave.getBoolean("solved")
         );
@@ -43,6 +50,7 @@ public abstract class PuzzleSave {
     public JSONObject getAsJson() throws JSONException {
         JSONObject joPuzzleSave = new JSONObject();
         joPuzzleSave.put("lifetime", getLifetime().name());
+        joPuzzleSave.put("difficulty", getDifficulty().name());
         joPuzzleSave.put("datas", datas);
         return joPuzzleSave;
     }
@@ -69,6 +77,11 @@ public abstract class PuzzleSave {
     @NonNull
     public final PuzzleLifetime getLifetime() {
         return lifetime;
+    }
+
+    @NonNull
+    public PuzzleDifficulty getDifficulty() {
+        return difficulty;
     }
 
     @NonNull

@@ -2,7 +2,7 @@ package com.leaders.app.views.selector;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.widget.LinearLayout;
+import android.widget.GridLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -10,7 +10,7 @@ import androidx.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class SelectorGroupView<T, V extends SelectorView<T>> extends LinearLayout {
+public abstract class SelectorGroupView<T, V extends SelectorView<T>> extends GridLayout {
     private final List<V> selectorViews = new ArrayList<>();
 
     public interface OnSelectionChangeListener {
@@ -25,7 +25,9 @@ public abstract class SelectorGroupView<T, V extends SelectorView<T>> extends Li
     protected SelectorGroupView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
-        setOrientation(VERTICAL);
+        // HORIZONTAL (default): items fill rows first. Do NOT use VERTICAL here.
+        setOrientation(HORIZONTAL);
+        setColumnCount(1); // list mode by default
     }
 
     /**
@@ -33,6 +35,40 @@ public abstract class SelectorGroupView<T, V extends SelectorView<T>> extends Li
      */
     @NonNull
     protected abstract V createSelectorView(@NonNull T item);
+
+    // ---------------------------------------------------------------------------------------------
+    // Display mode
+    // ---------------------------------------------------------------------------------------------
+
+    /**
+     * Number of columns: 1 = list, 2 or more = grid.
+     */
+    public final void setSpanCount(int spanCount) {
+        int safeSpanCount = Math.max(1, spanCount);
+
+        if (safeSpanCount == getColumnCount()) {
+            return;
+        }
+
+        setColumnCount(safeSpanCount);
+
+        // Margins and column specs depend on the column index, so refresh them.
+        for (int i = 0; i < selectorViews.size(); i++) {
+            selectorViews.get(i).setLayoutParams(createLayoutParams(i));
+        }
+    }
+
+    public final int getSpanCount() {
+        return getColumnCount();
+    }
+
+    public final boolean isGrid() {
+        return getColumnCount() > 1;
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    // Items
+    // ---------------------------------------------------------------------------------------------
 
     /**
      * Replaces all items displayed by this group.
@@ -49,8 +85,8 @@ public abstract class SelectorGroupView<T, V extends SelectorView<T>> extends Li
             selectorView.setOnSelectorClickListener(sender -> onSelectorClick(selectorView));
             selectorView.setOnSelectorLongClickListener(sender -> onSelectorLongClick(selectorView));
 
+            addView(selectorView, createLayoutParams(selectorViews.size()));
             selectorViews.add(selectorView);
-            addView(selectorView, getSelectorLayoutParams());
         }
 
         notifySelectionChanged();
@@ -85,6 +121,41 @@ public abstract class SelectorGroupView<T, V extends SelectorView<T>> extends Li
         this.selectionChangeListener = listener;
     }
 
+    public boolean isSingleSelection() {
+        return singleSelection;
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    // Layout
+    // ---------------------------------------------------------------------------------------------
+
+    @NonNull
+    private GridLayout.LayoutParams createLayoutParams(int index) {
+        int spacing = (int) (4 * getResources().getDisplayMetrics().density);
+        int column = index % getColumnCount();
+
+        GridLayout.LayoutParams params = new GridLayout.LayoutParams(
+                // Row: let the grid place it, stretch to the tallest cell of the row
+                GridLayout.spec(GridLayout.UNDEFINED, GridLayout.FILL),
+                // Column: equal weight, so all columns share the width evenly
+                GridLayout.spec(GridLayout.UNDEFINED, GridLayout.FILL, 1f)
+        );
+
+        params.width = 0; // required for the column weight to apply
+        params.height = LayoutParams.WRAP_CONTENT;
+        params.topMargin = spacing;
+
+        if (column > 0) {
+            params.setMarginStart(spacing);
+        }
+
+        return params;
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    // Selection logic (unchanged)
+    // ---------------------------------------------------------------------------------------------
+
     private void setAllChecked(boolean checked) {
         for (V selectorView : selectorViews) {
             selectorView.setChecked(checked);
@@ -107,10 +178,6 @@ public abstract class SelectorGroupView<T, V extends SelectorView<T>> extends Li
         }
 
         return false;
-    }
-
-    public boolean isSingleSelection() {
-        return singleSelection;
     }
 
     @Nullable
@@ -150,11 +217,11 @@ public abstract class SelectorGroupView<T, V extends SelectorView<T>> extends Li
             sender.setChecked(true);
 
         } else {
+            // Children are still direct children, added in order: indexOfChild() stays valid
             int selectorIndex = indexOfChild(sender);
             Integer closestSelectedIndex = getClosestSelectedIndex(selectorIndex);
 
             if (closestSelectedIndex != null) {
-
                 int startIndex;
                 int endIndex;
                 if (selectorIndex < closestSelectedIndex) {
@@ -174,17 +241,6 @@ public abstract class SelectorGroupView<T, V extends SelectorView<T>> extends Li
         notifySelectionChanged();
 
         return true;
-    }
-
-    @NonNull
-    private LinearLayout.LayoutParams getSelectorLayoutParams() {
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT
-        );
-
-        layoutParams.topMargin = (int) (4 * getResources().getDisplayMetrics().density);
-
-        return layoutParams;
     }
 
     private void notifySelectionChanged() {
