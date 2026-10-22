@@ -2,11 +2,9 @@ package com.leaders.app.views.puzzle;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.view.MotionEvent;
-import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -21,17 +19,10 @@ public final class PuzzleSelectorView extends SelectorView<PuzzleSave> {
     private ImageView imvSolved;
     private TextView txvName;
     private TextView txvAuthor;
-
-    private final String puzzleSolvedToast;
+    private LinearLayout llyDifficulty;
 
     public PuzzleSelectorView(@NonNull Context context, @NonNull PuzzleSave puzzleSave) {
         super(context, puzzleSave);
-
-        puzzleSolvedToast = String.format(
-                context.getString(puzzleSave.isSolved() ?
-                        R.string.puzzle_solved_format : R.string.puzzle_unsolved_format),
-                puzzleSave.getName()
-        );
     }
 
     @Override
@@ -41,14 +32,7 @@ public final class PuzzleSelectorView extends SelectorView<PuzzleSave> {
         imvSolved = findViewById(R.id.imvPuzzleSolved_vwPuzzleSelector);
         txvName = findViewById(R.id.txvPuzzleName_vwPuzzleSelector);
         txvAuthor = findViewById(R.id.txvPuzzleAuthor_vwPuzzleSelector);
-    }
-
-    @Override
-    @SuppressLint("ClickableViewAccessibility")
-    protected void initListeners() {
-        super.initListeners();
-
-        imvSolved.setOnTouchListener(this::onImvSolvedTouch);
+        llyDifficulty = findViewById(R.id.llyDifficulty_vwPuzzleSelector);
     }
 
 
@@ -61,6 +45,10 @@ public final class PuzzleSelectorView extends SelectorView<PuzzleSave> {
         imvSolved.setImageResource(puzzleSave.isSolved() ?
                 R.drawable.icon_highlighted_crown : R.drawable.icon_empty_crown
         );
+
+        for (int i = 0; i <= puzzleSave.getDifficulty().ordinal(); i++) {
+            ((ImageView) llyDifficulty.getChildAt(i)).setImageResource(R.drawable.difficulty_marker);
+        }
 
         txvName.setText(puzzleSave.getName());
 
@@ -103,13 +91,11 @@ public final class PuzzleSelectorView extends SelectorView<PuzzleSave> {
         imvChecked.setImageResource(isChecked() ? R.drawable.checked_box : R.drawable.unchecked_box);
 
         int strokeWidth = getResources().getDimensionPixelSize(R.dimen.default_stroke_width);
-        int backgroundColorId = R.color.darker_background;
         int strokeColorId = R.color.font;
         int textColorId = R.color.font;
 
         if (isChecked()) {
-            strokeWidth *= 2;
-            backgroundColorId = R.color.ultra_dark_background;
+            strokeWidth = (int) (strokeWidth * 1.5f);
             strokeColorId = R.color.white;
             textColorId = R.color.white;
         }
@@ -117,27 +103,10 @@ public final class PuzzleSelectorView extends SelectorView<PuzzleSave> {
         int textColor = getResources().getColor(textColorId, getContext().getTheme());
 
         btnMain.setStrokeWidth(strokeWidth);
-        btnMain.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), backgroundColorId));
         btnMain.setStrokeColor(ContextCompat.getColorStateList(getContext(), strokeColorId));
 
         txvName.setTextColor(textColor);
         txvAuthor.setTextColor(textColor);
-    }
-
-    private boolean onImvSolvedTouch(View view, MotionEvent event) {
-        if (event.getActionMasked() == MotionEvent.ACTION_UP) {
-            Toast.makeText(view.getContext(), puzzleSolvedToast, Toast.LENGTH_SHORT).show();
-        }
-
-        MotionEvent forwardedEvent = MotionEvent.obtain(event);
-
-        try {
-            btnMain.dispatchTouchEvent(forwardedEvent);
-        } finally {
-            forwardedEvent.recycle();
-        }
-
-        return true;
     }
 
     @NonNull

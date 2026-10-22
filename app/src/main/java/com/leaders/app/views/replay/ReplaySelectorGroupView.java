@@ -14,6 +14,7 @@ import java.util.List;
 public final class ReplaySelectorGroupView extends SelectorGroupView<ReplaySave, ReplaySelectorView> {
     public ReplaySelectorGroupView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        setSpanCount(1);
     }
 
     @NonNull

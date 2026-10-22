@@ -14,6 +14,7 @@ import java.util.List;
 public final class PuzzleSelectorGroupView extends SelectorGroupView<PuzzleSave, PuzzleSelectorView> {
     public PuzzleSelectorGroupView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        setSpanCount(3);
     }
 
     @NonNull

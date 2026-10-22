@@ -2,6 +2,7 @@ package com.leaders.puzzlelogic.entities;
 
 import androidx.annotation.NonNull;
 
+import com.leaders.puzzlelogic.enums.PuzzleDifficulty;
 import com.leaders.puzzlelogic.enums.PuzzleLifetime;
 
 import org.json.JSONException;
@@ -29,15 +30,19 @@ public final class TransferablePuzzleSave {
     @NonNull
     private final PuzzleLifetime lifetime;
     @NonNull
+    private final PuzzleDifficulty difficulty;
+    @NonNull
     private final JSONObject datas;
 
     private TransferablePuzzleSave(@NonNull String name,
                                    @NonNull String author,
                                    @NonNull PuzzleLifetime lifetime,
+                                   @NonNull PuzzleDifficulty difficulty,
                                    @NonNull JSONObject datas) {
         this.name = name;
         this.author = author;
         this.lifetime = lifetime;
+        this.difficulty = difficulty;
         try {
             this.datas = new JSONObject(datas.toString());
         } catch (JSONException e) {
@@ -64,6 +69,7 @@ public final class TransferablePuzzleSave {
                 officialPuzzleSave.getName(),
                 "",
                 officialPuzzleSave.getLifetime(),
+                officialPuzzleSave.getDifficulty(),
                 officialPuzzleSave.getDatas()
         );
     }
@@ -74,13 +80,14 @@ public final class TransferablePuzzleSave {
                 customPuzzleSave.getName(),
                 customPuzzleSave.getAuthor(),
                 customPuzzleSave.getLifetime(),
+                customPuzzleSave.getDifficulty(),
                 customPuzzleSave.getDatas()
         );
     }
 
     @NonNull
     public CustomPuzzleSave toCustomSave() {
-        return new CustomPuzzleSave(name, author, lifetime, datas, false);
+        return new CustomPuzzleSave(name, author, lifetime, difficulty, datas, false);
     }
 
     @NonNull
@@ -89,6 +96,7 @@ public final class TransferablePuzzleSave {
                 joPuzzleSave.getString("name"),
                 joPuzzleSave.optString("author", ""),
                 PuzzleLifetime.valueOf(joPuzzleSave.getString("lifetime")),
+                PuzzleDifficulty.valueOf(joPuzzleSave.getString("difficulty")),
                 joPuzzleSave.getJSONObject("datas")
         );
     }
@@ -100,6 +108,7 @@ public final class TransferablePuzzleSave {
         joPuzzleSave.put("name", name);
         joPuzzleSave.put("author", author);
         joPuzzleSave.put("lifetime", lifetime.name());
+        joPuzzleSave.put("difficulty", difficulty.name());
         joPuzzleSave.put("datas", new JSONObject(datas.toString()));
 
         return joPuzzleSave;
