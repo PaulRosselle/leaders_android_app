@@ -8,7 +8,7 @@ import com.leaders.gamelogic.factories.GameFactory;
 import com.leaders.puzzlelogic.enums.PuzzleLifetime;
 import com.leaders.puzzlelogic.utilities.GameStateHashUtils;
 
-public class PuzzleIdentity {
+public final class PuzzleIdentity {
     @NonNull
     private final String name;
     @NonNull

@@ -282,5 +282,7 @@
     <string name="change_details">Modifier les détails</string>
     <string name="changes_saved">Changements sauvegardés !</string>
     <string name="copy">Copier</string>
+    <string name="puzzles_not_imported">Puzzles non importés</string>
+    <string name="duplicate_of">- \"%s\" doublon de \"%s\"%n</string>
 
 </resources>
