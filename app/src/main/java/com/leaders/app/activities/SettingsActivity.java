@@ -20,13 +20,14 @@ import com.leaders.app.views.settings.CharacterSkinView;
 import com.leaders.app.views.settings.ContactFormView;
 import com.leaders.app.views.settings.ContactView;
 import com.leaders.app.views.settings.HighlightColorView;
-import com.leaders.app.views.settings.PlayableItemsAnimationView;
+import com.leaders.app.views.settings.SettingsSwitch;
 import com.leaders.app.views.settings.UserNameView;
 
 public class SettingsActivity extends BaseActivity {
     private UserNameView unvUserName;
     private AnimationSpeedView asvAnimationSpeed;
-    private PlayableItemsAnimationView piasAnimatePlayableItems;
+    private SettingsSwitch swtAnimatePlayableItems;
+    private SettingsSwitch swtAutoRotation;
     private HighlightColorView hcvHighlightColor;
     private ContactView ctvContact;
     private View vwDialogBg;
@@ -45,7 +46,8 @@ public class SettingsActivity extends BaseActivity {
 
         unvUserName = findViewById(R.id.unvUserName_actSettings);
         asvAnimationSpeed = findViewById(R.id.asvAnimationSpeed_actSettings);
-        piasAnimatePlayableItems = findViewById(R.id.piasAnimatePlayableItems_actSettings);
+        swtAnimatePlayableItems = findViewById(R.id.swtAnimatePlayableItems_actSettings);
+        swtAutoRotation = findViewById(R.id.swtAutoRotation_actSettings);
         hcvHighlightColor = findViewById(R.id.hcvHighlightColor_actSettings);
 
         ctvContact = findViewById(R.id.ctvContact_actSettings);
@@ -62,7 +64,8 @@ public class SettingsActivity extends BaseActivity {
 
         unvUserName.setChangeListener(this::onNameChange);
         asvAnimationSpeed.setChangeListener(this::onAnimationSpeedChange);
-        piasAnimatePlayableItems.setOnCheckedChangeListener(this::onAnimatePlayableItemsChanged);
+        swtAnimatePlayableItems.setOnCheckedChangeListener(this::onAnimatePlayableItemsChanged);
+        swtAutoRotation.setOnCheckedChangeListener(this::onAutoRotationChanged);
         hcvHighlightColor.setChangeListener(this::onColorChange);
 
         ctvContact.setOnOpenFormClickListener(this::onOpenContactFormClick);
@@ -79,7 +82,8 @@ public class SettingsActivity extends BaseActivity {
         unvUserName.setName(settings.getUserName());
         asvAnimationSpeed.setSpeed(settings.getAnimationSpeed());
         hcvHighlightColor.setColor(settings.getHighlightColor());
-        piasAnimatePlayableItems.setChecked(settings.animatePlayableItems());
+        swtAnimatePlayableItems.setChecked(settings.animatePlayableItems());
+        swtAutoRotation.setChecked(settings.duelScreenAutoRotation());
     }
 
     @Override
@@ -136,6 +140,13 @@ public class SettingsActivity extends BaseActivity {
     public void onAnimatePlayableItemsChanged(@NonNull CompoundButton compoundButton,
                                               boolean animatePlayableItems) {
         settings.setAnimatePlayableItems(animatePlayableItems);
+        JsonUtils.saveSettings(this, settings);
+    }
+
+
+    public void onAutoRotationChanged(@NonNull CompoundButton compoundButton,
+                                      boolean duelScreenAutoRotation) {
+        settings.setDuelScreenAutoRotation(duelScreenAutoRotation);
         JsonUtils.saveSettings(this, settings);
     }
 

@@ -211,7 +211,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
         characterSkins = settings.getCharacterSkins();
         cnvCardInfo.setCharacterSkins(characterSkins);
         ccsvCardSelector.setCharacterSkins(characterSkins);
-        autoRotateEnabled = false; // TODO - add in settings
+        autoRotateEnabled = settings.duelScreenAutoRotation();
 
         updateAnimatePlayableIcon();
         updateAutoRotationIcon();

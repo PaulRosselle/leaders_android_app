@@ -97,12 +97,19 @@
 
             </com.leaders.app.views.settings.AnimationSpeedView>
 
-            <com.leaders.app.views.settings.PlayableItemsAnimationView
-                android:id="@+id/piasAnimatePlayableItems_actSettings"
+            <com.leaders.app.views.settings.SettingsSwitch
+                android:id="@+id/swtAnimatePlayableItems_actSettings"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="com.leaders.app.views.settings.PlayableItemsAnimationView" />
+                android:text="@string/playable_items_animation" />
+
+            <com.leaders.app.views.settings.SettingsSwitch
+                android:id="@+id/swtAutoRotation_actSettings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/settings_auto_rotation" />
 
             <com.leaders.app.views.settings.HighlightColorView
                 android:id="@+id/hcvHighlightColor_actSettings"
