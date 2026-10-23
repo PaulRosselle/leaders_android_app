@@ -19,7 +19,7 @@ public abstract class PuzzleSave {
     @NonNull
     private final PuzzleLifetime lifetime;
     @NonNull
-    private final PuzzleDifficulty difficulty;
+    private PuzzleDifficulty difficulty;
     @NonNull
     protected JSONObject datas;
     private boolean solved;
@@ -82,6 +82,10 @@ public abstract class PuzzleSave {
     @NonNull
     public PuzzleDifficulty getDifficulty() {
         return difficulty;
+    }
+
+    public void setDifficulty(@NonNull PuzzleDifficulty difficulty) {
+        this.difficulty = difficulty;
     }
 
     @NonNull

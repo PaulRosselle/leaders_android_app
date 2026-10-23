@@ -11,12 +11,14 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.leaders.R;
+import com.leaders.puzzlelogic.enums.PuzzleDifficulty;
 
 public final class PuzzleDetailsView extends ConstraintLayout {
     private String defaultName;
 
     private final EditText edtName;
     private final EditText edtAuthor;
+    private final PuzzleDifficultyView pdvDifficulty;
 
 
     public PuzzleDetailsView(@NonNull Context context, @Nullable AttributeSet attrs) {
@@ -27,6 +29,7 @@ public final class PuzzleDetailsView extends ConstraintLayout {
         defaultName = "";
         edtName = findViewById(R.id.edtName_vwPuzzleDetails);
         edtAuthor = findViewById(R.id.edtAuthor_vwPuzzleDetails);
+        pdvDifficulty = findViewById(R.id.pdvDifficulty_vwPuzzleDetails);
 
         try (TypedArray customAttrs = context.obtainStyledAttributes(attrs, R.styleable.PuzzleDetailsView)) {
             TextView txvTitle = findViewById(R.id.txvTitle_vwPuzzleDetails);
@@ -50,22 +53,33 @@ public final class PuzzleDetailsView extends ConstraintLayout {
         }
     }
 
+    public void setPuzzleDifficulty(@NonNull PuzzleDifficulty puzzleDifficulty) {
+        pdvDifficulty.setDifficulty(puzzleDifficulty);
+    }
+
     private String getFormattedText(EditText editText) {
         return getFormattedText(editText.getText().toString());
     }
 
-
+    @NonNull
     private String getFormattedText(@NonNull String text) {
         return text.trim();
     }
 
+    @NonNull
     public String getPuzzleName() {
         String name = getFormattedText(edtName);
         return name.isEmpty() ? getFormattedText(defaultName) : name;
     }
 
+    @NonNull
     public String getPuzzleAuthor() {
         return getFormattedText(edtAuthor);
+    }
+
+    @NonNull
+    public PuzzleDifficulty getPuzzleDifficulty() {
+        return pdvDifficulty.getDifficulty();
     }
 
     public void setOnBtnCancelClick(@NonNull OnClickListener onBtnCancelClick) {

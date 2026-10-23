@@ -24,6 +24,7 @@ import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.utilities.PuzzleExportUtils;
 import com.leaders.app.utilities.PuzzleImportUtils;
 import com.leaders.app.views.ActionsMenuView;
+import com.leaders.app.views.puzzle.PuzzleDetailsView;
 import com.leaders.app.views.puzzle.PuzzleSelectorGroupView;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
@@ -39,7 +40,8 @@ public final class PuzzleMenuActivity extends BaseActivity {
 
     private enum PuzzleSelectionAction {
         Add,
-        Edit,
+        EditPuzzle,
+        ChangeDetails,
         Remove,
         Import,
         Export,
@@ -49,7 +51,8 @@ public final class PuzzleMenuActivity extends BaseActivity {
         private int getIconResId() {
             switch (this) {
                 case Add: return R.drawable.icon_add;
-                case Edit: return R.drawable.icon_edit;
+                case EditPuzzle: return R.drawable.icon_puzzle;
+                case ChangeDetails: return R.drawable.icon_edit;
                 case Remove: return R.drawable.icon_remove;
                 case Import: return R.drawable.icon_import;
                 case Export: return R.drawable.icon_export;
@@ -62,7 +65,8 @@ public final class PuzzleMenuActivity extends BaseActivity {
         private int getTextResId() {
             switch (this) {
                 case Add: return R.string.new_puzzle;
-                case Edit: return R.string.edit_puzzle;
+                case EditPuzzle: return R.string.edit_puzzle;
+                case ChangeDetails: return R.string.change_details;
                 case Remove: return R.string.remove;
                 case Import: return R.string.import_puzzle;
                 case Export: return R.string.export_puzzle;
@@ -75,7 +79,8 @@ public final class PuzzleMenuActivity extends BaseActivity {
         private View.OnClickListener getOnClickListener(PuzzleMenuActivity activity) {
             switch (this) {
                 case Add: return activity::onNewPuzzleClick;
-                case Edit: return activity::onEditPuzzleClick;
+                case EditPuzzle: return activity::onEditPuzzleClick;
+                case ChangeDetails: return activity::onChangeDetailsClick;
                 case Remove: return activity::onRemoveClick;
                 case Import: return activity::onImportClick;
                 case Export: return activity::onExportClick;
@@ -89,6 +94,7 @@ public final class PuzzleMenuActivity extends BaseActivity {
     private View vwDialogBg;
     private MaterialButton btnPuzzleActions;
     private ActionsMenuView amvPuzzleActions;
+    private PuzzleDetailsView pdvDetails;
     private MaterialButtonToggleGroup mbtgPuzzlesCategory;
     private PuzzleSelectorGroupView psgvPuzzles;
     private PuzzleCategory puzzlesCategory;
@@ -103,6 +109,7 @@ public final class PuzzleMenuActivity extends BaseActivity {
         vwDialogBg = findViewById(R.id.vwDialogBg_actPuzzleMenu);
         btnPuzzleActions = findViewById(R.id.btnPuzzleActions_actPuzzleMenu);
         amvPuzzleActions = findViewById(R.id.amvPuzzleActions_actPuzzleMenu);
+        pdvDetails = findViewById(R.id.pdvDetails_actPuzzleMenu);
         mbtgPuzzlesCategory = findViewById(R.id.mbtgPuzzlesCategory_actPuzzleMenu);
         psgvPuzzles = findViewById(R.id.psgvPuzzles_actPuzzleMenu);
 
@@ -120,10 +127,12 @@ public final class PuzzleMenuActivity extends BaseActivity {
     protected void initListeners() {
         super.initListeners();
 
-        vwDialogBg.setOnClickListener(this::hidePuzzleActions);
+        vwDialogBg.setOnClickListener(this::onDialogBgClick);
         btnPuzzleActions.setOnClickListener(this::btnPuzzleActionsClick);
         psgvPuzzles.setSelectionChangeListener(this::onPuzzleSelectionChange);
         mbtgPuzzlesCategory.addOnButtonCheckedListener(this::onPuzzleCategoryChange);
+        pdvDetails.setOnBtnCancelClick(this::onDetailsCancel);
+        pdvDetails.setOnBtnSaveClick(this::onDetailsSave);
     }
 
     @Override
@@ -225,7 +234,7 @@ public final class PuzzleMenuActivity extends BaseActivity {
 
     //region PUZZLE ACTIONS METHODS
 
-    private void hidePuzzleActions(View v) {
+    private void hidePuzzleActions() {
         amvPuzzleActions.setVisibility(View.GONE);
         vwDialogBg.setVisibility(View.GONE);
     }
@@ -235,7 +244,9 @@ public final class PuzzleMenuActivity extends BaseActivity {
         int selectedPuzzlesCount = psgvPuzzles.getSelectedPuzzles().size();
 
         // Before showing the actions menu, we must update the available actions based on the puzzle selection
-        amvPuzzleActions.setButtonEnabled(PuzzleSelectionAction.Edit.ordinal(),
+        amvPuzzleActions.setButtonEnabled(PuzzleSelectionAction.EditPuzzle.ordinal(),
+                selectedPuzzlesCount == 1 && puzzlesCategory == PuzzleCategory.Custom);
+        amvPuzzleActions.setButtonEnabled(PuzzleSelectionAction.ChangeDetails.ordinal(),
                 selectedPuzzlesCount == 1 && puzzlesCategory == PuzzleCategory.Custom);
         amvPuzzleActions.setButtonEnabled(PuzzleSelectionAction.Remove.ordinal(),
                 selectedPuzzlesCount > 0 && puzzlesCategory == PuzzleCategory.Custom);
@@ -259,6 +270,17 @@ public final class PuzzleMenuActivity extends BaseActivity {
         int puzzleIdx = customPuzzleSaves.indexOf((CustomPuzzleSave) psgvPuzzles.getSelectedPuzzles().get(0));
         intent.putExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, puzzleIdx);
         goToActivity(intent);
+    }
+
+    public void onChangeDetailsClick(View v) {
+        PuzzleSave puzzleSave = psgvPuzzles.getSelectedPuzzles().get(0);
+
+        pdvDetails.setDefaultPuzzleName(puzzleSave.getName());
+        pdvDetails.setDefaultPuzzleAuthor(puzzleSave.getAuthor());
+        pdvDetails.setPuzzleDifficulty(puzzleSave.getDifficulty());
+        pdvDetails.setVisibility(View.VISIBLE);
+
+        amvPuzzleActions.setVisibility(View.GONE);
     }
 
     public void onRemoveClick(View v) {
@@ -288,7 +310,7 @@ public final class PuzzleMenuActivity extends BaseActivity {
         builder.setNegativeButton(R.string.cancel, null);
         builder.show();
 
-        hidePuzzleActions(null);
+        hidePuzzleActions();
     }
 
     public void onImportClick(View v) {
@@ -308,7 +330,7 @@ public final class PuzzleMenuActivity extends BaseActivity {
                 });
         builder.show();
 
-        hidePuzzleActions(v);
+        hidePuzzleActions();
     }
 
     private void selectImportFile() {
@@ -369,7 +391,7 @@ public final class PuzzleMenuActivity extends BaseActivity {
                 });
         builder.show();
 
-        hidePuzzleActions(v);
+        hidePuzzleActions();
     }
 
     private void selectExportFile() {
@@ -431,12 +453,47 @@ public final class PuzzleMenuActivity extends BaseActivity {
 
     public void onSelectAllClick(View v) {
         psgvPuzzles.selectAllPuzzles();
-        hidePuzzleActions(v);
+        hidePuzzleActions();
     }
 
-    public void onUnselectAllClick(View v) {
+    private void onUnselectAllClick(View v) {
         psgvPuzzles.clearPuzzleSelection();
-        hidePuzzleActions(v);
+        hidePuzzleActions();
+    }
+
+    private void onDialogBgClick(View v) {
+        if (amvPuzzleActions.getVisibility() == View.VISIBLE) {
+            hidePuzzleActions();
+        } else if (pdvDetails.getVisibility() == View.VISIBLE) {
+            hidePuzzleDetails();
+        }
+    }
+
+    //endregion
+
+    //region PUZZLE DETAILS
+
+    private void onDetailsCancel(View v) {
+        hidePuzzleDetails();
+    }
+
+    private void onDetailsSave(View v) {
+        CustomPuzzleSave customPuzzleSave = (CustomPuzzleSave) psgvPuzzles.getSelectedPuzzles().get(0);
+
+        customPuzzleSave.setName(pdvDetails.getPuzzleName());
+        customPuzzleSave.setAuthor(pdvDetails.getPuzzleAuthor());
+        customPuzzleSave.setDifficulty(pdvDetails.getPuzzleDifficulty());
+
+        JsonUtils.saveCustomPuzzles(this, customPuzzleSaves);
+        Toast.makeText(this, R.string.changes_saved, Toast.LENGTH_SHORT).show();
+        psgvPuzzles.setPuzzles(customPuzzleSaves);
+
+        hidePuzzleDetails();
+    }
+
+    private void hidePuzzleDetails() {
+        pdvDetails.setVisibility(View.GONE);
+        vwDialogBg.setVisibility(View.GONE);
     }
 
     //endregion

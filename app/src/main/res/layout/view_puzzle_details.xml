@@ -139,6 +139,18 @@
         app:layout_constraintVertical_bias="0.0"
         tools:ignore="LabelFor,TextFields" />
 
+    <com.leaders.app.views.puzzle.PuzzleDifficultyView
+        android:id="@+id/pdvDifficulty_vwPuzzleDetails"
+        android:layout_width="wrap_content"
+        android:layout_height="42dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/txvDifficulty_vwPuzzleDetails"
+        app:layout_constraintTop_toBottomOf="@+id/txvDifficulty_vwPuzzleDetails"
+        app:layout_constraintVertical_bias="0.0" />
+
     <TextView
         android:id="@+id/txvSave_vwPuzzleDetails"
         android:layout_width="wrap_content"
@@ -158,7 +170,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/puzzleDifficultyView"
+        app:layout_constraintTop_toBottomOf="@+id/pdvDifficulty_vwPuzzleDetails"
         app:layout_constraintVertical_bias="1.0" />
 
     <TextView
@@ -181,17 +193,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0" />
-
-    <com.leaders.app.views.puzzle.PuzzleDifficultyView
-        android:id="@+id/puzzleDifficultyView"
-        android:layout_width="wrap_content"
-        android:layout_height="42dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/txvDifficulty_vwPuzzleDetails"
-        app:layout_constraintTop_toBottomOf="@+id/txvDifficulty_vwPuzzleDetails"
-        app:layout_constraintVertical_bias="0.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

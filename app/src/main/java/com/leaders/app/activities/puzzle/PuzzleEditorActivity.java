@@ -39,6 +39,7 @@ import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
+import com.leaders.puzzlelogic.enums.PuzzleDifficulty;
 import com.leaders.puzzlelogic.serializers.SerializationContext;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
 import com.leaders.puzzlelogic.utilities.PuzzleEditionUtils;
@@ -775,6 +776,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
         // we apply them every time the save form is reopened
         pdvSave.setDefaultPuzzleName(puzzleSave != null ? puzzleSave.getName() : "");
         pdvSave.setDefaultPuzzleAuthor(puzzleSave != null ? puzzleSave.getAuthor() : settings.getUserName());
+        pdvSave.setPuzzleDifficulty(puzzleSave != null ? puzzleSave.getDifficulty() : PuzzleDifficulty.Medium);
         setSaveDialogVisible(true);
     }
 
@@ -800,6 +802,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
         }
         puzzleSave.setName(puzzleName);
         puzzleSave.setAuthor(pdvSave.getPuzzleAuthor());
+        puzzleSave.setDifficulty(pdvSave.getPuzzleDifficulty());
 
         JsonUtils.saveCustomPuzzles(this, puzzleSaves);
         Toast.makeText(this, R.string.puzzle_saved, Toast.LENGTH_SHORT).show();
