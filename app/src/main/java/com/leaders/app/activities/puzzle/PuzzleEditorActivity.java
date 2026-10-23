@@ -28,7 +28,7 @@ import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.board.CellView;
 import com.leaders.app.animators.CharacterActionAnimator;
 import com.leaders.app.views.character.CharacterDisplay;
-import com.leaders.app.views.puzzle.PuzzleSaveView;
+import com.leaders.app.views.puzzle.PuzzleDetailsView;
 import com.leaders.gamelogic.actions.CharacterActionMotion;
 import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.entities.Cell;
@@ -119,7 +119,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
     private View vwDialogBg;
     private MaterialButton btnPuzzleActions;
     private ActionsMenuView amvPuzzleActions;
-    private PuzzleSaveView psvSave;
+    private PuzzleDetailsView psvSave;
 
     private CharacterNotificationView cnvCardInfo;
     private PuzzleEditorBoardView bdvBoard;

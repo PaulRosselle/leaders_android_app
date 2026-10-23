@@ -10,21 +10,21 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.leaders.R;
 
-public final class PuzzleSaveView extends ConstraintLayout {
+public final class PuzzleDetailsView extends ConstraintLayout {
     private String defaultName;
 
     private final EditText edtName;
     private final EditText edtAuthor;
 
 
-    public PuzzleSaveView(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public PuzzleDetailsView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
-        inflate(context, R.layout.view_puzzle_save, this);
+        inflate(context, R.layout.view_puzzle_details, this);
 
         defaultName = "";
-        edtName = findViewById(R.id.edtName_vwPuzzleSave);
-        edtAuthor = findViewById(R.id.edtAuthor_vwPuzzleSave);
+        edtName = findViewById(R.id.edtName_vwPuzzleDetails);
+        edtAuthor = findViewById(R.id.edtAuthor_vwPuzzleDetails);
     }
 
     public void setDefaultPuzzleName(@NonNull String puzzleName) {
@@ -59,10 +59,10 @@ public final class PuzzleSaveView extends ConstraintLayout {
     }
 
     public void setOnBtnCancelClick(@NonNull OnClickListener onBtnCancelClick) {
-        (findViewById(R.id.txvCancel_vwPuzzleSave)).setOnClickListener(onBtnCancelClick);
+        (findViewById(R.id.txvCancel_vwPuzzleDetails)).setOnClickListener(onBtnCancelClick);
     }
 
     public void setOnBtnSaveClick(@NonNull OnClickListener onBtnSaveClick) {
-        (findViewById(R.id.txvSave_vwPuzzleSave)).setOnClickListener(onBtnSaveClick);
+        (findViewById(R.id.txvSave_vwPuzzleDetails)).setOnClickListener(onBtnSaveClick);
     }
 }
