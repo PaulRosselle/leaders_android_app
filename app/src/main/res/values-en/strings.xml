@@ -278,4 +278,10 @@
     <string name="search">Search…</string>
     <string name="filter">Filtrer</string>
     <string name="sort">Trier</string>
+    <string name="sort_name">Name A ➝ Z</string>
+    <string name="sort_name_desc">Name Z ➝ A</string>
+    <string name="sort_author_name">Author A ➝ Z</string>
+    <string name="sort_author_desc">Author Z ➝ A</string>
+    <string name="sort_difficulty">Easy ➝ Hard</string>
+    <string name="sort_difficulty_desc">Hard ➝ Easy</string>
 </resources>

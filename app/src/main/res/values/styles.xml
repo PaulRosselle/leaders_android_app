@@ -35,4 +35,11 @@
 
         <item name="colorAccent">@color/app_golden</item>
     </style>
+
+    <style name="popup_menu"
+        parent="Widget.MaterialComponents.PopupMenu">
+        <item name="android:popupBackground">@drawable/round_rect</item>
+        <item name="android:textColor">@color/font</item>
+        <item name="fontFamily">@font/jost</item>
+    </style>
 </resources>

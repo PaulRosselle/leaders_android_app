@@ -6,6 +6,7 @@ import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
@@ -14,13 +15,13 @@ import androidx.annotation.NonNull;
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 
-public class SearchToolbarView extends LinearLayout {
+public final class SearchToolbarView extends LinearLayout {
     public interface SearchToolbarListener {
         void onStartSearch(@NonNull String searchKey);
 
-        void onFilter(); // TODO - handle filters
+        void onFilter(@NonNull View btnSort);
 
-        void onSort(); // TODO - handle sorting
+        void onSort(@NonNull View btnFilter);
     }
 
     private static final long SEARCH_DELAY_MS = 300L;
@@ -50,17 +51,6 @@ public class SearchToolbarView extends LinearLayout {
         initListeners();
     }
 
-    @NonNull
-    private String getSearchKey() {
-        return edtSearch.getText().toString().trim();
-    }
-
-    private void startSearch() {
-        if (listener != null) {
-            listener.onStartSearch(getSearchKey());
-        }
-    }
-
     private void initListeners() {
         edtSearch.addTextChangedListener(new TextWatcher() {
             @Override
@@ -77,6 +67,36 @@ public class SearchToolbarView extends LinearLayout {
             public void afterTextChanged(Editable s) {
             }
         });
+
+        btnFilter.setOnClickListener(this::onFilterClick);
+        btnSort.setOnClickListener(this::onSortClick);
+    }
+
+    private void startSearch() {
+        if (listener != null) {
+            listener.onStartSearch(getSearchKey());
+        }
+    }
+
+    private void onSortClick(View v) {
+        if (listener != null) {
+            listener.onSort(btnSort);
+        }
+    }
+
+    private void onFilterClick(View v) {
+        if (listener != null) {
+            listener.onFilter(btnFilter);
+        }
+    }
+
+    public void setListener(SearchToolbarListener listener) {
+        this.listener = listener;
+    }
+
+    @NonNull
+    private String getSearchKey() {
+        return edtSearch.getText().toString().trim();
     }
 
     @Override

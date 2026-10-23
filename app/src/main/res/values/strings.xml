@@ -290,5 +290,11 @@
     <string name="search">Rechercher…</string>
     <string name="filter">Filter</string>
     <string name="sort">Sort</string>
+    <string name="sort_name">Nom A ➝ Z</string>
+    <string name="sort_name_desc">Nom Z ➝ A</string>
+    <string name="sort_author_name">Auteur A ➝ Z</string>
+    <string name="sort_author_desc">Auteur Z ➝ A</string>
+    <string name="sort_difficulty">Facile ➝ Difficile</string>
+    <string name="sort_difficulty_desc">Difficile ➝ Facile</string>
 
 </resources>
