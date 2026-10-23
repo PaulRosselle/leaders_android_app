@@ -98,7 +98,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:fontFamily="sans-serif"
-        android:text="Difficulté"
+        android:text="@string/difficulty"
         android:textAllCaps="true"
         android:textColor="@color/font"
         android:textStyle="bold"
@@ -158,7 +158,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txvDifficulty_vwPuzzleDetails"
+        app:layout_constraintTop_toBottomOf="@+id/puzzleDifficultyView"
         app:layout_constraintVertical_bias="1.0" />
 
     <TextView
@@ -181,5 +181,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0" />
+
+    <com.leaders.app.views.puzzle.PuzzleDifficultyView
+        android:id="@+id/puzzleDifficultyView"
+        android:layout_width="wrap_content"
+        android:layout_height="42dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/txvDifficulty_vwPuzzleDetails"
+        app:layout_constraintTop_toBottomOf="@+id/txvDifficulty_vwPuzzleDetails"
+        app:layout_constraintVertical_bias="0.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -148,7 +148,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
             amvPuzzleActions.addActionButton(action.getIconResId(), action.getTextResId(),
                     action.ordinal(), action.getOnClickListener(this));
         }
-        pdvSave = findViewById(R.id.psvSave_actPuzzleEditor);
+        pdvSave = findViewById(R.id.pdvSave_actPuzzleEditor);
         ViewCompat.setOnApplyWindowInsetsListener(pdvSave, (v, insets) -> {
                 Insets imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime());
                 pdvSave.setTranslationY(-imeInsets.bottom);

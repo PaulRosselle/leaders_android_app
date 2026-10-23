@@ -277,5 +277,6 @@
     <string name="enemy_nemesis_must_play">La Nemesis adverse doit jouer</string>
     <string name="interrupt">Interrompre</string>
     <string name="searching_for_a_move_able_to_block_you">Recherche d\'un coup capable de vous bloquer en cours…</string>
+    <string name="difficulty">Difficulté</string>
 
 </resources>
