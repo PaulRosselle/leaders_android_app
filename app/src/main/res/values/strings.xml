@@ -287,5 +287,25 @@
     <string name="screen_auto_rotation">Rotation auto de l\'écran</string>
     <string name="settings_auto_rotation">Rotation auto de l\'écran en duel</string>
     <string name="exit">Quitter</string>
+    <string name="search">Rechercher…</string>
+    <string name="filter">Filter</string>
+    <string name="sort">Sort</string>
+    <string name="sort_name">Nom A ➝ Z</string>
+    <string name="sort_name_desc">Nom Z ➝ A</string>
+    <string name="sort_author_name">Auteur A ➝ Z</string>
+    <string name="sort_author_desc">Auteur Z ➝ A</string>
+    <string name="sort_difficulty">Facile ➝ Difficile</string>
+    <string name="sort_difficulty_desc">Difficile ➝ Facile</string>
+    <string name="filter_title">Filtrer par</string>
+    <string name="filter_reset">Réinitialiser</string>
+    <string name="filter_group_difficulty">Difficulté</string>
+    <string name="filter_group_author">Auteur</string>
+    <string name="filter_solved">Puzzle résolu</string>
+    <string name="filter_unsolved">Puzzle à résoudre</string>
+    <string name="filter_group_solved">Résolution</string>
+    <string name="puzzle_difficulty_easy">Facile</string>
+    <string name="puzzle_difficulty_medium">Moyenne</string>
+    <string name="puzzle_difficulty_hard">Difficile</string>
+    <string name="puzzle_difficulty_extreme">Extreme</string>
 
 </resources>

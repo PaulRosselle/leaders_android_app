@@ -35,4 +35,21 @@
 
         <item name="colorAccent">@color/app_golden</item>
     </style>
+
+    <style name="App.PopupMenu.RadioButton"
+        parent="Widget.MaterialComponents.CompoundButton.RadioButton">
+        <item name="useMaterialThemeColors">false</item>
+        <item name="buttonTint">@color/app_golden</item>
+        <item name="android:buttonTint">@color/app_golden</item>
+    </style>
+
+    <style name="popup_menu"
+        parent="Widget.MaterialComponents.PopupMenu">
+        <item name="android:popupBackground">@drawable/round_rect</item>
+        <item name="android:textColor">@color/font</item>
+        <item name="fontFamily">@font/jost</item>
+        <item name="colorSecondary">@color/app_golden</item>
+
+        <item name="radioButtonStyle">@style/App.PopupMenu.RadioButton</item>
+    </style>
 </resources>

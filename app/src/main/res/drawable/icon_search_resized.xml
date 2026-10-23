@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:width="@dimen/toolbar_button_icon_size"
+        android:height="@dimen/toolbar_button_icon_size"
+        android:drawable="@drawable/icon_search"
+        android:gravity="center" />
+
+</layer-list>
