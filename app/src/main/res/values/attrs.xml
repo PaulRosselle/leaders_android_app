@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <attr name="titleResId" format="reference" />
+
     <declare-styleable name="DecorativeBackgroundView">
         <attr name="cornerTopLeftVisible" format="boolean"/>
         <attr name="cornerTopRightVisible" format="boolean"/>
@@ -14,7 +16,7 @@
 
     <declare-styleable name="RulesMenuButtonView">
         <attr name="characterResId" format="reference"/>
-        <attr name="titleResId" format="reference"/>
+        <attr name="titleResId"/>
         <attr name="titleAlignemnt" format="enum">
             <enum name="Left" value="0" />
             <enum name="Right" value="1" />
@@ -79,6 +81,6 @@
     </declare-styleable>
 
     <declare-styleable name="PuzzleDetailsView">
-        <attr name="titleResId" format="reference"/>
+        <attr name="titleResId"/>
     </declare-styleable>
 </resources>
