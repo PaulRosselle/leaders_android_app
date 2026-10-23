@@ -53,6 +53,7 @@ import java.util.List;
 
 public final class PuzzlePlayerActivity extends PlayableActivity implements NemesisBlockerCallback {
     private enum PuzzlePlayerAction {
+        Exit,
         GoToPreviousPuzzle,
         GoToNextPuzzle,
         ChangeAnimationSpeed,
@@ -62,6 +63,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
 
         private int getIconResId() {
             switch (this) {
+                case Exit: return R.drawable.icon_exit;
                 case GoToPreviousPuzzle: return R.drawable.icon_arrow_head_reversed;
                 case GoToNextPuzzle: return R.drawable.icon_arrow_head;
                 case ChangeAnimationSpeed: return R.drawable.icon_speed;
@@ -74,6 +76,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
 
         private int getTextResId() {
             switch (this) {
+                case Exit: return R.string.exit;
                 case GoToPreviousPuzzle: return R.string.previous_puzzle;
                 case GoToNextPuzzle: return R.string.next_puzzle;
                 case ChangeAnimationSpeed: return R.string.animation_speed;
@@ -86,6 +89,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
 
         private View.OnClickListener getOnClickListener(@NonNull PuzzlePlayerActivity activity) {
             switch (this) {
+                case Exit: return activity::onExitClick;
                 case GoToPreviousPuzzle: return activity::onPreviousPuzzleClick;
                 case GoToNextPuzzle: return activity::onNextPuzzleClick;
                 case ChangeAnimationSpeed: return activity::onChangeAnimationSpeedClick;
@@ -259,10 +263,10 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
         return R.id.gdlRoot_actPuzzlePlayer;
     }
 
-    @NonNull
+    @Nullable
     @Override
     protected Integer getBtnBackResId() {
-        return R.id.btnBack_actPuzzlePlayer;
+        return null;
     }
 
     @Override
@@ -499,6 +503,10 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     //endregion
 
     //region ACTIONS METHODS
+
+    private void onExitClick(View v) {
+        doOnBackPressed();
+    }
 
     private void onNextPuzzleClick(View v) {
         loadPuzzle(puzzleSaves.get(puzzleSaves.indexOf(puzzleSave) + 1));
