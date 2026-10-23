@@ -220,7 +220,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/btnActions_actDuelPlayer"
         app:layout_constraintEnd_toStartOf="@+id/btnActions_actDuelPlayer"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/btnActions_actDuelPlayer"
         tools:text="Au tour de Nemesis is top tier" />
 
     <com.leaders.app.views.character.HighlightView
