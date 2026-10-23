@@ -1,8 +1,10 @@
 package com.leaders.app.views.puzzle;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,6 +27,14 @@ public final class PuzzleDetailsView extends ConstraintLayout {
         defaultName = "";
         edtName = findViewById(R.id.edtName_vwPuzzleDetails);
         edtAuthor = findViewById(R.id.edtAuthor_vwPuzzleDetails);
+
+        try (TypedArray customAttrs = context.obtainStyledAttributes(attrs, R.styleable.PuzzleDetailsView)) {
+            TextView txvTitle = findViewById(R.id.txvTitle_vwPuzzleDetails);
+            txvTitle.setText(customAttrs.getResourceId(
+                    R.styleable.PuzzleDetailsView_titleResId,
+                    R.string.save_puzzle
+            ));
+        }
     }
 
     public void setDefaultPuzzleName(@NonNull String puzzleName) {

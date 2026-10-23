@@ -78,4 +78,7 @@
         </attr>
     </declare-styleable>
 
+    <declare-styleable name="PuzzleDetailsView">
+        <attr name="titleResId" format="reference"/>
+    </declare-styleable>
 </resources>
