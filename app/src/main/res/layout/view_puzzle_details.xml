@@ -8,7 +8,7 @@
     tools:ignore="SpUsage">
 
     <TextView
-        android:id="@+id/txvTitle_vwPuzzleSave"
+        android:id="@+id/txvTitle_vwPuzzleDetails"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -27,7 +27,7 @@
         app:layout_constraintVertical_bias="0.0" />
 
     <TextView
-        android:id="@+id/txvName_vwPuzzleSave"
+        android:id="@+id/txvName_vwPuzzleDetails"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -41,11 +41,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txvTitle_vwPuzzleSave"
+        app:layout_constraintTop_toBottomOf="@+id/txvTitle_vwPuzzleDetails"
         app:layout_constraintVertical_bias="0.0" />
 
     <EditText
-        android:id="@+id/edtName_vwPuzzleSave"
+        android:id="@+id/edtName_vwPuzzleDetails"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -69,12 +69,12 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txvName_vwPuzzleSave"
+        app:layout_constraintTop_toBottomOf="@+id/txvName_vwPuzzleDetails"
         app:layout_constraintVertical_bias="0.0"
         tools:ignore="LabelFor" />
 
     <TextView
-        android:id="@+id/txvAuthor_vwPuzzleSave"
+        android:id="@+id/txvAuthor_vwPuzzleDetails"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -88,11 +88,29 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtName_vwPuzzleSave"
+        app:layout_constraintTop_toBottomOf="@+id/edtName_vwPuzzleDetails"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/txvDifficulty_vwPuzzleDetails"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:fontFamily="sans-serif"
+        android:text="@string/difficulty"
+        android:textAllCaps="true"
+        android:textColor="@color/font"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edtAuthor_vwPuzzleDetails"
         app:layout_constraintVertical_bias="0.0" />
 
     <EditText
-        android:id="@+id/edtAuthor_vwPuzzleSave"
+        android:id="@+id/edtAuthor_vwPuzzleDetails"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -117,12 +135,24 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txvAuthor_vwPuzzleSave"
+        app:layout_constraintTop_toBottomOf="@+id/txvAuthor_vwPuzzleDetails"
         app:layout_constraintVertical_bias="0.0"
         tools:ignore="LabelFor,TextFields" />
 
+    <com.leaders.app.views.puzzle.PuzzleDifficultyView
+        android:id="@+id/pdvDifficulty_vwPuzzleDetails"
+        android:layout_width="wrap_content"
+        android:layout_height="42dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/txvDifficulty_vwPuzzleDetails"
+        app:layout_constraintTop_toBottomOf="@+id/txvDifficulty_vwPuzzleDetails"
+        app:layout_constraintVertical_bias="0.0" />
+
     <TextView
-        android:id="@+id/txvSave_vwPuzzleSave"
+        android:id="@+id/txvSave_vwPuzzleDetails"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/dialog_button_height"
         android:layout_marginTop="24dp"
@@ -140,11 +170,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtAuthor_vwPuzzleSave"
+        app:layout_constraintTop_toBottomOf="@+id/pdvDifficulty_vwPuzzleDetails"
         app:layout_constraintVertical_bias="1.0" />
 
     <TextView
-        android:id="@+id/txvCancel_vwPuzzleSave"
+        android:id="@+id/txvCancel_vwPuzzleDetails"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/dialog_button_height"
         android:layout_marginEnd="8dp"
@@ -158,7 +188,7 @@
         android:textColor="@color/app_golden"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/txvSave_vwPuzzleSave"
+        app:layout_constraintEnd_toStartOf="@+id/txvSave_vwPuzzleDetails"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

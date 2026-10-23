@@ -92,7 +92,7 @@
         android:id="@+id/mmbvPuzzles_vwMainMenu"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:iconResId="@drawable/icon_puzzle"
+        app:iconResId="@drawable/icon_puzzles"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/gdlC2R_vwMainMenu"
         app:layout_constraintStart_toStartOf="@+id/gdlC2L_vwMainMenu"

@@ -265,4 +265,8 @@
     <string name="enemy_nemesis_must_play">Enemy Nemesis must play</string>
     <string name="interrupt">Interrupt</string>
     <string name="searching_for_a_move_able_to_block_you">Searching for a move to block you…</string>
+    <string name="difficulty">Difficulty</string>
+    <string name="puzzle_details">Puzzle details</string>
+    <string name="change_details">Change details</string>
+    <string name="changes_saved">Changes saved!</string>
 </resources>

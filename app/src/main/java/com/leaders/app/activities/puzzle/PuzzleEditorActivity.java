@@ -28,7 +28,7 @@ import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.board.CellView;
 import com.leaders.app.animators.CharacterActionAnimator;
 import com.leaders.app.views.character.CharacterDisplay;
-import com.leaders.app.views.puzzle.PuzzleSaveView;
+import com.leaders.app.views.puzzle.PuzzleDetailsView;
 import com.leaders.gamelogic.actions.CharacterActionMotion;
 import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.entities.Cell;
@@ -39,6 +39,7 @@ import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
+import com.leaders.puzzlelogic.enums.PuzzleDifficulty;
 import com.leaders.puzzlelogic.serializers.SerializationContext;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
 import com.leaders.puzzlelogic.utilities.PuzzleEditionUtils;
@@ -119,7 +120,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
     private View vwDialogBg;
     private MaterialButton btnPuzzleActions;
     private ActionsMenuView amvPuzzleActions;
-    private PuzzleSaveView psvSave;
+    private PuzzleDetailsView pdvSave;
 
     private CharacterNotificationView cnvCardInfo;
     private PuzzleEditorBoardView bdvBoard;
@@ -148,13 +149,13 @@ public final class PuzzleEditorActivity extends BaseActivity {
             amvPuzzleActions.addActionButton(action.getIconResId(), action.getTextResId(),
                     action.ordinal(), action.getOnClickListener(this));
         }
-        psvSave = findViewById(R.id.psvSave_actPuzzleEditor);
-        ViewCompat.setOnApplyWindowInsetsListener(psvSave, (v, insets) -> {
+        pdvSave = findViewById(R.id.pdvSave_actPuzzleEditor);
+        ViewCompat.setOnApplyWindowInsetsListener(pdvSave, (v, insets) -> {
                 Insets imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime());
-                psvSave.setTranslationY(-imeInsets.bottom);
+                pdvSave.setTranslationY(-imeInsets.bottom);
                 return insets;
         });
-        ViewCompat.requestApplyInsets(psvSave);
+        ViewCompat.requestApplyInsets(pdvSave);
     }
 
     @Override
@@ -167,8 +168,8 @@ public final class PuzzleEditorActivity extends BaseActivity {
         vwDialogBg.setOnClickListener(this::vwDialogBgClick);
 
         // Save dialog listeners
-        psvSave.setOnBtnSaveClick(this::onSaveConfirmClick);
-        psvSave.setOnBtnCancelClick(this::onSaveCancelClick);
+        pdvSave.setOnBtnSaveClick(this::onSaveConfirmClick);
+        pdvSave.setOnBtnCancelClick(this::onSaveCancelClick);
 
         // Non interactive element listeners
         findViewById(R.id.clyMain_actPuzzleEditor).setOnClickListener(this::onNonInteractiveElementClick);
@@ -754,7 +755,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
     private void vwDialogBgClick(View v) {
         if (amvPuzzleActions.getVisibility() == View.VISIBLE) {
             setActionsMenuVisible(false);
-        } else if (psvSave.getVisibility() == View.VISIBLE) {
+        } else if (pdvSave.getVisibility() == View.VISIBLE) {
             setSaveDialogVisible(false);
         } else {
             vwDialogBg.setVisibility(View.GONE);
@@ -773,8 +774,9 @@ public final class PuzzleEditorActivity extends BaseActivity {
     private void openSavePuzzleDialog() {
         // In case the user overwrite the default value and want them back,
         // we apply them every time the save form is reopened
-        psvSave.setDefaultPuzzleName(puzzleSave != null ? puzzleSave.getName() : "");
-        psvSave.setDefaultPuzzleAuthor(puzzleSave != null ? puzzleSave.getAuthor() : settings.getUserName());
+        pdvSave.setDefaultPuzzleName(puzzleSave != null ? puzzleSave.getName() : "");
+        pdvSave.setDefaultPuzzleAuthor(puzzleSave != null ? puzzleSave.getAuthor() : settings.getUserName());
+        pdvSave.setPuzzleDifficulty(puzzleSave != null ? puzzleSave.getDifficulty() : PuzzleDifficulty.Medium);
         setSaveDialogVisible(true);
     }
 
@@ -783,7 +785,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
     }
 
     private void onSaveConfirmClick(View v) {
-        String puzzleName = psvSave.getPuzzleName();
+        String puzzleName = pdvSave.getPuzzleName();
         // We don't allow a puzzle to be saved without a name
         if (puzzleName.isEmpty()) {
             Toast.makeText(this, R.string.puzzle_name_is_mandatory, Toast.LENGTH_SHORT).show();
@@ -799,7 +801,8 @@ public final class PuzzleEditorActivity extends BaseActivity {
             puzzleSave.setSolved(false);
         }
         puzzleSave.setName(puzzleName);
-        puzzleSave.setAuthor(psvSave.getPuzzleAuthor());
+        puzzleSave.setAuthor(pdvSave.getPuzzleAuthor());
+        puzzleSave.setDifficulty(pdvSave.getPuzzleDifficulty());
 
         JsonUtils.saveCustomPuzzles(this, puzzleSaves);
         Toast.makeText(this, R.string.puzzle_saved, Toast.LENGTH_SHORT).show();
@@ -810,7 +813,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
     }
 
     private void setSaveDialogVisible(boolean visible) {
-        psvSave.setVisibility(visible ? View.VISIBLE : View.GONE);
+        pdvSave.setVisibility(visible ? View.VISIBLE : View.GONE);
         cevCharacterEditor.setVisibility(visible ? View.GONE : View.VISIBLE);
         vwDialogBg.setVisibility(visible ? View.VISIBLE : View.GONE);
         if (!visible) {

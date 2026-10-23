@@ -93,51 +93,16 @@
         app:layout_constraintVertical_bias="0.0"
         tools:text="par Paul" />
 
-    <LinearLayout
-        android:id="@+id/llyDifficulty_vwPuzzleSelector"
+    <com.leaders.app.views.puzzle.PuzzleDifficultyView
+        android:id="@+id/pdvDifficulty_vwPuzzleSelector"
         android:layout_width="wrap_content"
         android:layout_height="16dp"
-        android:layout_marginStart="4dp"
         android:layout_marginBottom="4dp"
-        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0">
-
-        <ImageView
-            android:id="@+id/imvDifficultyEasy_vwPuzzleSelector"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:adjustViewBounds="true"
-            app:srcCompat="@drawable/difficulty_marker_empty" />
-
-        <ImageView
-            android:id="@+id/imvDifficultyMedium_vwPuzzleSelector"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:adjustViewBounds="true"
-            app:srcCompat="@drawable/difficulty_marker_empty" />
-
-        <ImageView
-            android:id="@+id/imvDifficultyHard_vwPuzzleSelector"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:adjustViewBounds="true"
-            app:srcCompat="@drawable/difficulty_marker_empty" />
-
-        <ImageView
-            android:id="@+id/imvDifficultyExtreme_vwPuzzleSelector"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:adjustViewBounds="true"
-            app:srcCompat="@drawable/difficulty_marker_empty" />
-    </LinearLayout>
+        app:layout_constraintVertical_bias="1.0" />
 
     <ImageView
         android:id="@+id/imvChecked_vwPuzzleSelector"

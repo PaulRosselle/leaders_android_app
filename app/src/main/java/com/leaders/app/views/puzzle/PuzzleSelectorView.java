@@ -3,7 +3,6 @@ package com.leaders.app.views.puzzle;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,7 +18,7 @@ public final class PuzzleSelectorView extends SelectorView<PuzzleSave> {
     private ImageView imvSolved;
     private TextView txvName;
     private TextView txvAuthor;
-    private LinearLayout llyDifficulty;
+    private PuzzleDifficultyView pdvDifficulty;
 
     public PuzzleSelectorView(@NonNull Context context, @NonNull PuzzleSave puzzleSave) {
         super(context, puzzleSave);
@@ -32,7 +31,8 @@ public final class PuzzleSelectorView extends SelectorView<PuzzleSave> {
         imvSolved = findViewById(R.id.imvPuzzleSolved_vwPuzzleSelector);
         txvName = findViewById(R.id.txvPuzzleName_vwPuzzleSelector);
         txvAuthor = findViewById(R.id.txvPuzzleAuthor_vwPuzzleSelector);
-        llyDifficulty = findViewById(R.id.llyDifficulty_vwPuzzleSelector);
+        pdvDifficulty = findViewById(R.id.pdvDifficulty_vwPuzzleSelector);
+        pdvDifficulty.setReadonly(true);
     }
 
 
@@ -46,9 +46,7 @@ public final class PuzzleSelectorView extends SelectorView<PuzzleSave> {
                 R.drawable.icon_highlighted_crown : R.drawable.icon_empty_crown
         );
 
-        for (int i = 0; i <= puzzleSave.getDifficulty().ordinal(); i++) {
-            ((ImageView) llyDifficulty.getChildAt(i)).setImageResource(R.drawable.difficulty_marker);
-        }
+        pdvDifficulty.setDifficulty(puzzleSave.getDifficulty());
 
         txvName.setText(puzzleSave.getName());
 
