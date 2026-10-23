@@ -14,8 +14,8 @@ import com.leaders.R;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-public class PlayableItemsAnimationView extends SwitchCompat {
-    public PlayableItemsAnimationView(@NonNull Context context, @Nullable AttributeSet attrs) {
+public class SettingsSwitch extends SwitchCompat {
+    public SettingsSwitch(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
         // Selected by default
@@ -29,7 +29,6 @@ public class PlayableItemsAnimationView extends SwitchCompat {
         setBackgroundResource(R.drawable.round_rect);
 
         // TEXT
-        setText(R.string.playable_items_animation);
         setTextColor(ContextCompat.getColor(context, R.color.font));
         setAllCaps(true);
 

@@ -6,6 +6,10 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.Guideline;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
@@ -17,6 +21,7 @@ import com.leaders.app.entities.ReplaySave;
 import com.leaders.app.entities.Settings;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.AnimationSpeed;
+import com.leaders.app.enums.BoardOrientation;
 import com.leaders.app.enums.EndGameType;
 import com.leaders.app.enums.LeaderType;
 import com.leaders.app.utilities.AlignmentUtils;
@@ -70,6 +75,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
         ChangeAnimationSpeed,
         AnimatePlayableItems,
         DisplayCellPositions,
+        AutoRotation,
         Help;
 
         private int getIconResId() {
@@ -78,6 +84,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
                 case ChangeAnimationSpeed: return R.drawable.icon_speed;
                 case AnimatePlayableItems: return R.drawable.icon_sparkles;
                 case DisplayCellPositions: return R.drawable.icon_position;
+                case AutoRotation: return R.drawable.icon_swap;
                 case Help: return R.drawable.icon_question;
                 default: throw new IllegalStateException("No icon found for puzzle action: " + this);
             }
@@ -89,6 +96,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
                 case ChangeAnimationSpeed: return R.string.animation_speed;
                 case AnimatePlayableItems: return R.string.playable_items_animation;
                 case DisplayCellPositions: return R.string.board_coordinates;
+                case AutoRotation: return R.string.screen_auto_rotation;
                 case Help: return R.string.help;
                 default: throw new IllegalStateException("No text found for puzzle action: " + this);
             }
@@ -100,11 +108,18 @@ public final class DuelPlayerActivity extends PlayableActivity implements
                 case ChangeAnimationSpeed: return activity::onChangeAnimationSpeedClick;
                 case AnimatePlayableItems: return activity::onAnimatePlayableItems;
                 case DisplayCellPositions: return activity::onDisplayCellPosition;
+                case AutoRotation: return activity::onAutoRotation;
                 case Help: return activity::onHelpClick;
                 default: throw new IllegalStateException("No click listener found for puzzle action: " + this);
             }
         }
     }
+
+    private ConstraintLayout clyMain;
+    private Guideline gdlTop;
+    private Guideline gdlBottom;
+    private int statusBarHeight;
+    private boolean autoRotateEnabled;
 
     private CharacterCardSelectionView ccsvCardSelector;
     private PlayerBottomView pbvCurrentPlayer;
@@ -133,6 +148,10 @@ public final class DuelPlayerActivity extends PlayableActivity implements
     protected void initViews() {
         super.initViews();
 
+        clyMain = findViewById(R.id.clyMain_actDuelPlayer);
+        gdlTop = findViewById(R.id.gdlRoot_actDuelPlayer);
+        gdlBottom = findViewById(R.id.gdlBottom_actDuelPlayer);
+
         ccsvCardSelector = findViewById(R.id.ccsvCardSelector_actDuelPlayer);
         chdNewCharacter = new CharacterDisplay(this, ccsvCardSelector);
 
@@ -154,15 +173,19 @@ public final class DuelPlayerActivity extends PlayableActivity implements
         btnCards = findViewById(R.id.btnCards_actDuelPlayer);
         btnNextPhase = findViewById(R.id.btnNextPhase_actDuelPlayer);
         hlvNextPhase = findViewById(R.id.hlvNextPhase_actDuelPlayer);
+
+        ViewCompat.setOnApplyWindowInsetsListener(gdlBottom, (v, insets) -> {
+            statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
+            return insets;
+        });
     }
 
     @Override
     protected void initListeners() {
         super.initListeners();
 
-
         // Non interactive element listeners
-        (findViewById(R.id.clyMain_actDuelPlayer)).setOnClickListener(this::onNonInteractiveElementClick);
+        clyMain.setOnClickListener(this::onNonInteractiveElementClick);
         ccsvCardSelector.setOnClickListener(this::onNonInteractiveElementClick);
         ccsvCardSelector.setOnScrollViewClickListener(this::onNonInteractiveElementClick);
 
@@ -188,8 +211,10 @@ public final class DuelPlayerActivity extends PlayableActivity implements
         characterSkins = settings.getCharacterSkins();
         cnvCardInfo.setCharacterSkins(characterSkins);
         ccsvCardSelector.setCharacterSkins(characterSkins);
+        autoRotateEnabled = settings.duelScreenAutoRotation();
 
         updateAnimatePlayableIcon();
+        updateAutoRotationIcon();
 
         String gameDatas = getIntent().getStringExtra(ExtraUtils.EXTRA_DUEL_GAME_DATAS);
         if (gameDatas == null || gameDatas.isEmpty()) {
@@ -395,6 +420,21 @@ public final class DuelPlayerActivity extends PlayableActivity implements
         setActionsMenuVisible(false);
     }
 
+    private void updateAutoRotationIcon() {
+        amvActions.setButtonIcon(
+                DuelAction.AutoRotation.ordinal(),
+                autoRotateEnabled ? R.drawable.icon_swap_off : R.drawable.icon_swap
+        );
+    }
+
+    private void onAutoRotation(View v) {
+        autoRotateEnabled = !autoRotateEnabled;
+        updateAutoRotationIcon();
+        applyScreenRotation();
+
+        setActionsMenuVisible(false);
+    }
+
     private void onHelpClick(View v) {
         HelpUtils.getHelpDialog(this).show();
         setActionsMenuVisible(false);
@@ -526,6 +566,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
         Player currentPlayer = gameContext.getCurrentPlayer();
 
         bdvBoard.setOrientation(TeamColorUtils.getOrientation(currentPlayer.getTeamColor()));
+        applyScreenRotation();
 
         List<PlayerWarningState> warningStates = gameContext.getPlayerWarningStates();
 
@@ -537,6 +578,15 @@ public final class DuelPlayerActivity extends PlayableActivity implements
 
         ptvOpposingPlayer.setPlayer(opposingPlayer, getPlayerLeaderType(opposingPlayer, board));
         ptvOpposingPlayer.setWarningVisible(playerHasWarnings(opposingPlayer, warningStates));
+    }
+
+    private void applyScreenRotation() {
+        boolean rotate = autoRotateEnabled && bdvBoard.getOrientation() == BoardOrientation.Rotated;
+
+        clyMain.setRotation(rotate ? 180f : 0f);
+        int defaultMargin = getResources().getDimensionPixelSize(R.dimen.default_layout_margin);
+        gdlTop.setGuidelineBegin(rotate ? defaultMargin : statusBarHeight);
+        gdlBottom.setGuidelineEnd(rotate ? statusBarHeight : defaultMargin);
     }
 
     private boolean isPlayerNameFirstCharVowel(@NonNull String playerName) {

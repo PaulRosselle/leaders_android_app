@@ -170,6 +170,11 @@ public abstract class BoardView extends ConstraintLayout {
         setCellPositionVisible(isCellPositionVisible);
     }
 
+    @NonNull
+    public BoardOrientation getOrientation() {
+        return orientation;
+    }
+
     public final void setBoard(@NonNull Board board) {
         clearTargets();
 

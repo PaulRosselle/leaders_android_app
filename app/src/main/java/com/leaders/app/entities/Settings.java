@@ -20,6 +20,7 @@ public final class Settings {
     @NonNull
     private HighlightColor highlightColor;
     private boolean animatePlayableItems;
+    private boolean duelScreenAutoRotation;
     private CharacterSkins characterSkins;
 
     public Settings(){
@@ -27,6 +28,7 @@ public final class Settings {
         animationSpeed = AnimationSpeed.Normal;
         highlightColor = HighlightColor.Default;
         animatePlayableItems = true;
+        duelScreenAutoRotation = false;
         characterSkins = new CharacterSkins();
     }
 
@@ -47,6 +49,9 @@ public final class Settings {
             if (joSettings.has("animate_playable_items")) {
                 settings.setAnimatePlayableItems(joSettings.getBoolean("animate_playable_items"));
             }
+            if (joSettings.has("duel_screen_auto_rotation")) {
+                settings.setDuelScreenAutoRotation(joSettings.getBoolean("duel_screen_auto_rotation"));
+            }
             if (joSettings.has("character_skins")) {
                 settings.characterSkins = CharacterSkins.fromJson(joSettings.getJSONObject("character_skins"));
             }
@@ -66,6 +71,7 @@ public final class Settings {
         joSettings.put("animation_speed", getAnimationSpeed().name());
         joSettings.put("highlight_color", getHighlightColor().name());
         joSettings.put("animate_playable_items", animatePlayableItems());
+        joSettings.put("duel_screen_auto_rotation", duelScreenAutoRotation());
         joSettings.put("character_skins", characterSkins.toJson());
 
         return joSettings;
@@ -104,6 +110,14 @@ public final class Settings {
 
     public void setAnimatePlayableItems(boolean animatePlayableItems) {
         this.animatePlayableItems = animatePlayableItems;
+    }
+
+    public boolean duelScreenAutoRotation() {
+        return duelScreenAutoRotation;
+    }
+
+    public void setDuelScreenAutoRotation(boolean duelScreenAutoRotation) {
+        this.duelScreenAutoRotation = duelScreenAutoRotation;
     }
 
     @NonNull

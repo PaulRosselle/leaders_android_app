@@ -272,4 +272,6 @@
     <string name="copy">Copy</string>
     <string name="puzzles_not_imported">Puzzles Not Imported</string>
     <string name="duplicate_of">- \"%s\" duplicate of \"%s\"%n</string>
+    <string name="screen_auto_rotation">Screen auto rotation</string>
+    <string name="settings_auto_rotation">Screen autorotation in duel mode</string>
 </resources>
