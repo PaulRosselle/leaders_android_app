@@ -2,6 +2,7 @@ package com.leaders.app.views.puzzle;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -16,6 +17,7 @@ import java.util.Arrays;
 
 public class PuzzleDifficultyView extends LinearLayout {
     private PuzzleDifficulty difficulty;
+    private boolean readonly;
 
     public PuzzleDifficultyView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -31,6 +33,7 @@ public class PuzzleDifficultyView extends LinearLayout {
 
         // Medium is the default value
         setDifficulty(PuzzleDifficulty.Medium);
+        setReadonly(false);
     }
 
     private ImageView getImvDifficulty() {
@@ -38,6 +41,7 @@ public class PuzzleDifficultyView extends LinearLayout {
 
         imvDifficulty.setAdjustViewBounds(true);
         imvDifficulty.setImageResource(getImvDifficultyResId(true));
+        imvDifficulty.setOnClickListener(this::onImvClick);
 
         return imvDifficulty;
     }
@@ -50,12 +54,24 @@ public class PuzzleDifficultyView extends LinearLayout {
         return useEmptyRes ? R.drawable.difficulty_marker_empty : R.drawable.difficulty_marker;
     }
 
+    private void onImvClick(View v) {
+        if (readonly) {
+            return;
+        }
+
+        setDifficulty(PuzzleDifficulty.values()[indexOfChild(v)]);
+    }
+
+    public void setReadonly(boolean readonly) {
+        this.readonly = readonly;
+    }
+
     public void setDifficulty(@NonNull PuzzleDifficulty puzzleDifficulty) {
         this.difficulty = puzzleDifficulty;
 
         for (PuzzleDifficulty difficulty : PuzzleDifficulty.values()) {
             ((ImageView) getChildAt(difficulty.ordinal())).setImageResource(getImvDifficultyResId(
-                    difficulty.ordinal() <= puzzleDifficulty.ordinal())
+                    difficulty.ordinal() > puzzleDifficulty.ordinal())
             );
         }
     }
