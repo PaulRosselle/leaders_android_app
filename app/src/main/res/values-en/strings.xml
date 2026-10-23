@@ -275,4 +275,7 @@
     <string name="screen_auto_rotation">Screen auto rotation</string>
     <string name="settings_auto_rotation">Screen autorotation in duel mode</string>
     <string name="exit">Exit</string>
+    <string name="search">Search…</string>
+    <string name="filter">Filtrer</string>
+    <string name="sort">Trier</string>
 </resources>
