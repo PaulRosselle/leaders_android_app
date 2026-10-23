@@ -286,5 +286,6 @@
     <string name="duplicate_of">- \"%s\" doublon de \"%s\"%n</string>
     <string name="screen_auto_rotation">Rotation auto de l\'écran</string>
     <string name="settings_auto_rotation">Rotation auto de l\'écran en duel</string>
+    <string name="exit">Quitter</string>
 
 </resources>

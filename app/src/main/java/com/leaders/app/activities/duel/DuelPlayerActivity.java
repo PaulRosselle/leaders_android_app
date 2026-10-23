@@ -71,6 +71,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
         CharacterCardSelectionView.OnCardSelectedListener {
 
     private enum DuelAction {
+        Exit,
         SaveAsReplay,
         ChangeAnimationSpeed,
         AnimatePlayableItems,
@@ -80,6 +81,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
 
         private int getIconResId() {
             switch (this) {
+                case Exit: return R.drawable.icon_exit;
                 case SaveAsReplay: return R.drawable.icon_save;
                 case ChangeAnimationSpeed: return R.drawable.icon_speed;
                 case AnimatePlayableItems: return R.drawable.icon_sparkles;
@@ -92,6 +94,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
 
         private int getTextResId() {
             switch (this) {
+                case Exit: return R.string.exit;
                 case SaveAsReplay: return R.string.record_game;
                 case ChangeAnimationSpeed: return R.string.animation_speed;
                 case AnimatePlayableItems: return R.string.playable_items_animation;
@@ -104,6 +107,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
 
         private View.OnClickListener getOnClickListener(@NonNull DuelPlayerActivity activity) {
             switch (this) {
+                case Exit: return activity::onExitClick;
                 case SaveAsReplay: return activity::onSaveAsReplay;
                 case ChangeAnimationSpeed: return activity::onChangeAnimationSpeedClick;
                 case AnimatePlayableItems: return activity::onAnimatePlayableItems;
@@ -269,10 +273,10 @@ public final class DuelPlayerActivity extends PlayableActivity implements
         return R.id.gdlRoot_actDuelPlayer;
     }
 
-    @NonNull
+    @Nullable
     @Override
     protected Integer getBtnBackResId() {
-        return R.id.btnBack_actDuelPlayer;
+        return null;
     }
 
     @Override
@@ -338,6 +342,10 @@ public final class DuelPlayerActivity extends PlayableActivity implements
 
     private void onAnimationSpeedChange(@NonNull AnimationSpeed speed) {
         animationSpeed = speed;
+    }
+
+    private void onExitClick(View v) {
+        doOnBackPressed();
     }
 
     private void onSaveAsReplay(View v) {
