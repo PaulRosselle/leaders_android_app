@@ -2,8 +2,8 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:width="30dp"
-        android:height="30dp"
+        android:width="@dimen/toolbar_button_icon_size"
+        android:height="@dimen/toolbar_button_icon_size"
         android:drawable="@drawable/icon_search"
         android:gravity="center" />
 

@@ -100,8 +100,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnBack_actPuzzleMenu"
         app:layout_constraintVertical_bias="0.0"
-        app:singleSelection="true"
-        app:selectionRequired="true">
+        app:selectionRequired="true"
+        app:singleSelection="true">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnOfficial_actPuzzleMenu"
@@ -137,6 +137,19 @@
 
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
+    <com.leaders.app.views.puzzle.SearchToolbarView
+        android:id="@+id/stbSearch_actPuzzleMenu"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mbtgPuzzlesCategory_actPuzzleMenu"
+        app:layout_constraintVertical_bias="0.0" />
+
     <com.leaders.app.views.decoration.OrnateFrameView
         android:id="@+id/ofvPuzzles_actPuzzleMenu"
         android:layout_width="0dp"
@@ -149,7 +162,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/mbtgPuzzlesCategory_actPuzzleMenu">
+        app:layout_constraintTop_toBottomOf="@+id/stbSearch_actPuzzleMenu">
 
         <ScrollView
             android:id="@+id/scvPuzzles_actPuzzleMenu"
