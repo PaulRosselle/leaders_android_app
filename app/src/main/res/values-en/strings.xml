@@ -269,4 +269,5 @@
     <string name="puzzle_details">Puzzle details</string>
     <string name="change_details">Change details</string>
     <string name="changes_saved">Changes saved!</string>
+    <string name="copy">Copy</string>
 </resources>

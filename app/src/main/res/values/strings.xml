@@ -281,5 +281,6 @@
     <string name="puzzle_details">Détails du puzzle</string>
     <string name="change_details">Modifier les détails</string>
     <string name="changes_saved">Changements sauvegardés !</string>
+    <string name="copy">Copier</string>
 
 </resources>
