@@ -32,7 +32,12 @@ import com.leaders.puzzlelogic.entities.OfficialPuzzleSave;
 import com.leaders.puzzlelogic.entities.PuzzleSave;
 import com.leaders.puzzlelogic.enums.PuzzleCategory;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public final class PuzzleMenuActivity extends BaseActivity {
     private ActivityResultLauncher<String> importPuzzleFileSelector;
@@ -320,9 +325,55 @@ public final class PuzzleMenuActivity extends BaseActivity {
     }
 
     private void onCopyClick(View v) {
-        // TODO
+        for (PuzzleSave puzzleSave : psgvPuzzles.getSelectedPuzzles()) {
+            customPuzzleSaves.add(createCopy(puzzleSave));
+        }
+
+        JsonUtils.saveCustomPuzzles(this, customPuzzleSaves);
+        psgvPuzzles.setPuzzles(customPuzzleSaves);
 
         hidePuzzleActions();
+    }
+
+    private CustomPuzzleSave createCopy(@NonNull PuzzleSave puzzleSave) {
+        try {
+            return new CustomPuzzleSave(
+                    getAvailableCopyName(puzzleSave.getName(), customPuzzleSaves),
+                    puzzleSave.getAuthor(),
+                    puzzleSave.getLifetime(),
+                    puzzleSave.getDifficulty(),
+                    new JSONObject(puzzleSave.getDatas().toString()),
+                    false
+            );
+        } catch (JSONException e) {
+            throw new IllegalStateException("Error while parsing puzzle datas", e);
+        }
+    }
+
+    @NonNull
+    private static String getAvailableCopyName(@NonNull String originalName,
+                                               @NonNull List<? extends PuzzleSave> existingSaves) {
+        Set<String> existingNames = new HashSet<>();
+
+        String prefix = originalName + " (";
+
+        for (PuzzleSave save : existingSaves) {
+            String name = save.getName();
+
+            if (name.startsWith(prefix)) {
+                existingNames.add(name);
+            }
+        }
+
+        int index = 1;
+        String candidate;
+
+        do {
+            candidate = prefix + index + ")";
+            index++;
+        } while (existingNames.contains(candidate));
+
+        return candidate;
     }
 
     private void onImportClick(View v) {
