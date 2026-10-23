@@ -284,4 +284,15 @@
     <string name="sort_author_desc">Author Z ➝ A</string>
     <string name="sort_difficulty">Easy ➝ Hard</string>
     <string name="sort_difficulty_desc">Hard ➝ Easy</string>
+    <string name="filter_title">Filtrer par</string>
+    <string name="filter_reset">Réinitialiser</string>
+    <string name="filter_group_difficulty">Difficulté</string>
+    <string name="filter_group_author">Auteur</string>
+    <string name="filter_solved">Puzzle résolu</string>
+    <string name="filter_unsolved">Puzzle à résoudre</string>
+    <string name="filter_group_solved">Résolution</string>
+    <string name="puzzle_difficulty_easy">Facile</string>
+    <string name="puzzle_difficulty_medium">Moyenne</string>
+    <string name="puzzle_difficulty_hard">Difficile</string>
+    <string name="puzzle_difficulty_extreme">Extreme</string>
 </resources>

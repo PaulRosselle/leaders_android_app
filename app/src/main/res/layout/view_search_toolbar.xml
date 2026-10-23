@@ -10,7 +10,7 @@
     tools:ignore="SpUsage">
 
     <EditText
-        android:id="@+id/edtSearch_vwReplaySave"
+        android:id="@+id/edtSearch_vwSearchToolbar"
         android:layout_width="0dp"
         android:layout_height="@dimen/round_button_size"
         android:layout_marginEnd="4dp"
