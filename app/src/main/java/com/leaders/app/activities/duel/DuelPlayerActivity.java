@@ -6,6 +6,10 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.Guideline;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
@@ -17,6 +21,7 @@ import com.leaders.app.entities.ReplaySave;
 import com.leaders.app.entities.Settings;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.AnimationSpeed;
+import com.leaders.app.enums.BoardOrientation;
 import com.leaders.app.enums.EndGameType;
 import com.leaders.app.enums.LeaderType;
 import com.leaders.app.utilities.AlignmentUtils;
@@ -106,6 +111,12 @@ public final class DuelPlayerActivity extends PlayableActivity implements
         }
     }
 
+    private ConstraintLayout clyMain;
+    private Guideline gdlTop;
+    private Guideline gdlBottom;
+    private int statusBarHeight;
+    private boolean rotateFullScreen;
+
     private CharacterCardSelectionView ccsvCardSelector;
     private PlayerBottomView pbvCurrentPlayer;
     private PlayerHaloView phvCurrentPlayer;
@@ -133,6 +144,10 @@ public final class DuelPlayerActivity extends PlayableActivity implements
     protected void initViews() {
         super.initViews();
 
+        clyMain = findViewById(R.id.clyMain_actDuelPlayer);
+        gdlTop = findViewById(R.id.gdlRoot_actDuelPlayer);
+        gdlBottom = findViewById(R.id.gdlBottom_actDuelPlayer);
+
         ccsvCardSelector = findViewById(R.id.ccsvCardSelector_actDuelPlayer);
         chdNewCharacter = new CharacterDisplay(this, ccsvCardSelector);
 
@@ -154,15 +169,19 @@ public final class DuelPlayerActivity extends PlayableActivity implements
         btnCards = findViewById(R.id.btnCards_actDuelPlayer);
         btnNextPhase = findViewById(R.id.btnNextPhase_actDuelPlayer);
         hlvNextPhase = findViewById(R.id.hlvNextPhase_actDuelPlayer);
+
+        ViewCompat.setOnApplyWindowInsetsListener(gdlBottom, (v, insets) -> {
+            statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
+            return insets;
+        });
     }
 
     @Override
     protected void initListeners() {
         super.initListeners();
 
-
         // Non interactive element listeners
-        (findViewById(R.id.clyMain_actDuelPlayer)).setOnClickListener(this::onNonInteractiveElementClick);
+        clyMain.setOnClickListener(this::onNonInteractiveElementClick);
         ccsvCardSelector.setOnClickListener(this::onNonInteractiveElementClick);
         ccsvCardSelector.setOnScrollViewClickListener(this::onNonInteractiveElementClick);
 
@@ -188,6 +207,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
         characterSkins = settings.getCharacterSkins();
         cnvCardInfo.setCharacterSkins(characterSkins);
         ccsvCardSelector.setCharacterSkins(characterSkins);
+        rotateFullScreen = false; // TODO - add in settings
 
         updateAnimatePlayableIcon();
 
@@ -525,7 +545,15 @@ public final class DuelPlayerActivity extends PlayableActivity implements
     private void applyPlayerChange(@NonNull GameContext gameContext) {
         Player currentPlayer = gameContext.getCurrentPlayer();
 
-        bdvBoard.setOrientation(TeamColorUtils.getOrientation(currentPlayer.getTeamColor()));
+        BoardOrientation orientation = TeamColorUtils.getOrientation(currentPlayer.getTeamColor());
+        boolean isRotated = orientation == BoardOrientation.Rotated;
+        if (rotateFullScreen) {
+            clyMain.setRotation(isRotated ? 180f : 0f);
+            int defaultMargin = getResources().getDimensionPixelSize(R.dimen.default_layout_margin);
+            gdlTop.setGuidelineBegin(isRotated ? defaultMargin : statusBarHeight);
+            gdlBottom.setGuidelineEnd(isRotated ? statusBarHeight : defaultMargin);
+        }
+        bdvBoard.setOrientation(orientation);
 
         List<PlayerWarningState> warningStates = gameContext.getPlayerWarningStates();
 
