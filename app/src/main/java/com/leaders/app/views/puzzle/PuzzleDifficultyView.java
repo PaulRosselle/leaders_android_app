@@ -17,7 +17,6 @@ import java.util.Arrays;
 
 public class PuzzleDifficultyView extends LinearLayout {
     private PuzzleDifficulty difficulty;
-    private boolean readonly;
 
     public PuzzleDifficultyView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -55,15 +54,14 @@ public class PuzzleDifficultyView extends LinearLayout {
     }
 
     private void onImvClick(View v) {
-        if (readonly) {
-            return;
-        }
 
         setDifficulty(PuzzleDifficulty.values()[indexOfChild(v)]);
     }
 
     public void setReadonly(boolean readonly) {
-        this.readonly = readonly;
+        for (PuzzleDifficulty difficulty : PuzzleDifficulty.values()) {
+            getChildAt(difficulty.ordinal()).setClickable(!readonly);
+        }
     }
 
     public void setDifficulty(@NonNull PuzzleDifficulty puzzleDifficulty) {
