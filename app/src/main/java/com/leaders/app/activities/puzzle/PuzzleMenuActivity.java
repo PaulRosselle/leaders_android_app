@@ -43,6 +43,7 @@ public final class PuzzleMenuActivity extends BaseActivity {
         EditPuzzle,
         ChangeDetails,
         Remove,
+        Copy,
         Import,
         Export,
         SelectAll,
@@ -54,6 +55,7 @@ public final class PuzzleMenuActivity extends BaseActivity {
                 case EditPuzzle: return R.drawable.icon_puzzle;
                 case ChangeDetails: return R.drawable.icon_edit;
                 case Remove: return R.drawable.icon_remove;
+                case Copy: return R.drawable.icon_copy;
                 case Import: return R.drawable.icon_import;
                 case Export: return R.drawable.icon_export;
                 case SelectAll: return R.drawable.icon_select_all;
@@ -68,6 +70,7 @@ public final class PuzzleMenuActivity extends BaseActivity {
                 case EditPuzzle: return R.string.edit_puzzle;
                 case ChangeDetails: return R.string.change_details;
                 case Remove: return R.string.remove;
+                case Copy: return R.string.copy;
                 case Import: return R.string.import_puzzle;
                 case Export: return R.string.export_puzzle;
                 case SelectAll: return R.string.select_all;
@@ -82,6 +85,7 @@ public final class PuzzleMenuActivity extends BaseActivity {
                 case EditPuzzle: return activity::onEditPuzzleClick;
                 case ChangeDetails: return activity::onChangeDetailsClick;
                 case Remove: return activity::onRemoveClick;
+                case Copy: return activity::onCopyClick;
                 case Import: return activity::onImportClick;
                 case Export: return activity::onExportClick;
                 case SelectAll: return activity::onSelectAllClick;
@@ -250,6 +254,8 @@ public final class PuzzleMenuActivity extends BaseActivity {
                 selectedPuzzlesCount == 1 && puzzlesCategory == PuzzleCategory.Custom);
         amvPuzzleActions.setButtonEnabled(PuzzleSelectionAction.Remove.ordinal(),
                 selectedPuzzlesCount > 0 && puzzlesCategory == PuzzleCategory.Custom);
+        amvPuzzleActions.setButtonEnabled(PuzzleSelectionAction.Copy.ordinal(),
+                selectedPuzzlesCount > 0);
         amvPuzzleActions.setButtonEnabled(PuzzleSelectionAction.Export.ordinal(),
                 selectedPuzzlesCount > 0);
         amvPuzzleActions.setButtonEnabled(PuzzleSelectionAction.SelectAll.ordinal(),
@@ -261,18 +267,18 @@ public final class PuzzleMenuActivity extends BaseActivity {
         vwDialogBg.setVisibility(View.VISIBLE);
     }
 
-    public void onNewPuzzleClick(View v) {
+    private void onNewPuzzleClick(View v) {
         goToActivity(ActivityType.PuzzleEditor);
     }
 
-    public void onEditPuzzleClick(View v) {
+    private void onEditPuzzleClick(View v) {
         Intent intent = ActivityType.PuzzleEditor.getIntent(this);
         int puzzleIdx = customPuzzleSaves.indexOf((CustomPuzzleSave) psgvPuzzles.getSelectedPuzzles().get(0));
         intent.putExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, puzzleIdx);
         goToActivity(intent);
     }
 
-    public void onChangeDetailsClick(View v) {
+    private void onChangeDetailsClick(View v) {
         PuzzleSave puzzleSave = psgvPuzzles.getSelectedPuzzles().get(0);
 
         pdvDetails.setDefaultPuzzleName(puzzleSave.getName());
@@ -283,7 +289,7 @@ public final class PuzzleMenuActivity extends BaseActivity {
         amvPuzzleActions.setVisibility(View.GONE);
     }
 
-    public void onRemoveClick(View v) {
+    private void onRemoveClick(View v) {
         if (puzzlesCategory == PuzzleCategory.Official) {
             throw new IllegalStateException("Official puzzle removal is forbidden");
         }
@@ -313,7 +319,13 @@ public final class PuzzleMenuActivity extends BaseActivity {
         hidePuzzleActions();
     }
 
-    public void onImportClick(View v) {
+    private void onCopyClick(View v) {
+        // TODO
+
+        hidePuzzleActions();
+    }
+
+    private void onImportClick(View v) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.alert_dialog_theme);
         builder.setTitle(R.string.import_puzzle_title);
 
@@ -375,7 +387,7 @@ public final class PuzzleMenuActivity extends BaseActivity {
         goToActivity(intent);
     }
 
-    public void onExportClick(View v) {
+    private void onExportClick(View v) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.alert_dialog_theme);
         builder.setTitle(R.string.export_puzzle_title);
         builder.setItems(
@@ -451,7 +463,7 @@ public final class PuzzleMenuActivity extends BaseActivity {
         PuzzleExportUtils.exportAsTextIntent(this, builder.toString().trim());
     }
 
-    public void onSelectAllClick(View v) {
+    private void onSelectAllClick(View v) {
         psgvPuzzles.selectAllPuzzles();
         hidePuzzleActions();
     }
