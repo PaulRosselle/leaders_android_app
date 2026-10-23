@@ -270,4 +270,6 @@
     <string name="change_details">Change details</string>
     <string name="changes_saved">Changes saved!</string>
     <string name="copy">Copy</string>
+    <string name="puzzles_not_imported">Puzzles Not Imported</string>
+    <string name="duplicate_of">- \"%s\" duplicate of \"%s\"%n</string>
 </resources>

@@ -29,6 +29,8 @@ import com.leaders.app.views.puzzle.PuzzleSelectorGroupView;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
 import com.leaders.puzzlelogic.entities.OfficialPuzzleSave;
+import com.leaders.puzzlelogic.entities.PuzzleIdentity;
+import com.leaders.puzzlelogic.entities.PuzzleImportAnalysis;
 import com.leaders.puzzlelogic.entities.PuzzleSave;
 import com.leaders.puzzlelogic.enums.PuzzleCategory;
 
@@ -37,6 +39,7 @@ import org.json.JSONObject;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public final class PuzzleMenuActivity extends BaseActivity {
@@ -405,15 +408,33 @@ public final class PuzzleMenuActivity extends BaseActivity {
             // First we try to load the puzzles from the file
             List<CustomPuzzleSave> importedPuzzles = JsonUtils.loadCustomPuzzlesFromFile(this, uri);
 
-            if (!importedPuzzles.isEmpty()) {
+            PuzzleImportAnalysis importAnalysis = new PuzzleImportAnalysis(importedPuzzles, customPuzzleSaves);
+
+            if (!importAnalysis.getNewPuzzles().isEmpty()) {
                 // Then we save the new custom puzzles list
-                customPuzzleSaves.addAll(importedPuzzles);
+                customPuzzleSaves.addAll(importAnalysis.getNewPuzzles());
                 JsonUtils.saveCustomPuzzles(this, customPuzzleSaves);
 
                 // Finally we display the new puzzles and inform the user that the import was successful
                 psgvPuzzles.setPuzzles(customPuzzleSaves);
 
                 Toast.makeText(this, R.string.import_successful, Toast.LENGTH_SHORT).show();
+            }
+
+            if (!importAnalysis.getDuplicates().isEmpty()) {
+                StringBuilder stringBuilder = new StringBuilder();
+                for (Map.Entry<PuzzleIdentity, String> entry : importAnalysis.getDuplicates().entrySet()) {
+                    stringBuilder.append(String.format(getString(R.string.duplicate_of),
+                            entry.getKey().getName().toUpperCase(),
+                            entry.getValue().toUpperCase()
+                    ));
+                }
+
+                new AlertDialog.Builder(this, R.style.alert_dialog_theme)
+                        .setTitle(R.string.puzzles_not_imported)
+                        .setMessage(stringBuilder.toString().trim())
+                        .setPositiveButton(R.string.ok, null)
+                        .show();
             }
         } catch (IllegalArgumentException e) {
             Toast.makeText(this, R.string.error_import_file_loading, Toast.LENGTH_SHORT).show();
