@@ -27,4 +27,10 @@
     <color name="cyan_ripple_effect">#333ABF97</color>
     <color name="golden_ripple_effect">#33F9B235</color>
     <color name="red_ripple_effect">#33F14A40</color>
+    <color name="difficulty_easy_multiplicator">#BCFF9E</color>
+    <color name="difficulty_hard_multiplicator">#ECA62A</color>
+    <color name="difficulty_extreme_multiplicator">#C85F00</color>
+    <color name="difficulty_easy">#B8B221</color>
+    <color name="difficulty_hard">#E67409</color>
+    <color name="difficulty_extreme">#C34200</color>
 </resources>

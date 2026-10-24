@@ -1,14 +1,18 @@
 package com.leaders.app.views.puzzle;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.PorterDuff;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 import com.leaders.R;
 import com.leaders.puzzlelogic.enums.PuzzleDifficulty;
@@ -41,6 +45,7 @@ public class PuzzleDifficultyView extends LinearLayout {
         imvDifficulty.setAdjustViewBounds(true);
         imvDifficulty.setImageResource(getImvDifficultyResId(true));
         imvDifficulty.setOnClickListener(this::onImvClick);
+        imvDifficulty.setImageTintMode(PorterDuff.Mode.MULTIPLY);
 
         return imvDifficulty;
     }
@@ -67,10 +72,24 @@ public class PuzzleDifficultyView extends LinearLayout {
     public void setDifficulty(@NonNull PuzzleDifficulty puzzleDifficulty) {
         this.difficulty = puzzleDifficulty;
 
+        ColorStateList colorTint = ContextCompat.getColorStateList(getContext(),  getTintResId(puzzleDifficulty));
+
         for (PuzzleDifficulty difficulty : PuzzleDifficulty.values()) {
-            ((ImageView) getChildAt(difficulty.ordinal())).setImageResource(getImvDifficultyResId(
+            ImageView imvDifficulty = (ImageView) getChildAt(difficulty.ordinal());
+            imvDifficulty.setImageResource(getImvDifficultyResId(
                     difficulty.ordinal() > puzzleDifficulty.ordinal())
             );
+            imvDifficulty.setImageTintList(colorTint);
+        }
+    }
+
+    @ColorRes
+    private int getTintResId(@NonNull PuzzleDifficulty puzzleDifficulty) {
+        switch (puzzleDifficulty) {
+            case Easy: return R.color.difficulty_easy_multiplicator;
+            case Hard: return R.color.difficulty_hard_multiplicator;
+            case Extreme: return R.color.difficulty_extreme_multiplicator;
+            default: return R.color.white;
         }
     }
 

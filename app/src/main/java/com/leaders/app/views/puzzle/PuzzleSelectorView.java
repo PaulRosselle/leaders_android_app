@@ -5,6 +5,7 @@ import android.content.Context;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
@@ -12,6 +13,7 @@ import com.leaders.R;
 import com.leaders.app.views.selector.SelectorView;
 import com.leaders.puzzlelogic.entities.OfficialPuzzleSave;
 import com.leaders.puzzlelogic.entities.PuzzleSave;
+import com.leaders.puzzlelogic.enums.PuzzleDifficulty;
 
 @SuppressLint("ViewConstructor")
 public final class PuzzleSelectorView extends SelectorView<PuzzleSave> {
@@ -44,18 +46,33 @@ public final class PuzzleSelectorView extends SelectorView<PuzzleSave> {
 
         PuzzleSave puzzleSave = getItem();
 
-        applySolvedState(puzzleSave.isSolved());
+        applySolvedState(puzzleSave);
 
         pdvDifficulty.setDifficulty(puzzleSave.getDifficulty());
 
         applyIdentity(puzzleSave);
     }
 
-    private void applySolvedState(boolean solved) {
+    private void applySolvedState(@NonNull PuzzleSave puzzleSave) {
+        boolean solved = puzzleSave.isSolved();
+
+        imvSolved.setImageTintList(ContextCompat.getColorStateList(
+                getContext(), getTintResId(puzzleSave.getDifficulty()))
+        );
         imvSolved.setAlpha(solved ? 0.8f : 0.5f);
         btnMain.setBackgroundTintList(ContextCompat.getColorStateList(getContext(),
                 solved ? R.color.transparent_golden : R.color.darker_background
         ));
+    }
+
+    @ColorRes
+    private int getTintResId(@NonNull PuzzleDifficulty puzzleDifficulty) {
+        switch (puzzleDifficulty) {
+            case Easy: return R.color.difficulty_easy;
+            case Hard: return R.color.difficulty_hard;
+            case Extreme: return R.color.difficulty_extreme;
+            default: return R.color.app_golden;
+        }
     }
 
     private void applyIdentity(@NonNull PuzzleSave puzzleSave) {
