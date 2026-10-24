@@ -25,7 +25,7 @@
     <string name="unselect_all">Tout déselectionner</string>
     <string name="puzzle_solved_format">%s résolu !</string>
     <string name="checkbox">Case à cocher</string>
-    <string name="official_puzzle_name_format">#%d</string>
+    <string name="official_puzzle_name_format">%d</string>
     <string name="by_author">par %s</string>
     <string name="official_puzzles">officiels</string>
     <string name="custom">personnalisés</string>

@@ -23,7 +23,7 @@
         app:strokeWidth="@dimen/default_stroke_width" />
 
     <ImageView
-        android:id="@+id/imvPuzzleSolved_vwPuzzleSelector"
+        android:id="@+id/imvSolved_vwPuzzleSelector"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_marginStart="4dp"
@@ -31,7 +31,7 @@
         android:layout_marginEnd="4dp"
         android:layout_marginBottom="4dp"
         android:adjustViewBounds="true"
-        android:alpha="0.4"
+        android:alpha="0.5"
         android:contentDescription="@string/checkbox"
         android:tintMode="multiply"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -42,7 +42,7 @@
         app:tint="@color/app_golden" />
 
     <TextView
-        android:id="@+id/txvPuzzleName_vwPuzzleSelector"
+        android:id="@+id/txvName_vwPuzzleSelector"
         android:layout_width="0dp"
         android:layout_height="24dp"
         android:layout_marginStart="4dp"
@@ -58,6 +58,8 @@
         android:gravity="center"
         android:includeFontPadding="false"
         android:maxLines="1"
+        android:shadowColor="@color/black"
+        android:shadowRadius="6"
         android:textAlignment="gravity"
         android:textAllCaps="false"
         android:textColor="@color/font"
@@ -67,10 +69,11 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0"
-        tools:text="Test puzzle" />
+        tools:text="Test puzzle"
+        tools:visibility="gone" />
 
     <TextView
-        android:id="@+id/txvPuzzleAuthor_vwPuzzleSelector"
+        android:id="@+id/txvAuthor_vwPuzzleSelector"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
@@ -83,15 +86,46 @@
         android:fontFamily="@font/bukhari_script"
         android:gravity="center"
         android:maxLines="1"
+        android:shadowColor="@color/black"
+        android:shadowRadius="6"
         android:textAlignment="gravity"
         android:textColor="@color/font"
         android:textSize="11sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/btnMain_vwPuzzleSelector"
-        app:layout_constraintTop_toBottomOf="@+id/txvPuzzleName_vwPuzzleSelector"
+        app:layout_constraintTop_toBottomOf="@+id/txvName_vwPuzzleSelector"
         app:layout_constraintVertical_bias="0.0"
-        tools:text="par Paul" />
+        tools:text="par Paul"
+        tools:visibility="gone" />
+
+    <TextView
+        android:id="@+id/txvId_vwPuzzleSelector"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="4dp"
+        android:autoSizeTextType="none"
+        android:ellipsize="none"
+        android:fontFamily="@font/fredoka_medium"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:maxLines="1"
+        android:shadowColor="@color/black"
+        android:shadowRadius="6"
+        android:textAlignment="gravity"
+        android:textAllCaps="false"
+        android:textColor="@color/font"
+        android:textSize="28dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/pdvDifficulty_vwPuzzleSelector"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="123456789"
+        tools:visibility="visible" />
 
     <com.leaders.app.views.puzzle.PuzzleDifficultyView
         android:id="@+id/pdvDifficulty_vwPuzzleSelector"
