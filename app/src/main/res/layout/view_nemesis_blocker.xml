@@ -73,7 +73,7 @@
         android:insetBottom="0dp"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-        android:text="@string/interrupt"
+        android:text="@string/choose_the_move"
         android:textColor="@color/font"
         android:textSize="20sp"
         app:cornerRadius="@dimen/default_corner_radius"
