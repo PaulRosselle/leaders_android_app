@@ -6,16 +6,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 
 import com.leaders.R;
 import com.leaders.app.views.selector.SelectorView;
+import com.leaders.puzzlelogic.entities.OfficialPuzzleSave;
 import com.leaders.puzzlelogic.entities.PuzzleSave;
 
 @SuppressLint("ViewConstructor")
 public final class PuzzleSelectorView extends SelectorView<PuzzleSave> {
     private ImageView imvSolved;
+    private TextView txvId;
     private TextView txvName;
     private TextView txvAuthor;
     private PuzzleDifficultyView pdvDifficulty;
@@ -28,9 +29,10 @@ public final class PuzzleSelectorView extends SelectorView<PuzzleSave> {
     protected void initViews() {
         super.initViews();
 
-        imvSolved = findViewById(R.id.imvPuzzleSolved_vwPuzzleSelector);
-        txvName = findViewById(R.id.txvPuzzleName_vwPuzzleSelector);
-        txvAuthor = findViewById(R.id.txvPuzzleAuthor_vwPuzzleSelector);
+        imvSolved = findViewById(R.id.imvSolved_vwPuzzleSelector);
+        txvId = findViewById(R.id.txvId_vwPuzzleSelector);
+        txvName = findViewById(R.id.txvName_vwPuzzleSelector);
+        txvAuthor = findViewById(R.id.txvAuthor_vwPuzzleSelector);
         pdvDifficulty = findViewById(R.id.pdvDifficulty_vwPuzzleSelector);
         pdvDifficulty.setReadonly(true);
     }
@@ -42,26 +44,52 @@ public final class PuzzleSelectorView extends SelectorView<PuzzleSave> {
 
         PuzzleSave puzzleSave = getItem();
 
-        imvSolved.setImageResource(puzzleSave.isSolved() ?
-                R.drawable.icon_highlighted_crown : R.drawable.icon_empty_crown
-        );
+        applySolvedState(puzzleSave.isSolved());
 
         pdvDifficulty.setDifficulty(puzzleSave.getDifficulty());
 
+        applyIdentity(puzzleSave);
+    }
+
+    private void applySolvedState(boolean solved) {
+        imvSolved.setAlpha(solved ? 0.8f : 0.5f);
+        btnMain.setBackgroundTintList(ContextCompat.getColorStateList(getContext(),
+                solved ? R.color.transparent_golden : R.color.darker_background
+        ));
+    }
+
+    private void applyIdentity(@NonNull PuzzleSave puzzleSave) {
+        if (puzzleSave instanceof OfficialPuzzleSave) {
+            applyOfficialIdentity(puzzleSave);
+        } else {
+            applyCustomIdentity(puzzleSave);
+        }
+    }
+
+    private void applyOfficialIdentity(@NonNull PuzzleSave puzzleSave) {
+        txvId.setVisibility(VISIBLE);
+        txvId.setText(puzzleSave.getName());
+
+        txvName.setVisibility(GONE);
+        txvAuthor.setVisibility(GONE);
+    }
+
+    private void applyCustomIdentity(@NonNull PuzzleSave puzzleSave) {
+        txvId.setVisibility(GONE);
+        txvName.setVisibility(VISIBLE);
         txvName.setText(puzzleSave.getName());
 
-        ConstraintLayout.LayoutParams txvNameLayoutParams = (ConstraintLayout.LayoutParams) txvName.getLayoutParams();
+        String author = puzzleSave.getAuthor();
 
-        if (!puzzleSave.getAuthor().isEmpty()) {
-            txvNameLayoutParams.verticalBias = 0.0f;
-            txvAuthor.setVisibility(VISIBLE);
-            txvAuthor.setText(String.format(getResources().getString(R.string.by_author), puzzleSave.getAuthor()));
-        } else {
-            txvNameLayoutParams.verticalBias = 0.5f;
+        if (author.isEmpty()) {
             txvAuthor.setVisibility(GONE);
+            return;
         }
 
-        txvName.setLayoutParams(txvNameLayoutParams);
+        txvAuthor.setVisibility(VISIBLE);
+        txvAuthor.setText(
+                getResources().getString(R.string.by_author, author)
+        );
     }
 
     @Override

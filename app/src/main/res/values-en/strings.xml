@@ -24,7 +24,7 @@
     <string name="unselect_all">Unselect all</string>
     <string name="puzzle_solved_format">%s solved !</string>
     <string name="checkbox">Checkbox</string>
-    <string name="official_puzzle_name_format">#%d</string>
+    <string name="official_puzzle_name_format">%d</string>
     <string name="by_author">by %s</string>
     <string name="official_puzzles">officials</string>
     <string name="custom">custom</string>
