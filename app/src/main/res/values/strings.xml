@@ -275,8 +275,8 @@
     <string name="help">Aide</string>
     <string name="help_message">Restez appuyé sur un personnage pour afficher sa compétence.\n\nLe bouton \"{IMAGE_1}\" annule votre dernière action.\nCliquer sur un élément non-interactif annule l\'action en cours.\n\nRappel : Pour gagner, capturez le leader adverse en plaçant 2 de vos personnages sur des cases adjacentes à la sienne, ou encerclez-le complètement.\nChacun de vos personnage dispose d\'une action par tour. Vous n\'êtes pas obligé de tous les jouer pendant votre tour.</string>
     <string name="enemy_nemesis_must_play">La Nemesis adverse doit jouer</string>
-    <string name="interrupt">Interrompre</string>
-    <string name="searching_for_a_move_able_to_block_you">Recherche d\'un coup capable de vous bloquer en cours…</string>
+    <string name="choose_the_move">Choisir le coup</string>
+    <string name="searching_for_a_move_able_to_block_you">Recherche du meilleur coup adverse…</string>
     <string name="difficulty">Difficulté</string>
     <string name="puzzle_details">Détails du puzzle</string>
     <string name="change_details">Modifier les détails</string>
