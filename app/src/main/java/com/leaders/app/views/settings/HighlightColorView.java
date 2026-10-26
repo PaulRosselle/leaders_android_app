@@ -1,6 +1,7 @@
 package com.leaders.app.views.settings;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
@@ -11,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 
 import com.leaders.R;
 import com.leaders.app.enums.HighlightColor;
@@ -48,10 +50,13 @@ public class HighlightColorView extends ConstraintLayout {
         LinearLayout llyColors = findViewById(R.id.llyColors_vwHighlightColor);
         int highlightColorSize = getResources().getDimensionPixelSize(R.dimen.round_button_size);
 
+        ColorStateList checkTint = ContextCompat.getColorStateList(context, R.color.darker_background);
+
         for (HighlightColor highlightColor : HighlightColor.values()) {
             ImageView imvHighlightColor = new ImageView(context);
-            imvHighlightColor.setImageResource(highlightColor.getColorResId());
-            imvHighlightColor.setForeground(AppCompatResources.getDrawable(context, R.drawable.circular_ripple));
+            imvHighlightColor.setBackgroundResource(highlightColor.getColorResId());
+            imvHighlightColor.setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.circular_ripple));
+            imvHighlightColor.setForegroundTintList(checkTint);
             imvHighlightColor.setOnClickListener(this::onColorClick);
 
             LinearLayout llyContainer = new LinearLayout(context);
@@ -67,10 +72,12 @@ public class HighlightColorView extends ConstraintLayout {
         this.color = color;
 
         for (int i = 0; i < colorViews.size(); i++) {
-            colorViews.get(i).animate()
-                    .alpha(i == color.ordinal() ? 1f : 0.3f)
-                    .setDuration(200)
-                    .start();
+            ImageView colorView = colorViews.get(i);
+            boolean isSelected = i == color.ordinal();
+            colorView.setForeground(isSelected ?
+                    AppCompatResources.getDrawable(getContext(), R.drawable.icon_checked) : null
+            );
+            colorView.animate().alpha(isSelected ? 1f : 0.3f).setDuration(200).start();
         }
     }
 

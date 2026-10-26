@@ -245,7 +245,8 @@
     <string name="mail_message">message</string>
     <string name="send">envoyer</string>
     <string name="contact_me">me contacter</string>
-    <string name="problem_suggestion">un problème,\nune suggestion ?</string>
+    <string name="problem_suggestion_title">un problème, une suggestion ?</string>
+    <string name="problem_suggestion_message">Envoyez un email pour faire part de vos retours sur l\'application.</string>
     <string name="credits">crédits</string>
     <string name="credits_title">CReditS</string>
     <string name="official_game_intro">Leaders est un jeu de société compétitif publié par Studio H en 2025 proposant à deux joueurs de s\'affronter dans un duel tactique intense.</string>
@@ -259,6 +260,8 @@
     <string name="thanks">remerciements</string>
     <string name="app_adaptation">Cette application est une adaptation non officielle du jeu de société Leaders. Elle a été réalisée avec l\'aide de la fantastique communauté de Leaders.</string>
     <string name="playable_items_animation">Animation des éléments jouables</string>
+    <string name="playable_items_animation_title">Animation de jouabilité</string>
+    <string name="playable_items_animation_message">Jouer une animation sur les éléments avec lesquels le joueur peut intéragir.</string>
     <string name="let_the_duel_beggin">QUE LE DUEL COMMENCE !</string>
     <string name="match_vs_bot_reminder">Pour votre première partie, vous affronter un bot.\n\nRappel : pour gagner, capturez le leader adverse avec 2 de vos personnages adjacents ou encerclez-le totalement.</string>
     <string name="lets_go">C\'est parti</string>
@@ -285,7 +288,8 @@
     <string name="puzzles_not_imported">Puzzles non importés</string>
     <string name="duplicate_of">- \"%s\" doublon de \"%s\"%n</string>
     <string name="screen_auto_rotation">Rotation auto de l\'écran</string>
-    <string name="settings_auto_rotation">Rotation auto de l\'écran en duel</string>
+    <string name="screen_auto_rotation_title">Rotation auto de l\'écran</string>
+    <string name="screen_auto_rotation_message">Lors d\'un duel, retourner automatiquement l\'écran lorsque le joueur change.</string>
     <string name="exit">Quitter</string>
     <string name="search">Rechercher…</string>
     <string name="filter">Filter</string>
@@ -311,12 +315,13 @@
     <string name="puzzle_difficulty_extreme">Extreme</string>
     <string name="puzzle_not_solved">puzzle non résolu</string>
     <string name="puzzle_solved">puzzle résolu</string>
-    <string name="apply_not_solved_to_puzzle">Remettre les puzzles \"à résoudre\" pour les recommencer.</string>
+    <string name="apply_not_solved_to_puzzle">Remettez les puzzles \"à résoudre\" pour les recommencer.</string>
     <string name="reset_progress">Réinitaliser la progression</string>
     <string name="puzzle_reset_button_text">RÉINITIALISER</string>
     <string name="puzzle_progress_reset_dialog_title">Réinitialiser la progression ?</string>
     <string name="puzzle_progress_reset_dialog_message">Tous les puzzles seront marqués comme non-résolus. Cette action est irreversible.</string>
     <string name="reset_all">Tout réinitialiser</string>
     <string name="progress_reset">Progression réinitalisée !</string>
+    <string name="customize_your_characters">Personnalisez vos personnages avec les apparences disponibles.</string>
 
 </resources>

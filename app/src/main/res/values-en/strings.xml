@@ -237,7 +237,8 @@
     <string name="mail_message">message</string>
     <string name="send">send</string>
     <string name="contact_me">contact me</string>
-    <string name="problem_suggestion">A problem,\na suggestion ?</string>
+    <string name="problem_suggestion_title">A problem, a suggestion ?</string>
+    <string name="problem_suggestion_message">Send a email to give a feedback about the application.</string>
     <string name="credits">credits</string>
     <string name="credits_title">CReditS</string>
     <string name="official_game_intro">Leaders is a competitive board game edited by Studio H in 2025 allowing two players to battle in an intense strategic duel.</string>
@@ -247,6 +248,8 @@
     <string name="thanks">thanks</string>
     <string name="app_adaptation">This application is a non-official adaptation of the Leaders board game. It was made with the help of the fantastic Leaders community.</string>
     <string name="playable_items_animation">playable items animation</string>
+    <string name="playable_items_animation_title">playable animation</string>
+    <string name="playable_items_animation_message">play an animation on UI element which player can interact with.</string>
     <string name="let_the_duel_beggin">LET THE DUEL BEGGIN !</string>
     <string name="match_vs_bot_reminder">For your first game, you will fight against a bot.\n\nReminder: to win, capture the opponent\'s leader with 2 adjacent allies or surround him completely.</string>
     <string name="lets_go">Let\'s go</string>
@@ -273,7 +276,8 @@
     <string name="puzzles_not_imported">Puzzles Not Imported</string>
     <string name="duplicate_of">- \"%s\" duplicate of \"%s\"%n</string>
     <string name="screen_auto_rotation">Screen auto rotation</string>
-    <string name="settings_auto_rotation">Screen autorotation in duel mode</string>
+    <string name="screen_auto_rotation_title">Screen auto rotation</string>
+    <string name="screen_auto_rotation_message">During a duel, rotate the screen automatically when the player change.</string>
     <string name="exit">Exit</string>
     <string name="search">Search…</string>
     <string name="filter">Filter</string>
@@ -306,4 +310,5 @@
     <string name="puzzle_progress_reset_dialog_message">All puzzles will be marked as unsolved. This can\'t be undone.</string>
     <string name="reset_all">Reset all</string>
     <string name="progress_reset">Progress reset!</string>
+    <string name="customize_your_characters">Customize your characters with the available skins.</string>
 </resources>
