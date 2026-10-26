@@ -35,6 +35,7 @@ import com.leaders.gamelogic.enums.GamePhaseType;
 import com.leaders.gamelogic.enums.RecruitmentMotionType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.enums.WarningType;
+import com.leaders.gamelogic.factories.GameFactory;
 import com.leaders.gamelogic.historyentries.segments.ActionsPhase;
 import com.leaders.gamelogic.historyentries.segments.BanishmentPhase;
 import com.leaders.gamelogic.historyentries.segments.RecruitmentPhase;
@@ -52,6 +53,7 @@ import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.interactions.InteractionType;
 import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.RecruitmentQuery;
+import com.leaders.puzzlelogic.utilities.GameStateHashUtils;
 
 import org.junit.Test;
 
@@ -204,10 +206,19 @@ public class GameHandlerTest {
 
     @Test
     public void getCurrentHistory_returnsCurrentHistory() {
-        GameHistory history = createGameHistory();
+        GameHistory history = createPlayableCharacterGameHistory(new ArrayList<>());
         GameHandler gameHandler = new GameHandler(history, new TestGameFlowListener(history));
 
-        assertSame(history, gameHandler.getCurrentHistory());
+        String expectedGameHash = GameStateHashUtils.createHash(
+                GameFactory.create(history),
+                history
+        );
+        String gameHash = GameStateHashUtils.createHash(
+                gameHandler.getCurrentGame(),
+                gameHandler.getCurrentHistory()
+        );
+
+        assertEquals(expectedGameHash, gameHash);
     }
 
     @Test
@@ -972,8 +983,16 @@ public class GameHandlerTest {
         // The listener must have been notified exactly once.
         assertEquals(1, listener.getActionUndoneCount());
 
+        String expectedGameHash = GameStateHashUtils.createHash(
+                gameHandler.getCurrentGame(),
+                gameHandler.getCurrentHistory()
+        );
+        String gameHash = GameStateHashUtils.createHash(
+                listener.getLastActionUndoneGame(),
+                gameHandler.getCurrentHistory()
+        );
         // The notified game must be the current game.
-        assertSame(gameHandler.getCurrentGame(), listener.getLastActionUndoneGame());
+        assertEquals(expectedGameHash, gameHash);
 
         // The action must actually have been undone.
         assertTrue(actionsPhase.getActions().isEmpty());

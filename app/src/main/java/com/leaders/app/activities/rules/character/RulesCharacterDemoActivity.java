@@ -227,12 +227,12 @@ public final class RulesCharacterDemoActivity extends PlayableActivity {
     //region CONTROLLER METHODS
 
     @Override
-    public void onGameEnded(@NonNull Player winner) {
+    public void onGameEnded(@NonNull Player winner, @NonNull GameContext context) {
         runOnUiThread(() -> showEndGame(winner));
     }
 
     @Override
-    public void onPhaseChanged(@NonNull GamePhase phase) {
+    public void onPhaseChanged(@NonNull GamePhase phase, @NonNull GameContext context) {
         throw new IllegalStateException("Phase change is not supported within character demo");
     }
 

@@ -34,7 +34,6 @@ import com.leaders.app.views.rules.TutorialNavigationView;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
-import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
@@ -445,52 +444,47 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
     //region GAME CONTROLLER LISTENER METHODS
 
     @Override
-    public void onGameStarted(@NonNull Game game) {
+    public void onGameStarted(@NonNull GameContext context) {
         runOnUiThread(() -> {
             isGameEnded = false;
-            GameContext gameContext = controller.getCurrentContext();
 
-            initPlayerViews(gameContext);
-            bdvBoard.setBoard(game.getBoard());
-            ccsvCardSelector.applyGameModeParams(gameContext.getGameMode());
+            initPlayerViews(context);
+            bdvBoard.setBoard(context.getBoard());
+            ccsvCardSelector.applyGameModeParams(context.getGameMode());
 
-            clearInteractionUI(gameContext);
+            clearInteractionUI(context);
         });
     }
 
     @Override
-    public void onGameEnded(@NonNull Player winner) {
-        GameContext gameContext = controller.getCurrentContext();
-
-        clearInteractionUI(gameContext);
-        ButtonUtils.setEnabled(btnCards, true);
-        pbvPlayer.setInfo(R.string.game_ended, R.drawable.player_bottom_bg_info);
-        showEndGame(gameContext, winner);
-
-        isGameEnded = true;
-
-        setBtnNextPhaseEnabled(true, true);
-    }
-
-    @Override
-    public void onPhaseChanged(@NonNull GamePhase phase) {
+    public void onGameEnded(@NonNull Player winner, @NonNull GameContext context) {
         runOnUiThread(() -> {
-            GameContext gameContext = controller.getCurrentContext();
+            clearInteractionUI(context);
+            ButtonUtils.setEnabled(btnCards, true);
+            pbvPlayer.setInfo(R.string.game_ended, R.drawable.player_bottom_bg_info);
+            showEndGame(context, winner);
 
-            clearInteractionUI(gameContext);
+            isGameEnded = true;
 
-            applyPlayerChange(gameContext);
-
-            applyPhaseChange(phase, !isBotPlaying(gameContext));
+            setBtnNextPhaseEnabled(true, true);
         });
     }
 
     @Override
-    public void onInteractionRequired(@NonNull InteractionRequest request) {
+    public void onPhaseChanged(@NonNull GamePhase phase, @NonNull GameContext context) {
+        runOnUiThread(() -> {
+            clearInteractionUI(context);
+            applyPlayerChange(context);
+            applyPhaseChange(phase, !isBotPlaying(context));
+        });
+    }
+
+    @Override
+    public void onInteractionRequired(@NonNull InteractionRequest request, @NonNull GameContext context) {
         if (isBotPlaying(controller.getCurrentContext())) {
             TutorialBotUtils.handleRequest(controller, request);
         } else {
-            super.onInteractionRequired(request);
+            super.onInteractionRequired(request, context);
         }
     }
 

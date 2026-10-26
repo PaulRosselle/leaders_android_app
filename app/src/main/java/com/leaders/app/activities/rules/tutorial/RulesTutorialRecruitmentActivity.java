@@ -24,7 +24,6 @@ import com.leaders.app.views.duel.CharacterCardSelectionView;
 import com.leaders.app.views.portrait.PortraitView;
 import com.leaders.app.views.rules.TutorialNavigationView;
 import com.leaders.gamelogic.entities.Character;
-import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
@@ -320,37 +319,37 @@ public class RulesTutorialRecruitmentActivity extends PlayableActivity implement
     //region GAME CONTROLLER LISTENER METHODS
 
     @Override
-    public void onGameStarted(@NonNull Game game) {
+    public void onGameStarted(@NonNull GameContext context) {
         runOnUiThread(() -> {
-            GameContext gameContext = controller.getCurrentContext();
+            bdvBoard.setBoard(context.getBoard());
+            ccsvCardSelector.applyGameModeParams(context.getGameMode());
 
-            bdvBoard.setBoard(game.getBoard());
-            ccsvCardSelector.applyGameModeParams(gameContext.getGameMode());
-
-            clearInteractionUI(gameContext);
+            clearInteractionUI(context);
         });
     }
 
     @Override
-    public void onGameEnded(@NonNull Player winner) {
+    public void onGameEnded(@NonNull Player winner, @NonNull GameContext context) {
         throw new IllegalStateException("End game is not supported within recruitment tutorial activity");
     }
 
     @Override
-    public void onPhaseChanged(@NonNull GamePhase phase) {
-        ccsvCardSelector.setPortraitsVisible(false);
-        txvAfter.setVisibility(View.VISIBLE);
-        setBtnNextChapterEnabled(true);
+    public void onPhaseChanged(@NonNull GamePhase phase, @NonNull GameContext context) {
+        runOnUiThread(() -> {
+            ccsvCardSelector.setPortraitsVisible(false);
+            txvAfter.setVisibility(View.VISIBLE);
+            setBtnNextChapterEnabled(true);
+        });
     }
 
     @Override
-    public void onInteractionRequired(@NonNull InteractionRequest request) {
+    public void onInteractionRequired(@NonNull InteractionRequest request, @NonNull GameContext context) {
         // Playable character action requests are ignored in the activity
         if (request.getRequestType() == InteractionType.PlayableCharacterExpected) {
             return;
         }
 
-        super.onInteractionRequired(request);
+        super.onInteractionRequired(request, context);
     }
 
     //endregion
