@@ -1,5 +1,6 @@
 package com.leaders.app.activities.puzzle;
 
+import androidx.annotation.MenuRes;
 import androidx.appcompat.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
@@ -241,6 +242,12 @@ public final class PuzzleMenuActivity extends BaseActivity implements SearchTool
 
         puzzlesCategory = checkedId == R.id.btnOfficial_actPuzzleMenu ?
                 PuzzleCategory.Official : PuzzleCategory.Custom;
+
+        searchViewModel.setCategory(puzzlesCategory);
+        stbSearch.setSortMenu(
+                getSortMenuResId(),
+                PuzzleSaveToolbarMapper.toMenuItemId(searchViewModel.getCriteria().getSortMode())
+        );
         refreshPuzzles();
     }
 
@@ -268,7 +275,6 @@ public final class PuzzleMenuActivity extends BaseActivity implements SearchTool
     private void initToolbar() {
         // Restore the state before the listener is applied to avoid ealy notifications
         PuzzleSaveCriteria criteria = searchViewModel.getCriteria();
-        stbSearch.setSortMenu(R.menu.menu_sort, PuzzleSaveToolbarMapper.toMenuItemId(criteria.getSortMode()));
         stbSearch.setSelectedFilters(PuzzleSaveToolbarMapper.toSelection(criteria.getFilters()));
         stbSearch.setSearchKey(criteria.getSearchKey());
         stbSearch.setListener(this);
@@ -291,6 +297,11 @@ public final class PuzzleMenuActivity extends BaseActivity implements SearchTool
     @Override
     public void onFiltersChanged(@NonNull Map<String, Set<String>> selection) {
         searchViewModel.setFilters(PuzzleSaveToolbarMapper.toFilters(selection));
+    }
+
+    @MenuRes
+    private int getSortMenuResId() {
+        return puzzlesCategory == PuzzleCategory.Official ? R.menu.menu_sort_official : R.menu.menu_sort_custom;
     }
 
     //endregion
