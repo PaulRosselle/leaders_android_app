@@ -511,7 +511,6 @@ public final class PuzzleMenuActivity extends BaseActivity implements SearchTool
         }
 
         CustomPuzzleSave importedPuzzleSave = CustomPuzzleSave.getDefault(gameHistory);
-        customPuzzleSaves.add(importedPuzzleSave);
         JsonUtils.saveCustomPuzzles(this, customPuzzleSaves);
 
         Intent intent = ActivityType.PuzzleEditor.getIntent(this);

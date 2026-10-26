@@ -217,6 +217,9 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
             }
         }
 
+        amvPuzzleActions.setButtonEnabled(PuzzlePlayerAction.GoToNextPuzzle.ordinal(), canChangePuzzle());
+        amvPuzzleActions.setButtonEnabled(PuzzlePlayerAction.GoToPreviousPuzzle.ordinal(), canChangePuzzle());
+
         if (puzzleGameHistory == null) {
             throw new IllegalStateException("No puzzle data received by the player");
         }
@@ -325,9 +328,6 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     }
 
     private void onPuzzleActionsClick(View v) {
-        // Before showing the actions menu, we must update the available actions based on the puzzle state
-        updatePuzzleActions();
-
         amvPuzzleActions.setVisibility(View.VISIBLE);
         vwDialogBg.setVisibility(View.VISIBLE);
     }
@@ -491,7 +491,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
 
             saveProgress(isVictory);
             showEndGame(winnerColor, isVictory);
-            setNextPuzzleVisible(isVictory && hasNextPuzzle());
+            setNextPuzzleVisible(isVictory && canChangePuzzle());
         });
     }
 
@@ -509,11 +509,19 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     }
 
     private void onNextPuzzleClick(View v) {
-        loadPuzzle(puzzleSaves.get(puzzleSaves.indexOf(puzzleSave) + 1));
+        int nextPuzzleIndex = puzzleSaves.indexOf(puzzleSave) + 1;
+        if (nextPuzzleIndex >= puzzleSaves.size()) {
+            nextPuzzleIndex = 0;
+        }
+        loadPuzzle(puzzleSaves.get(nextPuzzleIndex));
     }
 
     private void onPreviousPuzzleClick(View v) {
-        loadPuzzle(puzzleSaves.get(puzzleSaves.indexOf(puzzleSave) - 1));
+        int previousPuzzleIndex = puzzleSaves.indexOf(puzzleSave) - 1;
+        if (previousPuzzleIndex <= 0) {
+            previousPuzzleIndex = puzzleSaves.size() - 1;
+        }
+        loadPuzzle(puzzleSaves.get(previousPuzzleIndex));
     }
 
     private void restartPuzzle() {
@@ -586,21 +594,10 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
         txvAuthorName.setText(String.format(getString(R.string.by_author), authorName));
     }
 
-    private boolean hasNextPuzzle() {
-        int puzzleIdx = puzzleSaves.indexOf(puzzleSave);
+    private boolean canChangePuzzle() {
         return puzzleSource != PuzzleSource.Editor &&
-                puzzleIdx != -1 &&
-                puzzleIdx < puzzleSaves.size() - 1;
-    }
-
-    private boolean hasPreviousPuzzle() {
-        int puzzleIdx = puzzleSaves.indexOf(puzzleSave);
-        return puzzleSource != PuzzleSource.Editor && puzzleIdx > 0;
-    }
-
-    private void updatePuzzleActions() {
-        amvPuzzleActions.setButtonEnabled(PuzzlePlayerAction.GoToNextPuzzle.ordinal(), hasNextPuzzle());
-        amvPuzzleActions.setButtonEnabled(PuzzlePlayerAction.GoToPreviousPuzzle.ordinal(), hasPreviousPuzzle());
+                puzzleSaves.size() > 1 &&
+                puzzleSaves.contains(puzzleSave);
     }
 
     private void setAnimationSpeedVisible(boolean visible) {
