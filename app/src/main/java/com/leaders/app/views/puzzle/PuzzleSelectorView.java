@@ -85,7 +85,7 @@ public final class PuzzleSelectorView extends SelectorView<PuzzleSave> {
 
     private void applyOfficialIdentity(@NonNull PuzzleSave puzzleSave) {
         txvId.setVisibility(VISIBLE);
-        txvId.setText(puzzleSave.getName());
+        txvId.setText(String.valueOf(((OfficialPuzzleSave) puzzleSave).getId()));
 
         txvName.setVisibility(GONE);
         txvAuthor.setVisibility(GONE);

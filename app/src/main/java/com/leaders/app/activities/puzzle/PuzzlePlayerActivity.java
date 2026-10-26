@@ -601,12 +601,13 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
 
     private void loadPuzzleInfos() {
         String authorName = puzzleSave.getAuthor();
+        boolean isInEditor = puzzleSource == PuzzleSource.Editor;
 
         txvPuzzleName.setVisibility(View.VISIBLE);
-        txvAuthorName.setVisibility(!authorName.isEmpty() ? View.VISIBLE : View.GONE);
+        txvAuthorName.setVisibility(authorName.isEmpty() ? View.GONE : View.VISIBLE);
         pdvDifficulty.setVisibility(View.VISIBLE);
-        imvSolved.setVisibility(View.VISIBLE);
-        txvSolved.setVisibility(View.VISIBLE);
+        imvSolved.setVisibility(isInEditor ? View.GONE : View.VISIBLE);
+        txvSolved.setVisibility(isInEditor ? View.GONE : View.VISIBLE);
 
 
         txvPuzzleName.setText(puzzleSave.getName());
