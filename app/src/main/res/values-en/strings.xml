@@ -247,6 +247,8 @@
     <string name="thanks">thanks</string>
     <string name="app_adaptation">This application is a non-official adaptation of the Leaders board game. It was made with the help of the fantastic Leaders community.</string>
     <string name="playable_items_animation">playable items animation</string>
+    <string name="playable_items_animation_title">playable animation</string>
+    <string name="playable_items_animation_message">play an animation on UI element which player can interact with.</string>
     <string name="let_the_duel_beggin">LET THE DUEL BEGGIN !</string>
     <string name="match_vs_bot_reminder">For your first game, you will fight against a bot.\n\nReminder: to win, capture the opponent\'s leader with 2 adjacent allies or surround him completely.</string>
     <string name="lets_go">Let\'s go</string>
@@ -273,7 +275,8 @@
     <string name="puzzles_not_imported">Puzzles Not Imported</string>
     <string name="duplicate_of">- \"%s\" duplicate of \"%s\"%n</string>
     <string name="screen_auto_rotation">Screen auto rotation</string>
-    <string name="settings_auto_rotation">Screen autorotation in duel mode</string>
+    <string name="screen_auto_rotation_title">Screen auto rotation</string>
+    <string name="screen_auto_rotation_message">During a duel, rotate the screen automatically when the player change.</string>
     <string name="exit">Exit</string>
     <string name="search">Search…</string>
     <string name="filter">Filter</string>

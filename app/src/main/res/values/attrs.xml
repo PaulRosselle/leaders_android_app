@@ -83,4 +83,9 @@
     <declare-styleable name="PuzzleDetailsView">
         <attr name="titleResId"/>
     </declare-styleable>
+
+    <declare-styleable name="SettingsSwitch">
+        <attr name="titleResId"/>
+        <attr name="switchTextResId"/>
+    </declare-styleable>
 </resources>

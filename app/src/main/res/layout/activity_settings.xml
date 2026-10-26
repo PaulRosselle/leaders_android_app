@@ -102,14 +102,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="@string/playable_items_animation" />
+                app:titleResId="@string/playable_items_animation_title"
+                app:switchTextResId="@string/playable_items_animation_message"/>
 
             <com.leaders.app.views.settings.SettingsSwitch
                 android:id="@+id/swtAutoRotation_actSettings"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="@string/settings_auto_rotation" />
+                app:titleResId="@string/screen_auto_rotation_title"
+                app:switchTextResId="@string/screen_auto_rotation_message" />
 
             <com.leaders.app.views.settings.HighlightColorView
                 android:id="@+id/hcvHighlightColor_actSettings"
