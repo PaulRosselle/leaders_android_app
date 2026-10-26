@@ -237,7 +237,8 @@
     <string name="mail_message">message</string>
     <string name="send">send</string>
     <string name="contact_me">contact me</string>
-    <string name="problem_suggestion">A problem,\na suggestion ?</string>
+    <string name="problem_suggestion_title">A problem, a suggestion ?</string>
+    <string name="problem_suggestion_message">Send a email to give a feedback about the application.</string>
     <string name="credits">credits</string>
     <string name="credits_title">CReditS</string>
     <string name="official_game_intro">Leaders is a competitive board game edited by Studio H in 2025 allowing two players to battle in an intense strategic duel.</string>

@@ -245,7 +245,8 @@
     <string name="mail_message">message</string>
     <string name="send">envoyer</string>
     <string name="contact_me">me contacter</string>
-    <string name="problem_suggestion">un problème,\nune suggestion ?</string>
+    <string name="problem_suggestion_title">un problème, une suggestion ?</string>
+    <string name="problem_suggestion_message">Envoyez un email pour faire part de vos retours sur l\'application.</string>
     <string name="credits">crédits</string>
     <string name="credits_title">CReditS</string>
     <string name="official_game_intro">Leaders est un jeu de société compétitif publié par Studio H en 2025 proposant à deux joueurs de s\'affronter dans un duel tactique intense.</string>
