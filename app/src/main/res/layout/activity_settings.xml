@@ -117,17 +117,24 @@
                 android:layout_height="match_parent"
                 android:layout_marginTop="8dp" />
 
-            <com.leaders.app.views.settings.ContactView
-                android:id="@+id/ctvContact_actSettings"
+            <com.leaders.app.views.settings.ResetPuzzleProgressionView
+                android:id="@+id/rpvResetProgression_actSettings"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="8dp"  />
 
             <com.leaders.app.views.settings.CharacterSkinView
                 android:id="@+id/csvSkins_actSettings"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="8dp" />
+
+            <com.leaders.app.views.settings.ContactView
+                android:id="@+id/ctvContact_actSettings"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="8dp" />
+
         </LinearLayout>
     </ScrollView>
 
