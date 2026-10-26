@@ -18,6 +18,7 @@ import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
 import com.leaders.puzzlelogic.entities.OfficialPuzzleSave;
 import com.leaders.puzzlelogic.entities.PuzzleSave;
 import com.leaders.puzzlelogic.entities.TransferablePuzzleSave;
+import com.leaders.puzzlelogic.search.PuzzleSortMode;
 import com.leaders.puzzlelogic.serializers.SerializationContext;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
 
@@ -253,6 +254,7 @@ public final class JsonUtils {
             for (int i = 0; i < jaCustomPuzzles.length(); i++) {
                 customPuzzles.add(new CustomPuzzleSave(jaCustomPuzzles.getJSONObject(i)));
             }
+            customPuzzles.sort(PuzzleSortMode.DIFFICULTY_ASC.getComparator());
 
             return customPuzzles;
         } catch (JSONException e) {
@@ -308,6 +310,7 @@ public final class JsonUtils {
     public static void saveCustomPuzzles(@NonNull Context context,
                                          @NonNull List<CustomPuzzleSave> customPuzzles) {
         try {
+            customPuzzles.sort(PuzzleSortMode.DIFFICULTY_ASC.getComparator());
             JSONArray jaCustomPuzzles = new JSONArray();
             for (CustomPuzzleSave customPuzzle : customPuzzles) {
                 jaCustomPuzzles.put(customPuzzle.getAsJson());
@@ -321,7 +324,6 @@ public final class JsonUtils {
             throw new RuntimeException(e);
         }
     }
-
 
     public static void savePuzzlesToFile(@NonNull Context context,
                                          @NonNull List<PuzzleSave> puzzleSaves,

@@ -272,6 +272,7 @@ public final class PuzzleMenuActivity extends BaseActivity implements SearchTool
 
     //region TOOLBAR METHODS
 
+
     private void initToolbar() {
         // Restore the state before the listener is applied to avoid ealy notifications
         PuzzleSaveCriteria criteria = searchViewModel.getCriteria();
@@ -511,7 +512,6 @@ public final class PuzzleMenuActivity extends BaseActivity implements SearchTool
         }
 
         CustomPuzzleSave importedPuzzleSave = CustomPuzzleSave.getDefault(gameHistory);
-        customPuzzleSaves.add(importedPuzzleSave);
         JsonUtils.saveCustomPuzzles(this, customPuzzleSaves);
 
         Intent intent = ActivityType.PuzzleEditor.getIntent(this);
