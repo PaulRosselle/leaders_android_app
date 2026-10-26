@@ -6,11 +6,15 @@ import android.util.AttributeSet;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.AppCompatImageView;
 
 import com.leaders.R;
+import com.leaders.app.entities.LeadersApplication;
+import com.leaders.app.entities.Settings;
 import com.leaders.app.enums.BoardOrientation;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 
@@ -19,10 +23,19 @@ import java.util.Objects;
 public final class CellView extends AppCompatImageView {
     @Nullable
     private InteractionTarget target;
+    @DrawableRes
+    private final int highlightResId;
 
     public CellView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         target = null;
+
+        if (!isInEditMode()) {
+            Settings settings = ((LeadersApplication) context.getApplicationContext()).getSettings();
+            highlightResId = settings.getHighlightColor().getOutlineResId();
+        } else {
+            highlightResId = R.drawable.highlight_outline_default;
+        }
 
         // Cell views are instanciated without a target
         clearTarget();
@@ -35,6 +48,7 @@ public final class CellView extends AppCompatImageView {
     public void clearTarget() {
         target = null;
         setImageResource(R.drawable.empty_cell);
+        setForeground(null);
     }
 
     public void setAsRecruitmentDestinationTarget(@NonNull InteractionTarget target,
@@ -49,6 +63,8 @@ public final class CellView extends AppCompatImageView {
         setRotation(0f);
         setRotationY(rotateImg ? 180f : 0f);
         setRotationX(0f);
+
+        setForeground(AppCompatResources.getDrawable(getContext(), highlightResId));
     }
 
     public void setAsMovementDestinationTarget(@NonNull InteractionTarget target,
@@ -92,7 +108,7 @@ public final class CellView extends AppCompatImageView {
     }
 
     public void playHighlight() {
-        animate().scaleX(0.85f).scaleY(0.85f).alpha(0.7f)
+        animate().scaleX(0.9f).scaleY(0.9f).alpha(0.7f)
                 .setDuration(300)
                 .setInterpolator(new AccelerateInterpolator())
                 .withEndAction(() -> animate()
