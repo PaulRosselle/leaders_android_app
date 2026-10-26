@@ -272,7 +272,6 @@ public final class PuzzleMenuActivity extends BaseActivity implements SearchTool
 
     //region TOOLBAR METHODS
 
-
     private void initToolbar() {
         // Restore the state before the listener is applied to avoid ealy notifications
         PuzzleSaveCriteria criteria = searchViewModel.getCriteria();
