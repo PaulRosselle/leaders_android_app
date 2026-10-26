@@ -38,7 +38,7 @@
         app:layout_constraintEnd_toEndOf="@+id/btnMain_vwPuzzleSelector"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/icon_empty_crown"
+        app:srcCompat="@drawable/icon_crown_empty"
         app:tint="@color/app_golden" />
 
     <TextView

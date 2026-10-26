@@ -3,10 +3,13 @@ package com.leaders.app.activities.puzzle;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
@@ -26,6 +29,7 @@ import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.character.HighlightView;
 import com.leaders.app.views.puzzle.NemesisBlockerView;
+import com.leaders.app.views.puzzle.PuzzleDifficultyView;
 import com.leaders.app.views.settings.AnimationSpeedView;
 import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.GameHistory;
@@ -114,6 +118,9 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
 
     private TextView txvPuzzleName;
     private TextView txvAuthorName;
+    private ImageView imvSolved;
+    private TextView txvSolved;
+    private PuzzleDifficultyView pdvDifficulty;
 
     private NemesisBlockerView nbvBlocker;
     private View vwBlockerBg;
@@ -151,6 +158,9 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
 
         txvPuzzleName = findViewById(R.id.txvPuzzleName_actPuzzlePlayer);
         txvAuthorName = findViewById(R.id.txvAuthorName_actPuzzlePlayer);
+        imvSolved = findViewById(R.id.imvSolved_actPuzzlePlayer);
+        txvSolved = findViewById(R.id.txvSolved_actPuzzlePlayer);
+        pdvDifficulty = findViewById(R.id.pdvDifficulty_actPuzzlePlayer);
 
         nbvBlocker = findViewById(R.id.nbvBlocker_actPuzzlePlayer);
         vwBlockerBg = findViewById(R.id.vwBlockerBg_actPuzzlePlayer);
@@ -491,6 +501,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
 
             saveProgress(isVictory);
             showEndGame(winnerColor, isVictory);
+            updatePuzzleInfos();
             setNextPuzzleVisible(isVictory && canChangePuzzle());
         });
     }
@@ -581,17 +592,56 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     }
 
     private void updatePuzzleInfos() {
-        String puzzleName = puzzleSave.getName();
+        if (puzzleSaves.contains(puzzleSave)) {
+            loadPuzzleInfos();
+        } else {
+            hidePuzzleInfos();
+        }
+    }
+
+    private void loadPuzzleInfos() {
         String authorName = puzzleSave.getAuthor();
+        boolean isInEditor = puzzleSource == PuzzleSource.Editor;
 
-        boolean showPuzzleName = !puzzleName.isEmpty();
-        boolean showPuzzleAuthor = showPuzzleName && !authorName.isEmpty();
+        txvPuzzleName.setVisibility(View.VISIBLE);
+        txvAuthorName.setVisibility(authorName.isEmpty() ? View.GONE : View.VISIBLE);
+        pdvDifficulty.setVisibility(View.VISIBLE);
+        imvSolved.setVisibility(isInEditor ? View.GONE : View.VISIBLE);
+        txvSolved.setVisibility(isInEditor ? View.GONE : View.VISIBLE);
 
-        txvPuzzleName.setVisibility(showPuzzleName ? View.VISIBLE : View.GONE);
-        txvAuthorName.setVisibility(showPuzzleAuthor ? View.VISIBLE : View.GONE);
 
-        txvPuzzleName.setText(puzzleName);
+        txvPuzzleName.setText(puzzleSave.getName());
         txvAuthorName.setText(String.format(getString(R.string.by_author), authorName));
+        pdvDifficulty.setDifficulty(puzzleSave.getDifficulty());
+
+        int solvedColor = getSolvedColorRes();
+        imvSolved.setImageResource(puzzleSave.isSolved() ? R.drawable.icon_crown : R.drawable.icon_crown_empty);
+        imvSolved.setImageTintList(ContextCompat.getColorStateList(this, solvedColor));
+        txvSolved.setText(puzzleSave.isSolved() ? R.string.puzzle_solved : R.string.puzzle_not_solved);
+        txvSolved.setTextColor(getColor(solvedColor));
+    }
+
+    @ColorRes
+    private int getSolvedColorRes() {
+        if (!puzzleSave.isSolved()) {
+            return R.color.darker_font;
+        }
+
+        switch (puzzleSave.getDifficulty()) {
+            case Easy: return R.color.difficulty_easy;
+            case Medium: return R.color.app_golden;
+            case Hard: return R.color.difficulty_hard;
+            case Extreme: return R.color.difficulty_extreme;
+            default: throw new IllegalStateException("No solved color found matching difficulty: " + puzzleSave.getDifficulty());
+        }
+    }
+
+    private void hidePuzzleInfos() {
+        txvPuzzleName.setVisibility(View.GONE);
+        txvAuthorName.setVisibility(View.GONE);
+        pdvDifficulty.setVisibility(View.GONE);
+        imvSolved.setVisibility(View.GONE);
+        txvSolved.setVisibility(View.GONE);
     }
 
     private boolean canChangePuzzle() {

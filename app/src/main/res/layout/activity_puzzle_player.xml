@@ -61,6 +61,40 @@
         app:layout_constraintTop_toTopOf="@+id/gdlRoot_actPuzzlePlayer"
         tools:ignore="SpeakableTextPresentCheck" />
 
+    <ImageView
+        android:id="@+id/imvSolved_actPuzzlePlayer"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:adjustViewBounds="true"
+        android:importantForAccessibility="no"
+        android:scaleType="centerInside"
+        android:scaleX="1.2"
+        android:scaleY="1.2"
+        android:translationY="2dp"
+        app:layout_constraintBottom_toBottomOf="@+id/txvSolved_actPuzzlePlayer"
+        app:layout_constraintEnd_toStartOf="@+id/txvSolved_actPuzzlePlayer"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/txvSolved_actPuzzlePlayer"
+        app:srcCompat="@drawable/icon_crown"
+        app:tint="@color/app_golden" />
+
+    <TextView
+        android:id="@+id/txvSolved_actPuzzlePlayer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:fontFamily="@font/bobby_jones_condensed"
+        android:text="@string/puzzle_solved"
+        android:textAllCaps="false"
+        android:textColor="@color/app_golden"
+        android:textSize="@dimen/default_text_font_size"
+        app:layout_constraintBottom_toTopOf="@+id/bdvBoard_actPuzzlePlayer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imvSolved_actPuzzlePlayer"
+        app:layout_constraintTop_toBottomOf="@+id/prvRules_actPuzzlePlayer"
+        app:layout_constraintVertical_bias="1.0" />
+
     <com.leaders.app.views.board.PlayableBoardView
         android:id="@+id/bdvBoard_actPuzzlePlayer"
         android:layout_width="0dp"
@@ -206,6 +240,23 @@
         app:layout_constraintVertical_bias="0.0"
         tools:text="by Author Name"
         tools:visibility="visible" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barPuzzleInfoBottom_actPuzzlePlayer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="txvPuzzleName_actPuzzlePlayer,txvAuthorName_actPuzzlePlayer" />
+
+    <com.leaders.app.views.puzzle.PuzzleDifficultyView
+        android:id="@+id/pdvDifficulty_actPuzzlePlayer"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/barPuzzleInfoBottom_actPuzzlePlayer"
+        app:layout_constraintVertical_bias="0.0" />
 
     <com.leaders.app.views.character.CharacterNotificationView
         android:id="@+id/cnvCardInfo_actPuzzlePlayer"

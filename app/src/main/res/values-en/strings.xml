@@ -24,7 +24,7 @@
     <string name="unselect_all">Unselect all</string>
     <string name="puzzle_solved_format">%s solved !</string>
     <string name="checkbox">Checkbox</string>
-    <string name="official_puzzle_name_format">%d</string>
+    <string name="official_puzzle_name_format">official puzzle #%d</string>
     <string name="by_author">by %s</string>
     <string name="official_puzzles">officials</string>
     <string name="custom">custom</string>
@@ -297,4 +297,6 @@
     <string name="puzzle_difficulty_medium">Medium</string>
     <string name="puzzle_difficulty_hard">Hard</string>
     <string name="puzzle_difficulty_extreme">Extreme</string>
+    <string name="puzzle_not_solved">puzzle not solved</string>
+    <string name="puzzle_solved">puzzle solved</string>
 </resources>
