@@ -55,8 +55,8 @@ public class HighlightColorView extends ConstraintLayout {
         for (HighlightColor highlightColor : HighlightColor.values()) {
             ImageView imvHighlightColor = new ImageView(context);
             imvHighlightColor.setBackgroundResource(highlightColor.getColorResId());
-            imvHighlightColor.setImageTintList(checkTint);
-            imvHighlightColor.setForeground(AppCompatResources.getDrawable(context, R.drawable.circular_ripple));
+            imvHighlightColor.setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.circular_ripple));
+            imvHighlightColor.setForegroundTintList(checkTint);
             imvHighlightColor.setOnClickListener(this::onColorClick);
 
             LinearLayout llyContainer = new LinearLayout(context);
@@ -74,11 +74,9 @@ public class HighlightColorView extends ConstraintLayout {
         for (int i = 0; i < colorViews.size(); i++) {
             ImageView colorView = colorViews.get(i);
             boolean isSelected = i == color.ordinal();
-            if (isSelected) {
-                colorView.setImageResource(R.drawable.icon_checked);
-            } else {
-                colorView.setImageDrawable(null);
-            }
+            colorView.setForeground(isSelected ?
+                    AppCompatResources.getDrawable(getContext(), R.drawable.icon_checked) : null
+            );
             colorView.animate().alpha(isSelected ? 1f : 0.3f).setDuration(200).start();
         }
     }
