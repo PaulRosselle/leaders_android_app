@@ -65,7 +65,7 @@
         android:layout_width="@dimen/round_button_size"
         android:layout_height="@dimen/round_button_size"
         android:layout_marginEnd="17dp"
-        android:foreground="@drawable/icon_empty_crown"
+        android:foreground="@drawable/icon_crown_empty"
         android:foregroundTint="@color/app_golden"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
