@@ -1,7 +1,5 @@
 package com.leaders.gamelogic.queries;
 
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -10,7 +8,6 @@ import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.PlayableCharacter;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
-import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.factories.CharacterActionResolverFactory;
 import com.leaders.gamelogic.historyentries.IPhase;
 import com.leaders.gamelogic.historyentries.segments.ActionsPhase;

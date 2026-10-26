@@ -493,8 +493,9 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
         runOnUiThread(() -> {
             if (nbvBlocker.canAutoBlock(request)) {
                 startAutoBlock(request, context);
+            } else {
+                super.onInteractionRequired(request, context);
             }
-            else super.onInteractionRequired(request, context);
         });
     }
 
