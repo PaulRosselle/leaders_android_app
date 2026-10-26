@@ -309,5 +309,7 @@
     <string name="puzzle_difficulty_medium">Moyenne</string>
     <string name="puzzle_difficulty_hard">Difficile</string>
     <string name="puzzle_difficulty_extreme">Extreme</string>
+    <string name="puzzle_not_solved">puzzle non résolu</string>
+    <string name="puzzle_solved">puzzle résolu</string>
 
 </resources>
