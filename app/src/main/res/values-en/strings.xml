@@ -299,4 +299,11 @@
     <string name="puzzle_difficulty_extreme">Extreme</string>
     <string name="puzzle_not_solved">puzzle not solved</string>
     <string name="puzzle_solved">puzzle solved</string>
+    <string name="apply_not_solved_to_puzzle">Mark puzzles as unsolved to solve them again.</string>
+    <string name="reset_progress">Reset progress</string>
+    <string name="puzzle_reset_button_text">RESET</string>
+    <string name="puzzle_progress_reset_dialog_title">Reset progress ?</string>
+    <string name="puzzle_progress_reset_dialog_message">All puzzles will be marked as unsolved. This can\'t be undone.</string>
+    <string name="reset_all">Reset all</string>
+    <string name="progress_reset">Progress reset!</string>
 </resources>

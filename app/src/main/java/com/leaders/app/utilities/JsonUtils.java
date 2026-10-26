@@ -307,6 +307,12 @@ public final class JsonUtils {
         }
     }
 
+    public static void clearOfficialPuzzlesSolved(@NonNull Context context) {
+        if (fileExists(context, SOLVED_OFFICIAL_PUZZLES_FILENAME)) {
+            deleteFile(context, SOLVED_OFFICIAL_PUZZLES_FILENAME);
+        }
+    }
+
     public static void saveCustomPuzzles(@NonNull Context context,
                                          @NonNull List<CustomPuzzleSave> customPuzzles) {
         try {
