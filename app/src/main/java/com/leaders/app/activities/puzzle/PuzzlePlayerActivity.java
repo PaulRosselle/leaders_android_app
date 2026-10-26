@@ -54,6 +54,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public final class PuzzlePlayerActivity extends PlayableActivity implements NemesisBlockerCallback {
     private enum PuzzlePlayerAction {
@@ -105,6 +106,18 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
         }
     }
 
+    private static final class BlockedRequest {
+        final InteractionRequest request;
+        final GameContext context;
+
+        BlockedRequest(@NonNull InteractionRequest request, @NonNull GameContext context) {
+            this.request = request;
+            this.context = context;
+        }
+    }
+
+    private final AtomicReference<BlockedRequest> blockedRequest = new AtomicReference<>();
+
     private MaterialButton btnPuzzleActions;
     private ActionsMenuView amvPuzzleActions;
 
@@ -129,8 +142,6 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     private List<? extends PuzzleSave> puzzleSaves;
     private PuzzleSave puzzleSave;
     private NemesisMoves nemesisMoves;
-    @Nullable
-    private InteractionRequest blockerRequest;
 
     private CharacterSkins characterSkins;
 
@@ -352,7 +363,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
 
         // Request is cleared to ensure "onInteractionRequired"
         // won't be called again after the interaction clear
-        blockerRequest = null;
+        blockedRequest.set(null);
         nbvBlocker.shutdownBlocker();
     }
 
@@ -414,7 +425,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
 
     //region AUTO PLAY
 
-    private void startAutoBlock(@NonNull InteractionRequest request) {
+    private void startAutoBlock(@NonNull InteractionRequest request, @NonNull GameContext context) {
         // If the puzzles have auto moves registered, we play them directly
         if (nemesisMoves != null) {
             controller.selectTarget(nemesisMoves.getBlockingTarget(controller.getHistory(), request));
@@ -422,48 +433,42 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
         }
 
         // Without registered moves, we start an auto blocker which will search for a blocking move
-        blockerRequest = request;
+        blockedRequest.set(new BlockedRequest(request, context));
         NemesisBlocker blocker = nbvBlocker.initBlocker(controller.getHistory(), request, this);
-
         if (blocker.canBeInterrupted()) {
             setBlockerVisible(true);
         }
-
         blocker.start();
     }
 
     @Override
     public void onBlockingActionFound(@NonNull InteractionTarget target) {
-        blockerRequest = null;
-
+        blockedRequest.set(null);
         controller.selectTarget(target);
-
         setBlockerVisible(false);
     }
 
     @Override
     public void onSearchCompletedWithoutResult(@Nullable InteractionTarget defaultTarget) {
-        // When no action is possible, autoplay should not be started
         if (defaultTarget == null) {
             throw new IllegalStateException("No default target found for Nemesis");
         }
-        blockerRequest = null;
-
+        blockedRequest.set(null);
         controller.selectTarget(defaultTarget);
-
         setBlockerVisible(false);
     }
 
     @Override
     public void onSearchCancelled() {
-        InteractionRequest request = blockerRequest;
-        blockerRequest = null;
+        // getAndSet guaranties a single consumer for the request
+        BlockedRequest blocked = blockedRequest.getAndSet(null);
 
         setBlockerVisible(false);
 
-        // On autoplay cancellation, the request is reapplied so the user can play manually
-        if (request != null) {
-            super.onInteractionRequired(request);
+        // Request is reapplied if the gameHandler is still waiting for a result so
+        // the user can play the awaited move manually
+        if (blocked != null && controller.isRequestPending(blocked.request)) {
+            super.onInteractionRequired(blocked.request, blocked.context);
         }
     }
 
@@ -483,18 +488,18 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     //region CONTROLLER METHODS
 
     @Override
-    public void onInteractionRequired(@NonNull InteractionRequest request) {
+    public void onInteractionRequired(@NonNull InteractionRequest request,
+                                      @NonNull GameContext context) {
         runOnUiThread(() -> {
             if (nbvBlocker.canAutoBlock(request)) {
-                startAutoBlock(request);
-            } else {
-                super.onInteractionRequired(request);
+                startAutoBlock(request, context);
             }
+            else super.onInteractionRequired(request, context);
         });
     }
 
     @Override
-    public void onGameEnded(@NonNull Player winner) {
+    public void onGameEnded(@NonNull Player winner, @NonNull GameContext context) {
         runOnUiThread(() -> {
             TeamColor winnerColor = winner.getTeamColor();
             boolean isVictory = winnerColor == PuzzleEditionUtils.getPuzzlePlayerTeamColor();
@@ -507,7 +512,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     }
 
     @Override
-    public void onPhaseChanged(@NonNull GamePhase phase) {
+    public void onPhaseChanged(@NonNull GamePhase phase, @NonNull GameContext context) {
         throw new IllegalStateException("Phase change is not supported within the puzzle player");
     }
 
@@ -664,7 +669,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
 
     @Override
     protected void onDestroy() {
-        blockerRequest = null;
+        blockedRequest.set(null);
         nbvBlocker.shutdownBlocker();
         super.onDestroy();
     }

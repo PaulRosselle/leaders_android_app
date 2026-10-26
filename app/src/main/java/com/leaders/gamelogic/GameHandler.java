@@ -95,12 +95,12 @@ public final class GameHandler {
 
     @NonNull
     public Game getCurrentGame() {
-        return currentGame;
+        return new Game(currentGame);
     }
 
     @NonNull
     public GameHistory getCurrentHistory() {
-        return currentHistory;
+        return new GameHistory(currentHistory);
     }
 
     @NonNull

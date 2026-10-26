@@ -15,27 +15,44 @@ import com.leaders.gamelogic.interactions.InteractionResult;
 import com.leaders.gamelogic.interactions.InteractionResultType;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.atomic.AtomicReference;
 
 public final class GameController implements IGameFlowListener {
 
     public interface Listener {
-        void onGameStarted(@NonNull Game game);
-
-        void onGameEnded(@NonNull Player winner);
-
-        void onActionUndone(@NonNull Game game);
-
-        void onInteractionRequired(@NonNull InteractionRequest request);
-
-        void onPhaseChanged(@NonNull GamePhase phase);
-
+        void onGameStarted(@NonNull GameContext context);
+        void onGameEnded(@NonNull Player winner, @NonNull GameContext context);
+        void onActionUndone(@NonNull GameContext context);
+        void onInteractionRequired(@NonNull InteractionRequest request, @NonNull GameContext context);
+        void onInteractionCleared(@NonNull GameContext context);
+        void onPhaseChanged(@NonNull GamePhase phase, @NonNull GameContext context);
         void onFeedback(@NonNull InteractionFeedback feedback, @NonNull InteractionCompletion completion);
-
-        void onInteractionCleared();
     }
+
+    private static final class Pending {
+        @NonNull
+        final InteractionRequest request;
+        @NonNull
+        final CompletableFuture<InteractionResult> future;
+        @NonNull
+        final GameContext context;
+
+        Pending(@NonNull InteractionRequest request,
+                @NonNull CompletableFuture<InteractionResult> future,
+                @NonNull GameContext context) {
+            this.request = request;
+            this.future = future;
+            this.context = context;
+        }
+    }
+
+    private final AtomicReference<Pending> pending = new AtomicReference<>();
+    private volatile GameContext latestContext;
 
     public interface InteractionCompletion {
         void complete();
@@ -44,12 +61,8 @@ public final class GameController implements IGameFlowListener {
     private final Listener listener;
 
     private final ExecutorService gameHandlerExecutor = Executors.newSingleThreadExecutor();
-
     private GameHandler gameHandler;
     private CompletableFuture<Void> gameTask;
-
-    private InteractionRequest pendingRequest;
-    private CompletableFuture<InteractionResult> pendingRequestFuture;
 
     public GameController(@NonNull Listener listener) {
         this.listener = listener;
@@ -61,27 +74,29 @@ public final class GameController implements IGameFlowListener {
 
             gameTask = gameHandler.runAsync();
 
-            gameTask.whenComplete((result, throwable) -> {
-                if (throwable != null) {
-                    Thread thread = Thread.currentThread();
-                    Thread.UncaughtExceptionHandler exceptionHandler =
-                            thread.getUncaughtExceptionHandler();
-
-                    if (exceptionHandler != null) {
-                        exceptionHandler.uncaughtException(thread, throwable);
-                    }
-                }
-            });
+            gameTask.whenComplete(this::doOnGameEnd);
         });
     }
 
-    private void endGame() {
-        if (hasPendingInteraction() && isCancellationAllowed()) {
-            cancelAction();
-        }
+    private void doOnGameEnd(Void result, Throwable throwable) {
+        if (throwable != null) {
+            Thread thread = Thread.currentThread();
+            Thread.UncaughtExceptionHandler exceptionHandler = thread.getUncaughtExceptionHandler();
 
+            if (exceptionHandler != null) {
+                exceptionHandler.uncaughtException(thread, throwable);
+            }
+        }
+    }
+
+    private void endGame() {
         if (gameHandler != null) {
             gameHandler.stop();
+        }
+        Pending currentPending = pending.getAndSet(null);
+        if (currentPending != null) {
+            // Last game loop ends with a CancellationException (catched by the gameHandler)
+            currentPending.future.completeExceptionally(new CancellationException());
         }
     }
 
@@ -90,20 +105,9 @@ public final class GameController implements IGameFlowListener {
         startGame(gameHistory);
     }
 
-    public boolean hasPendingInteraction() {
-        return pendingRequest != null && pendingRequestFuture != null && !pendingRequestFuture.isDone();
-    }
-
-    public boolean isLegalTarget(@NonNull InteractionTarget target) {
-        if (pendingRequest == null) {
-            return false;
-        }
-
-        return pendingRequest.getLegalTargets().contains(target);
-    }
-
-    public boolean isCancellationAllowed() {
-        return hasLegalResult(InteractionResultType.CancelAction);
+    private boolean hasLegalResult(@NonNull InteractionResultType type) {
+        Pending currentPeding = pending.get();
+        return currentPeding != null && currentPeding.request.getLegalResults().contains(type);
     }
 
     public boolean canUndoLastAction() {
@@ -115,63 +119,62 @@ public final class GameController implements IGameFlowListener {
     }
 
     public void selectTarget(@NonNull InteractionTarget target) {
-        if (!hasPendingInteraction()) {
+        Pending currentPending = pending.get();
+        if (currentPending == null) {
             throw new IllegalStateException("Targets should not exist outside of a valid request context");
         }
-
-        if (!isLegalTarget(target)) {
+        if (!currentPending.request.getLegalTargets().contains(target)) {
             throw new IllegalArgumentException("Invalid target: " + target);
         }
+        completeInteraction(currentPending, getTargetResult(currentPending.request, target));
+    }
 
-        completeInteraction(getTargetResult(pendingRequest, target));
+    private void completeInteractionWithResult(@NonNull InteractionResultType resultType) {
+        Pending currentPending = pending.get();
+        if (currentPending == null ||
+                !currentPending.request.getLegalResults().contains(resultType)) {
+            return;
+        }
+        completeInteraction(currentPending, getResult(currentPending.request, resultType));
     }
 
     public void cancelAction() {
-        if (!isCancellationAllowed()) {
-            return;
-        }
-
-        completeInteraction(getResult(pendingRequest, InteractionResultType.CancelAction));
+        completeInteractionWithResult(InteractionResultType.CancelAction);
     }
 
     public void undoLastAction() {
-        if (!hasPendingInteraction()) {
-            throw new IllegalStateException("Undo should not exist outside of a valid request context");
-        }
-
-        if (!canUndoLastAction()) {
-            return;
-        }
-
-        completeInteraction(getResult(pendingRequest, InteractionResultType.UndoLastAction));
+        completeInteractionWithResult(InteractionResultType.UndoLastAction);
     }
 
     public void endPhase() {
-        if (!hasPendingInteraction() || !canEndPhase()) {
-            throw new IllegalStateException("Undo should not exist outside of a valid request context");
-        }
-
-        completeInteraction(getResult(pendingRequest, InteractionResultType.EndPhase));
+        completeInteractionWithResult(InteractionResultType.EndPhase);
     }
 
-    private boolean hasLegalResult(@NonNull InteractionResultType resultType) {
-        return pendingRequest != null
-                && pendingRequest.getLegalResults().contains(resultType);
-    }
-
-    private void completeInteraction(@NonNull InteractionResult result) {
-        final CompletableFuture<InteractionResult> future = pendingRequestFuture;
-
-        if (future == null || future.isDone()) {
+    private void completeInteraction(@NonNull Pending pending, @NonNull InteractionResult result) {
+        // compareAndSet prevent two different threads to complete the same interaction
+        if (!this.pending.compareAndSet(pending, null)) {
             return;
         }
 
-        pendingRequest = null;
-        pendingRequestFuture = null;
+        runOnGameThread(() -> {
+            // Since state is still linked with the last request, we can use pending.contexte here.
+            // Clear is called before the next notification sent to the listener
+            listener.onInteractionCleared(pending.context);
+            pending.future.complete(result);
+        });
+    }
 
-        listener.onInteractionCleared();
+    private void runOnGameThread(@NonNull Runnable task) {
+        try {
+            gameHandlerExecutor.execute(task);
+        } catch (RejectedExecutionException ignored) {
+            // stopped controller
+        }
+    }
 
-        future.complete(result);
+    public boolean isRequestPending(@NonNull InteractionRequest request) {
+        Pending currentPending = pending.get();
+        return currentPending != null && currentPending.request == request;
     }
 
     private InteractionResult getTargetResult(@NonNull InteractionRequest request,
@@ -190,67 +193,70 @@ public final class GameController implements IGameFlowListener {
 
     @NonNull
     @Override
+    public CompletableFuture<InteractionResult> onInputRequired(@NonNull InteractionRequest request) {
+        CompletableFuture<InteractionResult> future = new CompletableFuture<>();
+        GameContext context = snapshot();
+        pending.set(new Pending(request, future, context));
+        listener.onInteractionRequired(request, context);
+        return future;
+    }
+
+    @NonNull
+    @Override
     public CompletableFuture<Void> onGameStarted(@NonNull Game game) {
-        listener.onGameStarted(game);
+        listener.onGameStarted(snapshot());
         return CompletableFuture.completedFuture(null);
     }
 
     @NonNull
     @Override
     public CompletableFuture<Void> onGameEnded(@NonNull Player winner) {
-        listener.onGameEnded(winner);
+        listener.onGameEnded(winner, snapshot());
         return CompletableFuture.completedFuture(null);
     }
 
     @NonNull
     @Override
     public CompletableFuture<Void> onPhaseChanged(@NonNull GamePhase phase) {
-        listener.onPhaseChanged(phase);
+        listener.onPhaseChanged(phase, snapshot());
         return CompletableFuture.completedFuture(null);
     }
 
     @NonNull
     @Override
     public CompletableFuture<Void> onActionUndone(@NonNull Game game) {
-        listener.onActionUndone(game);
+        listener.onActionUndone(snapshot());
         return CompletableFuture.completedFuture(null);
-    }
-
-    @NonNull
-    @Override
-    public CompletableFuture<InteractionResult> onInputRequired(@NonNull InteractionRequest request) {
-        final CompletableFuture<InteractionResult> future = new CompletableFuture<>();
-
-        pendingRequest = request;
-        pendingRequestFuture = future;
-
-        listener.onInteractionRequired(request);
-
-        return future;
     }
 
     @NonNull
     @Override
     public CompletableFuture<Void> onFeedback(@NonNull InteractionFeedback feedback) {
         CompletableFuture<Void> future = new CompletableFuture<>();
-
-        listener.onFeedback(feedback, () -> future.complete(null));
-
+        listener.onFeedback(feedback, () -> runOnGameThread(() -> future.complete(null)));
         return future;
     }
+
+    // Only called from the gameHandler thread
+    private GameContext snapshot() {
+        GameContext context = gameHandler.getCurrentContext();
+        latestContext = context;
+        return context;
+    }
+
 
     public void shutdown() {
         endGame();
         gameHandlerExecutor.shutdownNow();
     }
 
-    @NonNull
+    // Readonly gameContext for UI: always an immutable snapshot
     public GameContext getCurrentContext() {
-        if (gameHandler == null) {
+        GameContext context = latestContext;
+        if (context == null) {
             throw new IllegalStateException("No game in progress");
         }
-
-        return gameHandler.getCurrentContext();
+        return context;
     }
 
     public GameHistory getHistory() {

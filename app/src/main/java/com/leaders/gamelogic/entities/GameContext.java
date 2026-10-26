@@ -138,6 +138,7 @@ public final class GameContext {
 
     @NonNull
     public static GameContext createCurrent(@NonNull Game game, @NonNull GameHistory gameHistory) {
+        // TODO - check for immutability
         GamePhase currentGamePhase = getCurrentContextPhase(game, gameHistory);
 
         Player currentPlayer = currentGamePhase.getPhasePlayer();
@@ -159,7 +160,7 @@ public final class GameContext {
                 currentPlayer,
                 opposingPlayer,
                 gameHistory.getConfig().getGameMode(),
-                game.getBoard(),
+                new Board(game.getBoard()),
                 getCurrentPlayerWarningState(game),
                 SelectableCardsQuery.getSelectableCards(game, gameHistory),
                 playableCharacters);

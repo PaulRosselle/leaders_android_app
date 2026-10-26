@@ -43,7 +43,6 @@ import com.leaders.app.views.settings.AnimationSpeedView;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
-import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
@@ -714,36 +713,29 @@ public final class DuelPlayerActivity extends PlayableActivity implements
     //region GAME CONTROLLER METHODS
 
     @Override
-    public void onGameStarted(@NonNull Game game) {
+    public void onGameStarted(@NonNull GameContext context) {
         runOnUiThread(() -> {
-            GameContext gameContext = controller.getCurrentContext();
-
-            bdvBoard.setBoard(game.getBoard());
-            ccsvCardSelector.applyGameModeParams(gameContext.getGameMode());
-
-            clearInteractionUI(gameContext);
+            bdvBoard.setBoard(context.getBoard());
+            ccsvCardSelector.applyGameModeParams(context.getGameMode());
+            clearInteractionUI(context);
         });
     }
 
     @Override
-    public void onGameEnded(@NonNull Player winner) {
-        GameContext gameContext = controller.getCurrentContext();
-
-        clearInteractionUI(gameContext);
-        ButtonUtils.setEnabled(btnCards, true);
-        pbvCurrentPlayer.setInfo(R.string.game_ended, R.drawable.player_bottom_bg_info);
-        showEndGame(gameContext, winner);
+    public void onGameEnded(@NonNull Player winner, @NonNull GameContext context) {
+        runOnUiThread(() -> {
+            clearInteractionUI(context);
+            ButtonUtils.setEnabled(btnCards, true);
+            pbvCurrentPlayer.setInfo(R.string.game_ended, R.drawable.player_bottom_bg_info);
+            showEndGame(context, winner);
+        });
     }
 
     @Override
-    public void onPhaseChanged(@NonNull GamePhase phase) {
+    public void onPhaseChanged(@NonNull GamePhase phase, @NonNull GameContext context) {
         runOnUiThread(() -> {
-            GameContext gameContext = controller.getCurrentContext();
-
-            clearInteractionUI(gameContext);
-
-            applyPlayerChange(gameContext);
-
+            clearInteractionUI(context);
+            applyPlayerChange(context);
             applyPhaseChange(phase, true);
         });
     }

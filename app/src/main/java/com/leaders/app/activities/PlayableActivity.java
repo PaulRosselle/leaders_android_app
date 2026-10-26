@@ -19,7 +19,6 @@ import com.leaders.app.views.character.CharacterNotificationView;
 import com.leaders.app.views.character.CharacterView;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
-import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
@@ -231,19 +230,30 @@ public abstract class PlayableActivity extends BaseActivity
 
 
     //region GAME CONTROLLER LISTENER METHODS
-
     @Override
-    public void onGameStarted(@NonNull Game game) {
+    public void onGameStarted(@NonNull GameContext context) {
         runOnUiThread(() -> {
-            GameContext gameContext = controller.getCurrentContext();
-            clearInteractionUI(gameContext);
-            bdvBoard.setBoard(gameContext.getBoard());
+            clearInteractionUI(context);
+            bdvBoard.setBoard(context.getBoard());
         });
     }
 
     @Override
-    public void onActionUndone(@NonNull Game game) {
-        runOnUiThread(() -> bdvBoard.setBoard(game.getBoard()));
+    public void onActionUndone(@NonNull GameContext context) {
+        runOnUiThread(() -> bdvBoard.setBoard(context.getBoard()));
+    }
+
+    @Override
+    public void onInteractionCleared(@NonNull GameContext context) {
+        runOnUiThread(() -> clearInteractionUI(context));
+    }
+
+    @Override
+    public void onInteractionRequired(@NonNull InteractionRequest request, @NonNull GameContext context) {
+        runOnUiThread(() -> {
+            applyInteractionTargets(context, request);
+            updateInteractionUI(context, request);
+        });
     }
 
     @Override
@@ -252,21 +262,6 @@ public abstract class PlayableActivity extends BaseActivity
         runOnUiThread(() -> bdvBoard.animateFeedback(
                 feedback, animationSpeed, getCharacterSkins(), completion::complete
         ));
-    }
-
-    @Override
-    public void onInteractionCleared() {
-        runOnUiThread(() -> clearInteractionUI(controller.getCurrentContext()));
-    }
-
-
-    @Override
-    public void onInteractionRequired(@NonNull InteractionRequest request) {
-        runOnUiThread(() -> {
-            GameContext gameContext = controller.getCurrentContext();
-            applyInteractionTargets(gameContext, request);
-            updateInteractionUI(gameContext, request);
-        });
     }
 
     //endregion
