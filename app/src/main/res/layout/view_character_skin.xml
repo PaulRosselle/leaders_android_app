@@ -11,6 +11,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         android:autoSizeMaxTextSize="@dimen/smaller_text_font_size"
         android:autoSizeMinTextSize="14dp"
@@ -28,21 +29,40 @@
         app:layout_constraintEnd_toStartOf="@+id/btnOpenForm_vwCharacterSkin"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/txvMessage_vwCharacterSkin"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="8dp"
+        android:fontFamily="sans-serif"
+        android:text="@string/customize_your_characters"
+        android:textAllCaps="false"
+        android:textColor="@color/darker_font"
+        android:textSize="14dp"
+        app:layout_constraintBottom_toBottomOf="@+id/btnOpenForm_vwCharacterSkin"
+        app:layout_constraintEnd_toStartOf="@+id/btnOpenForm_vwCharacterSkin"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/btnOpenForm_vwCharacterSkin" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnOpenForm_vwCharacterSkin"
-        android:layout_width="70dp"
+        android:layout_width="wrap_content"
         android:layout_height="@dimen/round_button_size"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:fontFamily="@font/bobby_jones_regular"
+        android:fontFamily="sans-serif-condensed-medium"
         android:insetTop="0dp"
         android:insetBottom="0dp"
-        android:paddingLeft="0dp"
-        android:paddingRight="0dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
         android:text="@string/choose"
+        android:textAllCaps="true"
         android:textColor="@color/app_golden"
         android:textSize="14dp"
         app:backgroundTint="@color/darker_background"
@@ -51,7 +71,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txvTitle_vwCharacterSkin"
         app:strokeColor="@color/app_golden"
         app:strokeWidth="@dimen/default_stroke_width" />
 

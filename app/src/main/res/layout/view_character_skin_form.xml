@@ -109,7 +109,7 @@
         android:layout_height="@dimen/round_button_size"
         android:layout_marginBottom="16dp"
         android:backgroundTint="@color/ultra_dark_background"
-        android:fontFamily="@font/bobby_jones_regular"
+        android:fontFamily="sans-serif-condensed-medium"
         android:insetTop="0dp"
         android:insetBottom="0dp"
         android:text="@string/choose"

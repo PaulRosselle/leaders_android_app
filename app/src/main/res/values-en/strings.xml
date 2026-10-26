@@ -310,4 +310,5 @@
     <string name="puzzle_progress_reset_dialog_message">All puzzles will be marked as unsolved. This can\'t be undone.</string>
     <string name="reset_all">Reset all</string>
     <string name="progress_reset">Progress reset!</string>
+    <string name="customize_your_characters">Customize your characters with the available skins.</string>
 </resources>

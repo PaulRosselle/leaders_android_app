@@ -315,12 +315,13 @@
     <string name="puzzle_difficulty_extreme">Extreme</string>
     <string name="puzzle_not_solved">puzzle non résolu</string>
     <string name="puzzle_solved">puzzle résolu</string>
-    <string name="apply_not_solved_to_puzzle">Remettre les puzzles \"à résoudre\" pour les recommencer.</string>
+    <string name="apply_not_solved_to_puzzle">Remettez les puzzles \"à résoudre\" pour les recommencer.</string>
     <string name="reset_progress">Réinitaliser la progression</string>
     <string name="puzzle_reset_button_text">RÉINITIALISER</string>
     <string name="puzzle_progress_reset_dialog_title">Réinitialiser la progression ?</string>
     <string name="puzzle_progress_reset_dialog_message">Tous les puzzles seront marqués comme non-résolus. Cette action est irreversible.</string>
     <string name="reset_all">Tout réinitialiser</string>
     <string name="progress_reset">Progression réinitalisée !</string>
+    <string name="customize_your_characters">Personnalisez vos personnages avec les apparences disponibles.</string>
 
 </resources>
