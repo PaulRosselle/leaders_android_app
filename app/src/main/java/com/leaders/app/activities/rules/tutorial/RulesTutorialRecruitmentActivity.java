@@ -335,9 +335,11 @@ public class RulesTutorialRecruitmentActivity extends PlayableActivity implement
 
     @Override
     public void onPhaseChanged(@NonNull GamePhase phase, @NonNull GameContext context) {
-        ccsvCardSelector.setPortraitsVisible(false);
-        txvAfter.setVisibility(View.VISIBLE);
-        setBtnNextChapterEnabled(true);
+        runOnUiThread(() -> {
+            ccsvCardSelector.setPortraitsVisible(false);
+            txvAfter.setVisibility(View.VISIBLE);
+            setBtnNextChapterEnabled(true);
+        });
     }
 
     @Override
