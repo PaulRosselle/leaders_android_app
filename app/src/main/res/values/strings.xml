@@ -296,6 +296,8 @@
     <string name="sort_author_desc">Auteur Z ➝ A</string>
     <string name="sort_difficulty">Facile ➝ Difficile</string>
     <string name="sort_difficulty_desc">Difficile ➝ Facile</string>
+    <string name="sort_first_to_last">Premier ➝ Dernier</string>
+    <string name="sort_last_to_first">Dernier ➝ Premier</string>
     <string name="filter_title">Filtrer par</string>
     <string name="filter_reset">Réinitialiser</string>
     <string name="filter_group_difficulty">Difficulté</string>

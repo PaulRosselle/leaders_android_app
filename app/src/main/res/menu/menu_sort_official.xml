@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/sort_name"
+        android:title="@string/sort_first_to_last" />
+    <item
+        android:id="@+id/sort_name_desc"
+        android:title="@string/sort_last_to_first" />
+    <item
+        android:id="@+id/sort_difficulty"
+        android:title="@string/sort_difficulty" />
+    <item
+        android:id="@+id/sort_difficulty_desc"
+        android:title="@string/sort_difficulty_desc" />
+</menu>
