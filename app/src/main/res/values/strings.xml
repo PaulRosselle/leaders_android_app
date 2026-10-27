@@ -324,4 +324,7 @@
     <string name="creator_name" translatable="false">Hugo Frénoy</string>
     <string name="alpha" translatable="false">ALPHA</string>
     <string name="beta" translatable="false">BETA</string>
+    <string name="language_french">french</string>
+    <string name="language_english">english</string>
+    <string name="app_language">App language</string>
 </resources>
