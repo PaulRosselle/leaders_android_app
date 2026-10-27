@@ -2,10 +2,14 @@ package com.leaders.app.views.portrait;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.util.AttributeSet;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.AppCompatImageView;
 
 import com.leaders.R;
@@ -36,6 +40,7 @@ public final class PortraitView extends AppCompatImageView {
 
         info = new PortraitInfo(CharacterCard.LeaderQueen, CharacterSkinType.Default, false, displayMode);
 
+        setLayerType(View.LAYER_TYPE_HARDWARE, null);
         updateDisplay();
     }
 
@@ -60,13 +65,45 @@ public final class PortraitView extends AppCompatImageView {
     }
 
     private void updateDisplay() {
-        int resId;
+        Drawable teamDrawable = getTeamDrawable();
+        Drawable characterDrawable = getCharacterDrawable();
+
+        if (teamDrawable != null) {
+            setImageDrawable(new LayerDrawable(new Drawable[]{characterDrawable, teamDrawable}));
+        } else {
+            setImageDrawable(characterDrawable);
+        }
+    }
+
+    @Nullable
+    private Drawable getCharacterDrawable() {
+        int characterResId;
+
         switch (info.getDisplayMode()) {
-            case Default: resId = getPortraitDrawableId(); break;
-            case Hexagonal: resId = getPortraitHexagonalDrawableId(); break;
+            case Default: characterResId = getPortraitDrawableId(); break;
+            case Hexagonal: characterResId = getPortraitHexagonalDrawableId(); break;
             default: throw new IllegalStateException("Unexpected display mode: " + info.getDisplayMode());
         }
-        setImageResource(resId);
+
+        return AppCompatResources.getDrawable(getContext(), characterResId);
+    }
+
+    @Nullable
+    private Drawable getTeamDrawable() {
+        if (!info.isBanned() ||
+                info.getTeamColor() == null) {
+            return null;
+        }
+
+        int foregroundResId;
+        boolean isHex = info.getDisplayMode() == PortraitDisplayMode.Hexagonal;
+        if (info.getTeamColor() == TeamColor.Black) {
+            foregroundResId = isHex ? R.drawable.card_hex_portrait_team_b : R.drawable.card_portrait_team_b;
+        } else {
+            foregroundResId = isHex ? R.drawable.card_hex_portrait_team_w : R.drawable.card_portrait_team_w;
+        }
+
+        return AppCompatResources.getDrawable(getContext(), foregroundResId);
     }
 
     private int getPortraitDrawableId() {
@@ -114,113 +151,37 @@ public final class PortraitView extends AppCompatImageView {
 
     private int getPortraitBannedDrawableId() {
         switch (info.getCard()) {
-            case Acrobat: return getPortraitFromTeamColor(info.getTeamColor(),
-                    R.drawable.card_portrait_banned_acrobat,
-                    R.drawable.card_portrait_banned_acrobat_b,
-                    R.drawable.card_portrait_banned_acrobat_w
-            );
-            case Archer: return getPortraitFromTeamColor(info.getTeamColor(),
-                    R.drawable.card_portrait_banned_archer,
-                    R.drawable.card_portrait_banned_archer_b,
-                    R.drawable.card_portrait_banned_archer_w
-            );
-            case Assassin: return getPortraitFromTeamColor(info.getTeamColor(),
-                    R.drawable.card_portrait_banned_assassin,
-                    R.drawable.card_portrait_banned_assassin_b,
-                    R.drawable.card_portrait_banned_assassin_w
-            );
-            case Brewmaster: return getPortraitFromTeamColor(info.getTeamColor(),
-                    R.drawable.card_portrait_banned_brewmaster,
-                    R.drawable.card_portrait_banned_brewmaster_b,
-                    R.drawable.card_portrait_banned_brewmaster_w
-            );
-            case Bruiser: return getPortraitFromTeamColor(info.getTeamColor(),
-                    R.drawable.card_portrait_banned_bruiser,
-                    R.drawable.card_portrait_banned_bruiser_b,
-                    R.drawable.card_portrait_banned_bruiser_w
-            );
-            case ClawLauncher: return getPortraitFromTeamColor(info.getTeamColor(),
-                    R.drawable.card_portrait_banned_claw_launcher,
-                    R.drawable.card_portrait_banned_claw_launcher_b,
-                    R.drawable.card_portrait_banned_claw_launcher_w
-            );
-            case HermitAndCub: return getPortraitFromTeamColor(info.getTeamColor(),
-                    R.drawable.card_portrait_banned_hermit_and_cub,
-                    R.drawable.card_portrait_banned_hermit_and_cub_b,
-                    R.drawable.card_portrait_banned_hermit_and_cub_w
-            );
+            case Acrobat: return R.drawable.card_portrait_banned_acrobat;
+            case Archer: return R.drawable.card_portrait_banned_archer;
+            case Assassin: return R.drawable.card_portrait_banned_assassin;
+            case Brewmaster: return R.drawable.card_portrait_banned_brewmaster;
+            case Bruiser: return R.drawable.card_portrait_banned_bruiser;
+            case ClawLauncher: return R.drawable.card_portrait_banned_claw_launcher;
+            case HermitAndCub: return R.drawable.card_portrait_banned_hermit_and_cub;
             case Illusionist: {
                 if (info.getSkinType() == CharacterSkinType.LaughingMoonSage) {
-                    return getPortraitFromTeamColor(info.getTeamColor(),
-                            R.drawable.card_portrait_banned_illusionist_lms,
-                            R.drawable.card_portrait_banned_illusionist_lms_b,
-                            R.drawable.card_portrait_banned_illusionist_lms_w
-                    );
+                    return R.drawable.card_portrait_banned_illusionist_lms;
                 }
-                return getPortraitFromTeamColor(info.getTeamColor(),
-                        R.drawable.card_portrait_banned_illusionist,
-                        R.drawable.card_portrait_banned_illusionist_b,
-                        R.drawable.card_portrait_banned_illusionist_w
-                );
+                return R.drawable.card_portrait_banned_illusionist;
             }
-            case Jailer: return getPortraitFromTeamColor(info.getTeamColor(),
-                    R.drawable.card_portrait_banned_jailer,
-                    R.drawable.card_portrait_banned_jailer_b,
-                    R.drawable.card_portrait_banned_jailer_w
-            );
-            case Manipulator: return getPortraitFromTeamColor(info.getTeamColor(),
-                    R.drawable.card_portrait_banned_manipulator,
-                    R.drawable.card_portrait_banned_manipulator_b,
-                    R.drawable.card_portrait_banned_manipulator_w
-            );
-            case Nemesis: return getPortraitFromTeamColor(info.getTeamColor(),
-                    R.drawable.card_portrait_banned_nemesis,
-                    R.drawable.card_portrait_banned_nemesis_b,
-                    R.drawable.card_portrait_banned_nemesis_w
-            );
-            case Protector: return getPortraitFromTeamColor(info.getTeamColor(),
-                    R.drawable.card_portrait_banned_protector,
-                    R.drawable.card_portrait_banned_protector_b,
-                    R.drawable.card_portrait_banned_protector_w
-            );
-            case Rider: return getPortraitFromTeamColor(info.getTeamColor(),
-                    R.drawable.card_portrait_banned_rider,
-                    R.drawable.card_portrait_banned_rider_b,
-                    R.drawable.card_portrait_banned_rider_w
-            );
+            case Jailer: return R.drawable.card_portrait_banned_jailer;
+            case Manipulator: return R.drawable.card_portrait_banned_manipulator;
+            case Nemesis: return R.drawable.card_portrait_banned_nemesis;
+            case Protector: return R.drawable.card_portrait_banned_protector;
+            case Rider: return R.drawable.card_portrait_banned_rider;
             case RoyalGuard: {
                 if (info.getSkinType() == CharacterSkinType.LaughingMoonSage) {
-                    return getPortraitFromTeamColor(info.getTeamColor(),
-                            R.drawable.card_portrait_banned_royal_guard_lms,
-                            R.drawable.card_portrait_banned_royal_guard_lms_b,
-                            R.drawable.card_portrait_banned_royal_guard_lms_w
-                    );
+                    return R.drawable.card_portrait_banned_royal_guard_lms;
                 }
-                return getPortraitFromTeamColor(info.getTeamColor(),
-                        R.drawable.card_portrait_banned_royal_guard,
-                        R.drawable.card_portrait_banned_royal_guard_b,
-                        R.drawable.card_portrait_banned_royal_guard_w
-                );
+                return R.drawable.card_portrait_banned_royal_guard;
             }
             case Vizier: {
                 if (info.getSkinType() == CharacterSkinType.LaughingMoonSage) {
-                    return getPortraitFromTeamColor(info.getTeamColor(),
-                            R.drawable.card_portrait_banned_vizier_lms,
-                            R.drawable.card_portrait_banned_vizier_lms_b,
-                            R.drawable.card_portrait_banned_vizier_lms_w
-                    );
+                    return R.drawable.card_portrait_banned_vizier_lms;
                 }
-                return getPortraitFromTeamColor(info.getTeamColor(),
-                        R.drawable.card_portrait_banned_vizier,
-                        R.drawable.card_portrait_banned_vizier_b,
-                        R.drawable.card_portrait_banned_vizier_w
-                );
+                return R.drawable.card_portrait_banned_vizier;
             }
-            case Wanderer: return getPortraitFromTeamColor(info.getTeamColor(),
-                    R.drawable.card_portrait_banned_wanderer,
-                    R.drawable.card_portrait_banned_wanderer_b,
-                    R.drawable.card_portrait_banned_wanderer_w
-            );
+            case Wanderer: return R.drawable.card_portrait_banned_wanderer;
             default: throw new IllegalArgumentException("No portrait drawable for card: " + info.getCard());
         }
     }
@@ -270,128 +231,39 @@ public final class PortraitView extends AppCompatImageView {
 
     private int getPortraitHexagonalBannedDrawableId() {
         switch (info.getCard()) {
-            case Acrobat: return getPortraitFromTeamColor(info.getTeamColor(),
-                    R.drawable.card_hex_portrait_banned_acrobat,
-                    R.drawable.card_hex_portrait_banned_acrobat_b,
-                    R.drawable.card_hex_portrait_banned_acrobat_w
-            );
-            case Archer: return getPortraitFromTeamColor(info.getTeamColor(),
-                    R.drawable.card_hex_portrait_banned_archer,
-                    R.drawable.card_hex_portrait_banned_archer_b,
-                    R.drawable.card_hex_portrait_banned_archer_w
-            );
-            case Assassin: return getPortraitFromTeamColor(info.getTeamColor(),
-                    R.drawable.card_hex_portrait_banned_assassin,
-                    R.drawable.card_hex_portrait_banned_assassin_b,
-                    R.drawable.card_hex_portrait_banned_assassin_w
-            );
-            case Brewmaster: return getPortraitFromTeamColor(info.getTeamColor(),
-                    R.drawable.card_hex_portrait_banned_brewmaster,
-                    R.drawable.card_hex_portrait_banned_brewmaster_b,
-                    R.drawable.card_hex_portrait_banned_brewmaster_w
-            );
-            case Bruiser: return getPortraitFromTeamColor(info.getTeamColor(),
-                    R.drawable.card_hex_portrait_banned_bruiser,
-                    R.drawable.card_hex_portrait_banned_bruiser_b,
-                    R.drawable.card_hex_portrait_banned_bruiser_w
-            );
-            case ClawLauncher: return getPortraitFromTeamColor(info.getTeamColor(),
-                    R.drawable.card_hex_portrait_banned_claw_launcher,
-                    R.drawable.card_hex_portrait_banned_claw_launcher_b,
-                    R.drawable.card_hex_portrait_banned_claw_launcher_w
-            );
-            case HermitAndCub: return getPortraitFromTeamColor(info.getTeamColor(),
-                    R.drawable.card_hex_portrait_banned_hermit_and_cub,
-                    R.drawable.card_hex_portrait_banned_hermit_and_cub_b,
-                    R.drawable.card_hex_portrait_banned_hermit_and_cub_w
-            );
+            case Acrobat: return R.drawable.card_hex_portrait_banned_acrobat;
+            case Archer: return R.drawable.card_hex_portrait_banned_archer;
+            case Assassin: return R.drawable.card_hex_portrait_banned_assassin;
+            case Brewmaster: return R.drawable.card_hex_portrait_banned_brewmaster;
+            case Bruiser: return R.drawable.card_hex_portrait_banned_bruiser;
+            case ClawLauncher: return R.drawable.card_hex_portrait_banned_claw_launcher;
+            case HermitAndCub: return R.drawable.card_hex_portrait_banned_hermit_and_cub;
             case Illusionist: {
                 if (info.getSkinType() == CharacterSkinType.LaughingMoonSage) {
-                    return getPortraitFromTeamColor(info.getTeamColor(),
-                            R.drawable.card_hex_portrait_banned_illusionist_lms,
-                            R.drawable.card_hex_portrait_banned_illusionist_lms_b,
-                            R.drawable.card_hex_portrait_banned_illusionist_lms_w
-                    );
+                    return R.drawable.card_hex_portrait_banned_illusionist_lms;
                 }
-                return getPortraitFromTeamColor(info.getTeamColor(),
-                        R.drawable.card_hex_portrait_banned_illusionist,
-                        R.drawable.card_hex_portrait_banned_illusionist_b,
-                        R.drawable.card_hex_portrait_banned_illusionist_w
-                );
+                return R.drawable.card_hex_portrait_banned_illusionist;
             }
-            case Jailer: return getPortraitFromTeamColor(info.getTeamColor(),
-                    R.drawable.card_hex_portrait_banned_jailer,
-                    R.drawable.card_hex_portrait_banned_jailer_b,
-                    R.drawable.card_hex_portrait_banned_jailer_w
-            );
-            case Manipulator: return getPortraitFromTeamColor(info.getTeamColor(),
-                    R.drawable.card_hex_portrait_banned_manipulator,
-                    R.drawable.card_hex_portrait_banned_manipulator_b,
-                    R.drawable.card_hex_portrait_banned_manipulator_w
-            );
-            case Nemesis: return getPortraitFromTeamColor(info.getTeamColor(),
-                    R.drawable.card_hex_portrait_banned_nemesis,
-                    R.drawable.card_hex_portrait_banned_nemesis_b,
-                    R.drawable.card_hex_portrait_banned_nemesis_w
-            );
-            case Protector: return getPortraitFromTeamColor(info.getTeamColor(),
-                    R.drawable.card_hex_portrait_banned_protector,
-                    R.drawable.card_hex_portrait_banned_protector_b,
-                    R.drawable.card_hex_portrait_banned_protector_w
-            );
-            case Rider: return getPortraitFromTeamColor(info.getTeamColor(),
-                    R.drawable.card_hex_portrait_banned_rider,
-                    R.drawable.card_hex_portrait_banned_rider_b,
-                    R.drawable.card_hex_portrait_banned_rider_w
-            );
+            case Jailer: return R.drawable.card_hex_portrait_banned_jailer;
+            case Manipulator: return R.drawable.card_hex_portrait_banned_manipulator;
+            case Nemesis: return R.drawable.card_hex_portrait_banned_nemesis;
+            case Protector: return R.drawable.card_hex_portrait_banned_protector;
+            case Rider: return R.drawable.card_hex_portrait_banned_rider;
             case RoyalGuard: {
                 if (info.getSkinType() == CharacterSkinType.LaughingMoonSage) {
-                    return getPortraitFromTeamColor(info.getTeamColor(),
-                            R.drawable.card_hex_portrait_banned_royal_guard_lms,
-                            R.drawable.card_hex_portrait_banned_royal_guard_lms_b,
-                            R.drawable.card_hex_portrait_banned_royal_guard_lms_w
-                    );
+                    return R.drawable.card_hex_portrait_banned_royal_guard_lms;
                 }
-                return getPortraitFromTeamColor(info.getTeamColor(),
-                        R.drawable.card_hex_portrait_banned_royal_guard,
-                        R.drawable.card_hex_portrait_banned_royal_guard_b,
-                        R.drawable.card_hex_portrait_banned_royal_guard_w
-                );
+                return R.drawable.card_hex_portrait_banned_royal_guard;
             }
             case Vizier: {
                 if (info.getSkinType() == CharacterSkinType.LaughingMoonSage) {
-                    return getPortraitFromTeamColor(info.getTeamColor(),
-                            R.drawable.card_hex_portrait_banned_vizier_lms,
-                            R.drawable.card_hex_portrait_banned_vizier_lms_b,
-                            R.drawable.card_hex_portrait_banned_vizier_lms_w
-                    );
+                    return R.drawable.card_hex_portrait_banned_vizier_lms;
                 }
-                return getPortraitFromTeamColor(info.getTeamColor(),
-                        R.drawable.card_hex_portrait_banned_vizier,
-                        R.drawable.card_hex_portrait_banned_vizier_b,
-                        R.drawable.card_hex_portrait_banned_vizier_w
-                );
+                return R.drawable.card_hex_portrait_banned_vizier;
             }
-            case Wanderer: return getPortraitFromTeamColor(info.getTeamColor(),
-                    R.drawable.card_hex_portrait_banned_wanderer,
-                    R.drawable.card_hex_portrait_banned_wanderer_b,
-                    R.drawable.card_hex_portrait_banned_wanderer_w
-            );
+            case Wanderer: return R.drawable.card_hex_portrait_banned_wanderer;
             default: throw new IllegalArgumentException("No hex portrait drawable for card: " + info.getCard());
         }
-    }
-
-    private int getPortraitFromTeamColor(@Nullable TeamColor teamColor,
-                                         int nullResId, int blackResId, int whiteResId) {
-        if (teamColor == null) {
-            return nullResId;
-        }
-
-        if (teamColor == TeamColor.Black) {
-            return blackResId;
-        }
-
-        return whiteResId;
     }
 
     @NonNull
