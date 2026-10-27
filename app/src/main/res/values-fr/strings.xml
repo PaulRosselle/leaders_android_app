@@ -252,13 +252,9 @@
     <string name="official_game_intro">Leaders est un jeu de société compétitif publié par Studio H en 2025 proposant à deux joueurs de s\'affronter dans un duel tactique intense.</string>
     <string name="created_by">Il a été imaginé par :</string>
     <string name="illustrated_by">et illustré par :</string>
-
-
-
-
-    <string name="privacy_policy">politique de confidentialité</string>
-    <string name="thanks">remerciements</string>
-    <string name="app_adaptation">Cette application est une adaptation non officielle du jeu de société Leaders. Elle a été réalisée avec l\'aide de la fantastique communauté de Leaders.</string>
+    <string name="privacy_policy"><u>politique de confidentialité</u></string>
+    <string name="thanks">RemerciementS</string>
+    <string name="app_adaptation">Cette application est une adaptation non officielle du jeu de société Leaders. Elle a été réalisée avec l\'aide de la communauté de Leaders.</string>
     <string name="playable_items_animation">Animation des éléments jouables</string>
     <string name="playable_items_animation_title">Animation de jouabilité</string>
     <string name="playable_items_animation_message">Jouer une animation sur les éléments avec lesquels le joueur peut intéragir.</string>
@@ -327,5 +323,6 @@
     <string name="language_english">anglais</string>
     <string name="app_language">Langue de l\'application</string>
     <string name="puzzle_export_identity">%s par %s</string>
+    <string name="join_the_community">Rejoignez la communautÉ</string>
 
 </resources>
