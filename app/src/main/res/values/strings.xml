@@ -311,7 +311,7 @@
     <string name="reset_all">Reset all</string>
     <string name="progress_reset">Progress reset!</string>
     <string name="customize_your_characters">Customize your characters with the available skins.</string>
-    <string name="app_version" translatable="false">v0.9.2</string>
+    <string name="app_version" translatable="false">v0.9.3</string>
     <string name="app_name" translatable="false">Leaders</string>
     <string name="leaders_board_editor" translatable="false">Leaders Board Editor</string>
     <string name="rules_chapter_number_capture_leader" translatable="false">I.</string>
