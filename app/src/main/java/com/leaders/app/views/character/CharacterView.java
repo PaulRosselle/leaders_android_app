@@ -8,8 +8,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.AttributeSet;
 import android.util.TypedValue;
+import android.view.View;
 
-import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.AppCompatImageView;
 
 import androidx.annotation.NonNull;
@@ -18,6 +18,7 @@ import androidx.core.content.ContextCompat;
 import androidx.interpolator.view.animation.LinearOutSlowInInterpolator;
 
 import com.leaders.R;
+import com.leaders.app.entities.CharacterPiece;
 import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.enums.CharacterType;
@@ -29,12 +30,8 @@ public final class CharacterView extends AppCompatImageView {
 
     @Nullable
     private InteractionTarget target;
-    @Nullable
-    private CharacterType characterType;
     @NonNull
-    private CharacterSkinType skinType;
-    @NonNull
-    private TeamColor teamColor;
+    private CharacterPiece piece;
 
 
     public CharacterView(Context context) {
@@ -47,13 +44,16 @@ public final class CharacterView extends AppCompatImageView {
         target = null;
         try (TypedArray customAttrs = context.obtainStyledAttributes(attrs, R.styleable.CharacterView)) {
             int characterTypeOrd = customAttrs.getInteger(R.styleable.CharacterView_characterType, -1);
-            characterType = characterTypeOrd == -1 ? null : CharacterType.values()[characterTypeOrd];
+            CharacterType characterType = characterTypeOrd == -1 ? null : CharacterType.values()[characterTypeOrd];
             int teamColorOrd = customAttrs.getInteger(R.styleable.CharacterView_teamColor, TeamColor.Black.ordinal());
-            teamColor = TeamColor.values()[teamColorOrd];
-            skinType = CharacterSkinType.Default;
+            TeamColor teamColor = TeamColor.values()[teamColorOrd];
+            CharacterSkinType skinType = CharacterSkinType.Default;
 
-            setCharacter(characterType, skinType, teamColor);
+            this.piece = new CharacterPiece(characterType, skinType, teamColor);
+            setCharacter(piece);
         }
+
+        setLayerType(View.LAYER_TYPE_HARDWARE, null);
     }
 
     public void setCharacter(@NonNull Character character, @NonNull CharacterSkinType skinType) {
@@ -63,58 +63,12 @@ public final class CharacterView extends AppCompatImageView {
     public void setCharacter(@Nullable CharacterType characterType,
                              @NonNull CharacterSkinType skinType,
                              @NonNull TeamColor teamColor) {
-        this.characterType = characterType;
-        this.skinType = skinType;
-        this.teamColor = teamColor;
-        setImageResource(getCharacterDrawableId(characterType, skinType, teamColor));
+        setCharacter(new CharacterPiece(characterType, skinType, teamColor));
     }
 
-    private int getCharacterDrawableId(@Nullable CharacterType characterType,
-                                       @NonNull CharacterSkinType skinType,
-                                       @NonNull TeamColor teamColor) {
-        boolean isWhite = teamColor == TeamColor.White;
-
-        if (characterType == null) {
-            return isWhite ? R.drawable.character_piece_empty_w : R.drawable.character_piece_empty_b;
-        }
-
-        switch (characterType) {
-            case Acrobat: return isWhite ? R.drawable.character_piece_acrobat_w : R.drawable.character_piece_acrobat_b;
-            case Archer: return isWhite ? R.drawable.character_piece_archer_w : R.drawable.character_piece_archer_b;
-            case Assassin: return isWhite ? R.drawable.character_piece_assassin_w : R.drawable.character_piece_assassin_b;
-            case Brewmaster: return isWhite ? R.drawable.character_piece_brewmaster_w : R.drawable.character_piece_brewmaster_b;
-            case Bruiser: return isWhite ? R.drawable.character_piece_bruiser_w : R.drawable.character_piece_bruiser_b;
-            case ClawLauncher: return isWhite ? R.drawable.character_piece_claw_launcher_w : R.drawable.character_piece_claw_launcher_b;
-            case Cub: return isWhite ? R.drawable.character_piece_cub_w : R.drawable.character_piece_cub_b;
-            case Hermit: return isWhite ? R.drawable.character_piece_hermit_w : R.drawable.character_piece_hermit_b;
-            case Illusionist: {
-                if (skinType == CharacterSkinType.LaughingMoonSage) {
-                    return isWhite ? R.drawable.character_piece_illusionist_lms_w : R.drawable.character_piece_illusionist_lms_b;
-                }
-                return isWhite ? R.drawable.character_piece_illusionist_w : R.drawable.character_piece_illusionist_b;
-            }
-            case Jailer: return isWhite ? R.drawable.character_piece_jailer_w : R.drawable.character_piece_jailer_b;
-            case LeaderKing: return isWhite ? R.drawable.character_piece_leader_king_w : R.drawable.character_piece_leader_king_b;
-            case LeaderQueen: return isWhite ? R.drawable.character_piece_leader_queen_w : R.drawable.character_piece_leader_queen_b;
-            case Manipulator: return isWhite ? R.drawable.character_piece_manipulator_w : R.drawable.character_piece_manipulator_b;
-            case Nemesis: return isWhite ? R.drawable.character_piece_nemesis_w : R.drawable.character_piece_nemesis_b;
-            case Protector: return isWhite ? R.drawable.character_piece_protector_w : R.drawable.character_piece_protector_b;
-            case Rider: return isWhite ? R.drawable.character_piece_rider_w : R.drawable.character_piece_rider_b;
-            case RoyalGuard: {
-                if (skinType == CharacterSkinType.LaughingMoonSage) {
-                    return isWhite ? R.drawable.character_piece_royal_guard_lms_w : R.drawable.character_piece_royal_guard_lms_b;
-                }
-                return isWhite ? R.drawable.character_piece_royal_guard_w : R.drawable.character_piece_royal_guard_b;
-            }
-            case Vizier: {
-                if (skinType == CharacterSkinType.LaughingMoonSage) {
-                    return isWhite ? R.drawable.character_piece_vizier_lms_w : R.drawable.character_piece_vizier_lms_b;
-                }
-                return isWhite ? R.drawable.character_piece_vizier_w : R.drawable.character_piece_vizier_b;
-            }
-            case Wanderer: return isWhite ? R.drawable.character_piece_wanderer_w : R.drawable.character_piece_wanderer_b;
-            default: throw new IllegalArgumentException("No drawable found for character: " + characterType);
-        }
+    public void setCharacter(@NonNull CharacterPiece piece) {
+        this.piece = piece;
+        setImageDrawable(piece.getDrawable(getContext()));
     }
 
     public void clearTarget() {
@@ -146,12 +100,12 @@ public final class CharacterView extends AppCompatImageView {
 
     @Nullable
     public CharacterType getCharacterType() {
-        return characterType;
+        return piece.getCharacterType();
     }
 
     @NonNull
     public TeamColor getTeamColor() {
-        return teamColor;
+        return piece.getTeamColor();
     }
 
     private float getScaleForHighlightValue() {
@@ -179,12 +133,12 @@ public final class CharacterView extends AppCompatImageView {
                                     @NonNull TeamColor teamColor,
                                     int duration,
                                     @Nullable Runnable onAnimationEnd) {
+        this.piece = new CharacterPiece(characterType, skinType, teamColor);
+
         Drawable[] drawables = new Drawable[2];
         drawables[0] = getDrawable();
-        drawables[1] = AppCompatResources.getDrawable(
-                getContext(),
-                getCharacterDrawableId(characterType, skinType, teamColor)
-        );
+        drawables[1] = piece.getDrawable(getContext());
+
         TransitionDrawable fadeTransition = new TransitionDrawable(drawables);
         fadeTransition.setCrossFadeEnabled(true);
         setImageDrawable(fadeTransition);

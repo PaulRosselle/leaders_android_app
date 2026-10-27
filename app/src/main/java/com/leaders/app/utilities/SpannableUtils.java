@@ -50,6 +50,10 @@ public class SpannableUtils {
             throw new NoSuchElementException("No resource found for id=" + imageResId);
         }
 
+        return getImageSpan(drawable, width, height);
+    }
+
+    public static ImageSpan getImageSpan(@NonNull Drawable drawable, int width, int height) {
         drawable.setBounds(0, 0, width, height);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {

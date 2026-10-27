@@ -1,14 +1,19 @@
 package com.leaders.app.activities.rules.tutorial;
 
+import android.content.Context;
 import android.text.Spannable;
 import android.text.style.ImageSpan;
 
 import androidx.annotation.NonNull;
 
 import com.leaders.R;
+import com.leaders.app.entities.CharacterPiece;
 import com.leaders.app.enums.ActivityType;
+import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.app.enums.TutorialChapter;
 import com.leaders.app.utilities.SpannableUtils;
+import com.leaders.gamelogic.enums.CharacterType;
+import com.leaders.gamelogic.enums.TeamColor;
 
 import java.util.List;
 
@@ -34,16 +39,23 @@ public class RulesTutorialActiveAbilitiesActivity extends RulesTutorialActivity 
                 iconSize
         );
 
+        Context context = getBaseContext();
         ImageSpan acrobatSpan = SpannableUtils.getImageSpan(
-                this,
-                R.drawable.character_piece_acrobat_b,
+                new CharacterPiece(
+                        CharacterType.Acrobat,
+                        CharacterSkinType.Default,
+                        TeamColor.Black
+                ).getDrawable(context),
                 iconSize,
                 iconSize
         );
 
         ImageSpan illusionistSpan = SpannableUtils.getImageSpan(
-                this,
-                R.drawable.character_piece_illusionist_b,
+                new CharacterPiece(
+                        CharacterType.Illusionist,
+                        CharacterSkinType.Default,
+                        TeamColor.Black
+                ).getDrawable(context),
                 iconSize,
                 iconSize
         );

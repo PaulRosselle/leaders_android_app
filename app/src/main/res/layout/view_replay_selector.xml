@@ -71,7 +71,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/txvName_vwReplaySelector"
         app:layout_constraintTop_toTopOf="@+id/txvWhitePlayer_vwReplaySelector"
-        app:srcCompat="@drawable/character_piece_empty_w" />
+        app:srcCompat="@drawable/character_piece_empty_alt_w" />
 
     <TextView
         android:id="@+id/txvWhitePlayer_vwReplaySelector"

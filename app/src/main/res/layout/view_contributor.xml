@@ -16,7 +16,7 @@
         android:layout_width="@dimen/round_button_icon_size"
         android:layout_height="@dimen/round_button_icon_size"
         android:importantForAccessibility="no"
-        app:srcCompat="@drawable/character_piece_leader_king_w" />
+        app:srcCompat="@drawable/character_piece_empty_w" />
 
     <TextView
         android:id="@+id/txvName_vwContributor"
