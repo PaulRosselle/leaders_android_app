@@ -324,5 +324,9 @@
     <string name="app_language">Langue de l\'application</string>
     <string name="puzzle_export_identity">%s par %s</string>
     <string name="join_the_community">Rejoignez la communautÉ</string>
+    <string name="welcome_message">Un jeu de stratégie où chaque décision compte. Recrutez de puissants alliés, déjouez les plans de votre adversaire et capturez son Leader pour remporter la victoire.\n\nVous découvrez le jeu ? Suivez le tutoriel pour apprendre les règles pas à pas, ou partez directement à la conquête du royaume !</string>
+    <string name="welcome_title">Bienvenue dans Leaders !</string>
+    <string name="learn_the_rules">Découvrir les règles</string>
+    <string name="welcome_button_continue">Continuer</string>
 
 </resources>

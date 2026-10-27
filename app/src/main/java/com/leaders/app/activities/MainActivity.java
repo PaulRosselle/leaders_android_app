@@ -14,15 +14,21 @@ import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 
 import com.leaders.R;
+import com.leaders.app.entities.LeadersApplication;
+import com.leaders.app.entities.Settings;
 import com.leaders.app.entities.crash.CrashLog;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.AppSection;
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.views.mainmenu.CrashLogView;
 import com.leaders.app.views.mainmenu.MainMenuView;
+import com.leaders.app.views.mainmenu.WelcomeView;
 
 public final class MainActivity extends BaseActivity {
     private CrashLogView clvCrashDialog;
+    private WelcomeView wcvWelcome;
+
+    private Settings settings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +41,7 @@ public final class MainActivity extends BaseActivity {
         super.initViews();
 
         clvCrashDialog = findViewById(R.id.clvCrashDialog_actMain);
+        wcvWelcome = findViewById(R.id.wcvWelcome_actMain);
     }
 
     @Override
@@ -43,15 +50,22 @@ public final class MainActivity extends BaseActivity {
 
         MainMenuView mmvMainMenu = findViewById(R.id.mmvMainMenu_actMain);
         mmvMainMenu.setSectionClickListener(this::onSectionClick);
+        wcvWelcome.setListener(this::onWelcomeActionClick);
     }
 
     @Override
     protected void initDatas() {
         super.initDatas();
 
+        settings = ((LeadersApplication) getApplication()).getSettings();
+
         CrashLog crashLog = JsonUtils.loadCrashLog(this);
         if (crashLog != null) {
             clvCrashDialog.show(crashLog);
+        }
+
+        if (settings.isFirstLaunch()) {
+            wcvWelcome.setVisibility(View.VISIBLE);
         }
     }
 
@@ -89,6 +103,15 @@ public final class MainActivity extends BaseActivity {
     @Override
     public ActivityType getActivityType() {
         return ActivityType.Main;
+    }
+
+    private void onWelcomeActionClick(@NonNull WelcomeView.Action action) {
+        settings.setIsFirstLaunch(false);
+        JsonUtils.saveSettings(this, settings);
+
+        if (action == WelcomeView.Action.START_TUTORIAL) {
+            goToActivity(ActivityType.RulesTutorialCapture);
+        }
     }
 
     private void startLightAnimation() {

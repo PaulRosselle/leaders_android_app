@@ -329,4 +329,8 @@
     <string name="app_language">App language</string>
     <string name="puzzle_export_identity">%s by %s</string>
     <string name="join_the_community">join the community</string>
+    <string name="welcome_message">A strategy game where every decision matters. Recruit powerful allies, outsmart your opponent, and capture their Leader to claim victory.\n\nNew to the game? Follow the tutorial to learn the rules step by step, or jump straight into the battle for the kingdom!</string>
+    <string name="welcome_title">Welcome to Leaders!</string>
+    <string name="learn_the_rules">Learn the Rules</string>
+    <string name="welcome_button_continue">Continue</string>
 </resources>
