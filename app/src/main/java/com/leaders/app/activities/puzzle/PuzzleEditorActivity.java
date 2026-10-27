@@ -715,10 +715,23 @@ public final class PuzzleEditorActivity extends BaseActivity {
     }
 
     private void btnImportClick(View v) {
-        GameHistory gameHistory = PuzzleImportUtils.importPuzzleFromClipboard(this);
-        if (gameHistory != null) {
-            loadPuzzleFromHistory(gameHistory);
+        PuzzleImportUtils.ImportResult result = PuzzleImportUtils.importPuzzlesFromClipboard(this);
+        if (result.puzzles.isEmpty()) {
+            setActionsMenuVisible(false);
+            return;
         }
+
+        PuzzleImportUtils.ImportedPuzzle puzzleImport = result.puzzles.get(0);
+        CustomPuzzleSave importedSave = CustomPuzzleSave.getDefault(puzzleImport.history);
+        if (!puzzleImport.name.isEmpty()) {
+            importedSave.setName(puzzleImport.name);
+        }
+        if (!puzzleImport.author.isEmpty()) {
+            importedSave.setAuthor(puzzleImport.author);
+        }
+
+        GameHistory gameHistory = puzzleImport.history;
+        loadPuzzleFromHistory(gameHistory);
 
         setActionsMenuVisible(false);
     }
