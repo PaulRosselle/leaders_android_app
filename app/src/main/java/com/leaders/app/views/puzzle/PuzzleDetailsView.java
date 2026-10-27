@@ -40,6 +40,14 @@ public final class PuzzleDetailsView extends ConstraintLayout {
         }
     }
 
+    public void setPuzzleName(@NonNull String puzzleName) {
+        edtName.setText(puzzleName);
+    }
+
+    public void setPuzzleAuthor(@NonNull String puzzleAuthor) {
+        edtAuthor.setText(puzzleAuthor);
+    }
+
     public void setDefaultPuzzleName(@NonNull String puzzleName) {
         defaultName = puzzleName;
         if (!puzzleName.isEmpty()) {

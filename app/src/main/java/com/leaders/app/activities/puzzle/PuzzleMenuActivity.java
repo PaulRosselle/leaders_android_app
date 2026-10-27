@@ -351,8 +351,12 @@ public final class PuzzleMenuActivity extends BaseActivity implements SearchTool
     private void onChangeDetailsClick(View v) {
         PuzzleSave puzzleSave = psgvPuzzles.getSelectedPuzzles().get(0);
 
-        pdvDetails.setDefaultPuzzleName(puzzleSave.getName());
-        pdvDetails.setDefaultPuzzleAuthor(puzzleSave.getAuthor());
+        String puzzleName = puzzleSave.getName();
+        String puzzleAuthor = puzzleSave.getAuthor();
+
+        pdvDetails.setPuzzleName(puzzleName);
+        pdvDetails.setDefaultPuzzleName(puzzleName);
+        pdvDetails.setPuzzleAuthor(puzzleAuthor);
         pdvDetails.setPuzzleDifficulty(puzzleSave.getDifficulty());
         pdvDetails.setVisibility(View.VISIBLE);
 
