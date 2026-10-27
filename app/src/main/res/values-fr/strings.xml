@@ -326,5 +326,6 @@
     <string name="language_french">français</string>
     <string name="language_english">anglais</string>
     <string name="app_language">Langue de l\'application</string>
+    <string name="puzzle_export_identity">%s par %s</string>
 
 </resources>

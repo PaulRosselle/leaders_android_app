@@ -29,7 +29,6 @@ import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.puzzle.PuzzleDetailsView;
 import com.leaders.app.views.puzzle.PuzzleSelectorGroupView;
 import com.leaders.app.views.puzzle.SearchToolbarView;
-import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
 import com.leaders.puzzlelogic.entities.OfficialPuzzleSave;
 import com.leaders.puzzlelogic.entities.PuzzleIdentity;
@@ -43,6 +42,7 @@ import com.leaders.puzzlelogic.search.PuzzleSaveToolbarMapper;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -471,37 +471,7 @@ public final class PuzzleMenuActivity extends BaseActivity implements SearchTool
 
     private void importFromFile(@NonNull Uri uri) {
         try {
-            // First we try to load the puzzles from the file
-            List<CustomPuzzleSave> importedPuzzles = JsonUtils.loadCustomPuzzlesFromFile(this, uri);
-
-            PuzzleImportAnalysis importAnalysis = new PuzzleImportAnalysis(importedPuzzles, customPuzzleSaves);
-
-            if (!importAnalysis.getNewPuzzles().isEmpty()) {
-                // Then we save the new custom puzzles list
-                customPuzzleSaves.addAll(importAnalysis.getNewPuzzles());
-                JsonUtils.saveCustomPuzzles(this, customPuzzleSaves);
-
-                // Finally we display the new puzzles and inform the user that the import was successful
-                refreshPuzzles();
-
-                Toast.makeText(this, R.string.import_successful, Toast.LENGTH_SHORT).show();
-            }
-
-            if (!importAnalysis.getDuplicates().isEmpty()) {
-                StringBuilder stringBuilder = new StringBuilder();
-                for (Map.Entry<PuzzleIdentity, String> entry : importAnalysis.getDuplicates().entrySet()) {
-                    stringBuilder.append(String.format(getString(R.string.duplicate_of),
-                            entry.getKey().getName().toUpperCase(),
-                            entry.getValue().toUpperCase()
-                    ));
-                }
-
-                new AlertDialog.Builder(this, R.style.alert_dialog_theme)
-                        .setTitle(R.string.puzzles_not_imported)
-                        .setMessage(stringBuilder.toString().trim())
-                        .setPositiveButton(R.string.ok, null)
-                        .show();
-            }
+            processImport(JsonUtils.loadCustomPuzzlesFromFile(this, uri));
         } catch (IllegalArgumentException e) {
             Toast.makeText(this, R.string.error_import_file_loading, Toast.LENGTH_SHORT).show();
         }
@@ -509,19 +479,55 @@ public final class PuzzleMenuActivity extends BaseActivity implements SearchTool
 
     private void importLbeLinkFromClipboard() {
         // The import method handle itself error messages
-        GameHistory gameHistory = PuzzleImportUtils.importPuzzleFromClipboard(this);
-        if (gameHistory == null) {
+        PuzzleImportUtils.ImportResult result = PuzzleImportUtils.importPuzzlesFromClipboard(this);
+        if (result.puzzles.isEmpty()) {
             return;
         }
 
-        CustomPuzzleSave importedPuzzleSave = CustomPuzzleSave.getDefault(gameHistory);
-        JsonUtils.saveCustomPuzzles(this, customPuzzleSaves);
+        List<CustomPuzzleSave> importedPuzzles = new ArrayList<>();
+        for (PuzzleImportUtils.ImportedPuzzle imported : result.puzzles) {
+            CustomPuzzleSave save = CustomPuzzleSave.getDefault(imported.history);
+            if (!imported.name.isEmpty()) {
+                save.setName(imported.name);
+            }
+            if (!imported.author.isEmpty()) {
+                save.setAuthor(imported.author);
+            }
+            importedPuzzles.add(save);
+        }
 
-        Intent intent = ActivityType.PuzzleEditor.getIntent(this);
-        int puzzleIdx = customPuzzleSaves.indexOf(importedPuzzleSave);
-        intent.putExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, puzzleIdx);
-        intent.putExtra(ExtraUtils.EXTRA_PUZZLE_IMPORTED, true);
-        goToActivity(intent);
+        processImport(importedPuzzles);
+    }
+
+    private void processImport(@NonNull List<CustomPuzzleSave> importedPuzzles) {
+        PuzzleImportAnalysis importAnalysis = new PuzzleImportAnalysis(importedPuzzles, customPuzzleSaves);
+
+        if (!importAnalysis.getNewPuzzles().isEmpty()) {
+            // Then we save the new custom puzzles list
+            customPuzzleSaves.addAll(importAnalysis.getNewPuzzles());
+            JsonUtils.saveCustomPuzzles(this, customPuzzleSaves);
+
+            // Finally we display the new puzzles and inform the user that the import was successful
+            refreshPuzzles();
+
+            Toast.makeText(this, R.string.import_successful, Toast.LENGTH_SHORT).show();
+        }
+
+        if (!importAnalysis.getDuplicates().isEmpty()) {
+            StringBuilder stringBuilder = new StringBuilder();
+            for (Map.Entry<PuzzleIdentity, String> entry : importAnalysis.getDuplicates().entrySet()) {
+                stringBuilder.append(String.format(getString(R.string.duplicate_of),
+                        entry.getKey().getName().toUpperCase(),
+                        entry.getValue().toUpperCase()
+                ));
+            }
+
+            new AlertDialog.Builder(this, R.style.alert_dialog_theme)
+                    .setTitle(R.string.puzzles_not_imported)
+                    .setMessage(stringBuilder.toString().trim())
+                    .setPositiveButton(R.string.ok, null)
+                    .show();
+        }
     }
 
     private void onExportClick(View v) {
@@ -546,6 +552,7 @@ public final class PuzzleMenuActivity extends BaseActivity implements SearchTool
     private void selectExportFile() {
         exportPuzzleDirectorySelector.launch(null);
     }
+
     private void exportToFile(@NonNull Uri directoryUri) {
         // Now that the user has chosen a directory to export the puzzles
         // we can set up an alertDialog with an editText so the user can
@@ -588,9 +595,14 @@ public final class PuzzleMenuActivity extends BaseActivity implements SearchTool
     private void exportToLbeLinks() {
         StringBuilder builder = new StringBuilder();
         for (PuzzleSave puzzleSave : psgvPuzzles.getSelectedPuzzles()) {
-            builder.append(puzzleSave.getName());
-            if (!puzzleSave.getAuthor().isEmpty()) {
-                builder.append(String.format(getString(R.string.by_author), puzzleSave.getAuthor()));
+            if (puzzleSave.getAuthor().isEmpty()) {
+                builder.append(puzzleSave.getName());
+            } else {
+                builder.append(String.format(
+                        getString(R.string.puzzle_export_identity),
+                        puzzleSave.getName(),
+                        puzzleSave.getAuthor()
+                ));
             }
             builder.append("\n");
             builder.append(PuzzleExportUtils.getLbeUrl(puzzleSave));
