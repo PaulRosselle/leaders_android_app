@@ -7,23 +7,23 @@ import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.puzzlelogic.utilities.blocker.NemesisBlockerUtils;
+import com.leaders.puzzlelogic.utilities.blocker.SearchCache;
 
 import java.util.List;
-import java.util.Set;
 
 final class NemesisBlockerWorker implements Runnable {
     private final NemesisBlockerCoordinator coordinator;
     private final Game game;
     private final GameHistory gameHistory;
     private final List<CharacterAction> nemesisActions;
-    private final Set<String> losingStates; // Shared and concurrent
+    private final SearchCache searchCache; // Shared and concurrent
     private final Runnable endCallback;
 
     NemesisBlockerWorker(@NonNull NemesisBlockerCoordinator coordinator,
                          @NonNull Game game,
                          @NonNull GameHistory gameHistory,
                          @NonNull List<CharacterAction> nemesisActions,
-                         @NonNull Set<String> losingStates,
+                         @NonNull SearchCache searchCache,
                          @NonNull Runnable endCallback) {
         this.coordinator = coordinator;
 
@@ -32,7 +32,7 @@ final class NemesisBlockerWorker implements Runnable {
         this.gameHistory = new GameHistory(gameHistory);
 
         this.nemesisActions = nemesisActions;
-        this.losingStates = losingStates;
+        this.searchCache = searchCache;
         this.endCallback = endCallback;
     }
 
@@ -45,7 +45,7 @@ final class NemesisBlockerWorker implements Runnable {
 
                 try {
                     boolean blocks = NemesisBlockerUtils.canBlock(
-                            game, gameHistory, nemesisActions.get(index), losingStates,
+                            game, gameHistory, nemesisActions.get(index), searchCache,
                             () -> coordinator.isSuperseded(index)
                                     || Thread.currentThread().isInterrupted());
 

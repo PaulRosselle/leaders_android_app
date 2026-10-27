@@ -20,12 +20,11 @@ import com.leaders.gamelogic.queries.CharacterAbilityQuery;
 import com.leaders.gamelogic.queries.GameHistoryQuery;
 import com.leaders.puzzlelogic.utilities.GameSearchUtils;
 import com.leaders.puzzlelogic.utilities.blocker.NemesisBlockerUtils;
+import com.leaders.puzzlelogic.utilities.blocker.SearchCache;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -37,7 +36,7 @@ public final class NemesisBlocker {
     private final List<InteractionTarget> nemesisTargets;
     private final List<Character> opponentCharacters;
     private final NemesisBlockerCallback callback;
-    private final Set<String> losingStates;
+    private final SearchCache searchCache;
 
     private final NemesisBlockerCoordinator coordinator;
     private boolean callbackDelivered;
@@ -60,7 +59,7 @@ public final class NemesisBlocker {
 
         this.nemesisActions = GameSearchUtils.enumerateActions(game, gameHistory, nemesis);
         this.opponentCharacters = searchOpponentCharacters(game, gameHistory, nemesis);
-        this.losingStates = ConcurrentHashMap.newKeySet();
+        this.searchCache = new SearchCache();
 
         this.callback = callback;
         this.callbackDelivered = false;
@@ -107,7 +106,7 @@ public final class NemesisBlocker {
             boolean canBlock;
             try {
                 canBlock = NemesisBlockerUtils.canBlock(
-                        game, gameHistory, nemesisAction, losingStates, () -> false);
+                        game, gameHistory, nemesisAction, searchCache, () -> false);
             } catch (InterruptedException e) {
                 throw new IllegalStateException("Invalid context for interruption", e);
             }
@@ -138,7 +137,7 @@ public final class NemesisBlocker {
                 for (int i = 0; i < workerCount; i++) {
                     executor.execute(new NemesisBlockerWorker(
                             coordinator, game, gameHistory,
-                            nemesisActions, losingStates, this::onCoordinatorChanged
+                            nemesisActions, searchCache, this::onCoordinatorChanged
                     ));
                 }
             }

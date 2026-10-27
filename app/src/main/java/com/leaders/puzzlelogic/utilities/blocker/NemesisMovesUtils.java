@@ -64,9 +64,19 @@ public final class NemesisMovesUtils {
     }
 
     /**
-     * Discovers blocking moves without cross-checking the results.
+     * Searches for blocking moves for a given character permutation without verifying results.
      *
-     * @see #solve(Game, GameHistory, List, long, Map, Set, Set, Set, BooleanSupplier, boolean)
+     * @param game the current game state
+     * @param history the game history
+     * @param characters the characters used to generate the permutation
+     * @param permutationIndex the index of the permutation to evaluate
+     * @param blockingMoves the map of identified blocking moves
+     * @param exploredStates the set of explored game states
+     * @param nemesisEvaluated the set of evaluated Nemesis states
+     * @param searchCache the cache used to store search results
+     * @param shouldCancel the condition used to cancel the search
+     * @throws IllegalArgumentException if the current phase is not an {@code ActionsPhase}
+     * @throws InterruptedException if the search is interrupted
      */
     public static void solve(@NonNull Game game,
                              @NonNull GameHistory history,
@@ -75,30 +85,27 @@ public final class NemesisMovesUtils {
                              @NonNull Map<String, CharacterAction> blockingMoves,
                              @NonNull Set<String> exploredStates,
                              @NonNull Set<String> nemesisEvaluated,
-                             @NonNull Set<String> losingStates,
+                             @NonNull SearchCache searchCache,
                              @NonNull BooleanSupplier shouldCancel) throws InterruptedException {
         solve(game, history, characters, permutationIndex, blockingMoves,
-                exploredStates, nemesisEvaluated, losingStates, shouldCancel, false);
+                exploredStates, nemesisEvaluated, searchCache, shouldCancel, false);
     }
 
     /**
-     * Discovers blocking moves while exploring the reachable game states.
+     * Searches for blocking moves for a given character permutation.
      *
-     * @param game current game state
-     * @param history current game history (current phase must be an ActionsPhase)
-     * @param characters player characters defining the enumeration order
-     * @param permutationIndex index of the permutation used for the enumeration
-     * @param blockingMoves receives, for each Nemesis state, its first blocking action
-     * @param exploredStates enumeration nodes already visited (one exploration only)
-     * @param nemesisEvaluated Nemesis states already fully evaluated
-     * @param losingStates memoization of the exhaustive proof, shareable between searches
-     * @param shouldCancel cancellation signal
-     * @param verifyResults if true, every reported result is cross-checked with an
-     *                      unmemoized brute-force search; throws
-     *                      {@link IllegalStateException} on any mismatch. Exponential
-     *                      cost: intended for debug builds and tests only.
-     * @throws IllegalArgumentException if the current phase is not an ActionsPhase
-     * @throws InterruptedException if the search is interrupted or canceled
+     * @param game the current game state
+     * @param history the game history
+     * @param characters the characters used to generate the permutation
+     * @param permutationIndex the index of the permutation to evaluate
+     * @param blockingMoves the map of identified blocking moves
+     * @param exploredStates the set of explored game states
+     * @param nemesisEvaluated the set of evaluated Nemesis states
+     * @param searchCache the cache used to store search results
+     * @param shouldCancel the condition used to cancel the search
+     * @param verifyResults {@code true} to verify search results, otherwise {@code false}
+     * @throws IllegalArgumentException if the current phase is not an {@code ActionsPhase}
+     * @throws InterruptedException if the search is interrupted
      */
     public static void solve(@NonNull Game game,
                              @NonNull GameHistory history,
@@ -107,7 +114,7 @@ public final class NemesisMovesUtils {
                              @NonNull Map<String, CharacterAction> blockingMoves,
                              @NonNull Set<String> exploredStates,
                              @NonNull Set<String> nemesisEvaluated,
-                             @NonNull Set<String> losingStates,
+                             @NonNull SearchCache searchCache,
                              @NonNull BooleanSupplier shouldCancel,
                              boolean verifyResults) throws InterruptedException {
         checkCancellation(shouldCancel);
@@ -119,7 +126,7 @@ public final class NemesisMovesUtils {
 
         SearchContext ctx = new SearchContext(
                 game, history, (ActionsPhase) phase, blockingMoves,
-                exploredStates, nemesisEvaluated, losingStates, shouldCancel, verifyResults
+                exploredStates, nemesisEvaluated, searchCache, shouldCancel, verifyResults
         );
 
         List<Character> permutation = CharactersPermutationUtils.getPermutation(characters, permutationIndex);
@@ -294,7 +301,7 @@ public final class NemesisMovesUtils {
 
             if (NemesisBlockerUtils.canBlock(
                     searchContext.game, searchContext.history, action,
-                    searchContext.losingStates, searchContext.shouldCancel)) {
+                    searchContext.searchCache, searchContext.shouldCancel)) {
                 if (firstBlockingAction == null) {
                     firstBlockingAction = action;
                 }
@@ -431,7 +438,7 @@ public final class NemesisMovesUtils {
         final Map<String, CharacterAction> blockingMoves;
         final Set<String> exploredStates;
         final Set<String> nemesisEvaluated;
-        final Set<String> losingStates;
+        final SearchCache searchCache;
         final BooleanSupplier shouldCancel;
         final boolean verifyResults;
 
@@ -441,7 +448,7 @@ public final class NemesisMovesUtils {
                       @NonNull Map<String, CharacterAction> blockingMoves,
                       @NonNull Set<String> exploredStates,
                       @NonNull Set<String> nemesisEvaluated,
-                      @NonNull Set<String> losingStates,
+                      @NonNull SearchCache searchCache,
                       @NonNull BooleanSupplier shouldCancel,
                       boolean verifyResults) {
             this.game = game;
@@ -450,7 +457,7 @@ public final class NemesisMovesUtils {
             this.blockingMoves = blockingMoves;
             this.exploredStates = exploredStates;
             this.nemesisEvaluated = nemesisEvaluated;
-            this.losingStates = losingStates;
+            this.searchCache = searchCache;
             this.shouldCancel = shouldCancel;
             this.verifyResults = verifyResults;
         }
