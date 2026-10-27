@@ -8,7 +8,6 @@ public enum ContributorAvatar {
     Assassin,
     Brewmaster,
     ClawLauncher,
-    Frog,
     Illusionist,
     Jailer,
     LeaderKing,
@@ -29,7 +28,6 @@ public enum ContributorAvatar {
             case Assassin: return R.drawable.character_piece_assassin_w;
             case Brewmaster: return R.drawable.character_piece_brewmaster_w;
             case ClawLauncher: return R.drawable.character_piece_claw_launcher_w;
-            case Frog: return R.drawable.character_piece_frog_w;
             case Illusionist: return R.drawable.character_piece_illusionist_w;
             case Jailer: return R.drawable.character_piece_jailer_w;
             case LeaderKing: return R.drawable.character_piece_leader_king_w;
