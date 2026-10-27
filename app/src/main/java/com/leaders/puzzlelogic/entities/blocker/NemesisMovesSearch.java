@@ -18,6 +18,7 @@ import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.gamelogic.queries.GameHistoryQuery;
 import com.leaders.puzzlelogic.utilities.CharactersPermutationUtils;
 import com.leaders.puzzlelogic.utilities.blocker.NemesisMovesUtils;
+import com.leaders.puzzlelogic.utilities.blocker.SearchCache;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -75,13 +76,13 @@ public final class NemesisMovesSearch {
         Map<String, CharacterAction> blockingMoves = new HashMap<>();
         Set<String> exploredStates = new HashSet<>();
         Set<String> nemesisEvaluated = new HashSet<>();
-        Set<String> losingStates = new HashSet<>();
+        SearchCache searchCache = new SearchCache();
         try {
             logProgress(0, permutationCount);
             for (long permutationIndex = 0; permutationIndex < permutationCount; permutationIndex++) {
                 NemesisMovesUtils.solve(
                         game, gameHistory, characters, permutationIndex,
-                        blockingMoves, exploredStates, nemesisEvaluated, losingStates,
+                        blockingMoves, exploredStates, nemesisEvaluated, searchCache,
                         () -> false // Interruption is not allowed in this context
                 );
                 logProgress(permutationIndex + 1, permutationCount);

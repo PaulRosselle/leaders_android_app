@@ -18,7 +18,6 @@ import com.leaders.puzzlelogic.utilities.GameSearchUtils;
 import com.leaders.puzzlelogic.utilities.GameStateHashUtils;
 
 import java.util.List;
-import java.util.Set;
 import java.util.function.BooleanSupplier;
 
 public final class NemesisBlockerUtils {
@@ -27,21 +26,21 @@ public final class NemesisBlockerUtils {
     }
 
     /**
-     * Determines whether the specified Nemesis action can block the opponent from winning.
+     * Checks whether the given Nemesis action can be blocked by the current team.
      *
-     * @param game the current game
-     * @param history the game history containing the current phase
+     * @param game the current game state
+     * @param history the game history
      * @param nemesisAction the Nemesis action to evaluate
-     * @param shouldCancel the cancellation signal checked during the evaluation
-     * @return {@code true} if the action prevents the opponent from winning; {@code false} otherwise
-     * @throws IllegalArgumentException if the current phase is not an {@link ActionsPhase}
-     * @throws InterruptedException if the evaluation is interrupted
-     * @throws NullPointerException if any parameter annotated with {@code @NonNull} is {@code null}
+     * @param searchCache the cache used to store search results
+     * @param shouldCancel the condition used to cancel the search
+     * @return {@code true} if the action can be blocked, otherwise {@code false}
+     * @throws IllegalArgumentException if the current phase is not an {@code ActionsPhase}
+     * @throws InterruptedException if the search is interrupted
      */
     public static boolean canBlock(@NonNull Game game,
                                    @NonNull GameHistory history,
                                    @NonNull CharacterAction nemesisAction,
-                                   @NonNull Set<String> losingStates,
+                                   @NonNull SearchCache searchCache,
                                    @NonNull BooleanSupplier shouldCancel) throws InterruptedException {
         checkCancellation(shouldCancel);
 
@@ -51,7 +50,7 @@ public final class NemesisBlockerUtils {
         }
         ActionsPhase actionsPhase = (ActionsPhase) phase;
 
-        return !applyAndCheck(game, history, actionsPhase, nemesisAction, losingStates, shouldCancel);
+        return !applyAndCheck(game, history, actionsPhase, nemesisAction, searchCache, shouldCancel);
     }
 
     /**
@@ -67,29 +66,35 @@ public final class NemesisBlockerUtils {
         }
     }
 
-
     /**
      * Checks whether the current team can force a win from the given game state.
      *
      * @param game the current game state
      * @param history the game history
      * @param phase the current actions phase
-     * @param losingStates the hashes of game states known to be losing
+     * @param searchCache the cache used to store search results
      * @param shouldCancel the condition used to cancel the search
      * @return {@code true} if the current team can force a win, otherwise {@code false}
      * @throws InterruptedException if the search is interrupted
      */
-    private static boolean canPlayerWin(Game game, GameHistory history, ActionsPhase phase,
-                                        Set<String> losingStates,
-                                        BooleanSupplier shouldCancel) throws InterruptedException {
+    private static boolean canPlayerWin(@NonNull Game game,
+                                        @NonNull GameHistory history,
+                                        @NonNull ActionsPhase phase,
+                                        @NonNull SearchCache searchCache,
+                                        @NonNull BooleanSupplier shouldCancel) throws InterruptedException {
         checkCancellation(shouldCancel);
 
         TeamColor team = phase.getTurnTeamColor();
         TeamColor winner = GameQuery.getWinnerTeam(game, team);
-        if (winner != null) return winner == team;
+        if (winner != null) {
+            return winner == team; // Ends the search, no need to hash
+        }
 
         String hash = GameStateHashUtils.createHash(game, history);
-        if (losingStates.contains(hash)) return false;
+        Boolean cached = searchCache.get(hash);
+        if (cached != null) {
+            return cached;
+        }
 
         List<PlayableCharacter> playable = PlayabilityQuery.getPlayableCharacters(game, history);
         boolean result;
@@ -97,12 +102,11 @@ public final class NemesisBlockerUtils {
         if (playable.size() == 1 && playable.get(0).isMandatory()
                 && playable.get(0).getCharacter().getTeamColor() != team) {
             // Nemesis actions : the player must win against all her actions (AND).
-            result = true;
             List<CharacterAction> actions = GameSearchUtils.enumerateActions(
                     game, history, playable.get(0).getCharacter());
-            if (actions.isEmpty()) result = false;
+            result = !actions.isEmpty();
             for (CharacterAction action : actions) {
-                if (!applyAndCheck(game, history, phase, action, losingStates, shouldCancel)) {
+                if (!applyAndCheck(game, history, phase, action, searchCache, shouldCancel)) {
                     result = false;
                     break;
                 }
@@ -111,10 +115,10 @@ public final class NemesisBlockerUtils {
             // Ally actions : any action can lead to the player victory (OR).
             result = false;
             outer:
-            for (PlayableCharacter playableCharacter : playable) {
-                if (playableCharacter.getCharacter().getTeamColor() != team) continue;
-                for (CharacterAction action : GameSearchUtils.enumerateActions(game, history, playableCharacter.getCharacter())) {
-                    if (applyAndCheck(game, history, phase, action, losingStates, shouldCancel)) {
+            for (PlayableCharacter pc : playable) {
+                if (pc.getCharacter().getTeamColor() != team) continue;
+                for (CharacterAction action : GameSearchUtils.enumerateActions(game, history, pc.getCharacter())) {
+                    if (applyAndCheck(game, history, phase, action, searchCache, shouldCancel)) {
                         result = true;
                         break outer;
                     }
@@ -122,7 +126,7 @@ public final class NemesisBlockerUtils {
             }
         }
 
-        if (!result) losingStates.add(hash);
+        searchCache.put(hash, result);
         return result;
     }
 
@@ -133,19 +137,22 @@ public final class NemesisBlockerUtils {
      * @param history the game history
      * @param phase the current actions phase
      * @param action the action to evaluate
-     * @param losingStates the hashes of game states known to be losing
+     * @param searchCache the cache used to store search results
      * @param shouldCancel the condition used to cancel the search
      * @return {@code true} if the current team can force a win after the action, otherwise {@code false}
      * @throws InterruptedException if the search is interrupted
      */
-    private static boolean applyAndCheck(Game game, GameHistory history, ActionsPhase phase,
-                                         CharacterAction action, Set<String> losingStates,
-                                         BooleanSupplier shouldCancel) throws InterruptedException {
+    private static boolean applyAndCheck(@NonNull Game game,
+                                         @NonNull GameHistory history,
+                                         @NonNull ActionsPhase phase,
+                                         @NonNull CharacterAction action,
+                                         @NonNull SearchCache searchCache,
+                                         @NonNull BooleanSupplier shouldCancel) throws InterruptedException {
         GameActionHandler handler = GameActionHandlerFactory.create(game, action);
         handler.doAction();
         phase.getActions().add(action);
         try {
-            return canPlayerWin(game, history, phase, losingStates, shouldCancel);
+            return canPlayerWin(game, history, phase, searchCache, shouldCancel);
         } finally {
             phase.getActions().remove(phase.getActions().size() - 1);
             handler.undoAction();
