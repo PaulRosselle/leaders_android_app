@@ -323,5 +323,8 @@
     <string name="reset_all">Tout réinitialiser</string>
     <string name="progress_reset">Progression réinitalisée !</string>
     <string name="customize_your_characters">Personnalisez vos personnages avec les apparences disponibles.</string>
+    <string name="language_french">français</string>
+    <string name="language_english">anglais</string>
+    <string name="app_language">Langue de l\'application</string>
 
 </resources>

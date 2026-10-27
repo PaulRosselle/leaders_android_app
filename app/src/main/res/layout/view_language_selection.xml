@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    tools:ignore="SpUsage">
+
+    <TextView
+        android:id="@+id/txvTitle_vwLanguageSelection"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif"
+        android:text="@string/app_language"
+        android:textAllCaps="true"
+        android:textColor="@color/font"
+        android:textSize="@dimen/smaller_text_font_size"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/mbtgPuzzlesCategory_vwLanguageSelection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txvTitle_vwLanguageSelection"
+        app:layout_constraintVertical_bias="0.0"
+        app:selectionRequired="true"
+        app:singleSelection="true">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOfficial_vwLanguageSelection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif-medium"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/language_english"
+            android:textAllCaps="true"
+            android:textColor="@color/font"
+            android:textSize="@dimen/smaller_text_font_size"
+            app:backgroundTint="@color/toggle_button_tint"
+            app:cornerRadius="8dp"
+            app:strokeColor="@color/font"
+            app:strokeWidth="@dimen/default_stroke_width" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCustom_vwLanguageSelection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif-medium"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/language_french"
+            android:textAllCaps="true"
+            android:textColor="@color/font"
+            android:textSize="@dimen/smaller_text_font_size"
+            app:backgroundTint="@color/toggle_button_tint"
+            app:cornerRadius="8dp"
+            app:strokeColor="@color/font"
+            app:strokeWidth="@dimen/default_stroke_width" />
+
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+</androidx.constraintlayout.widget.ConstraintLayout>
