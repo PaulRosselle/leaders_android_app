@@ -6,9 +6,13 @@ import android.text.style.ImageSpan;
 import androidx.annotation.NonNull;
 
 import com.leaders.R;
+import com.leaders.app.entities.CharacterPiece;
 import com.leaders.app.enums.ActivityType;
+import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.app.enums.TutorialChapter;
 import com.leaders.app.utilities.SpannableUtils;
+import com.leaders.gamelogic.enums.CharacterType;
+import com.leaders.gamelogic.enums.TeamColor;
 
 import java.util.List;
 
@@ -28,8 +32,11 @@ public final class RulesTutorialCaptureActivity extends RulesTutorialActivity {
         int iconSize = getResources().getDimensionPixelSize(R.dimen.image_span_default_size);
 
         ImageSpan iconSpan = SpannableUtils.getImageSpan(
-                this,
-                R.drawable.character_piece_leader_queen_w,
+                new CharacterPiece(
+                        CharacterType.LeaderQueen,
+                        CharacterSkinType.Default,
+                        TeamColor.White
+                ).getDrawable(this),
                 iconSize,
                 iconSize
         );

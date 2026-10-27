@@ -74,7 +74,7 @@ public class FirstPlayerButtonView extends ConstraintLayout {
                 txvTeam.setText(R.string.black_name);
             } break;
             case White: {
-                imvTeam.setImageResource(R.drawable.character_piece_empty_w);
+                imvTeam.setImageResource(R.drawable.character_piece_empty_alt_w);
                 txvTeam.setText(R.string.white_name);
             } break;
             default: throw new IllegalStateException("Unsupported first team: " + team);
