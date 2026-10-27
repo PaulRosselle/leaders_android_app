@@ -304,7 +304,8 @@ public final class GameHandler {
                             .thenCompose(actionResult -> {
                                 // The cancellation of an auto-action requires to undo the last action
                                 if (actionResult == CharacterActionResult.Cancelled &&
-                                        AutoPlayQuery.canAutoPlayCharacter(getGameMode(), result)) {
+                                        (AutoPlayQuery.canAutoPlayCharacter(getGameMode(), result) ||
+                                                AutoPlayQuery.canAutoSelectCharacter(getGameMode(), result))) {
                                     return undoLastAction()
                                             .thenCompose(ignored -> runActionsPhaseAsync(currentPhase));
                                 }
@@ -879,7 +880,7 @@ public final class GameHandler {
         while (!playerActionUndone && !actions.isEmpty()) {
             int lastActionIndex = actions.size() - 1;
             IGameAction lastAction = actions.get(lastActionIndex);
-            playerActionUndone = !AutoPlayQuery.isAutoAction(getGameMode(), lastAction);
+            playerActionUndone = !AutoPlayQuery.isAutoCancellableAction(getGameMode(), lastAction);
             actions.remove(lastActionIndex);
 
             GameActionHandler actionHandler = GameActionHandlerFactory.create(currentGame, lastAction);
