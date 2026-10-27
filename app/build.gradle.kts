@@ -10,8 +10,8 @@ android {
         applicationId = "com.paulrosselle.leaders"
         minSdk = 28
         targetSdk = 37
-        versionCode = 9
-        versionName = "v0.9.2"
+        versionCode = 10
+        versionName = "v0.9.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
