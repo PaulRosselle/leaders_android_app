@@ -30,7 +30,7 @@ public class SkewedRectangleDrawable extends Drawable {
     private float strokeWidth;
 
     @ColorInt
-    private int fillColor;
+    private final int fillColor;
 
     @ColorInt
     private int strokeColor;
@@ -116,18 +116,9 @@ public class SkewedRectangleDrawable extends Drawable {
         invalidateSelf();
     }
 
-    public float getCutSize() {
-        return cutSize;
-    }
-
     public void setCutSide(@NonNull CutSide cutSide) {
         this.cutSide = cutSide;
         invalidateSelf();
-    }
-
-    @NonNull
-    public CutSide getCutSide() {
-        return cutSide;
     }
 
     public void setStrokeWidth(float strokeWidth) {
@@ -138,16 +129,6 @@ public class SkewedRectangleDrawable extends Drawable {
 
     public float getStrokeWidth() {
         return strokeWidth;
-    }
-
-    public void setFillColor(@ColorInt int fillColor) {
-        this.fillColor = fillColor;
-        fillPaint.setColor(fillColor);
-        invalidateSelf();
-    }
-
-    public int getFillColor() {
-        return fillColor;
     }
 
     public void setStrokeColor(@ColorInt int strokeColor) {
