@@ -11,6 +11,7 @@ import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
+import com.leaders.gamelogic.interactions.InteractionResultType;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.interactions.InteractionType;
 import com.leaders.gamelogic.interactions.TargetCategory;
@@ -36,7 +37,22 @@ public final class AutoPlayQuery {
         return gameMode == GameMode.Puzzle &&
                 request.getRequestType() == InteractionType.PlayableCharacterExpected &&
                 request.getLegalTargets().size() == 1 &&
-                isAutoPlayableCharacter(getPlayableCharacterFromTarget(request.getLegalTargets().get(0)));
+                isAutoPlayableCharacter(getPlayableCharacterFromTarget(request.getLegalTargets().get(0)), true);
+    }
+
+    /**
+     * Checks whether a chosen character can be selected automatically.
+     *
+     * @param gameMode the current game mode
+     * @param result the result of the interaction
+     * @return {@code true} if a playable character was chosen and can be selected automatically
+     *         in puzzle mode, otherwise {@code false}
+     */
+    public static boolean canAutoSelectCharacter(@NonNull GameMode gameMode,
+                                                 @NonNull InteractionResult result) {
+        return gameMode == GameMode.Puzzle &&
+                result.getResultType() == InteractionResultType.PlayableCharacterChosen &&
+                isAutoPlayableCharacter(getPlayableCharacterFromTarget(result.getChosenTarget()), true);
     }
 
     /**
@@ -51,7 +67,7 @@ public final class AutoPlayQuery {
                                                @NonNull InteractionRequest request) {
         return gameMode == GameMode.Puzzle &&
                 request.getRequestType() == InteractionType.PositionExpected &&
-                isAutoCharacter(request.getContext().getSourceCharacter());
+                isAutoCharacter(request.getContext().getSourceCharacter(), false);
     }
 
     /**
@@ -70,28 +86,28 @@ public final class AutoPlayQuery {
 
         switch (result.getResultType()) {
             case PlayableCharacterChosen:
-                return isAutoPlayableCharacter(getPlayableCharacterFromTarget(result.getChosenTarget()));
+                return isAutoPlayableCharacter(getPlayableCharacterFromTarget(result.getChosenTarget()), false);
             case PositionChosen:
-                return isAutoCharacter(result.getContext().getSourceCharacter());
+                return isAutoCharacter(result.getContext().getSourceCharacter(), false);
             default:
                 return false;
         }
     }
 
     /**
-     * Determines whether the action is performed automatically.
+     * Checks whether an action can be cancelled automatically.
      *
      * @param gameMode the current game mode
-     * @param action the game action to evaluate
-     * @return {@code true} if the game is in puzzle mode and the action originates from an automatically played
-     *         character; {@code false} otherwise
+     * @param action the action to check
+     * @return {@code true} if the action is a character action performed by an auto-controlled
+     *         character in puzzle mode, otherwise {@code false}
      */
-    public static boolean isAutoAction(@NonNull GameMode gameMode, @NonNull IGameAction action) {
+    public static boolean isAutoCancellableAction(@NonNull GameMode gameMode, @NonNull IGameAction action) {
         if (gameMode != GameMode.Puzzle || !(action instanceof CharacterAction)) {
             return false;
         }
         CharacterAction characterAction = (CharacterAction) action;
-        return isAutoCharacter(characterAction.getSrcCharacter());
+        return isAutoCharacter(characterAction.getSrcCharacter(), true);
     }
 
     /**
@@ -124,8 +140,8 @@ public final class AutoPlayQuery {
      * @param playableCharacter the playable character to evaluate
      * @return {@code true} if the character is mandatory and eligible for automatic play; {@code false} otherwise
      */
-    private static boolean isAutoPlayableCharacter(@NonNull PlayableCharacter playableCharacter) {
-        return playableCharacter.isMandatory() && isAutoCharacter(playableCharacter.getCharacter());
+    private static boolean isAutoPlayableCharacter(@NonNull PlayableCharacter playableCharacter, boolean ignoreTeam) {
+        return playableCharacter.isMandatory() && isAutoCharacter(playableCharacter.getCharacter(), ignoreTeam);
     }
 
     /**
@@ -135,10 +151,10 @@ public final class AutoPlayQuery {
      * @return {@code true} if the character has an automatically playable type and belongs to a different team
      *         than the puzzle player; {@code false} otherwise
      */
-    private static boolean isAutoCharacter(@Nullable Character character) {
+    private static boolean isAutoCharacter(@Nullable Character character, boolean ignoreTeam) {
         return character != null &&
                 isAutoCharacterType(character.getCharacterType()) &&
-                character.getTeamColor() != PuzzleEditionUtils.getPuzzlePlayerTeamColor();
+                (ignoreTeam || character.getTeamColor() != PuzzleEditionUtils.getPuzzlePlayerTeamColor());
     }
 
     /**
