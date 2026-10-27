@@ -172,6 +172,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
         imvSolved = findViewById(R.id.imvSolved_actPuzzlePlayer);
         txvSolved = findViewById(R.id.txvSolved_actPuzzlePlayer);
         pdvDifficulty = findViewById(R.id.pdvDifficulty_actPuzzlePlayer);
+        pdvDifficulty.setReadonly(true);
 
         nbvBlocker = findViewById(R.id.nbvBlocker_actPuzzlePlayer);
         vwBlockerBg = findViewById(R.id.vwBlockerBg_actPuzzlePlayer);
