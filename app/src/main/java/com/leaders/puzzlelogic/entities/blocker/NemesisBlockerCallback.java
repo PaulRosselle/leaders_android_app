@@ -9,7 +9,7 @@ import com.leaders.gamelogic.interactions.InteractionTarget;
 public interface NemesisBlockerCallback {
     void onBlockingActionFound(@NonNull InteractionTarget target);
 
-    void onSearchCompletedWithoutResult(@Nullable InteractionTarget defaultTarget);
+    void onSearchCompletedWithoutResult(@NonNull InteractionTarget defaultTarget);
 
     void onSearchCancelled();
 }
