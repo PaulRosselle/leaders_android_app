@@ -248,18 +248,30 @@ public final class JsonUtils {
         }
 
         try {
-            List<CustomPuzzleSave> customPuzzles = new ArrayList<>();
-
-            JSONArray jaCustomPuzzles = openJsonFile(context, CUSTOM_PUZZLES_FILENAME).getJSONArray("puzzles");
-            for (int i = 0; i < jaCustomPuzzles.length(); i++) {
-                customPuzzles.add(new CustomPuzzleSave(jaCustomPuzzles.getJSONObject(i)));
-            }
-            customPuzzles.sort(PuzzleSortMode.DIFFICULTY_ASC.getComparator());
-
-            return customPuzzles;
+            return getCustomPuzzlesFromJson(openJsonFile(context, CUSTOM_PUZZLES_FILENAME));
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static List<CustomPuzzleSave> loadDefaultCustomPuzzles(@NonNull Context context) {
+        try (InputStream fisPuzzles = context.getResources().openRawResource(R.raw.default_custom_puzzles)) {
+            return getCustomPuzzlesFromJson(openJsonFile(fisPuzzles));
+        } catch (IOException | JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static List<CustomPuzzleSave> getCustomPuzzlesFromJson(@NonNull JSONObject jsonObject) throws JSONException {
+        List<CustomPuzzleSave> customPuzzles = new ArrayList<>();
+
+        JSONArray jaCustomPuzzles = jsonObject.getJSONArray("puzzles");
+        for (int i = 0; i < jaCustomPuzzles.length(); i++) {
+            customPuzzles.add(new CustomPuzzleSave(jaCustomPuzzles.getJSONObject(i)));
+        }
+        customPuzzles.sort(PuzzleSortMode.DIFFICULTY_ASC.getComparator());
+
+        return customPuzzles;
     }
 
     public static List<CustomPuzzleSave> loadCustomPuzzlesFromFile(@NonNull Context context,
@@ -374,6 +386,14 @@ public final class JsonUtils {
         try {
             return getReplaysFromJson(openJsonFile(context, REPLAYS_FILENAME));
         } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static List<ReplaySave> loadDefaultReplays(@NonNull Context context) {
+        try (InputStream fisReplays = context.getResources().openRawResource(R.raw.default_replays)) {
+            return getReplaysFromJson(openJsonFile(fisReplays));
+        } catch (IOException | JSONException e) {
             throw new RuntimeException(e);
         }
     }

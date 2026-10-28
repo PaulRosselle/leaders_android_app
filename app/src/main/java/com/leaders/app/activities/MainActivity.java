@@ -19,6 +19,7 @@ import com.leaders.app.entities.Settings;
 import com.leaders.app.entities.crash.CrashLog;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.AppSection;
+import com.leaders.app.utilities.DefaultResourcesUtils;
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.views.mainmenu.CrashLogView;
 import com.leaders.app.views.mainmenu.MainMenuView;
@@ -66,6 +67,7 @@ public final class MainActivity extends BaseActivity {
 
         if (settings.isFirstLaunch()) {
             wcvWelcome.setVisibility(View.VISIBLE);
+            runOnUiThread(() -> DefaultResourcesUtils.loadDefaultResources(this));
         }
     }
 
