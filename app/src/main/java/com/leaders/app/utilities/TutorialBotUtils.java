@@ -1,7 +1,6 @@
 package com.leaders.app.utilities;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.leaders.app.controllers.GameController;
 import com.leaders.gamelogic.entities.Cell;
@@ -14,13 +13,14 @@ import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.queries.BoardQuery;
+import com.leaders.puzzlelogic.utilities.BotUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class TutorialBotUtils {
+public final class TutorialBotUtils {
     private TutorialBotUtils(){
         throw new AssertionError("Cannot instantiate utility class");
     }
@@ -94,22 +94,13 @@ public class TutorialBotUtils {
 
     private static void handlePositionRequest(@NonNull GameController controller,
                                               @NonNull InteractionRequest request) {
-        InteractionTarget selectedTarget = null;
-
         Position enemyLeaderPos = getEnemyLeaderPos(controller);
-
         boolean isLeaderRequest = isEnemyLeaderRequest(request);
 
-        // We select the closest position to the enemy leader
-        for (InteractionTarget target : getShuffledTargets(request)) {
-            if (isBetterTargetPosition(target, selectedTarget, enemyLeaderPos, isLeaderRequest)) {
-                selectedTarget = target;
-            }
-        }
-
-        if (selectedTarget == null) {
-            throw new IllegalStateException("No valid position found");
-        }
+        List<InteractionTarget> targets =getShuffledTargets(request);
+        InteractionTarget selectedTarget = isLeaderRequest ?
+                BotUtils.getFurthestTarget(targets, enemyLeaderPos) :
+                BotUtils.getClosestTarget(targets, enemyLeaderPos);
 
         controller.selectTarget(selectedTarget);
     }
@@ -127,19 +118,6 @@ public class TutorialBotUtils {
         return character != null && 
                 character.getCharacterType().getCharacterCard().isLeader() &&
                 character.getTeamColor() == TutorialGameUtils.getPlayerTeamColor().getOpposite();
-    }
-
-    private static boolean isBetterTargetPosition(@NonNull InteractionTarget target,
-                                                  @Nullable InteractionTarget refTarget,
-                                                  @NonNull Position enemyLeaderPos,
-                                                  boolean isLeaderRequest) {
-        if (refTarget == null) {
-            return true;
-        }
-
-        int targetDist = getTargetPositionDistance(target, enemyLeaderPos);
-        int selectedTargetDist = getTargetPositionDistance(refTarget, enemyLeaderPos);
-        return isLeaderRequest ? targetDist > selectedTargetDist : targetDist < selectedTargetDist;
     }
 
     @NonNull
@@ -161,15 +139,6 @@ public class TutorialBotUtils {
         List<InteractionTarget> targets = new ArrayList<>(request.getLegalTargets());
         Collections.shuffle(targets);
         return targets;
-    }
-
-    private static int getTargetPositionDistance(@NonNull InteractionTarget target,
-                                                 @NonNull Position enemyLeaderPos) {
-        Position position = Objects.requireNonNull(
-                target.getChosenPosition(),
-                "Invalid target: not a position"
-        );
-        return position.distanceTo(enemyLeaderPos);
     }
 
     private static int getTargetCharacterDistance(@NonNull InteractionTarget target,

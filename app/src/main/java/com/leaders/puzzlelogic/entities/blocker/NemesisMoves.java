@@ -7,13 +7,17 @@ import androidx.annotation.Nullable;
 
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.utilities.LbeUtils;
+import com.leaders.gamelogic.entities.Character;
+import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.factories.GameFactory;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionTarget;
+import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.puzzlelogic.entities.OfficialPuzzleSave;
 import com.leaders.puzzlelogic.entities.PuzzleSave;
+import com.leaders.puzzlelogic.utilities.BotUtils;
 import com.leaders.puzzlelogic.utilities.GameStateHashUtils;
 
 import org.json.JSONArray;
@@ -24,6 +28,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class NemesisMoves {
     private final Map<String, Position> moves;
@@ -42,15 +47,26 @@ public class NemesisMoves {
                                                @NonNull InteractionRequest request) {
         List<InteractionTarget> nemesisTargets = request.getLegalTargets();
         if (nemesisTargets.isEmpty()) {
-            throw new IllegalStateException("Nemesis action require at least one target");
+            throw new IllegalStateException("Invalid request for Nemesis action: no target");
         }
 
-        String stateHash = GameStateHashUtils.createHash(GameFactory.create(gameHistory), gameHistory);
+        Game game = GameFactory.create(gameHistory);
+        String stateHash = GameStateHashUtils.createHash(game, gameHistory);
         Position existingDestination = getDestination(stateHash);
         if (existingDestination != null) {
             return NemesisBlocker.getNemesisTargetFromDestination(nemesisTargets, existingDestination);
         }
-        return nemesisTargets.get(0);
+
+        Character nemesis = request.getContext().getSourceCharacter();
+        if (nemesis == null) {
+            throw new IllegalStateException("Invalid request for Nemesis action: source character missing");
+        }
+
+        Position enemyLeaderPos = Objects.requireNonNull(
+                BoardQuery.findLeaderCell(game.getBoard(), nemesis.getTeamColor().getOpposite()),
+                "Enemy leader required to initiate a Nemesis action"
+        ).getPosition();
+        return BotUtils.getClosestTarget(nemesisTargets, enemyLeaderPos);
     }
 
     @Nullable

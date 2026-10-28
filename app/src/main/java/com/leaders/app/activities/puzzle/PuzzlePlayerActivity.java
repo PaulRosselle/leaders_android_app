@@ -450,10 +450,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     }
 
     @Override
-    public void onSearchCompletedWithoutResult(@Nullable InteractionTarget defaultTarget) {
-        if (defaultTarget == null) {
-            throw new IllegalStateException("No default target found for Nemesis");
-        }
+    public void onSearchCompletedWithoutResult(@NonNull InteractionTarget defaultTarget) {
         blockedRequest.set(null);
         controller.selectTarget(defaultTarget);
         setBlockerVisible(false);
