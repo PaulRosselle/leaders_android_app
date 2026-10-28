@@ -12,6 +12,7 @@ import com.leaders.R;
 import com.leaders.app.activities.PlayableActivity;
 import com.leaders.app.controllers.GameController;
 import com.leaders.app.entities.CharacterSkins;
+import com.leaders.app.entities.TutorialBot;
 import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.CharacterSkinType;
@@ -21,7 +22,6 @@ import com.leaders.app.enums.TutorialChapter;
 import com.leaders.app.utilities.AlignmentUtils;
 import com.leaders.app.utilities.ButtonUtils;
 import com.leaders.app.utilities.HelpUtils;
-import com.leaders.app.utilities.TutorialBotUtils;
 import com.leaders.app.utilities.TutorialGameUtils;
 import com.leaders.app.views.character.CharacterDisplay;
 import com.leaders.app.views.character.HighlightView;
@@ -74,6 +74,7 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
 
     private boolean isGameEnded;
     private GameHistory startHistory;
+    private TutorialBot bot;
 
     //region BASE ACTIVITY OVERRIDEN METHODS
 
@@ -126,6 +127,7 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
         super.initDatas();
 
         startHistory = TutorialGameUtils.getDefaultHistory(this);
+        bot = new TutorialBot();
 
         controller = new GameController(this);
         controller.restartGame(new GameHistory(startHistory));
@@ -445,6 +447,8 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
 
     @Override
     public void onGameStarted(@NonNull GameContext context) {
+        bot.reset();
+
         runOnUiThread(() -> {
             isGameEnded = false;
 
@@ -472,6 +476,8 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
 
     @Override
     public void onPhaseChanged(@NonNull GamePhase phase, @NonNull GameContext context) {
+        bot.reset();
+
         runOnUiThread(() -> {
             clearInteractionUI(context);
             applyPlayerChange(context);
@@ -482,7 +488,7 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
     @Override
     public void onInteractionRequired(@NonNull InteractionRequest request, @NonNull GameContext context) {
         if (isBotPlaying(controller.getCurrentContext())) {
-            TutorialBotUtils.handleRequest(controller, request);
+            bot.handleRequest(controller, request);
         } else {
             super.onInteractionRequired(request, context);
         }
