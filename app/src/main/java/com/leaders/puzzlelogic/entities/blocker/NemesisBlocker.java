@@ -121,7 +121,6 @@ public final class NemesisBlocker {
         }
 
         callbackDelivered = true;
-        // TODO
         callback.onSearchCompletedWithoutResult(getDefaultTarget());
     }
 
