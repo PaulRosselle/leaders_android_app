@@ -162,7 +162,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/stbSearch_actPuzzleMenu">
+        app:layout_constraintTop_toBottomOf="@+id/stbSearch_actPuzzleMenu"
+        app:layout_constraintVertical_bias="0.3">
 
         <ScrollView
             android:id="@+id/scvPuzzles_actPuzzleMenu"
@@ -185,6 +186,24 @@
                 android:orientation="vertical" />
         </ScrollView>
 
+        <ProgressBar
+            android:id="@+id/pgbLoading_actPuzzleMenu"
+            style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Large"
+            android:layout_width="@dimen/round_button_icon_size"
+            android:layout_height="@dimen/round_button_icon_size"
+            android:alpha="0.75"
+            android:indeterminate="true"
+            android:indeterminateBehavior="repeat"
+            android:indeterminateTint="@color/app_golden"
+            android:maxWidth="@dimen/solver_progress_bar_size"
+            android:maxHeight="@dimen/solver_progress_bar_size"
+            android:minWidth="@dimen/solver_progress_bar_size"
+            android:minHeight="@dimen/solver_progress_bar_size"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.25" />
     </com.leaders.app.views.decoration.OrnateFrameView>
 
 

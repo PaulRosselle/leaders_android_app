@@ -328,5 +328,6 @@
     <string name="welcome_title">Bienvenue dans Leaders !</string>
     <string name="learn_the_rules">Découvrir les règles</string>
     <string name="welcome_button_continue">Continuer</string>
+    <string name="error_during_puzzle_loading">Erreur durant le chargement des puzzles</string>
 
 </resources>

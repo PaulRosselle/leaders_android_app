@@ -35,6 +35,7 @@ import com.leaders.puzzlelogic.entities.PuzzleIdentity;
 import com.leaders.puzzlelogic.entities.PuzzleImportAnalysis;
 import com.leaders.puzzlelogic.entities.PuzzleSave;
 import com.leaders.puzzlelogic.enums.PuzzleCategory;
+import com.leaders.puzzlelogic.search.PuzzleMenuViewModel;
 import com.leaders.puzzlelogic.search.PuzzleSaveCriteria;
 import com.leaders.puzzlelogic.search.PuzzleSaveListViewModel;
 import com.leaders.puzzlelogic.search.PuzzleSaveToolbarMapper;
@@ -110,6 +111,7 @@ public final class PuzzleMenuActivity extends BaseActivity implements SearchTool
     }
 
     private View vwDialogBg;
+    private View pgbLoading;
     private MaterialButton btnPuzzleActions;
     private ActionsMenuView amvPuzzleActions;
     private PuzzleDetailsView pdvDetails;
@@ -117,23 +119,23 @@ public final class PuzzleMenuActivity extends BaseActivity implements SearchTool
     private PuzzleSelectorGroupView psgvPuzzles;
     private PuzzleCategory puzzlesCategory;
 
+    private PuzzleMenuViewModel menuViewModel;
     private PuzzleSaveListViewModel searchViewModel;
     private SearchToolbarView stbSearch;
-
-    private List<OfficialPuzzleSave> officialPuzzleSaves;
-    private List<CustomPuzzleSave> customPuzzleSaves;
 
     @Override
     protected void initViews() {
         super.initViews();
 
         vwDialogBg = findViewById(R.id.vwDialogBg_actPuzzleMenu);
+        pgbLoading = findViewById(R.id.pgbLoading_actPuzzleMenu);
         btnPuzzleActions = findViewById(R.id.btnPuzzleActions_actPuzzleMenu);
         amvPuzzleActions = findViewById(R.id.amvPuzzleActions_actPuzzleMenu);
         pdvDetails = findViewById(R.id.pdvDetails_actPuzzleMenu);
         mbtgPuzzlesCategory = findViewById(R.id.mbtgPuzzlesCategory_actPuzzleMenu);
         psgvPuzzles = findViewById(R.id.psgvPuzzles_actPuzzleMenu);
 
+        menuViewModel = new ViewModelProvider(this).get(PuzzleMenuViewModel.class);
         searchViewModel = new ViewModelProvider(this).get(PuzzleSaveListViewModel.class);
         stbSearch = findViewById(R.id.stbSearch_actPuzzleMenu);
 
@@ -164,6 +166,7 @@ public final class PuzzleMenuActivity extends BaseActivity implements SearchTool
         searchViewModel.getDisplayedSaves().observe(this, saves ->
                 psgvPuzzles.setPuzzles(saves)
         );
+        menuViewModel.getLoadState().observe(this, this::onLoadStateChange);
     }
 
     @Override
@@ -186,13 +189,12 @@ public final class PuzzleMenuActivity extends BaseActivity implements SearchTool
                     }
                 });
 
-        officialPuzzleSaves = JsonUtils.loadOfficialPuzzles(this);
-        customPuzzleSaves = JsonUtils.loadCustomPuzzles(this);
-
         initToolbar();
 
-        // This will cause "onPuzzleSelectionChange" to be called
-        ((MaterialButton) (findViewById(R.id.btnOfficial_actPuzzleMenu))).setChecked(true);
+        // The puzzles are loaded in the background (only once, even after a screen rotation).
+        // "onLoadStateChange" is called when the loading state changes.
+        setLoading(true);
+        menuViewModel.loadIfNeeded();
     }
 
     @Override
@@ -231,19 +233,74 @@ public final class PuzzleMenuActivity extends BaseActivity implements SearchTool
         return ActivityType.PuzzleMenu;
     }
 
-    private List<? extends PuzzleSave> getPuzzlesFromCategory() {
-        return puzzlesCategory == PuzzleCategory.Official ? officialPuzzleSaves : customPuzzleSaves;
+    private List<OfficialPuzzleSave> getOfficialPuzzleSaves() {
+        return menuViewModel.getOfficialPuzzleSaves();
     }
+
+    private List<CustomPuzzleSave> getCustomPuzzleSaves() {
+        return menuViewModel.getCustomPuzzleSaves();
+    }
+
+    private List<? extends PuzzleSave> getPuzzlesFromCategory() {
+        return puzzlesCategory == PuzzleCategory.Official ? getOfficialPuzzleSaves() : getCustomPuzzleSaves();
+    }
+
+    //region LOADING METHODS
+
+    private void setLoading(boolean loading) {
+        pgbLoading.setVisibility(loading ? View.VISIBLE : View.GONE);
+        btnPuzzleActions.setEnabled(!loading);
+    }
+
+    private void onLoadStateChange(PuzzleMenuViewModel.LoadState state) {
+        switch (state) {
+            case LOADING:
+                setLoading(true);
+                break;
+            case LOADED:
+                onPuzzlesLoaded();
+                break;
+            case ERROR: {
+                setLoading(false);
+                btnPuzzleActions.setEnabled(false);
+                Toast.makeText(this, R.string.error_during_puzzle_loading, Toast.LENGTH_SHORT).show();
+            } break;
+        }
+    }
+
+    private void onPuzzlesLoaded() {
+        setLoading(false);
+
+        // Restores the category that was displayed before a possible screen rotation
+        PuzzleCategory category = menuViewModel.getCategory();
+        int buttonId = category == PuzzleCategory.Official ?
+                R.id.btnOfficial_actPuzzleMenu : R.id.btnCustom_actPuzzleMenu;
+
+        if (mbtgPuzzlesCategory.getCheckedButtonId() == buttonId) {
+            // The button is already checked, so the listener will not be called
+            applyPuzzlesCategory(category);
+        } else {
+            // This will cause "onPuzzleCategoryChange" to be called
+            mbtgPuzzlesCategory.check(buttonId);
+        }
+    }
+
+    //endregion
 
     private void onPuzzleCategoryChange(MaterialButtonToggleGroup group, int checkedId, boolean isChecked) {
         if (!isChecked) {
             return;
         }
 
-        puzzlesCategory = checkedId == R.id.btnOfficial_actPuzzleMenu ?
-                PuzzleCategory.Official : PuzzleCategory.Custom;
+        applyPuzzlesCategory(checkedId == R.id.btnOfficial_actPuzzleMenu ?
+                PuzzleCategory.Official : PuzzleCategory.Custom);
+    }
 
-        searchViewModel.setCategory(puzzlesCategory);
+    private void applyPuzzlesCategory(@NonNull PuzzleCategory category) {
+        puzzlesCategory = category;
+        menuViewModel.setCategory(category);
+
+        searchViewModel.setCategory(category);
         stbSearch.setSortMenu(
                 getSortMenuResId(),
                 PuzzleSaveToolbarMapper.toMenuItemId(searchViewModel.getCriteria().getSortMode())
@@ -273,7 +330,7 @@ public final class PuzzleMenuActivity extends BaseActivity implements SearchTool
     //region TOOLBAR METHODS
 
     private void initToolbar() {
-        // Restore the state before the listener is applied to avoid ealy notifications
+        // Restore the state before the listener is applied to avoid early notifications
         PuzzleSaveCriteria criteria = searchViewModel.getCriteria();
         stbSearch.setSelectedFilters(PuzzleSaveToolbarMapper.toSelection(criteria.getFilters()));
         stbSearch.setSearchKey(criteria.getSearchKey());
@@ -343,7 +400,7 @@ public final class PuzzleMenuActivity extends BaseActivity implements SearchTool
 
     private void onEditPuzzleClick(View v) {
         Intent intent = ActivityType.PuzzleEditor.getIntent(this);
-        int puzzleIdx = customPuzzleSaves.indexOf((CustomPuzzleSave) psgvPuzzles.getSelectedPuzzles().get(0));
+        int puzzleIdx = getCustomPuzzleSaves().indexOf((CustomPuzzleSave) psgvPuzzles.getSelectedPuzzles().get(0));
         intent.putExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, puzzleIdx);
         goToActivity(intent);
     }
@@ -382,9 +439,9 @@ public final class PuzzleMenuActivity extends BaseActivity implements SearchTool
         builder.setMessage(getString(R.string.warning_removal_cannot_be_undone));
         builder.setPositiveButton(R.string.confirm, (dialog, which) -> {
             for (PuzzleSave puzzleSave : selectedPuzzles) {
-                customPuzzleSaves.remove((CustomPuzzleSave) puzzleSave);
+                getCustomPuzzleSaves().remove((CustomPuzzleSave) puzzleSave);
             }
-            JsonUtils.saveCustomPuzzles(this, customPuzzleSaves);
+            menuViewModel.saveCustomPuzzles();
             refreshPuzzles();
         });
         builder.setNegativeButton(R.string.cancel, null);
@@ -395,10 +452,10 @@ public final class PuzzleMenuActivity extends BaseActivity implements SearchTool
 
     private void onCopyClick(View v) {
         for (PuzzleSave puzzleSave : psgvPuzzles.getSelectedPuzzles()) {
-            customPuzzleSaves.add(createCopy(puzzleSave));
+            getCustomPuzzleSaves().add(createCopy(puzzleSave));
         }
 
-        JsonUtils.saveCustomPuzzles(this, customPuzzleSaves);
+        menuViewModel.saveCustomPuzzles();
         refreshPuzzles();
 
         hidePuzzleActions();
@@ -407,7 +464,7 @@ public final class PuzzleMenuActivity extends BaseActivity implements SearchTool
     private CustomPuzzleSave createCopy(@NonNull PuzzleSave puzzleSave) {
         try {
             return new CustomPuzzleSave(
-                    getAvailableCopyName(puzzleSave.getName(), customPuzzleSaves),
+                    getAvailableCopyName(puzzleSave.getName(), getCustomPuzzleSaves()),
                     puzzleSave.getAuthor(),
                     puzzleSave.getLifetime(),
                     puzzleSave.getDifficulty(),
@@ -500,12 +557,12 @@ public final class PuzzleMenuActivity extends BaseActivity implements SearchTool
     }
 
     private void processImport(@NonNull List<CustomPuzzleSave> importedPuzzles) {
-        PuzzleImportAnalysis importAnalysis = new PuzzleImportAnalysis(importedPuzzles, customPuzzleSaves);
+        PuzzleImportAnalysis importAnalysis = new PuzzleImportAnalysis(importedPuzzles, getCustomPuzzleSaves());
 
         if (!importAnalysis.getNewPuzzles().isEmpty()) {
             // Then we save the new custom puzzles list
-            customPuzzleSaves.addAll(importAnalysis.getNewPuzzles());
-            JsonUtils.saveCustomPuzzles(this, customPuzzleSaves);
+            getCustomPuzzleSaves().addAll(importAnalysis.getNewPuzzles());
+            menuViewModel.saveCustomPuzzles();
 
             // Finally we display the new puzzles and inform the user that the import was successful
             refreshPuzzles();
@@ -645,7 +702,7 @@ public final class PuzzleMenuActivity extends BaseActivity implements SearchTool
         customPuzzleSave.setAuthor(pdvDetails.getPuzzleAuthor());
         customPuzzleSave.setDifficulty(pdvDetails.getPuzzleDifficulty());
 
-        JsonUtils.saveCustomPuzzles(this, customPuzzleSaves);
+        menuViewModel.saveCustomPuzzles();
         Toast.makeText(this, R.string.changes_saved, Toast.LENGTH_SHORT).show();
         refreshPuzzles();
 
