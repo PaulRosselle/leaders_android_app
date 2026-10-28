@@ -3,6 +3,7 @@ package com.leaders.app.views.puzzle;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -30,6 +31,7 @@ public final class PuzzleDetailsView extends ConstraintLayout {
         edtName = findViewById(R.id.edtName_vwPuzzleDetails);
         edtAuthor = findViewById(R.id.edtAuthor_vwPuzzleDetails);
         pdvDifficulty = findViewById(R.id.pdvDifficulty_vwPuzzleDetails);
+        findViewById(R.id.clyMain_vwPuzzleDetails).setOnClickListener(this::onBackgroundClick);
 
         try (TypedArray customAttrs = context.obtainStyledAttributes(attrs, R.styleable.PuzzleDetailsView)) {
             TextView txvTitle = findViewById(R.id.txvTitle_vwPuzzleDetails);
@@ -96,5 +98,9 @@ public final class PuzzleDetailsView extends ConstraintLayout {
 
     public void setOnBtnSaveClick(@NonNull OnClickListener onBtnSaveClick) {
         (findViewById(R.id.txvSave_vwPuzzleDetails)).setOnClickListener(onBtnSaveClick);
+    }
+
+    private void onBackgroundClick(View v) {
+        // Only called to stop the click listener propagation
     }
 }
