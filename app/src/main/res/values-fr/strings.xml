@@ -329,5 +329,7 @@
     <string name="learn_the_rules">Découvrir les règles</string>
     <string name="welcome_button_continue">Continuer</string>
     <string name="error_during_puzzle_loading">Erreur durant le chargement des puzzles</string>
+    <string name="copy_created">Copie créée!</string>
+    <string name="copies_created">Copies créées!</string>
 
 </resources>

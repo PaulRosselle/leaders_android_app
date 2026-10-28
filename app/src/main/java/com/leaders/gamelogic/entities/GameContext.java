@@ -138,7 +138,6 @@ public final class GameContext {
 
     @NonNull
     public static GameContext createCurrent(@NonNull Game game, @NonNull GameHistory gameHistory) {
-        // TODO - check for immutability
         GamePhase currentGamePhase = getCurrentContextPhase(game, gameHistory);
 
         Player currentPlayer = currentGamePhase.getPhasePlayer();

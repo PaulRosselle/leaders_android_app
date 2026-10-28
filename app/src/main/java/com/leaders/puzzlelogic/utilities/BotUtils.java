@@ -13,7 +13,14 @@ public final class BotUtils {
         throw new AssertionError("Cannot instantiate utility class");
     }
 
-    // TODO - javadoc
+    /**
+     * Returns the target closest to the reference position.
+     *
+     * @param targets the list of targets to search
+     * @param refPosition the reference position
+     * @return the target closest to the reference position
+     * @throws IllegalArgumentException if the target list is empty
+     */
     @NonNull
     public static InteractionTarget getClosestTarget(@NonNull List<InteractionTarget> targets,
                                                      @NonNull Position refPosition) {
@@ -39,32 +46,14 @@ public final class BotUtils {
         return closestTarget;
     }
 
-    // TODO - javadoc
-    @NonNull
-    public static InteractionTarget getFurthestTarget(@NonNull List<InteractionTarget> targets,
-                                                      @NonNull Position refPosition) {
-        if (targets.isEmpty()) {
-            throw new IllegalArgumentException("Cannot get the furthest target from an empty target list");
-        }
-        if (targets.size() == 1) {
-            return targets.get(0);
-        }
-
-        InteractionTarget furthestTarget = targets.get(0);
-        int furthestDistance = getTargetPositionDistance(furthestTarget, refPosition);
-        for (int i = 1; i < targets.size(); i++) {
-            final InteractionTarget target = targets.get(i);
-            final int targetDistance = getTargetPositionDistance(target, refPosition);
-            if (targetDistance > furthestDistance) {
-                furthestTarget = target;
-                furthestDistance = targetDistance;
-            }
-        }
-
-        return furthestTarget;
-    }
-
-    // TODO - javadoc
+    /**
+     * Returns the distance between a target's chosen position and a reference position.
+     *
+     * @param target the target whose position is used
+     * @param refPosition the reference position
+     * @return the distance between the two positions
+     * @throws NullPointerException if the target has no chosen position
+     */
     private static int getTargetPositionDistance(@NonNull InteractionTarget target,
                                                  @NonNull Position refPosition) {
         Position position = Objects.requireNonNull(

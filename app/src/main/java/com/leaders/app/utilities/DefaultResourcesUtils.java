@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 
 import com.leaders.app.entities.ReplaySave;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
+import com.leaders.puzzlelogic.search.PuzzleSortMode;
 
 import java.util.List;
 
@@ -26,6 +27,7 @@ public final class DefaultResourcesUtils {
 
     private static void loadDefaultCustomPuzzles(@NonNull Context context) {
         List<CustomPuzzleSave> defaultCustomPuzzles = JsonUtils.loadDefaultCustomPuzzles(context);
+        defaultCustomPuzzles.sort(PuzzleSortMode.DIFFICULTY_ASC.getComparator());
         JsonUtils.saveCustomPuzzles(context, defaultCustomPuzzles);
     }
 }

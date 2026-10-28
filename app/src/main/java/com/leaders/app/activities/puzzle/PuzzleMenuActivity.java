@@ -451,12 +451,18 @@ public final class PuzzleMenuActivity extends BaseActivity implements SearchTool
     }
 
     private void onCopyClick(View v) {
-        for (PuzzleSave puzzleSave : psgvPuzzles.getSelectedPuzzles()) {
+        List<PuzzleSave> selectedPuzzles = psgvPuzzles.getSelectedPuzzles();
+        for (PuzzleSave puzzleSave : selectedPuzzles) {
             getCustomPuzzleSaves().add(createCopy(puzzleSave));
         }
 
         menuViewModel.saveCustomPuzzles();
         refreshPuzzles();
+        
+        Toast.makeText(this, selectedPuzzles.size() == 1 ?
+                R.string.copy_created : R.string.copies_created,
+                Toast.LENGTH_SHORT
+        ).show();
 
         hidePuzzleActions();
     }

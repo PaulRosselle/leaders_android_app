@@ -15,6 +15,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.leaders.R;
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
+import com.leaders.puzzlelogic.search.PuzzleSortMode;
 
 import java.util.List;
 
@@ -55,6 +56,7 @@ public class ResetPuzzleProgressionView extends ConstraintLayout {
         for (CustomPuzzleSave customPuzzleSave : customPuzzleSaves) {
             customPuzzleSave.setSolved(false);
         }
+        customPuzzleSaves.sort(PuzzleSortMode.DIFFICULTY_ASC.getComparator());
         JsonUtils.saveCustomPuzzles(getContext(), customPuzzleSaves);
     }
 }
