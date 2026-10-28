@@ -533,7 +533,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
 
     private void onPreviousPuzzleClick(View v) {
         int previousPuzzleIndex = puzzleSaves.indexOf(puzzleSave) - 1;
-        if (previousPuzzleIndex <= 0) {
+        if (previousPuzzleIndex < 0) {
             previousPuzzleIndex = puzzleSaves.size() - 1;
         }
         loadPuzzle(puzzleSaves.get(previousPuzzleIndex));
