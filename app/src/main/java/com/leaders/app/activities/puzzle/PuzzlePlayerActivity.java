@@ -45,6 +45,7 @@ import com.leaders.puzzlelogic.entities.blocker.NemesisBlocker;
 import com.leaders.puzzlelogic.entities.blocker.NemesisBlockerCallback;
 import com.leaders.puzzlelogic.entities.blocker.NemesisMoves;
 import com.leaders.puzzlelogic.enums.PuzzleCategory;
+import com.leaders.puzzlelogic.search.PuzzleSortMode;
 import com.leaders.puzzlelogic.serializers.SerializationContext;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
 import com.leaders.puzzlelogic.utilities.PuzzleEditionUtils;
@@ -406,6 +407,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
             for (PuzzleSave customPuzzleSave : puzzleSaves) {
                 customPuzzleSaves.add((CustomPuzzleSave) customPuzzleSave);
             }
+            puzzleSaves.sort(PuzzleSortMode.DIFFICULTY_ASC.getComparator());
             JsonUtils.saveCustomPuzzles(this, customPuzzleSaves);
         }
     }

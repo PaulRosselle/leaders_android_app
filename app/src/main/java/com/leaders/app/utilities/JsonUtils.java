@@ -328,7 +328,6 @@ public final class JsonUtils {
     public static void saveCustomPuzzles(@NonNull Context context,
                                          @NonNull List<CustomPuzzleSave> customPuzzles) {
         try {
-            customPuzzles.sort(PuzzleSortMode.DIFFICULTY_ASC.getComparator());
             JSONArray jaCustomPuzzles = new JSONArray();
             for (CustomPuzzleSave customPuzzle : customPuzzles) {
                 jaCustomPuzzles.put(customPuzzle.getAsJson());

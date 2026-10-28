@@ -334,4 +334,6 @@
     <string name="learn_the_rules">Learn the Rules</string>
     <string name="welcome_button_continue">Continue</string>
     <string name="error_during_puzzle_loading">Error during puzzle loading</string>
+    <string name="copy_created">Copy created!</string>
+    <string name="copies_created">Copies created!</string>
 </resources>

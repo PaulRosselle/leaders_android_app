@@ -40,6 +40,7 @@ import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
 import com.leaders.puzzlelogic.enums.PuzzleDifficulty;
+import com.leaders.puzzlelogic.search.PuzzleSortMode;
 import com.leaders.puzzlelogic.serializers.SerializationContext;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
 import com.leaders.puzzlelogic.utilities.PuzzleEditionUtils;
@@ -202,7 +203,6 @@ public final class PuzzleEditorActivity extends BaseActivity {
         // When editing an existing puzzle, its index within customPuzzleSaves is sent through the intent
         Intent intent = getIntent();
         int puzzleIdx = intent.getIntExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, -1);
-        boolean isImported = intent.getBooleanExtra(ExtraUtils.EXTRA_PUZZLE_IMPORTED, false);
 
         // We load the current state of the board using the puzzle save game history
         puzzleSave = puzzleIdx != -1 ? puzzleSaves.get(puzzleIdx) : null;
@@ -224,15 +224,6 @@ public final class PuzzleEditorActivity extends BaseActivity {
             // Without explicit puzzle datas, we try to use the datas within the puzzle save
             puzzleGameHistory = puzzleSave != null ?
                     puzzleSave.getPuzzleGameHistory() : PuzzleEditionUtils.getDefaultHistory();
-        }
-
-        // An imported puzzle is only saved temporarely so it can be transmitted to the editor,
-        // we display the save dialog in case the user wants to name it and save it
-        if (isImported) {
-            puzzleSaves.remove(puzzleSave);
-            JsonUtils.saveCustomPuzzles(this, puzzleSaves);
-            puzzleSave = null;
-            openSavePuzzleDialog();
         }
 
         bdvBoard.post(() -> loadPuzzleFromHistory(puzzleGameHistory));
@@ -817,6 +808,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
         puzzleSave.setAuthor(pdvSave.getPuzzleAuthor());
         puzzleSave.setDifficulty(pdvSave.getPuzzleDifficulty());
 
+        puzzleSaves.sort(PuzzleSortMode.DIFFICULTY_ASC.getComparator());
         JsonUtils.saveCustomPuzzles(this, puzzleSaves);
         Toast.makeText(this, R.string.puzzle_saved, Toast.LENGTH_SHORT).show();
 

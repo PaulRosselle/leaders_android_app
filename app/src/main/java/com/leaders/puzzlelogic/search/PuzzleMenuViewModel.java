@@ -106,6 +106,7 @@ public final class PuzzleMenuViewModel extends AndroidViewModel {
      * Must be called from the main thread.
      */
     public void saveCustomPuzzles() {
+        customPuzzleSaves.sort(PuzzleSortMode.DIFFICULTY_ASC.getComparator());
         List<CustomPuzzleSave> snapshot = new ArrayList<>(customPuzzleSaves);
         executor.execute(() -> JsonUtils.saveCustomPuzzles(getApplication(), snapshot));
     }
