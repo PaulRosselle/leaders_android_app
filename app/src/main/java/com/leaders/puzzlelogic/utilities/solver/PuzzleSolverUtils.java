@@ -138,15 +138,17 @@ public final class PuzzleSolverUtils {
                     playableCharacters, character
             );
 
-            if (playableCharacter != null) {
-                remainingCharacters.remove(0);
+            remainingCharacters.remove(0);
 
-                try {
+            try {
+                if (playableCharacter != null) {
                     solutionFound = explorePlayerCharacterActions(game, history, actionsPhase,
                             remainingCharacters, playableCharacter, collector, deadEndStates);
-                } finally {
-                    remainingCharacters.add(0, character);
+                } else {
+                    solutionFound = search(game, history, actionsPhase, remainingCharacters, collector, deadEndStates);
                 }
+            } finally {
+                remainingCharacters.add(0, character);
             }
         }
 
@@ -232,7 +234,7 @@ public final class PuzzleSolverUtils {
             try {
                 ListSolutionCollector branchCollector = new ListSolutionCollector();
 
-                boolean solutionFound = search(game, history, actionsPhase,
+                boolean solutionFound = evaluateAction(game, history, actionsPhase,
                         remainingCharacters, branchCollector, deadEndStates);
 
                 // If this opponent action prevents every possible solution, the AND node is invalid
