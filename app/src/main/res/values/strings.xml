@@ -333,4 +333,5 @@
     <string name="welcome_title">Welcome to Leaders!</string>
     <string name="learn_the_rules">Learn the Rules</string>
     <string name="welcome_button_continue">Continue</string>
+    <string name="error_during_puzzle_loading">Error during puzzle loading</string>
 </resources>
