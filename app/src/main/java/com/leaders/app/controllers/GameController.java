@@ -61,8 +61,8 @@ public final class GameController implements IGameFlowListener {
     private final Listener listener;
 
     private final ExecutorService gameHandlerExecutor = Executors.newSingleThreadExecutor();
-    private GameHandler gameHandler;
-    private CompletableFuture<Void> gameTask;
+    private volatile GameHandler gameHandler;
+    private volatile CompletableFuture<Void> gameTask;
 
     public GameController(@NonNull Listener listener) {
         this.listener = listener;
@@ -265,5 +265,15 @@ public final class GameController implements IGameFlowListener {
         }
 
         return new GameHistory(gameHandler.getCurrentHistory());
+    }
+
+    /**
+     * Checks whether a game task is currently running.
+     *
+     * @return {@code true} if the game task exists and has not completed, otherwise {@code false}
+     */
+    public boolean isGameRunning() {
+        CompletableFuture<Void> task = gameTask;
+        return task != null && !task.isDone();
     }
 }

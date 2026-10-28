@@ -588,7 +588,9 @@ public final class DuelPlayerActivity extends PlayableActivity implements
     }
 
     private void applyScreenRotation() {
-        boolean rotate = autoRotateEnabled && bdvBoard.getOrientation() == BoardOrientation.Rotated;
+        boolean rotate =  autoRotateEnabled &&
+                bdvBoard.getOrientation() == BoardOrientation.Rotated &&
+                controller.isGameRunning();
 
         clyMain.setRotation(rotate ? 180f : 0f);
         int defaultMargin = getResources().getDimensionPixelSize(R.dimen.default_layout_margin);
@@ -725,6 +727,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
     public void onGameEnded(@NonNull Player winner, @NonNull GameContext context) {
         runOnUiThread(() -> {
             clearInteractionUI(context);
+            applyScreenRotation();
             ButtonUtils.setEnabled(btnCards, true);
             pbvCurrentPlayer.setInfo(R.string.game_ended, R.drawable.player_bottom_bg_info);
             showEndGame(context, winner);
