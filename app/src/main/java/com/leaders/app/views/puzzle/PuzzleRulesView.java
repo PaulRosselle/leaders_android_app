@@ -4,7 +4,6 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,7 +11,7 @@ import androidx.core.content.res.ResourcesCompat;
 
 import com.leaders.R;
 
-public final class PuzzleRulesView extends TextView {
+public final class PuzzleRulesView extends androidx.appcompat.widget.AppCompatTextView {
     public PuzzleRulesView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
