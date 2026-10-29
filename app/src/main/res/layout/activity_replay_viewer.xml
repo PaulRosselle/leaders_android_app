@@ -164,7 +164,7 @@
         android:autoSizeMinTextSize="14dp"
         android:autoSizeStepGranularity="2dp"
         android:autoSizeTextType="uniform"
-        android:fontFamily="@font/futura"
+        android:fontFamily="@font/jost"
         android:singleLine="true"
         android:textAlignment="center"
         android:textAllCaps="true"

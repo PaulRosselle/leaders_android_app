@@ -211,7 +211,7 @@
         android:autoSizeStepGranularity="1dp"
         android:autoSizeTextType="uniform"
         android:ellipsize="none"
-        android:fontFamily="@font/futura"
+        android:fontFamily="@font/jost"
         android:gravity="center"
         android:maxLines="1"
         android:textAllCaps="true"
