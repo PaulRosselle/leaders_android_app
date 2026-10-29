@@ -84,7 +84,7 @@
         android:id="@+id/txvVersion_actMain"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/futura"
+        android:fontFamily="@font/jost"
         android:text="@string/app_version"
         android:textColor="@color/app_golden"
         android:textSize="12dp"

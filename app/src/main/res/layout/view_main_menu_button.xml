@@ -67,7 +67,7 @@
         android:autoSizePresetSizes="20dp"
         android:autoSizeStepGranularity="1dp"
         android:autoSizeTextType="uniform"
-        android:fontFamily="@font/futura"
+        android:fontFamily="@font/jost_medium"
         android:gravity="center_horizontal|top"
         android:text="@string/duel"
         android:textAlignment="gravity"
