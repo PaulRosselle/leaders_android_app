@@ -2,6 +2,7 @@ package com.leaders.app.utilities;
 
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -534,11 +535,23 @@ public final class JsonUtils {
     //region CHARACTER DEMO METHODS
 
     public static Settings loadSettings(@NonNull Context context) {
-        if (!fileExists(context, SETTINGS_FILENAME)) {
-            return Settings.getFromJson(new JSONObject());
+        String[] candidates = { SETTINGS_FILENAME, SETTINGS_FILENAME + ".bak" };
+
+        for (String fileName : candidates) {
+            if (!fileExists(context, fileName)) {
+                continue;
+            }
+
+            try {
+                return Settings.getFromJson(openJsonFile(context, fileName));
+            } catch (IllegalArgumentException e) {
+                // Unreadable file or invalid json: we try the next candidate
+                Log.w("JsonUtils", "Unable to load \"" + fileName + "\"", e);
+            }
         }
 
-        return Settings.getFromJson(openJsonFile(context, SETTINGS_FILENAME));
+        // Without a valid settings save file, we return the default value
+        return new Settings();
     }
 
     public static void saveSettings(@NonNull Context context, @NonNull Settings settings) {
