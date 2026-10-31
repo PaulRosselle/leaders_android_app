@@ -50,6 +50,29 @@ public final class JsonUtils {
     private static final String SOLVED_OFFICIAL_PUZZLES_FILENAME = "solved_official_puzzles.json";
     private static final String REPLAYS_FILENAME = "replays.json";
     private static final String SETTINGS_FILENAME = "settings.json";
+    private static final String LOG_TAG = "JsonUtils";
+    private static final String ATOMIC_FILE_BACKUP_SUFFIX = ".bak";
+    private static final String APP_RECOVER_SUFFIX = ".recover";
+
+    private interface JsonParser<T> {
+        T parse(@NonNull JSONObject json) throws JSONException;
+    }
+
+    /** Save file unreadable, even after trying the app recover copy. The file is left untouched. */
+    public static final class CorruptedFileException extends Exception {
+
+        private final String fileName;
+
+        public CorruptedFileException(@NonNull String fileName, @NonNull Throwable cause) {
+            super(String.format("File \"%s\" is corrupted and could not be recovered", fileName), cause);
+            this.fileName = fileName;
+        }
+
+        @NonNull
+        public String getFileName() {
+            return fileName;
+        }
+    }
 
     private JsonUtils(){
         throw new AssertionError("Cannot instantiate utility class");
@@ -66,15 +89,20 @@ public final class JsonUtils {
     private static boolean fileExists(@NonNull Context context, @NonNull String fileName) {
         // After a crash we can have a backup file instead of "filename"
         return getFile(context, fileName).exists() ||
-                getFile(context, fileName + ".bak").exists();
+                getFile(context, fileName + ATOMIC_FILE_BACKUP_SUFFIX).exists() ||
+                getFile(context, fileName + APP_RECOVER_SUFFIX).exists();
     }
 
     private static void deleteFile(@NonNull Context context, @NonNull String fileName) {
-        File file = getFile(context, fileName);
-
-        // A missing file is considered successfully deleted.
-        if (!file.delete() && file.exists()) {
-            throw new IllegalStateException(String.format("Unable to delete file \"%s\"", fileName));
+        // The backups must be deleted too, otherwise deleted data would be restored
+        for (String name : new String[] {
+                fileName,
+                fileName + ATOMIC_FILE_BACKUP_SUFFIX,
+                fileName + APP_RECOVER_SUFFIX}) {
+            File file = getFile(context, name);
+            if (!file.delete() && file.exists()) {
+                throw new IllegalStateException(String.format("Unable to delete file \"%s\"", name));
+            }
         }
     }
 
@@ -121,6 +149,20 @@ public final class JsonUtils {
         outputStream.flush();
     }
 
+    private static void writeAtomically(@NonNull File file, @NonNull byte[] content) throws IOException {
+        AtomicFile atomicFile = new AtomicFile(file);
+        FileOutputStream outputStream = atomicFile.startWrite();
+        try {
+            outputStream.write(content);
+            // File sync + closing + backup removal
+            atomicFile.finishWrite(outputStream);
+        } catch (IOException e) {
+            // Restores the original file
+            atomicFile.failWrite(outputStream);
+            throw e;
+        }
+    }
+
     private static void saveJsonFile(@NonNull Context context,
                                      @NonNull String fileName,
                                      @NonNull JSONObject jsonObject) throws IOException {
@@ -133,20 +175,66 @@ public final class JsonUtils {
             throw new IOException(String.format("Generated JSON for file \"%s\" is invalid", fileName), e);
         }
 
-        AtomicFile atomicFile = new AtomicFile(getFile(context, fileName));
-        FileOutputStream outputStream = null;
+        writeAtomically(getFile(context, fileName), content);
+
+        // Best-effort copy of the app recover state. Its failure must not fail the save.
         try {
-            outputStream = atomicFile.startWrite();
-            outputStream.write(content);
-            // File sync + close + backup removal
-            atomicFile.finishWrite(outputStream);
+            writeAtomically(getFile(context, fileName + APP_RECOVER_SUFFIX), content);
         } catch (IOException e) {
-            if (outputStream != null) {
-                // Retore the original file
-                atomicFile.failWrite(outputStream);
-            }
-            throw e;
+            Log.w(LOG_TAG, "Unable to update app recover copy of " + fileName, e);
         }
+    }
+
+    @NonNull
+    private static <T> T loadWithFallback(@NonNull Context context,
+                                          @NonNull String fileName,
+                                          @NonNull JsonParser<T> parser) throws CorruptedFileException {
+        try {
+            return parser.parse(openJsonFile(context, fileName));
+        } catch (JSONException | RuntimeException primaryError) {
+            // Covers unreadable file, invalid JSON and invalid structure/content
+            Log.w(LOG_TAG, "Unable to load " + fileName + ", trying app recover copy", primaryError);
+
+            String lastGoodName = fileName + APP_RECOVER_SUFFIX;
+            if (getFile(context, lastGoodName).exists()) {
+                try {
+                    T result = parser.parse(openJsonFile(context, lastGoodName));
+                    Log.w(LOG_TAG, fileName + " restored from app recover copy");
+                    return result;
+                } catch (JSONException | RuntimeException fallbackError) {
+                    primaryError.addSuppressed(fallbackError);
+                }
+            }
+            // Nothing is deleted: the user decides what to do
+            throw new CorruptedFileException(fileName, primaryError);
+        }
+    }
+
+    /**
+     * Deletes the corrupted file (and its backups) so the app can start from a clean state.
+     * To be called only after an explicit user confirmation.
+     */
+    public static void discardCorruptedFile(@NonNull Context context,
+                                            @NonNull CorruptedFileException exception) {
+        deleteFile(context, exception.getFileName());
+    }
+
+    /**
+     * Sets aside (renames, never deletes) the corrupted files so the app can start from a clean state.
+     * To be called only after an explicit user choice.
+     */
+    public static boolean quarantineCorruptedFile(@NonNull Context context,
+                                                  @NonNull CorruptedFileException exception) {
+        String suffix = ".corrupt-" + System.currentTimeMillis();
+        boolean success = true;
+        for (String name : new String[]{exception.getFileName(),
+                exception.getFileName() + APP_RECOVER_SUFFIX}) {
+            File file = getFile(context, name);
+            if (file.exists() && !file.renameTo(getFile(context, name + suffix))) {
+                success = false;
+            }
+        }
+        return success;
     }
 
     //endregion
@@ -183,7 +271,7 @@ public final class JsonUtils {
 
     //region PUZZLE SAVE METHODS
 
-    public static List<OfficialPuzzleSave> loadOfficialPuzzles(@NonNull Context context) {
+    public static List<OfficialPuzzleSave> loadOfficialPuzzles(@NonNull Context context) throws CorruptedFileException {
         // Official puzzles are stored within a raw resource file
         try (InputStream fisPuzzles = context.getResources().openRawResource(R.raw.official_puzzles)) {
             JSONArray jaPuzzles = openJsonFile(fisPuzzles).getJSONArray("puzzles");
@@ -205,37 +293,26 @@ public final class JsonUtils {
         }
     }
 
-    private static Set<Integer> loadSolvedOfficialPuzzles(@NonNull Context context) {
+    private static Set<Integer> loadSolvedOfficialPuzzles(@NonNull Context context) throws CorruptedFileException {
         if (!fileExists(context, SOLVED_OFFICIAL_PUZZLES_FILENAME)) {
             return Collections.emptySet();
         }
 
-        try {
-            JSONObject joSolvedPuzzles = openJsonFile(context, SOLVED_OFFICIAL_PUZZLES_FILENAME);
-            JSONArray jaSolvedPuzzles = joSolvedPuzzles.getJSONArray("solved_puzzles");
-
+        return loadWithFallback(context, SOLVED_OFFICIAL_PUZZLES_FILENAME, json -> {
+            JSONArray jaSolvedPuzzles = json.getJSONArray("solved_puzzles");
             Set<Integer> solvedPuzzles = new HashSet<>();
             for (int i = 0; i < jaSolvedPuzzles.length(); i++) {
                 solvedPuzzles.add(jaSolvedPuzzles.getInt(i));
             }
             return solvedPuzzles;
-        } catch (JSONException e) {
-            // If the official puzzle solved tracking file is corrupted, it is better to remove it
-            deleteFile(context, SOLVED_OFFICIAL_PUZZLES_FILENAME);
-            throw new RuntimeException(e);
-        }
+        });
     }
 
-    public static List<CustomPuzzleSave> loadCustomPuzzles(@NonNull Context context) {
+    public static List<CustomPuzzleSave> loadCustomPuzzles(@NonNull Context context) throws CorruptedFileException {
         if (!fileExists(context, CUSTOM_PUZZLES_FILENAME)) {
             return new ArrayList<>();
         }
-
-        try {
-            return getCustomPuzzlesFromJson(openJsonFile(context, CUSTOM_PUZZLES_FILENAME));
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
+        return loadWithFallback(context, CUSTOM_PUZZLES_FILENAME, JsonUtils::getCustomPuzzlesFromJson);
     }
 
     public static List<CustomPuzzleSave> loadDefaultCustomPuzzles(@NonNull Context context) {
@@ -361,16 +438,11 @@ public final class JsonUtils {
 
     //region REPLAY SAVE METHODS
 
-    public static List<ReplaySave> loadReplays(@NonNull Context context) {
+    public static List<ReplaySave> loadReplays(@NonNull Context context) throws CorruptedFileException {
         if (!fileExists(context, REPLAYS_FILENAME)) {
             return new ArrayList<>();
         }
-
-        try {
-            return getReplaysFromJson(openJsonFile(context, REPLAYS_FILENAME));
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
+        return loadWithFallback(context, REPLAYS_FILENAME, JsonUtils::getReplaysFromJson);
     }
 
     public static List<ReplaySave> loadDefaultReplays(@NonNull Context context) {
@@ -522,7 +594,7 @@ public final class JsonUtils {
             try {
                 return Settings.getFromJson(openJsonFile(context, SETTINGS_FILENAME));
             } catch (IllegalArgumentException e) {
-                Log.w("JsonUtils", "Unable to load settings", e);
+                Log.w(LOG_TAG, "Unable to load settings", e);
             }
         }
         // Without a valid settings save file, we return the default value

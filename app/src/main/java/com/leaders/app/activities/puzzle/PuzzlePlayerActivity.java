@@ -16,6 +16,7 @@ import com.leaders.R;
 import com.leaders.app.activities.PlayableActivity;
 import com.leaders.app.controllers.GameController;
 import com.leaders.app.entities.CharacterSkins;
+import com.leaders.app.entities.CorruptedDataDialog;
 import com.leaders.app.entities.LeadersApplication;
 import com.leaders.app.entities.Settings;
 import com.leaders.app.enums.ActivityTransitionType;
@@ -209,16 +210,30 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
         updateAnimatePlayableIcon();
 
         puzzleSource = PuzzleSource.valueOf(getIntent().getStringExtra(ExtraUtils.EXTRA_PUZZLE_SOURCE));
+        // When the player is loading a saved puzzle, its index is sent through the intent
+        int puzzleIdx = getIntent().getIntExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, -1);
 
-        if (puzzleSource == PuzzleSource.OfficialSelection) {
-            puzzleSaves = JsonUtils.loadOfficialPuzzles(this);
-        } else {
-            puzzleSaves = JsonUtils.loadCustomPuzzles(this);
+        try {
+            puzzleSaves = (puzzleSource == PuzzleSource.OfficialSelection) ?
+                    JsonUtils.loadOfficialPuzzles(this) : JsonUtils.loadCustomPuzzles(this);
+        } catch (JsonUtils.CorruptedFileException e) {
+            if (puzzleSource == PuzzleSource.Editor && puzzleIdx == -1) {
+                // A corrupted save file is not a problem to load an unsaved puzzle
+                puzzleSaves = new ArrayList<>();
+            } else {
+                CorruptedDataDialog.show(this,
+                        this::recreate,
+                        () -> {
+                            JsonUtils.discardCorruptedFile(this, e);
+                            doOnBackPressed();
+                        },
+                        this::doOnBackPressed);
+                // The rest of initDatas needs puzzleSaves
+                return;
+            }
         }
 
         GameHistory puzzleGameHistory = null;
-        // When the player is loading a saved puzzle, its index is sent through the intent
-        int puzzleIdx = getIntent().getIntExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, -1);
         if (puzzleIdx != -1) {
             puzzleSave = puzzleSaves.get(puzzleIdx);
             puzzleGameHistory = puzzleSave.getPuzzleGameHistory();
@@ -308,14 +323,13 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
 
     @Override
     protected void doOnBackPressed() {
-        if (puzzleSource == PuzzleSource.Editor) {
+        if (puzzleSource == PuzzleSource.Editor && puzzleSaves != null && puzzleSave != null) {
             Intent intent = ActivityType.PuzzleEditor.getIntent(this);
 
             intent.putExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, puzzleSaves.indexOf(puzzleSave));
             intent.putExtra(ExtraUtils.EXTRA_PUZZLE_DATAS, puzzleSave.getDatas().toString());
 
             goToActivity(intent, ActivityTransitionType.SlideLeft);
-
         } else {
             goToActivity(ActivityType.PuzzleMenu, ActivityTransitionType.SlideLeft);
         }

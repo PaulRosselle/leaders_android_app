@@ -28,7 +28,8 @@ public final class PuzzleMenuViewModel extends AndroidViewModel {
     public enum LoadState {
         LOADING,
         LOADED,
-        ERROR
+        ERROR,
+        CORRUPTED
     }
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -39,6 +40,8 @@ public final class PuzzleMenuViewModel extends AndroidViewModel {
     private final List<OfficialPuzzleSave> officialPuzzleSaves = new ArrayList<>();
     private final List<CustomPuzzleSave> customPuzzleSaves = new ArrayList<>();
 
+    // Written by the worker thread BEFORE the state switches to CORRUPTED
+    private volatile JsonUtils.CorruptedFileException corruptedFileException;
     private boolean loadStarted = false;
     private PuzzleCategory category = PuzzleCategory.Official;
 
@@ -80,23 +83,43 @@ public final class PuzzleMenuViewModel extends AndroidViewModel {
         }
         loadStarted = true;
         loadState.setValue(LoadState.LOADING);
+        executor.execute(this::load);
+    }
 
+    // TODO - javadoc
+    private void load() {
+        try {
+            List<OfficialPuzzleSave> official = JsonUtils.loadOfficialPuzzles(getApplication());
+            List<CustomPuzzleSave> custom = JsonUtils.loadCustomPuzzles(getApplication());
+
+            officialPuzzleSaves.clear();
+            officialPuzzleSaves.addAll(official);
+            customPuzzleSaves.clear();
+            customPuzzleSaves.addAll(custom);
+
+            loadState.postValue(LoadState.LOADED);
+        } catch (JsonUtils.CorruptedFileException e) {
+            corruptedFileException = e;
+            loadStarted = false; // "Retry" calls loadIfNeeded() again
+            loadState.postValue(LoadState.CORRUPTED);
+        } catch (RuntimeException e) {
+            loadStarted = false;
+            loadState.postValue(LoadState.ERROR);
+        }
+    }
+
+    // TODO - javadoc
+    public void discardCorruptedDataAndReload() {
+        JsonUtils.CorruptedFileException exception = corruptedFileException;
+        if (exception == null) {
+            return;
+        }
+        corruptedFileException = null;
+        loadStarted = true;
+        loadState.setValue(LoadState.LOADING);
         executor.execute(() -> {
-            try {
-                List<OfficialPuzzleSave> official = JsonUtils.loadOfficialPuzzles(getApplication());
-                List<CustomPuzzleSave> custom = JsonUtils.loadCustomPuzzles(getApplication());
-
-                officialPuzzleSaves.clear();
-                officialPuzzleSaves.addAll(official);
-                customPuzzleSaves.clear();
-                customPuzzleSaves.addAll(custom);
-
-                loadState.postValue(LoadState.LOADED);
-            } catch (RuntimeException e) {
-                // Allows a new attempt the next time loadIfNeeded() is called
-                loadStarted = false;
-                loadState.postValue(LoadState.ERROR);
-            }
+            JsonUtils.discardCorruptedFile(getApplication(), exception);
+            load();
         });
     }
 

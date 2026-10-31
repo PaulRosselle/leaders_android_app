@@ -329,4 +329,10 @@
     <string name="error_during_puzzle_loading">Erreur durant le chargement des puzzles</string>
     <string name="copy_created">Copie créée !</string>
     <string name="copies_created">Copies créées !</string>
+    <string name="error_during_progress_reset">Erreur durant la réinitialisation de la progression des puzzles</string>
+    <string name="reset_data">Réinitialiser les données</string>
+    <string name="retry">Rééssayer</string>
+    <string name="corrupted_data_message">Les données n\'ont pas pu être correctement chargées.</string>
+    <string name="corrupted_data_title">Données corrompues</string>
+    <string name="data_will_be_forever_lost">Les données seront définitivement perdues.</string>
 </resources>

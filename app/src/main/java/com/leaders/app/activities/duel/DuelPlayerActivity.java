@@ -16,6 +16,7 @@ import com.leaders.R;
 import com.leaders.app.activities.PlayableActivity;
 import com.leaders.app.controllers.GameController;
 import com.leaders.app.entities.CharacterSkins;
+import com.leaders.app.entities.CorruptedDataDialog;
 import com.leaders.app.entities.LeadersApplication;
 import com.leaders.app.entities.ReplaySave;
 import com.leaders.app.entities.Settings;
@@ -366,18 +367,32 @@ public final class DuelPlayerActivity extends PlayableActivity implements
     }
 
     private void onSaveAsReplayConfirmed(View v) {
-        ReplaySave newReplay = new ReplaySave(
+        saveReplay(new ReplaySave(
                 rsvReplaySave.getName(),
                 rsvReplaySave.getDate(),
                 controller.getHistory()
-        );
+        ));
+    }
 
-        List<ReplaySave> replays = JsonUtils.loadReplays(this);
+    private void saveReplay(@NonNull ReplaySave newReplay) {
+        List<ReplaySave> replays;
+        try {
+            replays = JsonUtils.loadReplays(this);
+        } catch (JsonUtils.CorruptedFileException e) {
+            CorruptedDataDialog.show(this,
+                    () -> saveReplay(newReplay),
+                    () -> {
+                        JsonUtils.discardCorruptedFile(this, e);
+                        saveReplay(newReplay);
+                    },
+                    () -> { }); // Cancellation, the save form stays open
+            return;
+        }
+
         replays.add(newReplay);
         JsonUtils.saveReplays(this, replays);
 
         Toast.makeText(this, R.string.saved_replay, Toast.LENGTH_SHORT).show();
-
         setReplaySaveVisible(false);
     }
 

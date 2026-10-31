@@ -14,6 +14,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
+import com.leaders.app.entities.CorruptedDataDialog;
 import com.leaders.app.entities.LeadersApplication;
 import com.leaders.app.entities.Settings;
 import com.leaders.app.enums.ActivityTransitionType;
@@ -198,7 +199,19 @@ public final class PuzzleEditorActivity extends BaseActivity {
         settings = ((LeadersApplication) getApplication()).getSettings();
         cnvCardInfo.setCharacterSkins(settings.getCharacterSkins());
 
-        puzzleSaves = JsonUtils.loadCustomPuzzles(this);
+        try {
+            puzzleSaves = JsonUtils.loadCustomPuzzles(this);
+        } catch (JsonUtils.CorruptedFileException e) {
+            CorruptedDataDialog.show(this,
+                    this::recreate,
+                    () -> {
+                        JsonUtils.discardCorruptedFile(this, e);
+                        doOnBackPressed();
+                    },
+                    this::doOnBackPressed);
+            // The rest of initDatas needs puzzleSaves
+            return;
+        }
 
         // When editing an existing puzzle, its index within customPuzzleSaves is sent through the intent
         Intent intent = getIntent();
