@@ -26,6 +26,7 @@ import com.leaders.puzzlelogic.utilities.PuzzleEditionUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -186,8 +187,8 @@ public final class PuzzleImportUtils {
                 continue;
             }
             String[] characterDatas = cellData.split(LbeUtils.CHARACTER_DATA_SEPARATOR);
-            Position position = LbeUtils.getPositionFromExportStr(context, characterDatas[0].toUpperCase());
-            CharacterType characterType = LbeUtils.getCharacterTypeFromExportStr(context, characterDatas[1].toUpperCase());
+            Position position = LbeUtils.getPositionFromExportStr(context, characterDatas[0].toUpperCase(Locale.ROOT));
+            CharacterType characterType = LbeUtils.getCharacterTypeFromExportStr(context, characterDatas[1].toUpperCase(Locale.ROOT));
 
             Cell characterCell = new Cell(position);
             characterCell.setCharacter(Character.create(characterType, teamColor));
