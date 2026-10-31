@@ -30,7 +30,6 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -122,7 +121,6 @@ public final class JsonUtils {
         outputStream.flush();
     }
 
-    @SuppressWarnings({"IOStreamConstructor", "ResultOfMethodCallIgnored"})
     private static void saveJsonFile(@NonNull Context context,
                                      @NonNull String fileName,
                                      @NonNull JSONObject jsonObject) throws IOException {
