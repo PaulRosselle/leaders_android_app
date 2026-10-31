@@ -50,7 +50,7 @@ public final class Settings {
             try {
                 settings.characterSkins = CharacterSkins.fromJson((JSONObject) skins);
             } catch (Exception e) {
-                // Skins invalides : on garde les skins par défaut
+                // If the json is invalid, we use the skins default value
             }
         }
 
@@ -76,16 +76,16 @@ public final class Settings {
     private static <E extends Enum<E>> E readEnum(@NonNull JSONObject jo,
                                                   @NonNull String key,
                                                   @NonNull Class<E> enumClass,
-                                                  @NonNull E fallback) {
+                                                  @NonNull E defaultValue) {
         Object value = jo.opt(key);
         if (!(value instanceof String)) {
-            return fallback;
+            return defaultValue;
         }
 
         try {
             return Enum.valueOf(enumClass, (String) value);
         } catch (IllegalArgumentException e) {
-            return fallback; // valeur supprimée ou renommée dans une version ultérieure
+            return defaultValue;
         }
     }
 

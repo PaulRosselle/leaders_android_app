@@ -545,7 +545,7 @@ public final class JsonUtils {
             try {
                 return Settings.getFromJson(openJsonFile(context, fileName));
             } catch (IllegalArgumentException e) {
-                // Fichier illisible ou JSON invalide : on essaie le candidat suivant
+                // Unreadable file or invalid json: we try the next candidate
                 Log.w("JsonUtils", "Unable to load \"" + fileName + "\"", e);
             }
         }
