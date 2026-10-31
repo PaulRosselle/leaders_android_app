@@ -46,6 +46,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -580,8 +581,8 @@ public final class PuzzleMenuActivity extends BaseActivity implements SearchTool
             StringBuilder stringBuilder = new StringBuilder();
             for (Map.Entry<PuzzleIdentity, String> entry : importAnalysis.getDuplicates().entrySet()) {
                 stringBuilder.append(String.format(getString(R.string.duplicate_of),
-                        entry.getKey().getName().toUpperCase(),
-                        entry.getValue().toUpperCase()
+                        entry.getKey().getName().toUpperCase(Locale.ROOT),
+                        entry.getValue().toUpperCase(Locale.ROOT)
                 ));
             }
 
