@@ -9,6 +9,7 @@ import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.PlayableCharacter;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.GameMode;
+import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
 import com.leaders.gamelogic.interactions.InteractionResultType;
@@ -154,7 +155,7 @@ public final class AutoPlayQuery {
     private static boolean isAutoCharacter(@Nullable Character character, boolean ignoreTeam) {
         return character != null &&
                 isAutoCharacterType(character.getCharacterType()) &&
-                (ignoreTeam || character.getTeamColor() != PuzzleEditionUtils.getPuzzlePlayerTeamColor());
+                (ignoreTeam || character.getTeamColor() == getAutoPlayableTeam());
     }
 
     /**
@@ -165,5 +166,14 @@ public final class AutoPlayQuery {
      */
     private static boolean isAutoCharacterType(@NonNull CharacterType characterType) {
         return characterType == CharacterType.Nemesis;
+    }
+
+    /**
+     * Returns the team assigned to automatically controlled characters.
+     *
+     * @return the team color assigned to automatically controlled characters
+     */
+    public static TeamColor getAutoPlayableTeam() {
+        return TeamColor.White;
     }
 }

@@ -25,6 +25,7 @@ import com.leaders.gamelogic.factories.GameFactory;
 import com.leaders.gamelogic.historyentries.IHistoryEntry;
 import com.leaders.gamelogic.historyentries.segments.Turn;
 import com.leaders.gamelogic.historyentries.segments.TurnPhase;
+import com.leaders.gamelogic.queries.AutoPlayQuery;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.gamelogic.queries.GameQuery;
 
@@ -131,7 +132,7 @@ public final class PuzzleEditionUtils {
     }
 
     public static TeamColor getPuzzlePlayerTeamColor() {
-        return TeamColor.Black;
+        return AutoPlayQuery.getAutoPlayableTeam().getOpposite();
     }
 
     public static String getCardAdditionErrors(@NonNull Context context,
