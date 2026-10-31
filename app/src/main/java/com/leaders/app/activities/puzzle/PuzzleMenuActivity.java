@@ -19,6 +19,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
+import com.leaders.app.entities.CorruptedDataDialog;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.PuzzleSource;
 import com.leaders.app.utilities.ExtraUtils;
@@ -266,6 +267,12 @@ public final class PuzzleMenuActivity extends BaseActivity implements SearchTool
                 btnPuzzleActions.setEnabled(false);
                 Toast.makeText(this, R.string.error_during_puzzle_loading, Toast.LENGTH_SHORT).show();
             } break;
+            case CORRUPTED:
+                CorruptedDataDialog.show(this,
+                        menuViewModel::loadIfNeeded,
+                        menuViewModel::discardCorruptedDataAndReload,
+                        this::finish);
+                break;
         }
     }
 

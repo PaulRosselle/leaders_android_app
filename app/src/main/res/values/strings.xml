@@ -336,4 +336,10 @@
     <string name="error_during_puzzle_loading">Error during puzzle loading</string>
     <string name="copy_created">Copy created!</string>
     <string name="copies_created">Copies created!</string>
+    <string name="error_during_progress_reset">Error during puzzle progress reset</string>
+    <string name="reset_data">Reset data</string>
+    <string name="retry">Retry</string>
+    <string name="corrupted_data_message">Data cannot be loaded</string>
+    <string name="corrupted_data_title">Corrupted data</string>
+    <string name="data_will_be_forever_lost">Data will be forever lost</string>
 </resources>

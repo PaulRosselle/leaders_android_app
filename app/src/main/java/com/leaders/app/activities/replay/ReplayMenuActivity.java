@@ -17,6 +17,7 @@ import androidx.documentfile.provider.DocumentFile;
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
+import com.leaders.app.entities.CorruptedDataDialog;
 import com.leaders.app.entities.ReplaySave;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.utilities.ExtraUtils;
@@ -141,7 +142,20 @@ public class ReplayMenuActivity extends BaseActivity {
                     }
                 });
 
-        replaySaves = JsonUtils.loadReplays(this);
+        try {
+            replaySaves = JsonUtils.loadReplays(this);
+        } catch (JsonUtils.CorruptedFileException e) {
+            CorruptedDataDialog.show(this,
+                    this::recreate,
+                    () -> {
+                        JsonUtils.discardCorruptedFile(this, e);
+                        recreate();
+                    },
+                    this::finish);
+            // The rest of initDatas needs replaySaves
+            return;
+        }
+
         rsgvReplays.setReplays(replaySaves);
     }
 

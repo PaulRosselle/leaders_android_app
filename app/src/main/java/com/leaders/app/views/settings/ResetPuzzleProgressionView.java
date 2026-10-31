@@ -41,22 +41,23 @@ public class ResetPuzzleProgressionView extends ConstraintLayout {
     }
 
     private void resetPuzzleProgression(DialogInterface dialogInterface, int id) {
-        resetOfficialPuzzlesProgression();
-        resetCustomPuzzlesProgression();
+        List<CustomPuzzleSave> customPuzzleSaves;
+        try {
+            // Loaded first: if it fails, nothing has been modified
+            customPuzzleSaves = JsonUtils.loadCustomPuzzles(getContext());
+        } catch (JsonUtils.CorruptedFileException e) {
+            Toast.makeText(getContext(), R.string.error_during_progress_reset, Toast.LENGTH_LONG).show();
+            return;
+        }
 
-        Toast.makeText(getContext(), R.string.progress_reset, Toast.LENGTH_SHORT).show();
-    }
-
-    private void resetOfficialPuzzlesProgression() {
-        JsonUtils.clearOfficialPuzzlesSolved(getContext());
-    }
-
-    private void resetCustomPuzzlesProgression() {
-        List<CustomPuzzleSave> customPuzzleSaves = JsonUtils.loadCustomPuzzles(getContext());
         for (CustomPuzzleSave customPuzzleSave : customPuzzleSaves) {
             customPuzzleSave.setSolved(false);
         }
         customPuzzleSaves.sort(PuzzleSortMode.DIFFICULTY_ASC.getComparator());
         JsonUtils.saveCustomPuzzles(getContext(), customPuzzleSaves);
+
+        JsonUtils.clearOfficialPuzzlesSolved(getContext());
+
+        Toast.makeText(getContext(), R.string.progress_reset, Toast.LENGTH_SHORT).show();
     }
 }
