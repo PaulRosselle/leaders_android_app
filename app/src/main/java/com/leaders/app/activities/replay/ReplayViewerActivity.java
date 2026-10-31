@@ -12,6 +12,7 @@ import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.animators.BanishmentActionAnimator;
 import com.leaders.app.entities.CharacterSkins;
+import com.leaders.app.entities.CorruptedDataDialog;
 import com.leaders.app.entities.ReplaySave;
 import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
@@ -173,7 +174,20 @@ public final class ReplayViewerActivity extends BaseActivity implements ReplayCo
         playerPerspective = TeamColor.Black;
         showCards = false;
 
-        List<ReplaySave> replaySaves = JsonUtils.loadReplays(this);
+        List<ReplaySave> replaySaves;
+        try {
+            replaySaves = JsonUtils.loadReplays(this);
+        } catch (JsonUtils.CorruptedFileException e) {
+            CorruptedDataDialog.show(this,
+                    this::recreate,
+                    () -> {
+                        JsonUtils.discardCorruptedFile(this, e);
+                        doOnBackPressed();
+                    },
+                    this::doOnBackPressed);
+            // The rest of initDatas needs replaySaves
+            return;
+        }
 
         Intent intent = getIntent();
         int replayIndex = intent.getIntExtra(ExtraUtils.EXTRA_REPLAY_INDEX, -1);
