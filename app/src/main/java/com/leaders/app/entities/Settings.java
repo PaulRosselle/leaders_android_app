@@ -35,37 +35,58 @@ public final class Settings {
     }
 
     @NonNull
-    public static Settings getFromJson(JSONObject joSettings) {
+    public static Settings getFromJson(@NonNull JSONObject joSettings) {
         Settings settings = new Settings();
 
-        try {
-            if (joSettings.has("user_name")) {
-                settings.setUserName(joSettings.getString("user_name"));
-            }
-            if (joSettings.has("animation_speed")) {
-                settings.setAnimationSpeed(AnimationSpeed.valueOf(joSettings.getString("animation_speed")));
-            }
-            if (joSettings.has("highlight_color")) {
-                settings.setHighlightColor(HighlightColor.valueOf(joSettings.getString("highlight_color")));
-            }
-            if (joSettings.has("animate_playable_items")) {
-                settings.setAnimatePlayableItems(joSettings.getBoolean("animate_playable_items"));
-            }
-            if (joSettings.has("duel_screen_auto_rotation")) {
-                settings.setDuelScreenAutoRotation(joSettings.getBoolean("duel_screen_auto_rotation"));
-            }
-            if (joSettings.has("is_first_launch")) {
-                settings.setIsFirstLaunch(joSettings.getBoolean("is_first_launch"));
-            }
-            if (joSettings.has("character_skins")) {
-                settings.characterSkins = CharacterSkins.fromJson(joSettings.getJSONObject("character_skins"));
-            }
+        settings.userName = readString(joSettings, "user_name", settings.userName);
+        settings.animationSpeed = readEnum(joSettings, "animation_speed", AnimationSpeed.class, settings.animationSpeed);
+        settings.highlightColor = readEnum(joSettings, "highlight_color", HighlightColor.class, settings.highlightColor);
+        settings.animatePlayableItems = readBoolean(joSettings, "animate_playable_items", settings.animatePlayableItems);
+        settings.duelScreenAutoRotation = readBoolean(joSettings, "duel_screen_auto_rotation", settings.duelScreenAutoRotation);
+        settings.isFirstLaunch = readBoolean(joSettings, "is_first_launch", settings.isFirstLaunch);
 
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
+        Object skins = joSettings.opt("character_skins");
+        if (skins instanceof JSONObject) {
+            try {
+                settings.characterSkins = CharacterSkins.fromJson((JSONObject) skins);
+            } catch (Exception e) {
+                // Skins invalides : on garde les skins par défaut
+            }
         }
 
         return settings;
+    }
+
+    @NonNull
+    private static String readString(@NonNull JSONObject jsonObject,
+                                     @NonNull String key,
+                                     @NonNull String defaultValue) {
+        Object value = jsonObject.opt(key);
+        return value instanceof String ? (String) value : defaultValue;
+    }
+
+    private static boolean readBoolean(@NonNull JSONObject jsonObject,
+                                       @NonNull String key,
+                                       boolean defaultValue) {
+        Object value = jsonObject.opt(key);
+        return value instanceof Boolean ? (Boolean) value : defaultValue;
+    }
+
+    @NonNull
+    private static <E extends Enum<E>> E readEnum(@NonNull JSONObject jo,
+                                                  @NonNull String key,
+                                                  @NonNull Class<E> enumClass,
+                                                  @NonNull E fallback) {
+        Object value = jo.opt(key);
+        if (!(value instanceof String)) {
+            return fallback;
+        }
+
+        try {
+            return Enum.valueOf(enumClass, (String) value);
+        } catch (IllegalArgumentException e) {
+            return fallback; // valeur supprimée ou renommée dans une version ultérieure
+        }
     }
 
     @NonNull
