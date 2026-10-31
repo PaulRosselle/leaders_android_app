@@ -2,6 +2,7 @@ package com.leaders.app.utilities;
 
 import android.content.Context;
 import android.net.Uri;
+import android.util.AtomicFile;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -29,7 +30,6 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,7 +64,9 @@ public final class JsonUtils {
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private static boolean fileExists(@NonNull Context context, @NonNull String fileName) {
-        return getFile(context, fileName).exists();
+        // After a crash we can have a backup file instead of "filename"
+        return getFile(context, fileName).exists() ||
+                getFile(context, fileName + ".bak").exists();
     }
 
     private static void deleteFile(@NonNull Context context, @NonNull String fileName) {
@@ -98,8 +100,10 @@ public final class JsonUtils {
     @NonNull
     private static JSONObject openJsonFile(@NonNull Context context,
                                            @NonNull String fileName) throws IllegalArgumentException {
+        AtomicFile atomicFile = new AtomicFile(getFile(context, fileName));
 
-        try (FileInputStream inputStream = context.openFileInput(fileName)) {
+        // "openRead" restores the backup if necessary
+        try (InputStream inputStream = atomicFile.openRead()) {
             return openJsonFile(inputStream);
 
         } catch (IOException e) {
@@ -117,52 +121,31 @@ public final class JsonUtils {
         outputStream.flush();
     }
 
-    @SuppressWarnings({"IOStreamConstructor", "ResultOfMethodCallIgnored"})
     private static void saveJsonFile(@NonNull Context context,
                                      @NonNull String fileName,
                                      @NonNull JSONObject jsonObject) throws IOException {
-        File directory = context.getFilesDir();
+        byte[] content = jsonObject.toString().getBytes(StandardCharsets.UTF_8);
 
-        File file = new File(directory, fileName);
-        File temporaryFile = new File(directory, fileName + ".tmp");
-        File backupFile = new File(directory, fileName + ".bak");
-
-        // 1. Write the new content into the temporary file.
-        try (OutputStream outputStream = new FileOutputStream(temporaryFile)) {
-            updateJsonFile(jsonObject, outputStream);
-        }
-
-        // 2. Validate the temporary file before touching the existing file.
-        try (InputStream inputStream = new FileInputStream(temporaryFile)) {
-            openJsonFile(inputStream);
+        // First we validate the json object in memory before updating the file
+        try {
+            new JSONObject(new String(content, StandardCharsets.UTF_8));
         } catch (JSONException e) {
-            // The temporary file is invalid. Keep the existing file untouched.
-            if (!temporaryFile.delete() && temporaryFile.exists()) {
-                throw new IOException(String.format("Unable to delete temporary file \"%s\"", temporaryFile.getName()), e);
-            }
-
             throw new IOException(String.format("Generated JSON for file \"%s\" is invalid", fileName), e);
         }
 
-        // 3. Keep the current version as a backup.
-        if (file.exists()) {
-            if (backupFile.exists() && !backupFile.delete()) {
-                throw new IOException(String.format("Unable to delete backup file \"%s\"", backupFile.getName()));
+        AtomicFile atomicFile = new AtomicFile(getFile(context, fileName));
+        FileOutputStream outputStream = null;
+        try {
+            outputStream = atomicFile.startWrite();
+            outputStream.write(content);
+            // File sync + close + backup removal
+            atomicFile.finishWrite(outputStream);
+        } catch (IOException e) {
+            if (outputStream != null) {
+                // Retore the original file
+                atomicFile.failWrite(outputStream);
             }
-
-            if (!file.renameTo(backupFile)) {
-                throw new IOException(String.format("Unable to create backup for file \"%s\"", fileName));
-            }
-        }
-
-        // 4. Replace the current version with the new version.
-        if (!temporaryFile.renameTo(file)) {
-            // Try to restore the previous version.
-            if (backupFile.exists() && !file.exists()) {
-                backupFile.renameTo(file);
-            }
-
-            throw new IOException(String.format("Unable to replace file \"%s\"", fileName));
+            throw e;
         }
     }
 
@@ -535,21 +518,13 @@ public final class JsonUtils {
     //region CHARACTER DEMO METHODS
 
     public static Settings loadSettings(@NonNull Context context) {
-        String[] candidates = { SETTINGS_FILENAME, SETTINGS_FILENAME + ".bak" };
-
-        for (String fileName : candidates) {
-            if (!fileExists(context, fileName)) {
-                continue;
-            }
-
+        if (fileExists(context, SETTINGS_FILENAME)) {
             try {
-                return Settings.getFromJson(openJsonFile(context, fileName));
+                return Settings.getFromJson(openJsonFile(context, SETTINGS_FILENAME));
             } catch (IllegalArgumentException e) {
-                // Unreadable file or invalid json: we try the next candidate
-                Log.w("JsonUtils", "Unable to load \"" + fileName + "\"", e);
+                Log.w("JsonUtils", "Unable to load settings", e);
             }
         }
-
         // Without a valid settings save file, we return the default value
         return new Settings();
     }
