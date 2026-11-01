@@ -3,6 +3,7 @@ package com.leaders.app.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 
 import androidx.activity.OnBackPressedCallback;
@@ -20,15 +21,43 @@ import androidx.core.view.WindowInsetsControllerCompat;
 import com.leaders.R;
 import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
+import com.leaders.app.utilities.JsonUtils;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class BaseActivity extends AppCompatActivity {
+    private static final String LOG_TAG = "BaseActivity";
+
+    /**
+     * Flag stored in the saved instance state once the snapshot has been written.
+     * It tells a recreation of the activity (process death, configuration change) apart from
+     * a fresh start, so that a leftover snapshot file is never loaded by mistake.
+     */
+    private static final String STATE_SNAPSHOT_SAVED = "BASE_ACTIVITY.SNAPSHOT_SAVED";
+
     protected List<Handler> handlersToInterruptOnFinish;
+
+    /** Saved instance state given back by the system, {@code null} on a fresh start. */
+    @Nullable
+    private Bundle savedState;
+    private boolean snapshotSaved;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        savedState = savedInstanceState;
+        snapshotSaved = savedInstanceState != null &&
+                savedInstanceState.getBoolean(STATE_SNAPSHOT_SAVED, false);
+
+        if (!snapshotSaved && supportsSnapshot()) {
+            // Fresh start: any remaining snapshot belongs to an abandoned session
+            JsonUtils.deleteSnapshot(this, getSnapshotName());
+        }
+
         super.onCreate(savedInstanceState);
         handlersToInterruptOnFinish = new ArrayList<>();
         // Handle system bar insets manually using the root guideline.
@@ -143,6 +172,110 @@ public abstract class BaseActivity extends AppCompatActivity {
      */
     @NonNull
     public abstract ActivityType getActivityType();
+
+    //region SNAPSHOT METHODS
+
+    /**
+     * Indicates whether the work in progress must survive the destruction of the activity by
+     * Android (process killed while the app is in background). Disabled by default.
+     * When enabled, {@link #createSnapshot()} must be implemented and the activity must give
+     * priority to {@link #loadSnapshot()} over its usual initial data.
+     */
+    protected boolean supportsSnapshot() {
+        return false;
+    }
+
+    /**
+     * Serializes the work in progress. Called each time the system asks the activity to save
+     * its state. Must never be called by the activity itself.
+     *
+     * @return the snapshot, or {@code null} if there is nothing to save yet
+     */
+    @Nullable
+    protected JSONObject createSnapshot() throws JSONException {
+        return null;
+    }
+
+    /**
+     * Returns the snapshot taken before the activity was destroyed by the system.
+     *
+     * @return the snapshot, or {@code null} on a fresh start: the activity must then use its
+     * usual initial data
+     */
+    @Nullable
+    protected final JSONObject loadSnapshot() {
+        if (!snapshotSaved || !supportsSnapshot()) {
+            return null;
+        }
+        return JsonUtils.loadSnapshot(this, getSnapshotName());
+    }
+
+    /** To be called when the content of a snapshot turns out to be unusable. */
+    protected final void discardSnapshot() {
+        JsonUtils.deleteSnapshot(this, getSnapshotName());
+    }
+
+    /**
+     * Returns the small state saved along the snapshot (see {@link #onSaveInstanceState(Bundle)}).
+     * Subclasses can use it to store what is needed to rebuild the context of the snapshot.
+     *
+     * @return the restored state, or {@code null} if there is no valid snapshot to restore
+     */
+    @Nullable
+    protected final Bundle getRestoredState() {
+        return snapshotSaved ? savedState : null;
+    }
+
+    /**
+     * Returns the state saved by the previous instance of the activity, snapshot or not.
+     * Meant for the small UI options, which do not need a snapshot.
+     *
+     * @return the saved state, or {@code null} on a fresh start
+     */
+    @Nullable
+    protected final Bundle getSavedState() {
+        return savedState;
+    }
+
+    @NonNull
+    private String getSnapshotName() {
+        return getActivityType().name();
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        if (!supportsSnapshot()) {
+            return;
+        }
+
+        try {
+            JSONObject joSnapshot = createSnapshot();
+            if (joSnapshot != null) {
+                // The snapshot is too big for a Bundle (size limit shared by the whole transaction),
+                // so it goes to a file. The Bundle only keeps the flag telling that the file is valid.
+                JsonUtils.saveSnapshot(this, getSnapshotName(), joSnapshot);
+                outState.putBoolean(STATE_SNAPSHOT_SAVED, true);
+            }
+        } catch (IOException | JSONException | RuntimeException e) {
+            // Saving the state must never crash the app. Without the flag, the activity
+            // restarts from its initial data.
+            Log.w(LOG_TAG, "Unable to save the snapshot", e);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        // Leaving on purpose (not a destruction by the system): nothing to restore anymore
+        if (isFinishing() && supportsSnapshot()) {
+            JsonUtils.deleteSnapshot(this, getSnapshotName());
+        }
+
+        super.onDestroy();
+    }
+
+    //endregion
 
     private void applyImmersiveMode() {
         WindowInsetsControllerCompat windowInsetsController =

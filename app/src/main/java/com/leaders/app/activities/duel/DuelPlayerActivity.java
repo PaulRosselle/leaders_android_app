@@ -1,5 +1,6 @@
 package com.leaders.app.activities.duel;
 
+import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -119,6 +120,8 @@ public final class DuelPlayerActivity extends PlayableActivity implements
         }
     }
 
+    private static final String STATE_AUTO_ROTATE = "DUEL_PLAYER.AUTO_ROTATE";
+
     private ConstraintLayout clyMain;
     private Guideline gdlTop;
     private Guideline gdlBottom;
@@ -144,7 +147,6 @@ public final class DuelPlayerActivity extends PlayableActivity implements
     private HighlightView hlvNextPhase;
 
     private CharacterSkins characterSkins;
-    
 
     //region BASE ACTIVITY OVERRIDEN METHODS
 
@@ -217,9 +219,16 @@ public final class DuelPlayerActivity extends PlayableActivity implements
         ccsvCardSelector.setCharacterSkins(characterSkins);
         autoRotateEnabled = settings.duelScreenAutoRotation();
 
+        // The options changed during the previous session take priority over the settings
+        Bundle savedState = getSavedState();
+        if (savedState != null) {
+            autoRotateEnabled = savedState.getBoolean(STATE_AUTO_ROTATE, autoRotateEnabled);
+        }
+
         updateAnimatePlayableIcon();
         updateAutoRotationIcon();
-        
+        updateCellPositionIcon();
+
         // After a destruction by the system, the game in progress takes priority over the intent
         GameHistory snapshot = loadGameSnapshot();
         final GameHistory loadedHistory = snapshot != null ? snapshot : getInitialGameHistory();
@@ -247,6 +256,13 @@ public final class DuelPlayerActivity extends PlayableActivity implements
     @Override
     protected boolean supportsGameSnapshot() {
         return true;
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putBoolean(STATE_AUTO_ROTATE, autoRotateEnabled);
     }
 
     @Override
@@ -429,6 +445,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
                 ccsvCardSelector.startShineAnimation();
             }
         }
+
         animatePlayableItems = !animatePlayableItems;
         updateAnimatePlayableIcon();
 
@@ -443,14 +460,17 @@ public final class DuelPlayerActivity extends PlayableActivity implements
     }
 
     private void onDisplayCellPosition(View v) {
-        boolean positionVisible = !bdvBoard.isCellPositionVisible();
-        amvActions.setButtonIcon(
-                DuelAction.DisplayCellPositions.ordinal(),
-                positionVisible ? R.drawable.icon_position_off : R.drawable.icon_position
-        );
-        bdvBoard.setCellPositionVisible(positionVisible);
+        bdvBoard.setCellPositionVisible(!bdvBoard.isCellPositionVisible());
+        updateCellPositionIcon();
 
         setActionsMenuVisible(false);
+    }
+
+    private void updateCellPositionIcon() {
+        amvActions.setButtonIcon(
+                DuelAction.DisplayCellPositions.ordinal(),
+                bdvBoard.isCellPositionVisible() ? R.drawable.icon_position_off : R.drawable.icon_position
+        );
     }
 
     private void updateAutoRotationIcon() {
@@ -495,6 +515,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
     public void onRecruitmentCardSelected(@NonNull InteractionTarget target) {
         controller.selectTarget(target);
     }
+
     public void onBanishmentCardSelected() {
         if (!btnNextPhase.isEnabled()) {
             setBtnNextPhaseEnabled(true, true);
@@ -519,6 +540,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
                 visible ? Collections.singletonList(ccsvCardSelector) : Collections.emptyList(),
                 true
         );
+
         ccsvCardSelector.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
@@ -544,6 +566,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
     private void setBtnNextPhaseEnabled(boolean enabled, boolean highlight) {
         ButtonUtils.setEnabled(btnNextPhase, enabled);
         hlvNextPhase.setVisibility(highlight ? View.VISIBLE : View.GONE);
+
         if (highlight) {
             hlvNextPhase.startAnimation();
         } else {
@@ -556,12 +579,13 @@ public final class DuelPlayerActivity extends PlayableActivity implements
                 BoardQuery.findLeaderCell(board, player.getTeamColor()),
                 "No leader found for player: " + player
         );
+
         return LeaderType.getFromCharacter(leaderCell.getCharacter());
     }
 
     @Override
     protected void highlightPlayableCharacters(@NonNull GameContext gameContext,
-                                             @NonNull InteractionRequest request) {
+                                               @NonNull InteractionRequest request) {
         super.highlightPlayableCharacters(gameContext, request);
 
         if (!animatePlayableItems) {
@@ -614,7 +638,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
     }
 
     private void applyScreenRotation() {
-        boolean rotate =  autoRotateEnabled &&
+        boolean rotate = autoRotateEnabled &&
                 bdvBoard.getOrientation() == BoardOrientation.Rotated &&
                 controller.isGameRunning();
 
@@ -632,14 +656,17 @@ public final class DuelPlayerActivity extends PlayableActivity implements
     private void applyPhaseChange(@NonNull GamePhase gamePhase,
                                   boolean canChangeSelectableCardsVisibility) {
         String playerName = gamePhase.getPhasePlayer().getName();
-        int playerTurnFormat = isPlayerNameFirstCharVowel(playerName) ? R.string.player_turn_vowel : R.string.player_turn_consonant;
+        int playerTurnFormat = isPlayerNameFirstCharVowel(playerName) ?
+                R.string.player_turn_vowel : R.string.player_turn_consonant;
         txvPlayerTurn.setText(String.format(getString(playerTurnFormat), playerName));
         ccsvCardSelector.applyTurnPhase(gamePhase.getPhaseType());
         pbvCurrentPlayer.setInfo(gamePhase.getPhaseType());
 
         boolean lockSelectableCardsView = gamePhase.getPhaseType() == GamePhaseType.Recruitment ||
                 gamePhase.getPhaseType() == GamePhaseType.Banishment;
+
         ButtonUtils.setEnabled(btnCards, !lockSelectableCardsView);
+
         if (canChangeSelectableCardsVisibility) {
             setCardSelectorVisible(lockSelectableCardsView);
         }
@@ -652,6 +679,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
         if (visible) {
             int size = bdvBoard.getCharacterDisplaySize();
             chdNewCharacter.setSize(size);
+
             chdNewCharacter.setPosition(
                     (ccsvCardSelector.getWidth() - size) / 2f,
                     (ccsvCardSelector.getHeight() - size) / 2f
@@ -663,6 +691,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
                         characterSkins.getCharacterSkin(newCharacter)
                 );
             }
+
             chdNewCharacter.startHighlightAnimation();
         } else {
             chdNewCharacter.stopHighlightAnimation();
@@ -718,7 +747,7 @@ public final class DuelPlayerActivity extends PlayableActivity implements
 
     @Override
     protected void updateInteractionUI(@NonNull GameContext gameContext,
-                                     @NonNull InteractionRequest request) {
+                                       @NonNull InteractionRequest request) {
         super.updateInteractionUI(gameContext, request);
 
         highlightSelectableCards(gameContext, request);
@@ -771,5 +800,5 @@ public final class DuelPlayerActivity extends PlayableActivity implements
         });
     }
 
-    //enregion
+    //endregion
 }

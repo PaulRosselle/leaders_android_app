@@ -212,6 +212,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
         cnvCardInfo.setCharacterSkins(characterSkins);
 
         updateAnimatePlayableIcon();
+        updateCellPositionIcon();
 
         puzzleSource = PuzzleSource.valueOf(getIntent().getStringExtra(ExtraUtils.EXTRA_PUZZLE_SOURCE));
         // When the player is loading a saved puzzle, its index is sent through the intent
@@ -418,7 +419,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
             return;
         }
 
-        // We only save progress when the puzzle has been completed for the first time
+        // We only save progress when a puzzle has been completed for the first time
         if (!isSolved && !puzzleSave.isSolved()) {
             return;
         }
@@ -615,13 +616,16 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     }
 
     private void onDisplayCellPositionClick(View v) {
-        boolean positionVisible = !bdvBoard.isCellPositionVisible();
+        bdvBoard.setCellPositionVisible(!bdvBoard.isCellPositionVisible());
+        updateCellPositionIcon();
+        hidePuzzleActions();
+    }
+
+    private void updateCellPositionIcon() {
         amvPuzzleActions.setButtonIcon(
                 PuzzlePlayerAction.DisplayCellPositions.ordinal(),
-                positionVisible ? R.drawable.icon_position_off : R.drawable.icon_position
+                bdvBoard.isCellPositionVisible() ? R.drawable.icon_position_off : R.drawable.icon_position
         );
-        bdvBoard.setCellPositionVisible(positionVisible);
-        hidePuzzleActions();
     }
 
     private void onHelpClick(View v) {
@@ -712,7 +716,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
             }
         }
     }
-    
+
     @Override
     protected void onDestroy() {
         blockedRequest.set(null);
