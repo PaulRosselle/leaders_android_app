@@ -2,6 +2,7 @@ package com.leaders.app.activities.puzzle;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -59,6 +60,9 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 public final class PuzzlePlayerActivity extends PlayableActivity implements NemesisBlockerCallback {
+    /** Index of the puzzle being played: the player can switch puzzle without changing its intent. */
+    private static final String STATE_PUZZLE_INDEX = "PUZZLE_PLAYER.PUZZLE_INDEX";
+
     private enum PuzzlePlayerAction {
         Exit,
         GoToPreviousPuzzle,
@@ -208,10 +212,16 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
         cnvCardInfo.setCharacterSkins(characterSkins);
 
         updateAnimatePlayableIcon();
+        updateCellPositionIcon();
 
         puzzleSource = PuzzleSource.valueOf(getIntent().getStringExtra(ExtraUtils.EXTRA_PUZZLE_SOURCE));
         // When the player is loading a saved puzzle, its index is sent through the intent
         int puzzleIdx = getIntent().getIntExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, -1);
+        Bundle restoredState = getRestoredState();
+        if (restoredState != null) {
+            // The player may have switched puzzle since the intent was created
+            puzzleIdx = restoredState.getInt(STATE_PUZZLE_INDEX, puzzleIdx);
+        }
 
         try {
             puzzleSaves = (puzzleSource == PuzzleSource.OfficialSelection) ?
@@ -262,11 +272,20 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
             throw new IllegalStateException("No puzzle data received by the player");
         }
 
-        controller = new GameController(this);
-        controller.startGame(puzzleGameHistory);
-
         nemesisMoves = NemesisMoves.loadForPuzzle(this, puzzleSave);
         updatePuzzleInfos();
+
+        // After a destruction by the system, the attempt in progress takes priority over the puzzle start
+        GameHistory snapshot = loadGameSnapshot();
+        final GameHistory loadedHistory = snapshot != null ? snapshot : puzzleGameHistory;
+
+        controller = new GameController(this);
+        bdvBoard.post(() -> controller.startGame(loadedHistory));
+    }
+
+    @Override
+    protected boolean supportsGameSnapshot() {
+        return true;
     }
 
     @Override
@@ -400,7 +419,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
             return;
         }
 
-        // We only save progress when the puzzle has been completed for the first time
+        // We only save progress when a puzzle has been completed for the first time
         if (!isSolved && !puzzleSave.isSolved()) {
             return;
         }
@@ -597,13 +616,16 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     }
 
     private void onDisplayCellPositionClick(View v) {
-        boolean positionVisible = !bdvBoard.isCellPositionVisible();
+        bdvBoard.setCellPositionVisible(!bdvBoard.isCellPositionVisible());
+        updateCellPositionIcon();
+        hidePuzzleActions();
+    }
+
+    private void updateCellPositionIcon() {
         amvPuzzleActions.setButtonIcon(
                 PuzzlePlayerAction.DisplayCellPositions.ordinal(),
-                positionVisible ? R.drawable.icon_position_off : R.drawable.icon_position
+                bdvBoard.isCellPositionVisible() ? R.drawable.icon_position_off : R.drawable.icon_position
         );
-        bdvBoard.setCellPositionVisible(positionVisible);
-        hidePuzzleActions();
     }
 
     private void onHelpClick(View v) {
@@ -681,6 +703,19 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     }
 
     //endregion
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // Both can be null if initDatas stopped early (corrupted puzzle file)
+        if (puzzleSaves != null && puzzleSave != null) {
+            int puzzleIdx = puzzleSaves.indexOf(puzzleSave);
+            if (puzzleIdx != -1) {
+                outState.putInt(STATE_PUZZLE_INDEX, puzzleIdx);
+            }
+        }
+    }
 
     @Override
     protected void onDestroy() {

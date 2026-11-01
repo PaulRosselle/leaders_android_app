@@ -53,6 +53,7 @@ public final class JsonUtils {
     private static final String LOG_TAG = "JsonUtils";
     private static final String ATOMIC_FILE_BACKUP_SUFFIX = ".bak";
     private static final String APP_RECOVER_SUFFIX = ".recover";
+    private static final String SNAPSHOT_FILENAME_PREFIX = "snapshot_";
 
     private interface JsonParser<T> {
         T parse(@NonNull JSONObject json) throws JSONException;
@@ -432,6 +433,62 @@ public final class JsonUtils {
         } catch (IOException | JSONException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    //endregion
+
+    //region SNAPSHOT METHODS
+
+    @NonNull
+    private static String getSnapshotFileName(@NonNull String snapshotName) {
+        return SNAPSHOT_FILENAME_PREFIX + snapshotName + ".json";
+    }
+
+    /**
+     * Saves the work in progress of an activity so it can be resumed if Android destroys the
+     * activity while the app is in background. The file write is atomic: a process killed during
+     * the save leaves the previous snapshot intact.
+     */
+    public static void saveSnapshot(@NonNull Context context,
+                                    @NonNull String snapshotName,
+                                    @NonNull JSONObject snapshot) throws IOException {
+        writeAtomically(
+                getFile(context, getSnapshotFileName(snapshotName)),
+                snapshot.toString().getBytes(StandardCharsets.UTF_8)
+        );
+    }
+
+    /**
+     * Loads a snapshot.
+     *
+     * @return the snapshot, or {@code null} if there is none or if it is not readable. A snapshot
+     * is only a convenience (unlike user saves): an unreadable one is silently deleted and the
+     * caller falls back to its usual initial data. The caller must call {@link #deleteSnapshot}
+     * if the structure of the content turns out to be invalid.
+     */
+    @Nullable
+    public static JSONObject loadSnapshot(@NonNull Context context, @NonNull String snapshotName) {
+        String fileName = getSnapshotFileName(snapshotName);
+        if (!fileExists(context, fileName)) {
+            return null;
+        }
+
+        try {
+            return openJsonFile(context, fileName);
+        } catch (IllegalArgumentException e) {
+            Log.w(LOG_TAG, "Unreadable snapshot " + snapshotName + ", it is discarded", e);
+            deleteSnapshot(context, snapshotName);
+            return null;
+        }
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored") // "delete()" results ignored here
+    public static void deleteSnapshot(@NonNull Context context, @NonNull String snapshotName) {
+        String fileName = getSnapshotFileName(snapshotName);
+        // Best effort: the "File.delete" result is ignored on purpose, a leftover snapshot is
+        // harmless (it is only loaded when the system gives back its matching saved state)
+        getFile(context, fileName).delete();
+        getFile(context, fileName + ATOMIC_FILE_BACKUP_SUFFIX).delete();
     }
 
     //endregion

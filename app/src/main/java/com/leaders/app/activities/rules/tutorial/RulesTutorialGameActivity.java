@@ -129,10 +129,21 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
         startHistory = TutorialGameUtils.getDefaultHistory(this);
         bot = new TutorialBot();
 
-        controller = new GameController(this);
-        controller.restartGame(new GameHistory(startHistory));
+        // After a destruction by the system, the attempt in progress takes priority over the puzzle start
+        GameHistory snapshot = loadGameSnapshot();
+        final GameHistory loadedHistory = snapshot != null ? snapshot : new GameHistory(startHistory);
 
-        showReminderDialog();
+        controller = new GameController(this);
+        bdvBoard.post(() -> controller.startGame(loadedHistory));
+
+        if (snapshot == null) {
+            showReminderDialog();
+        }
+    }
+
+    @Override
+    protected boolean supportsGameSnapshot() {
+        return true;
     }
 
     @Override
@@ -455,6 +466,8 @@ public class RulesTutorialGameActivity extends PlayableActivity implements
             initPlayerViews(context);
             bdvBoard.setBoard(context.getBoard());
             ccsvCardSelector.applyGameModeParams(context.getGameMode());
+            applyPlayerChange(context);
+            applyPhaseChange(context.getGamePhase(), true);
 
             clearInteractionUI(context);
         });

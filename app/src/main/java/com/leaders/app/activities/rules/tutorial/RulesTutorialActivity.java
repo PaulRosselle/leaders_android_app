@@ -94,7 +94,7 @@ public abstract class RulesTutorialActivity extends PlayableActivity implements 
         startHistoryHash = getHistoryHash(startHistory);
 
         controller = new GameController(this);
-        controller.restartGame(new GameHistory(startHistory));
+        bdvBoard.post(() -> controller.restartGame(new GameHistory(startHistory)));
     }
 
     @Override
