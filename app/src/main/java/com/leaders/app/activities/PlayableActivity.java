@@ -1,8 +1,11 @@
 package com.leaders.app.activities;
 
+import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.android.material.button.MaterialButton;
 import com.leaders.app.controllers.GameController;
@@ -13,6 +16,7 @@ import com.leaders.app.enums.AnimationSpeed;
 import com.leaders.app.enums.EndGameType;
 import com.leaders.app.enums.LeaderType;
 import com.leaders.app.utilities.ButtonUtils;
+import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.views.EndGameView;
 import com.leaders.app.views.board.PlayableBoardView;
 import com.leaders.app.views.character.CharacterNotificationView;
@@ -20,6 +24,7 @@ import com.leaders.app.views.character.CharacterView;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.GameContext;
+import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.TeamColor;
@@ -29,11 +34,19 @@ import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.interactions.InteractionType;
 import com.leaders.gamelogic.queries.BoardQuery;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Objects;
 
 public abstract class PlayableActivity extends BaseActivity
         implements PlayableBoardView.OnTargetClickListener, GameController.Listener {
+    /**
+     * Flag stored in the saved instance state once the game snapshot has been written.
+     * It tells a recreation of this activity (process death, configuration change) apart from
+     * a fresh start, so that a leftover snapshot file is never loaded by mistake.
+     */
+    private static final String STATE_SNAPSHOT_SAVED = "PLAYABLE_ACTIVITY.SNAPSHOT_SAVED";
+    private static final String LOG_TAG = "PlayableActivity";
 
     protected PlayableBoardView bdvBoard;
 
@@ -46,8 +59,10 @@ public abstract class PlayableActivity extends BaseActivity
 
     protected AnimationSpeed animationSpeed;
     protected boolean animatePlayableItems;
-
     protected GameController controller;
+    /** Saved instance state given back by the system, only when it comes with a valid snapshot. */
+    @Nullable
+    private Bundle restoredState;
 
 
     //region BASE ACTIVITY OVERRIDDEN METHODS
@@ -107,6 +122,87 @@ public abstract class PlayableActivity extends BaseActivity
 
     //endregion
 
+    //region GAME SNAPSHOT METHODS
+
+    /**
+     * Indicates whether the current game must survive the destruction of the activity by Android
+     * (process killed while the app is in background).
+     * When enabled, the activity must call {@link #loadGameSnapshot()} where it picks the history
+     * to start from, and give priority to its result over the initial history.
+     *
+     * @return {@code true} if the game history must be snapshotted. Disabled by default.
+     */
+    protected boolean supportsGameSnapshot() {
+        return false;
+    }
+
+    /**
+     * Returns the history of the game as it was when the activity has been destroyed by the system.
+     *
+     * @return the snapshot, or {@code null} if this is a fresh start (or if the snapshot is
+     * unusable): the activity must then start from its usual initial history.
+     */
+    @Nullable
+    protected final GameHistory loadGameSnapshot() {
+        if (restoredState == null || !supportsGameSnapshot()) {
+            return null;
+        }
+        return JsonUtils.loadGameSnapshot(this, getGameSnapshotName());
+    }
+
+    /**
+     * Returns the small state saved along the snapshot (see {@link #onSaveInstanceState(Bundle)}).
+     * Subclasses can use it to store what is needed to rebuild the context of the game.
+     *
+     * @return the restored state, or {@code null} if this is a fresh start
+     */
+    @Nullable
+    protected final Bundle getRestoredState() {
+        return restoredState;
+    }
+
+    @NonNull
+    private String getGameSnapshotName() {
+        return getActivityType().name();
+    }
+
+    //endregion
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        boolean snapshotSaved = savedInstanceState != null &&
+                savedInstanceState.getBoolean(STATE_SNAPSHOT_SAVED, false);
+        restoredState = snapshotSaved ? savedInstanceState : null;
+
+        if (!snapshotSaved && supportsGameSnapshot()) {
+            // Fresh start: any remaining snapshot belongs to an abandoned game
+            JsonUtils.deleteGameSnapshot(this, getGameSnapshotName());
+        }
+
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // The controller can be null if the initialization has been interrupted
+        if (!supportsGameSnapshot() || controller == null) {
+            return;
+        }
+
+        try {
+            // The history is too big for a Bundle (size limit shared by the whole transaction),
+            // so it goes to a file. The Bundle only keeps the flag telling that the file is valid.
+            JsonUtils.saveGameSnapshot(this, getGameSnapshotName(), controller.getHistory());
+            outState.putBoolean(STATE_SNAPSHOT_SAVED, true);
+        } catch (IOException e) {
+            // Without the flag, the activity restarts from its initial history instead of crashing
+            Log.w(LOG_TAG, "Unable to save the game snapshot", e);
+        }
+    }
+
+    //endregion
 
     //region BOARD INTERACTION METHODS
 

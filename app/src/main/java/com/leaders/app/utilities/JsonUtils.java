@@ -53,6 +53,7 @@ public final class JsonUtils {
     private static final String LOG_TAG = "JsonUtils";
     private static final String ATOMIC_FILE_BACKUP_SUFFIX = ".bak";
     private static final String APP_RECOVER_SUFFIX = ".recover";
+    private static final String GAME_SNAPSHOT_FILENAME_PREFIX = "game_snapshot_";
 
     private interface JsonParser<T> {
         T parse(@NonNull JSONObject json) throws JSONException;
@@ -432,6 +433,68 @@ public final class JsonUtils {
         } catch (IOException | JSONException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    //endregion
+
+    //region GAME SNAPSHOT METHODS
+
+    @NonNull
+    private static String getGameSnapshotFileName(@NonNull String snapshotName) {
+        return GAME_SNAPSHOT_FILENAME_PREFIX + snapshotName + ".json";
+    }
+
+    /**
+     * Saves the history of a game in progress so it can be resumed if Android destroys the
+     * activity while the app is in background. The file write is atomic: a process killed during
+     * the save leaves the previous snapshot intact.
+     */
+    public static void saveGameSnapshot(@NonNull Context context,
+                                        @NonNull String snapshotName,
+                                        @NonNull GameHistory history) throws IOException {
+        try {
+            JSONObject joHistory = new GameHistorySerializer().getAsJson(history);
+            writeAtomically(
+                    getFile(context, getGameSnapshotFileName(snapshotName)),
+                    joHistory.toString().getBytes(StandardCharsets.UTF_8)
+            );
+        } catch (JSONException e) {
+            throw new IOException("Unable to serialize the game snapshot " + snapshotName, e);
+        }
+    }
+
+    /**
+     * Loads a game snapshot.
+     *
+     * @return the snapshot, or {@code null} if there is none or if it is unusable. A snapshot is
+     * only a convenience (unlike user saves): an unusable one is silently deleted, the caller
+     * falls back to its usual initial history.
+     */
+    @Nullable
+    public static GameHistory loadGameSnapshot(@NonNull Context context,
+                                               @NonNull String snapshotName) {
+        String fileName = getGameSnapshotFileName(snapshotName);
+        if (!fileExists(context, fileName)) {
+            return null;
+        }
+
+        try {
+            return new GameHistorySerializer().getFromJson(
+                    openJsonFile(context, fileName), new SerializationContext());
+        } catch (JSONException | RuntimeException e) {
+            Log.w(LOG_TAG, "Unusable game snapshot " + snapshotName + ", it is discarded", e);
+            deleteGameSnapshot(context, snapshotName);
+            return null;
+        }
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored") // "delete()" results are ignored here
+    public static void deleteGameSnapshot(@NonNull Context context, @NonNull String snapshotName) {
+        String fileName = getGameSnapshotFileName(snapshotName);
+        // Best effort: the "File.delete" result is ignored on purpose, a leftover snapshot is
+        // harmless (it is only loaded when the system gives back its matching saved state)
+        getFile(context, fileName).delete();
+        getFile(context, fileName + ATOMIC_FILE_BACKUP_SUFFIX).delete();
     }
 
     //endregion

@@ -77,7 +77,8 @@ public final class RulesCharacterDemoActivity extends PlayableActivity {
         startHistoryHash = getHistoryHash(startHistory);
 
         controller = new GameController(this);
-        controller.startGame(new GameHistory(startHistory));
+        GameHistory demoHistory = new GameHistory(startHistory);
+        bdvBoard.post(() -> controller.startGame(demoHistory));
     }
 
     @Override

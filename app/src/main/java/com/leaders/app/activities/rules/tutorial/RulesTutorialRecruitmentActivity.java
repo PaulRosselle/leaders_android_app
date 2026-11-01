@@ -113,7 +113,7 @@ public class RulesTutorialRecruitmentActivity extends PlayableActivity implement
         startHistory = JsonUtils.loadTutorialChapter(this, getChapter());
 
         controller = new GameController(this);
-        controller.restartGame(new GameHistory(startHistory));
+        bdvBoard.post(() -> controller.restartGame(new GameHistory(startHistory)));
     }
 
     @Override

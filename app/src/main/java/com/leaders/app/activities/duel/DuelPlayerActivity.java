@@ -219,23 +219,34 @@ public final class DuelPlayerActivity extends PlayableActivity implements
 
         updateAnimatePlayableIcon();
         updateAutoRotationIcon();
+        
+        // After a destruction by the system, the game in progress takes priority over the intent
+        GameHistory snapshot = loadGameSnapshot();
+        final GameHistory loadedHistory = snapshot != null ? snapshot : getInitialGameHistory();
 
+        controller = new GameController(this);
+        bdvBoard.post(() -> controller.startGame(loadedHistory));
+    }
+
+    @NonNull
+    private GameHistory getInitialGameHistory() {
         String gameDatas = getIntent().getStringExtra(ExtraUtils.EXTRA_DUEL_GAME_DATAS);
         if (gameDatas == null || gameDatas.isEmpty()) {
             throw new IllegalStateException("Invalid duel game datas: missing datas");
         }
 
-        GameHistory gameHistory;
         GameHistorySerializer serializer = new GameHistorySerializer();
         try {
             JSONObject joGameDatas = new JSONObject(gameDatas);
-            gameHistory = serializer.getFromJson(joGameDatas, new SerializationContext());
+            return serializer.getFromJson(joGameDatas, new SerializationContext());
         } catch (JSONException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException("Invalid duel game datas: invalid datas", e);
         }
+    }
 
-        controller = new GameController(this);
-        controller.startGame(gameHistory);
+    @Override
+    protected boolean supportsGameSnapshot() {
+        return true;
     }
 
     @Override
@@ -734,6 +745,8 @@ public final class DuelPlayerActivity extends PlayableActivity implements
         runOnUiThread(() -> {
             bdvBoard.setBoard(context.getBoard());
             ccsvCardSelector.applyGameModeParams(context.getGameMode());
+            applyPlayerChange(context);
+            applyPhaseChange(context.getGamePhase(), true);
             clearInteractionUI(context);
         });
     }
