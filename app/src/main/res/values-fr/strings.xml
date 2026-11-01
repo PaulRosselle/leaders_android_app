@@ -335,4 +335,7 @@
     <string name="corrupted_data_message">Les données n\'ont pas pu être correctement chargées.</string>
     <string name="corrupted_data_title">Données corrompues</string>
     <string name="data_will_be_forever_lost">Les données seront définitivement perdues.</string>
+    <string name="unreadable_puzzle_data">Données du puzzles illisibles ou invalides</string>
+    <string name="puzzle_details_too_long">Détails du puzzle trop longs (taille > %d)</string>
+    <string name="puzzle_import_file_too_large">Fichier d\'import trop volumieux</string>
 </resources>

@@ -342,4 +342,7 @@
     <string name="corrupted_data_message">Data cannot be loaded</string>
     <string name="corrupted_data_title">Corrupted data</string>
     <string name="data_will_be_forever_lost">Data will be forever lost</string>
+    <string name="unreadable_puzzle_data">Unreadable puzzle data</string>
+    <string name="puzzle_details_too_long">Puzzle details too long (size > %d)</string>
+    <string name="puzzle_import_file_too_large">Puzzle import file too large</string>
 </resources>

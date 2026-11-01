@@ -21,6 +21,8 @@ import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.RecruitmentMotionType;
 import com.leaders.gamelogic.enums.TeamColor;
+import com.leaders.gamelogic.factories.GameFactory;
+import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
 import com.leaders.puzzlelogic.utilities.PuzzleEditionUtils;
 
 import java.util.ArrayList;
@@ -72,6 +74,8 @@ public final class PuzzleImportUtils {
         }
     }
 
+    private static final int MAX_DETAILS_LENGTH = 100;
+
     private PuzzleImportUtils(){
         throw new AssertionError("Cannot instantiate utility class");
     }
@@ -83,7 +87,7 @@ public final class PuzzleImportUtils {
      * @return the result containing the successfully imported puzzles and any errors
      */
     @NonNull
-    public static ImportResult importPuzzlesFromClipboard(@NonNull Context context) {
+    public static ImportResult importPuzzlesFromClipboard(@NonNull Context context, boolean tryCreateGames) {
         ImportResult result = new ImportResult();
 
         String text = readClipboardText(context);
@@ -102,7 +106,7 @@ public final class PuzzleImportUtils {
             try {
                 GameHistory history = getFromLbeUrl(context, entry.url);
 
-                String validityErrors = PuzzleEditionUtils.getPuzzleValidityErrors(context, history);
+                String validityErrors = getHistoryErrors(context, history, tryCreateGames);
                 if (!validityErrors.isEmpty()) {
                     result.errors.add(label + "\n" + validityErrors);
                     continue;
@@ -110,18 +114,13 @@ public final class PuzzleImportUtils {
 
                 String[] nameAndAuthor = splitTitle(titlePattern, entry.title);
                 result.puzzles.add(new ImportedPuzzle(nameAndAuthor[0], nameAndAuthor[1], history));
-            } catch (IllegalArgumentException | IndexOutOfBoundsException e) {
+            } catch (RuntimeException e) {
                 // Clipboard content is arbitrary input: malformed data must not crash the import
                 result.errors.add(label + "\n" + e.getMessage());
             }
         }
 
-        if (!result.errors.isEmpty()) {
-            new AlertDialog.Builder(context, R.style.alert_dialog_theme)
-                    .setTitle(R.string.invalid_puzzle)
-                    .setMessage(TextUtils.join("\n\n", result.errors))
-                    .show();
-        }
+        showImportErrors(context, result.errors);
         return result;
     }
 
@@ -321,5 +320,49 @@ public final class PuzzleImportUtils {
             }
         }
         return new String[]{title, ""};
+    }
+
+    /** Single validation entry point shared by the clipboard and file imports. */
+    @NonNull
+    private static String getHistoryErrors(@NonNull Context context, @NonNull GameHistory history, boolean tryCreateGame) {
+        String errors = PuzzleEditionUtils.getPuzzleValidityErrors(context, history);
+        if (!errors.isEmpty()) {
+            return errors;
+        }
+
+        // Guarantees the game can really be built
+        if (tryCreateGame) {
+            GameFactory.create(history);
+        }
+
+        return "";
+    }
+
+    /**
+     * Validates a puzzle coming from an untrusted file.
+     * @return the validation errors, or an empty string if the puzzle is valid
+     */
+    @NonNull
+    public static String getPuzzleSaveErrors(@NonNull Context context, @NonNull CustomPuzzleSave save, boolean tryCreateGame) {
+        if (save.getName().length() > MAX_DETAILS_LENGTH || save.getAuthor().length() > MAX_DETAILS_LENGTH) {
+            return String.format(context.getString(R.string.puzzle_details_too_long), MAX_DETAILS_LENGTH);
+        }
+        try {
+            return getHistoryErrors(context, save.getPuzzleGameHistory(), tryCreateGame);
+        } catch (RuntimeException e) {
+            // Untrusted input: any parsing/building failure means "invalid puzzle", never a crash
+            return context.getString(R.string.unreadable_puzzle_data);
+        }
+    }
+
+    /** Extracted from importPuzzlesFromClipboard so both imports show errors the same way. */
+    public static void showImportErrors(@NonNull Context context, @NonNull List<String> errors) {
+        if (errors.isEmpty()) {
+            return;
+        }
+        new AlertDialog.Builder(context, R.style.alert_dialog_theme)
+                .setTitle(R.string.invalid_puzzle)
+                .setMessage(TextUtils.join("\n\n", errors))
+                .show();
     }
 }
