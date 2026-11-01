@@ -52,6 +52,8 @@ import java.util.Map;
 import java.util.Set;
 
 public final class PuzzleMenuActivity extends BaseActivity implements SearchToolbarView.SearchToolbarListener {
+    private static final int MAX_IMPORT_FILE_BYTES = 5 * 1024 * 1024; // Import file limit = 5mo
+
     private ActivityResultLauncher<String> importPuzzleFileSelector;
     private ActivityResultLauncher<Uri> exportPuzzleDirectorySelector;
 
@@ -541,16 +543,44 @@ public final class PuzzleMenuActivity extends BaseActivity implements SearchTool
     }
 
     private void importFromFile(@NonNull Uri uri) {
+        JsonUtils.PuzzleImportResult result;
         try {
-            processImport(JsonUtils.loadCustomPuzzlesFromFile(this, uri));
+            result = JsonUtils.loadCustomPuzzlesFromFile(this, uri, MAX_IMPORT_FILE_BYTES);
+        } catch (JsonUtils.ImportLimitExceededException e) {
+            Toast.makeText(this, R.string.puzzle_import_file_too_large, Toast.LENGTH_SHORT).show();
+            return;
         } catch (IllegalArgumentException e) {
+            Toast.makeText(this, R.string.error_import_file_loading, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        List<CustomPuzzleSave> validPuzzles = new ArrayList<>();
+        List<String> errors = new ArrayList<>(result.errors);
+
+        for (CustomPuzzleSave save : result.puzzles) {
+            String saveErrors = PuzzleImportUtils.getPuzzleSaveErrors(this, save, false);
+            if (saveErrors.isEmpty()) {
+                validPuzzles.add(save);
+            } else {
+                final int errorMaxNameLength = 30;
+                String name = save.getName();
+                String errorName = name.length() <= errorMaxNameLength ? name : name.substring(0, errorMaxNameLength) + "…";
+                errors.add(errorName + "\n" + saveErrors);
+            }
+        }
+
+        PuzzleImportUtils.showImportErrors(this, errors);
+
+        if (!validPuzzles.isEmpty()) {
+            processImport(validPuzzles);
+        } else if (errors.isEmpty()) {
             Toast.makeText(this, R.string.error_import_file_loading, Toast.LENGTH_SHORT).show();
         }
     }
 
     private void importLbeLinkFromClipboard() {
         // The import method handle itself error messages
-        PuzzleImportUtils.ImportResult result = PuzzleImportUtils.importPuzzlesFromClipboard(this);
+        PuzzleImportUtils.ImportResult result = PuzzleImportUtils.importPuzzlesFromClipboard(this, false);
         if (result.puzzles.isEmpty()) {
             return;
         }
@@ -571,7 +601,13 @@ public final class PuzzleMenuActivity extends BaseActivity implements SearchTool
     }
 
     private void processImport(@NonNull List<CustomPuzzleSave> importedPuzzles) {
-        PuzzleImportAnalysis importAnalysis = new PuzzleImportAnalysis(importedPuzzles, getCustomPuzzleSaves());
+        PuzzleImportAnalysis importAnalysis;
+        try {
+            importAnalysis = new PuzzleImportAnalysis(importedPuzzles, getCustomPuzzleSaves());
+        } catch (RuntimeException e) {
+            Toast.makeText(this, R.string.error_import_file_loading, Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         if (!importAnalysis.getNewPuzzles().isEmpty()) {
             // Then we save the new custom puzzles list

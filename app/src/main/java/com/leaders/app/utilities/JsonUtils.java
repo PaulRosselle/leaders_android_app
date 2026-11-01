@@ -2,6 +2,7 @@ package com.leaders.app.utilities;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Build;
 import android.util.AtomicFile;
 import android.util.Log;
 
@@ -29,6 +30,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -74,6 +76,15 @@ public final class JsonUtils {
         public String getFileName() {
             return fileName;
         }
+    }
+
+    public static final class ImportLimitExceededException extends IllegalArgumentException {
+        ImportLimitExceededException(String message) { super(message); }
+    }
+
+    public static final class PuzzleImportResult {
+        @NonNull public final List<CustomPuzzleSave> puzzles = new ArrayList<>();
+        @NonNull public final List<String> errors = new ArrayList<>();
     }
 
     private JsonUtils(){
@@ -329,26 +340,52 @@ public final class JsonUtils {
         return customPuzzles;
     }
 
-    public static List<CustomPuzzleSave> loadCustomPuzzlesFromFile(@NonNull Context context,
-                                                                   @NonNull Uri uri) throws IllegalArgumentException {
+    @NonNull
+    public static PuzzleImportResult loadCustomPuzzlesFromFile(@NonNull Context context,
+                                                               @NonNull Uri uri,
+                                                               int maxBytes) throws IllegalArgumentException {
         try (InputStream inputStream = context.getContentResolver().openInputStream(uri)) {
             if (inputStream == null) {
                 throw new IllegalArgumentException("Cannot get valid input stream from Uri");
             }
-            List<CustomPuzzleSave> customPuzzles = new ArrayList<>();
 
-            JSONArray jaCustomPuzzles = openJsonFile(inputStream).getJSONArray("puzzles");
+            JSONArray jaCustomPuzzles = new JSONObject(readBounded(inputStream, maxBytes)).getJSONArray("puzzles");
+
+            PuzzleImportResult result = new PuzzleImportResult();
             for (int i = 0; i < jaCustomPuzzles.length(); i++) {
-                TransferablePuzzleSave puzzleSave = TransferablePuzzleSave.fromJson(
-                        jaCustomPuzzles.getJSONObject(i)
-                );
-                customPuzzles.add(puzzleSave.toCustomSave());
+                try {
+                    TransferablePuzzleSave puzzleSave = TransferablePuzzleSave.fromJson(jaCustomPuzzles.getJSONObject(i));
+                    result.puzzles.add(puzzleSave.toCustomSave());
+                } catch (JSONException | RuntimeException e) {
+                    // Invalid enum value, missing field, wrong type...: skip this entry only
+                    result.errors.add("#" + (i + 1) + "\n" + context.getString(R.string.unreadable_puzzle_data));
+                }
             }
-
-            return customPuzzles;
+            return result;
         } catch (IOException | JSONException e) {
             throw new IllegalArgumentException(e);
         }
+    }
+
+    /** Reads at most maxBytes, regardless of the size announced by the provider (which can be absent or wrong). */
+    @NonNull
+    private static String readBounded(@NonNull InputStream in, int maxBytes) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream(Math.min(maxBytes, 64 * 1024));
+        byte[] buffer = new byte[8192];
+        int total = 0;
+        int read;
+        while ((read = in.read(buffer)) != -1) {
+            total += read;
+            if (total > maxBytes) {
+                throw new ImportLimitExceededException("File larger than " + maxBytes + " bytes");
+            }
+            out.write(buffer, 0, read);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            return out.toString(StandardCharsets.UTF_8);
+        }
+        //noinspection StringOperationCanBeSimplified (not avaiable for the min SDK version)
+        return new String(out.toByteArray(), StandardCharsets.UTF_8);
     }
 
     public static void saveOfficialPuzzles(@NonNull Context context,

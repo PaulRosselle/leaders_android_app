@@ -36,6 +36,8 @@ public final class PuzzleImportAnalysis {
                 duplicates.put(identity, existingName);
             } else {
                 newPuzzles.add(importedPuzzle);
+                // Takes into account duplicates within imported puzzles
+                existingPuzzleMap.put(identity, importedPuzzle.getName());
             }
         }
 
