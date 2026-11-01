@@ -45,8 +45,8 @@ public final class ActionsMenuView extends LinearLayout {
         btnAction.setBackgroundTintList(AppCompatResources.getColorStateList(context, R.color.darker_background));
         // Text appearance
         btnAction.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-        btnAction.setTypeface(ResourcesCompat.getFont(context, R.font.bobby_jones_condensed));
-        btnAction.setIncludeFontPadding(false);
+        btnAction.setTypeface(ResourcesCompat.getFont(context, R.font.bebas_neue_regular));
+        btnAction.setIncludeFontPadding(true);
         btnAction.setTextAlignment(TEXT_ALIGNMENT_TEXT_START);
         // Icon appearance
         btnAction.setIconGravity(MaterialButton.ICON_GRAVITY_START);

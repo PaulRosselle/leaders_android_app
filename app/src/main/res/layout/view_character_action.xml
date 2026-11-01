@@ -42,7 +42,7 @@
         android:autoSizePresetSizes="32dp"
         android:autoSizeStepGranularity="4dp"
         android:autoSizeTextType="uniform"
-        android:fontFamily="@font/bobby_jones_regular"
+        android:fontFamily="@font/bebas_neue_bold"
         android:gravity="center"
         android:textAlignment="gravity"
         android:textAllCaps="true"
