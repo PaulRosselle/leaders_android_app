@@ -52,6 +52,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 public final class PuzzleSolverActivity extends BaseActivity {
@@ -80,6 +81,7 @@ public final class PuzzleSolverActivity extends BaseActivity {
     private CountDownLatch solverWorkersLatch;
     private BlockingQueue<List<CharacterAction>> solutionQueue;
     private Set<String> deadEndStates;
+    private final AtomicBoolean searchAborted = new AtomicBoolean(false);
 
     @Nullable
     private List<CharacterAction> displayedSolution;
@@ -305,10 +307,22 @@ public final class PuzzleSolverActivity extends BaseActivity {
                         deadEndStates
                 );
             }
+        } catch (OutOfMemoryError error) {
+            abortSearch();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         } finally {
             solverWorkersLatch.countDown();
+        }
+    }
+
+    private void abortSearch() {
+        if (!searchAborted.compareAndSet(false, true)) {
+            return;
+        }
+
+        if (solverExecutor != null) {
+            solverExecutor.shutdownNow();
         }
     }
 
