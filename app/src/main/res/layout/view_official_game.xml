@@ -32,6 +32,7 @@
         android:layout_marginEnd="8dp"
         android:fontFamily="@font/jost"
         android:justificationMode="inter_word"
+        android:lineSpacingExtra="-2dp"
         android:text="@string/official_game_intro"
         android:textAllCaps="false"
         android:textColor="@color/font"

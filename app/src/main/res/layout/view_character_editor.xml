@@ -72,10 +72,11 @@
 
     <TextView
         android:id="@+id/txvColor_vwCharacterEditor"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
         android:clickable="false"
-        android:fontFamily="@font/bobby_jones_condensed"
+        android:fontFamily="@font/bebas_neue_regular"
         android:longClickable="false"
         android:text="@string/color"
         android:textAlignment="center"
@@ -88,10 +89,11 @@
 
     <TextView
         android:id="@+id/txvRemove_vwCharacterEditor"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
         android:clickable="false"
-        android:fontFamily="@font/bobby_jones_condensed"
+        android:fontFamily="@font/bebas_neue_regular"
         android:longClickable="false"
         android:text="@string/remove"
         android:textAlignment="center"
