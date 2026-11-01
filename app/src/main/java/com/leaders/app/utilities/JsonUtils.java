@@ -30,6 +30,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -220,22 +221,14 @@ public final class JsonUtils {
         deleteFile(context, exception.getFileName());
     }
 
-    /**
-     * Sets aside (renames, never deletes) the corrupted files so the app can start from a clean state.
-     * To be called only after an explicit user choice.
-     */
-    public static boolean quarantineCorruptedFile(@NonNull Context context,
-                                                  @NonNull CorruptedFileException exception) {
-        String suffix = ".corrupt-" + System.currentTimeMillis();
-        boolean success = true;
-        for (String name : new String[]{exception.getFileName(),
-                exception.getFileName() + APP_RECOVER_SUFFIX}) {
-            File file = getFile(context, name);
-            if (file.exists() && !file.renameTo(getFile(context, name + suffix))) {
-                success = false;
-            }
+    private static OutputStream openTruncatingOutputStream(@NonNull Context context,
+                                                           @NonNull Uri uri) throws IOException {
+        try {
+            return context.getContentResolver().openOutputStream(uri, "wt");
+        } catch (FileNotFoundException | IllegalArgumentException | UnsupportedOperationException e) {
+            // Fallback is "write-truncate" mode is not handled
+            return context.getContentResolver().openOutputStream(uri, "w");
         }
-        return success;
     }
 
     //endregion
@@ -407,7 +400,7 @@ public final class JsonUtils {
     public static void savePuzzlesToFile(@NonNull Context context,
                                          @NonNull List<PuzzleSave> puzzleSaves,
                                          @NonNull Uri uri) {
-        try (OutputStream outputStream = context.getContentResolver().openOutputStream(uri)) {
+        try (OutputStream outputStream = openTruncatingOutputStream(context, uri)) {
             if (outputStream == null) {
                 throw new IllegalArgumentException("Cannot get valid outputStream stream from Uri");
             }
@@ -545,7 +538,7 @@ public final class JsonUtils {
     public static void saveReplaysToFile(@NonNull Context context,
                                          @NonNull List<ReplaySave> replays,
                                          @NonNull Uri uri) {
-        try (OutputStream outputStream = context.getContentResolver().openOutputStream(uri)) {
+        try (OutputStream outputStream = openTruncatingOutputStream(context, uri)) {
             if (outputStream == null) {
                 throw new IllegalArgumentException("Cannot get valid outputStream stream from Uri");
             }
@@ -644,7 +637,7 @@ public final class JsonUtils {
 
     //endregion
 
-    //region CHARACTER DEMO METHODS
+    //region SETTINGS METHODS
 
     public static Settings loadSettings(@NonNull Context context) {
         if (fileExists(context, SETTINGS_FILENAME)) {
