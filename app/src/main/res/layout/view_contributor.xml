@@ -24,10 +24,11 @@
         android:layout_height="@dimen/round_button_icon_size"
         android:layout_marginStart="4dp"
         android:layout_weight="1"
-        android:fontFamily="@font/bukhari_script"
+        android:fontFamily="@font/grand_hotel"
         android:gravity="start|center_vertical"
         android:textColor="@color/font"
-        android:textSize="14dp"
+        android:textSize="18dp"
+        android:textStyle="bold|italic"
         tools:text="@string/creator_name" />
 
     <TextView
