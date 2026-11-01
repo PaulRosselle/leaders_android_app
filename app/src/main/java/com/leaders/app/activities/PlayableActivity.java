@@ -84,9 +84,7 @@ public abstract class PlayableActivity extends BaseActivity
     @Override
     protected final JSONObject createSnapshot() throws JSONException {
         // The controller can be null if the initialization has been interrupted
-        return controller != null
-                ? new GameHistorySerializer().getAsJson(controller.getHistory())
-                : null;
+        return controller != null ? new GameHistorySerializer().getAsJson(controller.getHistory()) : null;
     }
 
     /**

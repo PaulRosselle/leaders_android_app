@@ -141,7 +141,6 @@ public final class PuzzleEditorActivity extends BaseActivity {
     private PuzzleEditorBoardView bdvBoard;
     private CharacterEditorView cevCharacterEditor;
 
-
     private Settings settings;
     private Board initialBoard;
     private Board board;
