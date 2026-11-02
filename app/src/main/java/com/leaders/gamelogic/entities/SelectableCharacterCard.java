@@ -43,9 +43,10 @@ public final class SelectableCharacterCard {
             return false;
         }
 
-        SelectableCharacterCard that = (SelectableCharacterCard) o;
-        return characterCard == that.characterCard
-                && selectionStatus == that.selectionStatus;
+        SelectableCharacterCard otherCard = (SelectableCharacterCard) o;
+        return characterCard == otherCard.characterCard &&
+                selectionStatus == otherCard.selectionStatus &&
+                teamColor == otherCard.teamColor;
     }
 
     @Nullable
