@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/clyMain_vwRulesMenuButton"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -26,6 +27,7 @@
         android:id="@+id/imvCharacter_vwRulesMenuButton"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:importantForAccessibility="no"
         android:scaleType="centerCrop"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -44,13 +46,14 @@
         android:fontFamily="@font/bourbon_test_regular"
         android:gravity="center"
         android:paddingStart="8dp"
-        android:text="apprendre avec le tutoriel"
+        android:text="@string/learn_using_the_tutorial"
         android:textColor="@color/font"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/gdlVertical_vwRulesMenuButton"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/gdlHorizontal_vwRulesMenuButton"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintVertical_bias="1.0"
+        tools:ignore="RtlSymmetry" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
