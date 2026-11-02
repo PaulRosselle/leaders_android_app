@@ -11,13 +11,12 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.leaders.R;
 import com.leaders.app.enums.CharacterSkinType;
-import com.leaders.app.utilities.CharacterCardUtils;
 import com.leaders.gamelogic.enums.CharacterCard;
 
 public final class CharacterCardView extends ConstraintLayout {
-    private final ImageView imvCard;
-    private final ImageView imvHighlight;
-    private final TextView txvCardName;
+    private ImageView imvCard;
+    private ImageView imvHighlight;
+    private TextView txvCardName;
 
     @NonNull
     private CharacterCard card;
@@ -25,22 +24,16 @@ public final class CharacterCardView extends ConstraintLayout {
     private CharacterSkinType skinType;
 
     public CharacterCardView(@NonNull Context context) {
-        this(context, null);
-    }
-
-    public CharacterCardView(@NonNull Context context,
-                             @NonNull CharacterCard card,
-                             @NonNull CharacterSkinType skinType,
-                             boolean highlighted) {
-        this(context, null);
-
-        setCard(card, skinType);
-        setHighlighted(highlighted);
+        super(context);
+        init(context);
     }
 
     public CharacterCardView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        init(context);
+    }
 
+    private void init(@NonNull Context context) {
         inflate(context, R.layout.view_character_card, this);
 
         imvCard = findViewById(R.id.imvCard_vwCharacterCard);
