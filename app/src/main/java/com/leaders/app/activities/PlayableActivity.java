@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -139,8 +140,14 @@ public abstract class PlayableActivity extends BaseActivity
 
     //endregion
 
-    //region BASE ACTIVITY OVERRIDDEN METHODS
+    //region ABSTRACT METHODS
 
+    @IdRes
+    protected abstract int getMainLayoutId();
+
+    //endregion
+
+    //region BASE ACTIVITY OVERRIDDEN METHODS
     @Override
     protected void initViews() {
         super.initViews();
@@ -155,6 +162,7 @@ public abstract class PlayableActivity extends BaseActivity
     protected void initListeners() {
         super.initListeners();
 
+        findViewById(getMainLayoutId()).setOnClickListener(this::onNonInteractiveElementClick);
         bdvBoard.setOnTargetClickListener(this);
         bdvBoard.setOnCharacterLongClickListener(this::onBoardCharacterLongClick);
 

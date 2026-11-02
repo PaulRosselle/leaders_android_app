@@ -8,6 +8,8 @@ import android.view.View;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.CallSuper;
+import androidx.annotation.IdRes;
+import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -127,6 +129,7 @@ public abstract class BaseActivity extends AppCompatActivity {
      *
      * @return the layout resource ID
      */
+    @LayoutRes
     protected abstract int getLayoutResId();
 
     /**
@@ -134,6 +137,7 @@ public abstract class BaseActivity extends AppCompatActivity {
      *
      * @return the root view resource ID
      */
+    @IdRes
     protected abstract int getRootGuidelineResId();
 
     /**
@@ -141,6 +145,7 @@ public abstract class BaseActivity extends AppCompatActivity {
      *
      * @return the button resource ID, or {@code null} if the activity has no back button
      */
+    @IdRes
     @Nullable
     protected abstract Integer getBtnBackResId();
 

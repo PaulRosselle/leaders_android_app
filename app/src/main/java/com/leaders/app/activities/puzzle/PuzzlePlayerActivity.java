@@ -155,6 +155,11 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     //region BASE ACTIVITY OVERRIDEN METHODS
 
     @Override
+    protected int getMainLayoutId() {
+        return R.id.clyMain_actPuzzlePlayer;
+    }
+
+    @Override
     protected void initViews() {
         super.initViews();
 
@@ -187,9 +192,6 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     @Override
     protected void initListeners() {
         super.initListeners();
-
-        // Non interactive element listeners
-        (findViewById(R.id.clyMain_actPuzzlePlayer)).setOnClickListener(this::onNonInteractiveElementClick);
 
         // Puzzle actions listeners
         btnPuzzleActions.setOnClickListener(this::onPuzzleActionsClick);
