@@ -43,6 +43,11 @@ public final class RulesCharacterDemoActivity extends PlayableActivity {
     //region BASE ACTIVITY OVERRIDEN METHODS
 
     @Override
+    protected int getMainLayoutId() {
+        return R.id.clyMain_actRulesCharacterDemo;
+    }
+
+    @Override
     protected void initViews() {
         super.initViews();
 
@@ -59,9 +64,6 @@ public final class RulesCharacterDemoActivity extends PlayableActivity {
     @Override
     protected void initListeners() {
         super.initListeners();
-
-        // Non interactive element listeners
-        (findViewById(R.id.clyMain_actRulesCharacterDemo)).setOnClickListener(this::onNonInteractiveElementClick);
 
         btnReset.setOnClickListener(this::onResetClick);
     }
