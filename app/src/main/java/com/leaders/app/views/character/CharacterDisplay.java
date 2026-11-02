@@ -33,7 +33,7 @@ public final class CharacterDisplay {
         shineView = new CharacterShineView(context);
         parentView.addView(shineView, getDefaultLayoutParams());
 
-        highlightView = new HighlightView(context);
+        highlightView = new HighlightView(context, null);
         parentView.addView(highlightView, getDefaultLayoutParams());
 
         reset();

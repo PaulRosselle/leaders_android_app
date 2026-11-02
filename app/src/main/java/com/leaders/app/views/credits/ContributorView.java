@@ -16,14 +16,23 @@ import com.leaders.app.entities.Contributor;
 import com.leaders.app.enums.ContributorAvatar;
 
 public class ContributorView extends LinearLayout {
-    private final ImageView imvAvatar;
-    private final TextView txvName;
-    private final TextView txvAlpha;
-    private final TextView txvBeta;
+    private ImageView imvAvatar;
+    private TextView txvName;
+    private TextView txvAlpha;
+    private TextView txvBeta;
 
     public ContributorView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        init(context);
+    }
 
+    public ContributorView(@NonNull Context context, @NonNull Contributor contributor) {
+        super(context);
+        init(context);
+        setContributor(contributor);
+    }
+
+    private void init(@NonNull Context context) {
         inflate(context, R.layout.view_contributor, this);
 
         imvAvatar = findViewById(R.id.imvAvatar_vwContributor);
@@ -32,15 +41,14 @@ public class ContributorView extends LinearLayout {
         txvBeta = findViewById(R.id.txvBeta_vwContributor);
     }
 
-    public ContributorView(@NonNull Context context, @NonNull Contributor contributor) {
-        this(context, (AttributeSet) null);
-
+    public void setContributor(@NonNull Contributor contributor) {
         imvAvatar.setImageResource(getAvatarResId(contributor.getAvatar()));
-        imvAvatar.setBackground(AppCompatResources.getDrawable(context, R.drawable.character_piece_empty_w));
+        imvAvatar.setBackground(AppCompatResources.getDrawable(getContext(), R.drawable.character_piece_empty_w));
         txvName.setText(String.format(" %s", contributor.getName()));
         txvAlpha.setVisibility(contributor.hasContributedToAlpha() ? View.VISIBLE : View.INVISIBLE);
         txvBeta.setVisibility(contributor.hasContributedToBeta() ? View.VISIBLE : View.INVISIBLE);
     }
+
     private int getAvatarResId(@NonNull ContributorAvatar avatar) {
         switch (avatar) {
             case Acrobat: return R.drawable.character_piece_acrobat;

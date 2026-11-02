@@ -25,20 +25,29 @@ import java.util.Objects;
 
 public final class CharacterActionView extends LinearLayoutCompat {
     @NonNull
-    private final CharacterView chvSourceCharacter;
+    private CharacterView chvSourceCharacter;
     @NonNull
-    private final ImageView imvActiveAbility;
+    private ImageView imvActiveAbility;
     @NonNull
-    private final CharacterView chvTargetCharacter;
+    private CharacterView chvTargetCharacter;
     @NonNull
-    private final TextView txvDestination;
+    private TextView txvDestination;
 
     @NonNull
-    private final Settings settings;
+    private Settings settings;
 
     public CharacterActionView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        init(context);
+    }
 
+    public CharacterActionView(@NonNull Context context, @NonNull CharacterAction characterAction) {
+        super(context);
+        init(context);
+        setCharacterAction(characterAction);
+    }
+
+    private void init(@NonNull Context context) {
         inflate(context, R.layout.view_character_action, this);
 
         chvSourceCharacter = findViewById(R.id.chvSourceCharacter_vwCharacterAction);
@@ -49,10 +58,7 @@ public final class CharacterActionView extends LinearLayoutCompat {
         settings = ((LeadersApplication) context.getApplicationContext()).getSettings();
     }
 
-    public CharacterActionView(@NonNull Context context,
-                               @NonNull CharacterAction characterAction) {
-        this(context, (AttributeSet) null);
-
+    public void setCharacterAction(@NonNull CharacterAction characterAction) {
         chvSourceCharacter.setCharacter(
                 characterAction.getSrcCharacter(),
                 settings.getCharacterSkin(characterAction.getSrcCharacter())

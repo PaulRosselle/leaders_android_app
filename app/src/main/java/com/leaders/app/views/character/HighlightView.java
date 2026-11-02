@@ -15,25 +15,30 @@ import com.leaders.app.entities.Settings;
 
 public final class HighlightView extends AppCompatImageView {
     private static final int HIGHLIGHT_ANIMATION_DURATION = 800;
-    private final ObjectAnimator animator;
+    private final ObjectAnimator animator = ObjectAnimator.ofFloat(this, ROTATION, 0f, 360f);
 
     public HighlightView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
+        init(context);
+    }
+
+    public HighlightView(@NonNull Context context) {
+        super(context);
+
+        init(context);
+    }
+
+    private void init(@NonNull Context context) {
         if (!isInEditMode()) {
             Settings settings = ((LeadersApplication) context.getApplicationContext()).getSettings();
             setImageResource(settings.getHighlightColor().getOutlineResId());
         }
 
-        animator = ObjectAnimator.ofFloat(this, ROTATION, 0f, 360f);
         animator.setDuration(HIGHLIGHT_ANIMATION_DURATION);
         animator.setInterpolator(new LinearInterpolator());
         animator.setRepeatCount(ValueAnimator.INFINITE);
         animator.setRepeatMode(ValueAnimator.RESTART);
-    }
-
-    public HighlightView(@NonNull Context context) {
-        this(context, null);
     }
 
     public void startAnimation() {
