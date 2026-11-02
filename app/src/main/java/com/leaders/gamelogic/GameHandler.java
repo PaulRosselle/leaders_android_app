@@ -603,7 +603,7 @@ public final class GameHandler {
                 default:
                     throw new IllegalStateException(
                             "Invalid interaction result : illegal type \"" +
-                                    result.getResultType() + "\" for actions phase"
+                                    result.getResultType() + "\" for recruitment phase"
                     );
             }
         });
