@@ -33,6 +33,8 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
     private GameModeView gmvGameMode;
     private FirstPlayerView fpvFirstPlayer;
 
+    private final Random random = new Random();
+
     //region BASE ACTIVITY OVERRIDEN METHODS
 
     @Override
@@ -63,8 +65,6 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
         Settings settings = ((LeadersApplication) getApplication()).getSettings();
         // First player setup is always loaded with the username
         psvFirst.setName(settings.getUserName());
-
-        Random random = new Random();
 
         // Player team color
         TeamColor teamColor = random.nextBoolean() ? TeamColor.Black : TeamColor.White;
