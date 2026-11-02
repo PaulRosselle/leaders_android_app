@@ -6,29 +6,20 @@ import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 
 import com.google.android.material.button.MaterialButton;
-import com.leaders.app.entities.CharacterSkins;
-import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.app.enums.LeaderType;
 import com.leaders.app.utilities.AlignmentUtils;
 import com.leaders.app.utilities.ButtonUtils;
-import com.leaders.app.views.character.CharacterDisplay;
 import com.leaders.app.views.character.HighlightView;
-import com.leaders.app.views.duel.CharacterCardSelectionView;
 import com.leaders.app.views.duel.PlayerBottomView;
 import com.leaders.app.views.duel.PlayerHaloView;
-import com.leaders.app.views.portrait.PortraitView;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
-import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.entities.PlayerWarningState;
 import com.leaders.gamelogic.enums.GamePhaseType;
 import com.leaders.gamelogic.interactions.InteractionRequest;
-import com.leaders.gamelogic.interactions.InteractionTarget;
-import com.leaders.gamelogic.interactions.InteractionType;
-import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
 
 import java.util.Collections;
@@ -37,13 +28,9 @@ import java.util.Objects;
 
 /**
  * Base class of the activities displaying a full game (duel, tutorial game vs bot...):
- * card selector, "next phase" button, bottom player view and end of game handling.
+ * "next phase" button, bottom player view and end of game handling.
  */
-public abstract class FullGameActivity extends PlayableActivity implements
-        CharacterCardSelectionView.OnCardSelectedListener {
-
-    protected CharacterCardSelectionView ccsvCardSelector;
-    protected CharacterDisplay chdNewCharacter;
+public abstract class FullGameActivity extends CardSelectionActivity {
 
     protected PlayerBottomView pbvBottomPlayer;
     protected PlayerHaloView phvBottomPlayer;
@@ -53,9 +40,6 @@ public abstract class FullGameActivity extends PlayableActivity implements
     protected HighlightView hlvNextPhase;
 
     //region ABSTRACT METHODS
-
-    @IdRes
-    protected abstract int getCardSelectorViewId();
 
     @IdRes
     protected abstract int getBottomPlayerViewId();
@@ -93,13 +77,6 @@ public abstract class FullGameActivity extends PlayableActivity implements
         return true;
     }
 
-    /** Skin used to display the character being recruited. */
-    @NonNull
-    protected CharacterSkinType getNewCharacterSkin(@NonNull Character character) {
-        CharacterSkins skins = getCharacterSkins();
-        return skins.getCharacterSkin(character);
-    }
-
     //endregion
 
     //region BASE ACTIVITY OVERRIDEN METHODS
@@ -107,9 +84,6 @@ public abstract class FullGameActivity extends PlayableActivity implements
     @Override
     protected void initViews() {
         super.initViews();
-
-        ccsvCardSelector = findViewById(getCardSelectorViewId());
-        chdNewCharacter = new CharacterDisplay(this, ccsvCardSelector);
 
         pbvBottomPlayer = findViewById(getBottomPlayerViewId());
         phvBottomPlayer = findViewById(getBottomPlayerHaloViewId());
@@ -122,13 +96,6 @@ public abstract class FullGameActivity extends PlayableActivity implements
     @Override
     protected void initListeners() {
         super.initListeners();
-
-        // Non interactive element listeners
-        ccsvCardSelector.setOnClickListener(this::onNonInteractiveElementClick);
-        ccsvCardSelector.setOnScrollViewClickListener(this::onNonInteractiveElementClick);
-
-        ccsvCardSelector.setOnCardSelectedListener(this);
-        ccsvCardSelector.setOnPortraitLongClickListener(this::onPortraitLongClick);
 
         btnCards.setOnClickListener(this::onCardsClick);
         btnNextPhase.setOnClickListener(this::onNextPhaseClick);
@@ -153,25 +120,6 @@ public abstract class FullGameActivity extends PlayableActivity implements
         } else {
             controller.endPhase();
         }
-    }
-
-    protected boolean onPortraitLongClick(View v) {
-        showCardDescriptionNotification(((PortraitView) v).getPortraitCard());
-        return true;
-    }
-
-    //endregion
-
-    //region CARD SELECTION LISTENER METHODS
-
-    @Override
-    public void onRecruitmentCardSelected(@NonNull InteractionTarget target) {
-        controller.selectTarget(target);
-    }
-
-    @Override
-    public void onNotSelectableCardClick() {
-        controller.cancelAction();
     }
 
     //endregion
@@ -217,33 +165,6 @@ public abstract class FullGameActivity extends PlayableActivity implements
         }
     }
 
-    protected void setNewCharacterVisible(@androidx.annotation.Nullable Character newCharacter,
-                                          boolean visible) {
-        chdNewCharacter.getCharacterView().setVisibility(visible ? View.VISIBLE : View.GONE);
-        chdNewCharacter.setIsHighlighted(visible, false);
-
-        if (visible) {
-            int size = bdvBoard.getCharacterDisplaySize();
-            chdNewCharacter.setSize(size);
-
-            chdNewCharacter.setPosition(
-                    (ccsvCardSelector.getWidth() - size) / 2f,
-                    (ccsvCardSelector.getHeight() - size) / 2f
-            );
-
-            if (newCharacter != null) {
-                chdNewCharacter.getCharacterView().setCharacter(
-                        newCharacter,
-                        getNewCharacterSkin(newCharacter)
-                );
-            }
-
-            chdNewCharacter.startHighlightAnimation();
-        } else {
-            chdNewCharacter.stopHighlightAnimation();
-        }
-    }
-
     @NonNull
     protected LeaderType getPlayerLeaderType(@NonNull Player player, @NonNull Board board) {
         Cell leaderCell = Objects.requireNonNull(
@@ -274,11 +195,6 @@ public abstract class FullGameActivity extends PlayableActivity implements
     protected void clearInteractionUI(@NonNull GameContext gameContext) {
         super.clearInteractionUI(gameContext);
 
-        ccsvCardSelector.applyCards(gameContext.getAvailableCharacterCards());
-
-        ccsvCardSelector.setPortraitsVisible(true);
-        setNewCharacterVisible(null, false);
-
         setBtnNextPhaseEnabled(false, false);
     }
 
@@ -289,15 +205,12 @@ public abstract class FullGameActivity extends PlayableActivity implements
             case NoTargetExpected:
                 clearInteractionUI(gameContext); // Only require to choose a result within legalResults
                 break;
-            case SelectableCharacterCardExpected:
-                ccsvCardSelector.applyTargets(request.getLegalTargets());
-                break;
             case PlayableCharacterExpected:
-            case PositionExpected: {
                 bdvBoard.applyTargets(request.getLegalTargets(), request.getContext(), gameContext.getBoard());
-            } break;
+                break;
             default:
-                throw new IllegalStateException("Unexpected request type: " + request.getRequestType());
+                // Selectable cards and positions are handled by RecruitmentActivity
+                super.applyInteractionTargets(gameContext, request);
         }
     }
 
@@ -306,55 +219,11 @@ public abstract class FullGameActivity extends PlayableActivity implements
                                        @NonNull InteractionRequest request) {
         super.updateInteractionUI(gameContext, request);
 
-        highlightSelectableCards(gameContext, request);
-
         setBtnNextPhaseEnabled(controller.canEndPhase(), request.getLegalTargets().isEmpty());
-
-        if (request.getRequestType() == InteractionType.PositionExpected &&
-                gameContext.getGamePhase().getPhaseType() == GamePhaseType.Recruitment) {
-            ccsvCardSelector.setPortraitsVisible(false);
-            setNewCharacterVisible(request.getContext().getTargetCharacter(), true);
-        }
 
         applyPlayerChange(gameContext);
 
         applyPhaseChange(gameContext.getGamePhase(), false);
-    }
-
-    @Override
-    protected void highlightPlayableCharacters(@NonNull GameContext gameContext,
-                                               @NonNull InteractionRequest request) {
-        super.highlightPlayableCharacters(gameContext, request);
-
-        if (!animatePlayableItems) {
-            return;
-        }
-
-        if (request.getLegalTargets().stream()
-                .anyMatch(target -> target.getCategory() == TargetCategory.RecruitmentDestination)) {
-            bdvBoard.startRecruitmentCellsAnimation();
-        } else {
-            bdvBoard.stopRecruitmentCellsAnimation();
-        }
-    }
-
-    protected void highlightSelectableCards(@NonNull GameContext gameContext,
-                                            @NonNull InteractionRequest request) {
-        GamePhase gamePhase = gameContext.getGamePhase();
-
-        boolean isValidPhase = gamePhase.getPhaseType() == GamePhaseType.Recruitment ||
-                gamePhase.getPhaseType() == GamePhaseType.Banishment;
-        boolean selectableCardRequest = request.getRequestType() == InteractionType.SelectableCharacterCardExpected;
-
-        if (!animatePlayableItems) {
-            return;
-        }
-
-        if (isValidPhase && selectableCardRequest) {
-            ccsvCardSelector.startShineAnimation();
-        } else {
-            ccsvCardSelector.stopShineAnimation();
-        }
     }
 
     //endregion

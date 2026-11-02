@@ -9,7 +9,7 @@ import androidx.annotation.Nullable;
 
 import com.google.android.material.button.MaterialButton;
 import com.leaders.R;
-import com.leaders.app.activities.PlayableActivity;
+import com.leaders.app.activities.CardSelectionActivity;
 import com.leaders.app.controllers.GameController;
 import com.leaders.app.entities.CharacterSkins;
 import com.leaders.app.enums.ActivityTransitionType;
@@ -18,31 +18,22 @@ import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.app.enums.TutorialChapter;
 import com.leaders.app.utilities.ButtonUtils;
 import com.leaders.app.utilities.JsonUtils;
-import com.leaders.app.views.character.CharacterDisplay;
 import com.leaders.app.views.character.HighlightView;
-import com.leaders.app.views.duel.CharacterCardSelectionView;
-import com.leaders.app.views.portrait.PortraitView;
 import com.leaders.app.views.rules.TutorialNavigationView;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.Player;
-import com.leaders.gamelogic.enums.GamePhaseType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.interactions.InteractionRequest;
-import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.interactions.InteractionType;
-import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
 
 import java.util.Objects;
 
-public class RulesTutorialRecruitmentActivity extends PlayableActivity implements
-        TutorialNavigationView.IRulesNavigation,
-        CharacterCardSelectionView.OnCardSelectedListener {
-    private CharacterCardSelectionView ccsvCardSelector;
-    private CharacterDisplay chdNewCharacter;
+public class RulesTutorialRecruitmentActivity extends CardSelectionActivity implements
+        TutorialNavigationView.IRulesNavigation {
 
     private MaterialButton btnInfo;
     private TutorialNavigationView tnvNavigation;
@@ -54,7 +45,6 @@ public class RulesTutorialRecruitmentActivity extends PlayableActivity implement
     private MaterialButton btnNextChapter;
 
     private HighlightView hlvNextChapter;
-
 
     private GameHistory startHistory;
 
@@ -71,9 +61,6 @@ public class RulesTutorialRecruitmentActivity extends PlayableActivity implement
 
         bdvBoard.setAlwaysUseDefaultSkins(true);
 
-        ccsvCardSelector = findViewById(R.id.ccsvCardSelector_actRulesTutorialRecruitment);
-        chdNewCharacter = new CharacterDisplay(this, ccsvCardSelector);
-
         btnInfo = findViewById(R.id.btnInfo_actRulesTutorialRecruitment);
         tnvNavigation = findViewById(R.id.tnvNavigation_actRulesTutorielRecruitment);
 
@@ -89,13 +76,6 @@ public class RulesTutorialRecruitmentActivity extends PlayableActivity implement
     @Override
     protected void initListeners() {
         super.initListeners();
-
-        // Non interactive element listeners
-        ccsvCardSelector.setOnClickListener(this::onNonInteractiveElementClick);
-        ccsvCardSelector.setOnScrollViewClickListener(this::onNonInteractiveElementClick);
-
-        ccsvCardSelector.setOnCardSelectedListener(this);
-        ccsvCardSelector.setOnPortraitLongClickListener(this::onPortraitLongClick);
 
         btnInfo.setOnClickListener(this::onInfoClick);
         tnvNavigation.setNavigator(this);
@@ -118,6 +98,11 @@ public class RulesTutorialRecruitmentActivity extends PlayableActivity implement
 
         controller = new GameController(this);
         bdvBoard.post(() -> controller.restartGame(new GameHistory(startHistory)));
+    }
+
+    @Override
+    protected int getCardSelectorViewId() {
+        return R.id.ccsvCardSelector_actRulesTutorialRecruitment;
     }
 
     @Override
@@ -179,48 +164,26 @@ public class RulesTutorialRecruitmentActivity extends PlayableActivity implement
 
     //endregion
 
-    //region INTERACTION METHODS
+    //region RECRUITMENT ACTIVITY OVERRIDEN METHODS
 
+    /** Characters always use their default skin in tutorials. */
+    @NonNull
     @Override
-    protected void clearInteractionUI(@NonNull GameContext gameContext) {
-        super.clearInteractionUI(gameContext);
-
-        ccsvCardSelector.applyCards(gameContext.getAvailableCharacterCards());
-
-        ccsvCardSelector.setPortraitsVisible(true);
-        setNewCharacterVisible(null, false);
+    protected CharacterSkinType getNewCharacterSkin(@NonNull Character character) {
+        return CharacterSkinType.Default;
     }
 
     @Override
-    protected void applyInteractionTargets(@NonNull GameContext gameContext,
-                                           @NonNull InteractionRequest request) {
-        switch (request.getRequestType()) {
-            case SelectableCharacterCardExpected:
-                ccsvCardSelector.applyTargets(request.getLegalTargets());
-                break;
-            case PositionExpected: {
-                bdvBoard.applyTargets(request.getLegalTargets(), request.getContext(), gameContext.getBoard());
-            } break;
-            default:
-                throw new IllegalStateException("Unexpected request type: " + request.getRequestType());
-        }
-    }
-
-    @Override
-    protected void updateInteractionUI(@NonNull GameContext gameContext,
-                                       @NonNull InteractionRequest request) {
-        super.updateInteractionUI(gameContext, request);
-
-        highlightSelectableCards(gameContext, request);
-
-        if (request.getRequestType() == InteractionType.PositionExpected &&
-                gameContext.getGamePhase().getPhaseType() == GamePhaseType.Recruitment) {
-            ccsvCardSelector.setPortraitsVisible(false);
-            setNewCharacterVisible(request.getContext().getTargetCharacter(), true);
-        } else if (hasRecruitedCharacter(gameContext)) {
+    protected void onRecruitmentPlacementNotRequested(@NonNull GameContext gameContext,
+                                                      @NonNull InteractionRequest request) {
+        if (hasRecruitedCharacter(gameContext)) {
             showSecondRecruitmentDialog();
         }
     }
+
+    //endregion
+
+    //region INTERACTION METHODS
 
     private boolean hasRecruitedCharacter(@NonNull GameContext gameContext) {
         return BoardQuery.getRecruitmentCells(gameContext.getBoard(), TeamColor.Black).size() < 7;
@@ -234,16 +197,19 @@ public class RulesTutorialRecruitmentActivity extends PlayableActivity implement
         builder.show();
     }
 
-    public void onRecruitmentCardSelected(@NonNull InteractionTarget target) {
-        controller.selectTarget(target);
-    }
+    @Override
     public void onBanishmentCardSelected() {
         throw new IllegalStateException("Banishment is not supported within recruitment tutorial activity");
     }
 
     @Override
-    public void onNotSelectableCardClick() {
-        controller.cancelAction();
+    public void onInteractionRequired(@NonNull InteractionRequest request, @NonNull GameContext context) {
+        // Playable character action requests are ignored in the activity
+        if (request.getRequestType() == InteractionType.PlayableCharacterExpected) {
+            return;
+        }
+
+        super.onInteractionRequired(request, context);
     }
 
     //endregion
@@ -257,64 +223,6 @@ public class RulesTutorialRecruitmentActivity extends PlayableActivity implement
             hlvNextChapter.startAnimation();
         } else {
             hlvNextChapter.stopAnimation();
-        }
-    }
-
-    @Override
-    protected void highlightPlayableCharacters(@NonNull GameContext gameContext,
-                                               @NonNull InteractionRequest request) {
-        super.highlightPlayableCharacters(gameContext, request);
-
-        if (request.getLegalTargets().stream()
-                .anyMatch(target -> target.getCategory() == TargetCategory.RecruitmentDestination)) {
-            bdvBoard.startRecruitmentCellsAnimation();
-        } else {
-            bdvBoard.stopRecruitmentCellsAnimation();
-        }
-    }
-
-
-    private void highlightSelectableCards(@NonNull GameContext gameContext,
-                                          @NonNull InteractionRequest request) {
-        GamePhase gamePhase = gameContext.getGamePhase();
-
-        boolean isValidPhase = gamePhase.getPhaseType() == GamePhaseType.Recruitment ||
-                gamePhase.getPhaseType() == GamePhaseType.Banishment;
-        boolean selectableCardRequest = request.getRequestType() == InteractionType.SelectableCharacterCardExpected;
-
-        if (!animatePlayableItems) {
-            return;
-        }
-
-        if (isValidPhase && selectableCardRequest) {
-            ccsvCardSelector.startShineAnimation();
-        } else {
-            ccsvCardSelector.stopShineAnimation();
-        }
-    }
-
-    private void setNewCharacterVisible(@Nullable Character newCharacter, boolean visible) {
-        chdNewCharacter.getCharacterView().setVisibility(visible ? View.VISIBLE : View.GONE);
-        chdNewCharacter.setIsHighlighted(visible, false);
-
-        if (visible) {
-            int size = bdvBoard.getCharacterDisplaySize();
-            chdNewCharacter.setSize(size);
-            chdNewCharacter.setPosition(
-                    (ccsvCardSelector.getWidth() - size) / 2f,
-                    (ccsvCardSelector.getHeight() - size) / 2f
-            );
-
-            if (newCharacter != null) {
-                // Character always use their default skin in tutorials
-                chdNewCharacter.getCharacterView().setCharacter(
-                        newCharacter,
-                        CharacterSkinType.Default
-                );
-            }
-            chdNewCharacter.startHighlightAnimation();
-        } else {
-            chdNewCharacter.stopHighlightAnimation();
         }
     }
 
@@ -346,16 +254,6 @@ public class RulesTutorialRecruitmentActivity extends PlayableActivity implement
         });
     }
 
-    @Override
-    public void onInteractionRequired(@NonNull InteractionRequest request, @NonNull GameContext context) {
-        // Playable character action requests are ignored in the activity
-        if (request.getRequestType() == InteractionType.PlayableCharacterExpected) {
-            return;
-        }
-
-        super.onInteractionRequired(request, context);
-    }
-
     //endregion
 
     //region CHAPTER NAVIGATION
@@ -372,11 +270,6 @@ public class RulesTutorialRecruitmentActivity extends PlayableActivity implement
     //endregion
 
     //region VIEW LISTENER METHODS
-
-    private boolean onPortraitLongClick(View v) {
-        showCardDescriptionNotification(((PortraitView) v).getPortraitCard());
-        return true;
-    }
 
     private void onInfoClick(View v) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.alert_dialog_theme);
