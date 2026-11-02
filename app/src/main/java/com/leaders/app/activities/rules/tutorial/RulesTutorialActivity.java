@@ -49,6 +49,11 @@ public abstract class RulesTutorialActivity extends PlayableActivity implements 
     //region BASE ACTIVITY OVERRIDEN METHODS
 
     @Override
+    protected int getMainLayoutId() {
+        return R.id.clyMain_actRulesTutorial;
+    }
+
+    @Override
     protected void initViews() {
         super.initViews();
 
@@ -69,9 +74,6 @@ public abstract class RulesTutorialActivity extends PlayableActivity implements 
     @Override
     protected void initListeners() {
         super.initListeners();
-
-        // Non interactive element listeners
-        (findViewById(R.id.clyMain_actRulesTutorial)).setOnClickListener(this::onNonInteractiveElementClick);
 
         btnInfo.setOnClickListener(this::onInfoClick);
         tnvNavigation.setNavigator(this);

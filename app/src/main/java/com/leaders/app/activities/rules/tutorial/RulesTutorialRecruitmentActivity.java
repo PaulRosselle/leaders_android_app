@@ -61,6 +61,11 @@ public class RulesTutorialRecruitmentActivity extends PlayableActivity implement
     //region BASE ACTIVITY OVERRIDEN METHODS
 
     @Override
+    protected int getMainLayoutId() {
+        return R.id.clyMain_actRulesTutorialRecruitment;
+    }
+
+    @Override
     protected void initViews() {
         super.initViews();
 
@@ -86,7 +91,6 @@ public class RulesTutorialRecruitmentActivity extends PlayableActivity implement
         super.initListeners();
 
         // Non interactive element listeners
-        (findViewById(R.id.clyMain_actRulesTutorialRecruitment)).setOnClickListener(this::onNonInteractiveElementClick);
         ccsvCardSelector.setOnClickListener(this::onNonInteractiveElementClick);
         ccsvCardSelector.setOnScrollViewClickListener(this::onNonInteractiveElementClick);
 
