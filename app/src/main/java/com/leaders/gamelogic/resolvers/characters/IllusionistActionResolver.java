@@ -120,7 +120,8 @@ public final class IllusionistActionResolver extends CharacterActionResolver {
                 Cell targetCell = BoardQuery.findVisibleCharacterCell(game.getBoard(), characterPos,
                         direction, null, null);
                 if (targetCell != null &&
-                        CharacterAbilityQuery.canBeMovedByEnemyAbilities(game, targetCell.getCharacter())) {
+                        (targetCell.getCharacter().getTeamColor() == character.getTeamColor() ||
+                                CharacterAbilityQuery.canBeMovedByEnemyAbilities(game, targetCell.getCharacter()))) {
                     Position targetPos = targetCell.getPosition();
 
                     InteractionResult swapResult = new InteractionResult(

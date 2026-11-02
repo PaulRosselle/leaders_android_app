@@ -74,7 +74,8 @@ public final class ClawLauncherActionResolver extends CharacterActionResolver {
 
                 // The target can be pulled next to the claw launcher
                 Character target = game.getBoard().getCell(targetPos).getCharacter();
-                if (CharacterAbilityQuery.canBeMovedByEnemyAbilities(game, target) &&
+                if ((target.getTeamColor() == character.getTeamColor() ||
+                        CharacterAbilityQuery.canBeMovedByEnemyAbilities(game, target)) &&
                         isValidPull(builder, TargetCategory.ActiveAbilityTargetPosition, targetPos)) {
                     legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityTargetPosition, targetPos));
                 }
