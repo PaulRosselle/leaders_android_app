@@ -18,31 +18,34 @@ import java.util.List;
 public final class PortraitGroupView extends LinearLayout {
     private static final int PORTRAIT_DEFAULT_MARGIN = 2;
 
-    private final ArrayList<PortraitView> portraitViews;
+    private final ArrayList<PortraitView> portraitViews = new ArrayList<>();
     private OnClickListener onPortraitClickListener;
     private OnLongClickListener onPortraitLongClickListener;
     private int portraitSpacing;
 
     public PortraitGroupView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-
-        portraitViews = new ArrayList<>();
-        onPortraitClickListener = null;
-        onPortraitLongClickListener = null;
-        portraitSpacing = PORTRAIT_DEFAULT_MARGIN;
+        init();
 
         try (TypedArray customAttrs = context.obtainStyledAttributes(attrs, R.styleable.PortraitGroupView)) {
             int groupSize = customAttrs.getInteger(R.styleable.PortraitGroupView_maxGroupSize, 6);
             setPortraits(new ArrayList<>(), groupSize);
         }
-
-        setOrientation(HORIZONTAL);
     }
 
     public PortraitGroupView(Context context, @NonNull List<PortraitInfo> portraitInfos, int groupSize) {
-        this(context, null);
+        super(context);
+        init();
 
         setPortraits(portraitInfos, groupSize);
+    }
+
+    private void init() {
+        onPortraitClickListener = null;
+        onPortraitLongClickListener = null;
+        portraitSpacing = PORTRAIT_DEFAULT_MARGIN;
+
+        setOrientation(HORIZONTAL);
     }
 
     public void setPortraits(@NonNull List<PortraitInfo> portraitInfos, int groupSize) {

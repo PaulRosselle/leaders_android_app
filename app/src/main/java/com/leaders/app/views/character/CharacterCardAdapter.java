@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("ClassEscapesDefinedScope")
-public class CharacterCardAdapter extends RecyclerView.Adapter<CharacterCardAdapter.ViewHolder> {
+public final class CharacterCardAdapter extends RecyclerView.Adapter<CharacterCardAdapter.ViewHolder> {
     private final List<Map.Entry<CharacterCard, CharacterSkinType>> cards;
     @Nullable
     private CharacterSkinType selectedSkinType;

@@ -14,7 +14,7 @@ import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.app.utilities.CharacterCardUtils;
 import com.leaders.gamelogic.enums.CharacterCard;
 
-public class CharacterCardView extends ConstraintLayout {
+public final class CharacterCardView extends ConstraintLayout {
     private final ImageView imvCard;
     private final ImageView imvHighlight;
     private final TextView txvCardName;
