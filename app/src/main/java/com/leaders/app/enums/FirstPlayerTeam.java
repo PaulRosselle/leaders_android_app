@@ -9,9 +9,11 @@ public enum FirstPlayerTeam {
     Black,
     White;
 
+    private static final Random random = new Random();
+
     public TeamColor getTeamColor() {
         switch (this) {
-            case Random: return new Random().nextBoolean() ? TeamColor.Black : TeamColor.White;
+            case Random: return random.nextBoolean() ? TeamColor.Black : TeamColor.White;
             case Black: return TeamColor.Black;
             case White: return TeamColor.White;
             default: throw new IllegalStateException("No team color found matching first team: " + this);
