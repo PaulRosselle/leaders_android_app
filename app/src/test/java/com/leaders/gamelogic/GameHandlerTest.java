@@ -1723,7 +1723,7 @@ public class GameHandlerTest {
     }
 
     @Test
-    public void checkGameEnded_shouldNotThrowWhenThereIsNoWinner() throws Exception {
+    public void checkGameEnded_shouldNotThrowWhenThereIsNoWinner() {
         GameHistory history = createCheckGameEndedGameHistory();
         GameHandler gameHandler = new GameHandler(history, new TestGameFlowListener(history));
 
@@ -1731,8 +1731,11 @@ public class GameHandlerTest {
                 GamePhaseType.TurnEnd,
                 history.getConfig().getPlayers().get(0)
         );
-
-        invokeCheckGameEnded(gameHandler, currentPhase);
+        try {
+            invokeCheckGameEnded(gameHandler, currentPhase);
+        } catch (Exception exception) {
+            fail("Expected no exception to be thrown, but got: " + exception.getMessage());
+        }
     }
 
     @Test
