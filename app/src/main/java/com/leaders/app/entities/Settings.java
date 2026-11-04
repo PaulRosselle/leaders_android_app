@@ -29,7 +29,7 @@ public final class Settings {
         animationSpeed = AnimationSpeed.Normal;
         highlightColor = HighlightColor.Default;
         animatePlayableItems = true;
-        duelScreenAutoRotation = false;
+        duelScreenAutoRotation = true;
         isFirstLaunch = true;
         characterSkins = new CharacterSkins();
     }
