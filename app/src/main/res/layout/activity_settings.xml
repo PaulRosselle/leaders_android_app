@@ -71,7 +71,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="@dimen/default_bottom_margin"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -108,16 +108,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                app:titleResId="@string/playable_items_animation_title"
-                app:switchTextResId="@string/playable_items_animation_message"/>
+                app:switchTextResId="@string/playable_items_animation_message"
+                app:titleResId="@string/playable_items_animation_title" />
 
             <com.leaders.app.views.settings.SettingsSwitch
                 android:id="@+id/swtAutoRotation_actSettings"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                app:titleResId="@string/screen_auto_rotation_title"
-                app:switchTextResId="@string/screen_auto_rotation_message" />
+                app:switchTextResId="@string/screen_auto_rotation_message"
+                app:titleResId="@string/screen_auto_rotation_title" />
 
             <com.leaders.app.views.settings.HighlightColorView
                 android:id="@+id/hcvHighlightColor_actSettings"
@@ -129,7 +129,7 @@
                 android:id="@+id/rpvResetProgression_actSettings"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="8dp"  />
+                android:layout_marginTop="8dp" />
 
             <com.leaders.app.views.settings.CharacterSkinView
                 android:id="@+id/csvSkins_actSettings"
