@@ -132,7 +132,7 @@
         android:id="@+id/btnStartGame_actDuelSetup"
         android:layout_width="280dp"
         android:layout_height="@dimen/round_button_size"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="@dimen/default_bottom_margin"
         android:backgroundTint="@color/darker_background"
         android:fontFamily="@font/bebas_neue_bold"
         android:includeFontPadding="true"

@@ -251,7 +251,7 @@
         android:id="@+id/txvPrivacyPolicy_actCredits"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="@dimen/compact_bottom_margin"
         android:fontFamily="@font/jost"
         android:paddingTop="8dp"
         android:paddingBottom="8dp"

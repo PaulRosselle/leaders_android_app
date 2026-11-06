@@ -22,7 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_end="16dp" />
+        app:layout_constraintGuide_end="@dimen/compact_bottom_margin" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/gdl50V_actDuelPlayer"

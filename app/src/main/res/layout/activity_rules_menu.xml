@@ -71,7 +71,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="@dimen/default_bottom_margin"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -86,9 +86,9 @@
             android:layout_marginBottom="4dp"
             android:layout_weight="1"
             app:characterResId="@drawable/rules_menu_acrobat"
-            app:titleResId="@string/learn_using_the_tutorial"
             app:rippleColorResId="@color/cyan_ripple_effect"
-            app:titleAlignemnt="Left" />
+            app:titleAlignemnt="Left"
+            app:titleResId="@string/learn_using_the_tutorial" />
 
         <com.leaders.app.views.rules.RulesMenuButtonView
             android:id="@+id/btnCharacters_actRulesMenu"
@@ -98,9 +98,9 @@
             android:layout_marginBottom="4dp"
             android:layout_weight="1"
             app:characterResId="@drawable/rules_menu_royal_guard"
-            app:titleResId="@string/test_out_characters"
             app:rippleColorResId="@color/golden_ripple_effect"
-            app:titleAlignemnt="Right" />
+            app:titleAlignemnt="Right"
+            app:titleResId="@string/test_out_characters" />
 
         <com.leaders.app.views.rules.RulesMenuButtonView
             android:id="@+id/btnOnlineGuide_actRulesMenu"
@@ -110,9 +110,9 @@
             android:layout_marginBottom="4dp"
             android:layout_weight="1"
             app:characterResId="@drawable/rules_menu_brewmaster"
-            app:titleResId="@string/online_guide"
             app:rippleColorResId="@color/red_ripple_effect"
-            app:titleAlignemnt="Left" />
+            app:titleAlignemnt="Left"
+            app:titleResId="@string/online_guide" />
     </LinearLayout>
 
 
