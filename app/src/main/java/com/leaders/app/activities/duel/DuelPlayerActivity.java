@@ -184,6 +184,14 @@ public final class DuelPlayerActivity extends FullGameActivity {
             statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
             return insets;
         });
+
+        // Overrides BaseActivity insets listener for gdlRoot
+        ViewCompat.setOnApplyWindowInsetsListener(gdlTop, (v, insets) -> {
+            statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
+            applyGuidelines(isScreenRotated());
+            return insets;
+        });
+        ViewCompat.requestApplyInsets(gdlTop);
     }
 
     @Override
@@ -525,12 +533,19 @@ public final class DuelPlayerActivity extends FullGameActivity {
         ptvOpposingPlayer.setWarningVisible(playerHasWarnings(opposingPlayer, warningStates));
     }
 
-    private void applyScreenRotation() {
-        boolean rotate = autoRotateEnabled &&
-                bdvBoard.getOrientation() == BoardOrientation.Rotated &&
-                controller.isGameRunning();
+    private boolean isScreenRotated() {
+        return autoRotateEnabled &&
+                bdvBoard != null && bdvBoard.getOrientation() == BoardOrientation.Rotated &&
+                controller != null && controller.isGameRunning();
+    }
 
+    private void applyScreenRotation() {
+        boolean rotate = isScreenRotated();
         clyMain.setRotation(rotate ? 180f : 0f);
+        applyGuidelines(rotate);
+    }
+
+    private void applyGuidelines(boolean rotate) {
         int defaultMargin = getResources().getDimensionPixelSize(R.dimen.default_layout_margin);
         gdlTop.setGuidelineBegin(rotate ? defaultMargin : statusBarHeight);
         gdlBottom.setGuidelineEnd(rotate ? statusBarHeight : defaultMargin);
