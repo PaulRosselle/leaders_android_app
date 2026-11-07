@@ -27,7 +27,7 @@ public final class GameFactory {
         // First, create a default game instance
         Game game = new Game(new Board(),
                 new ArrayList<>(gameHistory.getConfig().getInitialRecruitableCards()),
-                new ArrayList<>(), // recruitedCharacters
+                new EnumMap<>(TeamColor.class), // playerRecruitedCharacters
                 new EnumMap<>(TeamColor.class), // playerBanishedCards
                 new EnumMap<>(TeamColor.class) // playerWarnings
         );

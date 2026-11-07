@@ -5,7 +5,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import com.leaders.gamelogic.entities.Board;
-import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameConfig;
 import com.leaders.gamelogic.entities.GameHistory;
@@ -30,7 +29,7 @@ public class BanishmentQueryTest {
         // This state is intentionally invalid as a real game state.
         return new Game(new Board(),
                 new ArrayList<>(), // recruitableCards
-                new ArrayList<>(), // recruitedCharacters
+                new EnumMap<>(TeamColor.class), // playerRecruitedCharacters
                 new EnumMap<>(TeamColor.class), // playerBanishedCards
                 new EnumMap<>(TeamColor.class) // playerWarnings
         );
@@ -50,10 +49,6 @@ public class BanishmentQueryTest {
                 new ArrayList<>(), // initialRecruitableCards
                 new ArrayList<>() // initialPlacements
         ), new ArrayList<>());
-    }
-
-    private void addRecruitedCharacter(Game game, CharacterType characterType, TeamColor teamColor) {
-        game.getRecruitedCharacters().add(Character.create(characterType, teamColor));
     }
 
     @Test
@@ -77,7 +72,7 @@ public class BanishmentQueryTest {
         Game game = createTestGame();
         GameHistory history = createTestGameHistory(GameMode.Strategist);
 
-        addRecruitedCharacter(game, CharacterType.Archer, TeamColor.Black);
+        game.addRecruitedCharacter(TeamColor.Black, CharacterType.Archer);
 
         assertFalse(BanishmentQuery.canBanish(game, history, TeamColor.Black));
     }
@@ -97,10 +92,10 @@ public class BanishmentQueryTest {
         Game game = createTestGame();
         GameHistory history = createTestGameHistory(GameMode.Strategist);
 
-        addRecruitedCharacter(game, CharacterType.Archer, TeamColor.Black);
-        addRecruitedCharacter(game, CharacterType.Acrobat, TeamColor.Black);
-        addRecruitedCharacter(game, CharacterType.Bruiser, TeamColor.White);
-        addRecruitedCharacter(game, CharacterType.Assassin, TeamColor.White);
+        game.addRecruitedCharacter(TeamColor.Black, CharacterType.Archer);
+        game.addRecruitedCharacter(TeamColor.Black, CharacterType.Acrobat);
+        game.addRecruitedCharacter(TeamColor.White, CharacterType.Bruiser);
+        game.addRecruitedCharacter(TeamColor.White, CharacterType.Assassin);
 
         game.addBanishedCard(TeamColor.Black, CharacterCard.Archer);
 
@@ -123,12 +118,12 @@ public class BanishmentQueryTest {
         Game game = createTestGame();
         GameHistory history = createTestGameHistory(GameMode.Strategist);
 
-        addRecruitedCharacter(game, CharacterType.Archer, TeamColor.Black);
-        addRecruitedCharacter(game, CharacterType.Acrobat, TeamColor.Black);
-        addRecruitedCharacter(game, CharacterType.ClawLauncher, TeamColor.Black);
-        addRecruitedCharacter(game, CharacterType.Bruiser, TeamColor.White);
-        addRecruitedCharacter(game, CharacterType.Assassin, TeamColor.White);
-        addRecruitedCharacter(game, CharacterType.Illusionist, TeamColor.White);
+        game.addRecruitedCharacter(TeamColor.Black, CharacterType.Archer);
+        game.addRecruitedCharacter(TeamColor.Black, CharacterType.Acrobat);
+        game.addRecruitedCharacter(TeamColor.Black, CharacterType.ClawLauncher);
+        game.addRecruitedCharacter(TeamColor.White, CharacterType.Bruiser);
+        game.addRecruitedCharacter(TeamColor.White, CharacterType.Assassin);
+        game.addRecruitedCharacter(TeamColor.White, CharacterType.Illusionist);
 
         assertFalse(BanishmentQuery.canBanish(game, history, TeamColor.Black));
         assertFalse(BanishmentQuery.canBanish(game, history, TeamColor.White));

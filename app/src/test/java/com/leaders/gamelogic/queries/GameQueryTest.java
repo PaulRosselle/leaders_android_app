@@ -20,37 +20,35 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
-import java.util.List;
 import java.util.Objects;
 
 public class GameQueryTest {
 
     private Game createTestGame(Board board) {
-        return createTestGame(board, new ArrayList<>());
+        return createTestGame(board, new EnumMap<>(TeamColor.class));
     }
 
-    private Game createTestGame(Board board, List<Character> recruitedCharacters) {
+    private Game createTestGame(Board board, EnumMap<TeamColor, EnumMap<CharacterType, Integer>> recruitedCards) {
         // Build the minimal Game state required by the tests.
         // This state is intentionally invalid as a real game state.
         return new Game(board,
                 new ArrayList<>(), // recruitableCards
-                recruitedCharacters,
+                recruitedCards,
                 new EnumMap<>(TeamColor.class), // playerBanishedCards
                 new EnumMap<>(TeamColor.class) // playerWarnings
         );
     }
 
-    private Character placeCharacter(@NonNull Board board, @NonNull Position position,
+    private void placeCharacter(@NonNull Board board, @NonNull Position position,
                                      @NonNull CharacterType characterType, @NonNull TeamColor teamColor) {
         Character character = Character.create(characterType, teamColor);
         board.getCell(position).setCharacter(character);
-        return character;
     }
 
     private void placeCharacter(@NonNull Game game, @NonNull Position position,
                                 @NonNull CharacterType characterType, @NonNull TeamColor teamColor) {
-        Character character = placeCharacter(game.getBoard(), position, characterType, teamColor);
-        game.getRecruitedCharacters().add(character);
+        placeCharacter(game.getBoard(), position, characterType, teamColor);
+        game.addRecruitedCharacter(teamColor, characterType);
     }
 
     private void placeLeader(Board board, Position position, TeamColor teamColor) {
@@ -237,12 +235,14 @@ public class GameQueryTest {
     public void isBarrageDetected_shouldReturnTrueWhenChainSeparatesBoardAfterRecruitmentEnd() {
         Board board = new Board();
 
-        List<Character> recruitedCharacters = new ArrayList<>();
-        for (TeamColor teamColor : TeamColor.values()) {
-            for (int i = 0; i < RecruitmentQuery.FULL_TEAM_SIZE; i++) {
-                recruitedCharacters.add(Character.create(CharacterType.values()[i], teamColor));
-            }
-        }
+        EnumMap<TeamColor, EnumMap<CharacterType, Integer>> recruitedCharacters = new EnumMap<>(TeamColor.class);
+        EnumMap<CharacterType, Integer> blackCharacters = new EnumMap<>(CharacterType.class);
+        blackCharacters.put(CharacterType.Nemesis, RecruitmentQuery.RECRUITED_TEAM_SIZE);
+        recruitedCharacters.put(TeamColor.Black, blackCharacters);
+
+        EnumMap<CharacterType, Integer> whiteCharacters = new EnumMap<>(CharacterType.class);
+        whiteCharacters.put(CharacterType.Nemesis, RecruitmentQuery.RECRUITED_TEAM_SIZE);
+        recruitedCharacters.put(TeamColor.White, whiteCharacters);
 
         Game game = createTestGame(board, recruitedCharacters);
 

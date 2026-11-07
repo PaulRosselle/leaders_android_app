@@ -2242,7 +2242,7 @@ public class GameHandlerTest {
                 )));
             }
 
-            for (int i = 0; i < RecruitmentQuery.FULL_TEAM_WITHOUT_LEADER_SIZE; i++) {
+            for (int i = 0; i < RecruitmentQuery.RECRUITED_TEAM_SIZE; i++) {
                 initialPlacements.add(new RecruitmentAction(Collections.singletonList(
                         new RecruitmentActionMotion(
                                 RecruitmentMotionType.Add,

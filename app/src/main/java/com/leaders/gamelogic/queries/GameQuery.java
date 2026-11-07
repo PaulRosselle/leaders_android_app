@@ -235,13 +235,13 @@ public final class GameQuery {
      *
      * @param game the game whose teams are checked; must not be {@code null}
      * @return {@code true} if every team has at least
-     *         {@link RecruitmentQuery#FULL_TEAM_SIZE} recruited cards,
+     *         {@link RecruitmentQuery#RECRUITED_TEAM_SIZE} recruited cards,
      *         {@code false} otherwise
      * @throws NullPointerException if {@code game} is {@code null}
      */
     private static boolean playersTeamsAreFull(@NonNull Game game) {
         for (TeamColor teamColor : TeamColor.values()) {
-            if (RecruitmentQuery.getRecruitedCards(game, teamColor, true).size() < RecruitmentQuery.FULL_TEAM_SIZE) {
+            if (game.getRecruitedCards(teamColor).size() < RecruitmentQuery.RECRUITED_TEAM_SIZE) {
                 return false;
             }
         }

@@ -30,7 +30,7 @@ public class CharacterAbilityQueryTest {
         // This state is intentionally invalid as a real game state.
         return new Game(board,
                 new ArrayList<>(), // recruitableCards
-                new ArrayList<>(), // recruitedCharacters
+                new EnumMap<>(TeamColor.class), // playerRecruitedCharacters
                 new EnumMap<>(TeamColor.class), // playerBanishedCards
                 new EnumMap<>(TeamColor.class) // playerWarnings
         );
@@ -383,7 +383,7 @@ public class CharacterAbilityQueryTest {
         board.getCell(new Position(0, 0)).setCharacter(vizier);
 
         Game game = createTestGame(board);
-        game.getRecruitedCharacters().add(vizier);
+        game.addRecruitedCharacter(TeamColor.Black, CharacterType.Vizier);
 
         List<CharacterPath> destinations = CharacterAbilityQuery.getNormalMovementPaths(game, leader);
         assertEquals(Direction.values().length * 3, destinations.size());

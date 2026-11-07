@@ -52,18 +52,37 @@ public final class CharacterAbilityQuery {
     }
 
 
-    // TODO - javadoc
+    /**
+     * Returns the distance between a leader cell and another cell.
+     *
+     * @param leaderCell the cell containing the leader
+     * @param cell the cell to measure the distance to
+     * @return the distance between the two cells
+     */
     private static int getLeaderDistance(@NonNull Cell leaderCell, @NonNull Cell cell) {
         return leaderCell.getPosition().distanceTo(cell.getPosition());
     }
 
-    // TODO - javadoc
+    /**
+     * Checks whether a cell is aligned with the leader's cell.
+     *
+     * @param leaderCell the cell containing the leader
+     * @param cell the cell to check
+     * @return {@code true} if the two cells are aligned, otherwise {@code false}
+     */
     private static boolean isLeaderAligned(@NonNull Cell leaderCell, @NonNull Cell cell) {
         return leaderCell.getPosition().isAligned(cell.getPosition());
     }
 
 
-    // TODO - javadoc
+    /**
+     * Returns the contribution of a character to the capture of an enemy leader.
+     *
+     * @param enemyLeaderCell the cell containing the enemy leader
+     * @param characterCell the cell containing the character to evaluate
+     * @return the character's contribution to the capture
+     * @throws IllegalArgumentException if the character cell contains no character
+     */
     public static int getCaptureContribution(@NonNull Cell enemyLeaderCell, @NonNull Cell characterCell) {
         if (characterCell.getCharacter() == null) {
             throw new IllegalArgumentException("Invalid capture cell, no character: " + characterCell.getPosition());

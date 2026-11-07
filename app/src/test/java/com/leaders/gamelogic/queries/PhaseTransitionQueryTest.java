@@ -34,7 +34,7 @@ public class PhaseTransitionQueryTest {
         return new Game(
                 new Board(),
                 new ArrayList<>(), // recruitableCards
-                new ArrayList<>(), // recruitedCharacters
+                new EnumMap<>(TeamColor.class), // playerRecruitedCharacters
                 new EnumMap<>(TeamColor.class), // playerBanishedCards
                 new EnumMap<>(TeamColor.class) // playerWarnings
         );
@@ -237,11 +237,5 @@ public class PhaseTransitionQueryTest {
 
         assertEquals(GamePhaseType.TurnStart, nextPhase.getPhaseType());
         assertEquals(TeamColor.White, nextPhase.getPhasePlayer().getTeamColor());
-    }
-
-    private void addRecruitedCharacter(Game game, CharacterType characterType) {
-        game.getRecruitedCharacters().add(
-                Character.create(characterType, TeamColor.White)
-        );
     }
 }
