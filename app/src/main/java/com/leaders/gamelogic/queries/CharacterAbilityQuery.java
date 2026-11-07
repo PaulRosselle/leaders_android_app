@@ -51,81 +51,38 @@ public final class CharacterAbilityQuery {
         throw new AssertionError("Cannot instantiate utility class");
     }
 
-    /**
-     * Computes the distance between a character and an enemy leader on the board.
-     *
-     * <p>This method assumes that the given character exists on the game board.
-     * The distance is computed using the hexagonal grid distance defined by
-     * {@link Position#distanceTo(Position)}.</p>
-     *
-     * @param game the current game state
-     * @param leaderCell the cell occupied by the enemy leader
-     * @param character the character whose distance to the leader is computed
-     * @return the number of cells between the character and the enemy leader
-     */
-    private static int getLeaderDistance(@NonNull Game game, @NonNull Cell leaderCell,
-                                         @NonNull Character character) {
-        return leaderCell.getPosition().distanceTo(
-                BoardQuery.getCellByCharacterId(game.getBoard(), character.getId()).getPosition()
-        );
+
+    // TODO - javadoc
+    private static int getLeaderDistance(@NonNull Cell leaderCell, @NonNull Cell cell) {
+        return leaderCell.getPosition().distanceTo(cell.getPosition());
     }
 
-    /**
-     * Checks whether a character is aligned with an enemy leader on the board.
-     *
-     * <p>The character's cell is retrieved from the game board using its identifier.
-     * The alignment is then determined using {@link Position#isAligned(Position)}.</p>
-     *
-     * @param game the current game state containing the character and the board
-     * @param leaderCell the cell occupied by the enemy leader
-     * @param character the character whose alignment with the leader is checked
-     * @return {@code true} if the character and the enemy leader are aligned;
-     *         {@code false} otherwise
-     */
-    private static boolean isLeaderAligned(@NonNull Game game, @NonNull Cell leaderCell,
-                                           @NonNull Character character) {
-        return leaderCell.getPosition().isAligned(BoardQuery.getCellByCharacterId(game.getBoard(), character.getId()).getPosition());
+    // TODO - javadoc
+    private static boolean isLeaderAligned(@NonNull Cell leaderCell, @NonNull Cell cell) {
+        return leaderCell.getPosition().isAligned(cell.getPosition());
     }
 
-    /**
-     * Computes the contribution of a character to the capture of the enemy leader.
-     *
-     * <p>The contribution depends on the character type and its position relative
-     * to the enemy leader:</p>
-     * <ul>
-     *     <li>An {@code Archer} contributes {@code 1} when exactly two cells away
-     *     from the enemy leader.</li>
-     *     <li>An {@code Assassin} captures the enemy leader immediately when
-     *     adjacent to it and contributes {@link #LEADER_CAPTURE_VALUE}.</li>
-     *     <li>A {@code Cub} never contributes to a capture.</li>
-     *     <li>Other characters contribute {@code 1} when adjacent to the enemy leader.</li>
-     * </ul>
-     *
-     * <p>If no enemy leader exists on the board, this method returns {@code 0}.
-     * The game history parameter is currently reserved for passive abilities whose
-     * effects depend on previous game states.</p>
-     *
-     * @param game the current game state
-     * @param character the character whose capture contribution is evaluated
-     * @return the character's contribution to the enemy leader capture
-     */
-    public static int getCaptureContribution(@NonNull Game game,
-                                             @NonNull Character character,
-                                             @NonNull Cell enemyLeaderCell) {
-        switch (character.getCharacterType()) {
+
+    // TODO - javadoc
+    public static int getCaptureContribution(@NonNull Cell enemyLeaderCell, @NonNull Cell characterCell) {
+        if (characterCell.getCharacter() == null) {
+            throw new IllegalArgumentException("Invalid capture cell, no character: " + characterCell.getPosition());
+        }
+
+        switch (characterCell.getCharacter().getCharacterType()) {
             // The archer only takes part in the capture in a straight line from a distance of two
             case Archer: {
-                return isLeaderAligned(game, enemyLeaderCell, character) &&
-                        getLeaderDistance(game, enemyLeaderCell, character) == 2 ? 1 : 0;
+                return isLeaderAligned(enemyLeaderCell, characterCell) &&
+                        getLeaderDistance(enemyLeaderCell, characterCell) == 2 ? 1 : 0;
             }
             // The assassin captures the leader by himself if he is adjacent to it
             case Assassin: {
-                return getLeaderDistance(game, enemyLeaderCell, character) == 1 ? LEADER_CAPTURE_VALUE : 0;
+                return getLeaderDistance(enemyLeaderCell, characterCell) == 1 ? LEADER_CAPTURE_VALUE : 0;
             }
             // The cub never takes part to the capture
             case Cub: return 0;
             // By default, a character count as 1 and must be adjacent to be taken into account
-            default: return getLeaderDistance(game, enemyLeaderCell, character) == 1 ? 1 : 0;
+            default: return getLeaderDistance(enemyLeaderCell, characterCell) == 1 ? 1 : 0;
         }
     }
 
