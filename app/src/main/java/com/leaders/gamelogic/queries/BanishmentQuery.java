@@ -24,10 +24,8 @@ public final class BanishmentQuery {
             return false;
         }
 
-        int recruitedCardsCount = RecruitmentQuery.getRecruitedCards(
-                game, teamColor, false).size();
-        int opponentRecruitedCardsCount = RecruitmentQuery.getRecruitedCards(
-                game, teamColor.getOpposite(), false).size();
+        int recruitedCardsCount = game.getRecruitedCards(teamColor).size();
+        int opponentRecruitedCardsCount = game.getRecruitedCards(teamColor.getOpposite()).size();
 
         int teamBanishmentCount = game.getBanishedCards(teamColor).size();
 
@@ -38,7 +36,7 @@ public final class BanishmentQuery {
     }
 
     public static List<SelectableCharacterCard> getCurrentSelectableCards(@NonNull Game game,
-                                                                          @NonNull GameHistory gameHistory) {
+                                                                            @NonNull GameHistory gameHistory) {
         return SelectableCardsQuery.getSelectableCards(
                 game, gameHistory, null,
                 CharacterCardSelectionStatus.Banishable,

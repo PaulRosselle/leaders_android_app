@@ -5,7 +5,6 @@ import androidx.annotation.Nullable;
 
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
-import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.enums.Direction;
 import com.leaders.gamelogic.enums.TeamColor;
@@ -40,12 +39,11 @@ public final class GameQuery {
                 BoardQuery.findLeaderCell(game.getBoard(), teamColor),
                 "Leader not found for team " + teamColor
         );
-        for (Character character : game.getRecruitedCharacters()) {
-            if (character.getTeamColor() != teamColor) {
-                totalCaptureValue += CharacterAbilityQuery.getCaptureContribution(game, character, leaderCell);
-                if (totalCaptureValue >= CharacterAbilityQuery.LEADER_CAPTURE_VALUE) {
-                    return true;
-                }
+
+        for (Cell characterCell : BoardQuery.findCharacterCells(game.getBoard(), teamColor.getOpposite(), null)) {
+            totalCaptureValue += CharacterAbilityQuery.getCaptureContribution(leaderCell, characterCell);
+            if (totalCaptureValue >= CharacterAbilityQuery.LEADER_CAPTURE_VALUE) {
+                return true;
             }
         }
         // If we get here, it means that the required capture value wasn't reached
@@ -237,13 +235,13 @@ public final class GameQuery {
      *
      * @param game the game whose teams are checked; must not be {@code null}
      * @return {@code true} if every team has at least
-     *         {@link RecruitmentQuery#FULL_TEAM_SIZE} recruited cards,
+     *         {@link RecruitmentQuery#RECRUITED_TEAM_SIZE} recruited cards,
      *         {@code false} otherwise
      * @throws NullPointerException if {@code game} is {@code null}
      */
     private static boolean playersTeamsAreFull(@NonNull Game game) {
         for (TeamColor teamColor : TeamColor.values()) {
-            if (RecruitmentQuery.getRecruitedCards(game, teamColor, true).size() < RecruitmentQuery.FULL_TEAM_SIZE) {
+            if (game.getRecruitedCards(teamColor).size() < RecruitmentQuery.RECRUITED_TEAM_SIZE) {
                 return false;
             }
         }

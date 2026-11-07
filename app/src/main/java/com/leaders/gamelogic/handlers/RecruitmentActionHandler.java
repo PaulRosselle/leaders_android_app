@@ -24,7 +24,7 @@ public final class RecruitmentActionHandler extends GameActionHandler {
             // The only cases where the removal can fail (without generating any exception) are
             // cards like the Hermit & Cub matching multiple characters
             game.getRecruitableCards().remove(motion.getCharacter().getCharacterType().getCharacterCard());
-            game.getRecruitedCharacters().add(motion.getCharacter());
+            game.addRecruitedCharacter(motion.getCharacter().getTeamColor(), motion.getCharacter().getCharacterType());
         }
     }
 
@@ -33,7 +33,7 @@ public final class RecruitmentActionHandler extends GameActionHandler {
         for (int i = recruitmentAction.getMotions().size() - 1; i >= 0; i--) {
             RecruitmentActionMotion motion = recruitmentAction.getMotions().get(i);
 
-            game.getRecruitedCharacters().remove(motion.getCharacter());
+            game.removeRecruitedCharacter(motion.getCharacter().getTeamColor(), motion.getCharacter().getCharacterType());
 
             // Restore the recruited character's card only once, since the
             // recruitable cards pool should not contain duplicates.

@@ -3,6 +3,7 @@ package com.leaders.gamelogic.entities;
 import androidx.annotation.NonNull;
 
 import com.leaders.gamelogic.enums.CharacterCard;
+import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.enums.WarningType;
 
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Objects;
 
 public final class Game {
     @NonNull
@@ -17,19 +19,19 @@ public final class Game {
     @NonNull
     private final List<CharacterCard> recruitableCards;
     @NonNull
-    private final List<Character> recruitedCharacters;
+    private final EnumMap<TeamColor, EnumMap<CharacterType, Integer>> playerRecruitedCharacters;
     @NonNull
     private final EnumMap<TeamColor, List<CharacterCard>> playerBanishedCards;
     @NonNull
     private final EnumMap<TeamColor, EnumMap<WarningType, Integer>> playerWarnings;
 
     public Game(@NonNull Board board, @NonNull List<CharacterCard> recruitableCards,
-                @NonNull List<Character> recruitedCharacters,
+                @NonNull EnumMap<TeamColor, EnumMap<CharacterType, Integer>> playerRecruitedCharacters,
                 @NonNull EnumMap<TeamColor, List<CharacterCard>> playerBanishedCards,
                 @NonNull EnumMap<TeamColor, EnumMap<WarningType, Integer>> playerWarnings) {
         this.board = board;
         this.recruitableCards = recruitableCards;
-        this.recruitedCharacters = recruitedCharacters;
+        this.playerRecruitedCharacters = playerRecruitedCharacters;
         this.playerBanishedCards = playerBanishedCards;
         this.playerWarnings = playerWarnings;
     }
@@ -37,10 +39,56 @@ public final class Game {
     public Game(@NonNull Game refGame) {
         this(new Board(refGame.board),
                 new ArrayList<>(refGame.recruitableCards),
-                new ArrayList<>(refGame.recruitedCharacters),
-                new EnumMap<>(refGame.playerBanishedCards),
-                new EnumMap<>(refGame.playerWarnings)
+                copyRecruitedCharacters(refGame.playerRecruitedCharacters),
+                copyBannedCards(refGame.playerBanishedCards),
+                copyWarnings(refGame.playerWarnings)
         );
+    }
+
+    /**
+     * Creates a deep copy of the recruited characters map: each nested map is duplicated.
+     * Integer values are immutable, so they can be shared safely.
+     *
+     * @param source the map to copy
+     * @return an independent copy of the map
+     */
+    @NonNull
+    private static EnumMap<TeamColor, EnumMap<CharacterType, Integer>> copyRecruitedCharacters(@NonNull EnumMap<TeamColor, EnumMap<CharacterType, Integer>> source) {
+        EnumMap<TeamColor, EnumMap<CharacterType, Integer>> copy = new EnumMap<>(TeamColor.class);
+        for (EnumMap.Entry<TeamColor, EnumMap<CharacterType, Integer>> entry : source.entrySet()) {
+            copy.put(entry.getKey(), new EnumMap<>(entry.getValue()));
+        }
+        return copy;
+    }
+
+    /**
+     * Creates a deep copy of a map of lists: the map and every list it contains are duplicated.
+     *
+     * <p>{@link CharacterCard} is an enum, so its elements are immutable and shared safely.</p>
+     *
+     * @param source the map to copy
+     * @return an independent copy of the map
+     */
+    @NonNull
+    private static EnumMap<TeamColor, List<CharacterCard>> copyBannedCards(@NonNull EnumMap<TeamColor, List<CharacterCard>> source) {
+        EnumMap<TeamColor, List<CharacterCard>> copy = new EnumMap<>(TeamColor.class);
+        for (EnumMap.Entry<TeamColor, List<CharacterCard>> entry : source.entrySet()) {
+            copy.put(entry.getKey(), new ArrayList<>(entry.getValue()));
+        }
+        return copy;
+    }
+
+    /**
+     * Creates a deep copy of the warnings map: each nested map is duplicated.
+     * Integer values are immutable, so they can be shared safely.
+     */
+    @NonNull
+    private static EnumMap<TeamColor, EnumMap<WarningType, Integer>> copyWarnings(@NonNull EnumMap<TeamColor, EnumMap<WarningType, Integer>> source) {
+        EnumMap<TeamColor, EnumMap<WarningType, Integer>> copy = new EnumMap<>(TeamColor.class);
+        for (EnumMap.Entry<TeamColor, EnumMap<WarningType, Integer>> entry : source.entrySet()) {
+            copy.put(entry.getKey(), new EnumMap<>(entry.getValue()));
+        }
+        return copy;
     }
 
     @NonNull
@@ -54,14 +102,49 @@ public final class Game {
     }
 
     @NonNull
-    public List<Character> getRecruitedCharacters() {
-        return recruitedCharacters;
+    public List<CharacterCard> getRecruitedCards(@NonNull TeamColor team) {
+        EnumMap<CharacterType, Integer> counts = playerRecruitedCharacters.get(team);
+        if (counts == null) {
+            return List.of();
+        }
+
+        List<CharacterCard> cards = new ArrayList<>();
+        for (CharacterCard card : CharacterCard.values()) {
+            if (!card.canBeRecruited())  {
+                continue;
+            }
+
+            int copies = 0;
+            for (CharacterType type : CharacterType.getCharacterTypesMatchingCard(card)) {
+                copies = Math.max(copies, Objects.requireNonNullElse(counts.get(type), 0));
+            }
+            for (int i = 0; i < copies; i++) cards.add(card);
+        }
+        return Collections.unmodifiableList(cards);
+    }
+
+    public void addRecruitedCharacter(@NonNull TeamColor team, @NonNull CharacterType type) {
+        playerRecruitedCharacters
+                .computeIfAbsent(team, k -> new EnumMap<>(CharacterType.class))
+                .merge(type, 1, Integer::sum);
+    }
+
+    public void removeRecruitedCharacter(@NonNull TeamColor team, @NonNull CharacterType type) {
+        EnumMap<CharacterType, Integer> counts = playerRecruitedCharacters.get(team);
+        if (counts == null) {
+            return;
+        }
+        counts.computeIfPresent(type, (characterType, characterCount) ->
+                characterCount > 1 ? characterCount - 1 : null
+        );
+        if (counts.isEmpty()) {
+            playerRecruitedCharacters.remove(team);
+        }
     }
 
     @NonNull
     public List<CharacterCard> getBanishedCards(@NonNull TeamColor playerTeamColor) {
         List<CharacterCard> characterCards = playerBanishedCards.get(playerTeamColor);
-        // A missing team entry means that this team currently has no active warnings.
         if (characterCards == null) {
             return List.of();
         }
@@ -69,8 +152,6 @@ public final class Game {
     }
 
     public void addBanishedCard(@NonNull TeamColor playerTeamColor, @NonNull CharacterCard characterCard) {
-        // Creates the team's banishment list only when the first banishment of this team is added.
-        // computeIfAbsent avoids creating an unused ArrayList when the team already exists.
         playerBanishedCards.computeIfAbsent(playerTeamColor, key -> new ArrayList<>())
                 .add(characterCard);
     }

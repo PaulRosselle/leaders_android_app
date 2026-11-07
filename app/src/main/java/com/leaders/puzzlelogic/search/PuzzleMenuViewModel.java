@@ -86,7 +86,11 @@ public final class PuzzleMenuViewModel extends AndroidViewModel {
         executor.execute(this::load);
     }
 
-    // TODO - javadoc
+    /**
+     * Loads the official and custom puzzle saves.
+     *
+     * <p>Updates the load state according to the outcome of the operation.</p>
+     */
     private void load() {
         try {
             List<OfficialPuzzleSave> official = JsonUtils.loadOfficialPuzzles(getApplication());
@@ -108,7 +112,11 @@ public final class PuzzleMenuViewModel extends AndroidViewModel {
         }
     }
 
-    // TODO - javadoc
+    /**
+     * Discards corrupted puzzle data and reloads the available puzzle saves.
+     *
+     * <p>Does nothing if no corrupted file exception is available.</p>
+     */
     public void discardCorruptedDataAndReload() {
         JsonUtils.CorruptedFileException exception = corruptedFileException;
         if (exception == null) {

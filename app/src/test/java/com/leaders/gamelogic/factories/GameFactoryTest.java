@@ -205,7 +205,10 @@ public class GameFactoryTest {
             }
         }
         assertTrue(game.getRecruitableCards().isEmpty());
-        assertTrue(game.getRecruitedCharacters().isEmpty());
+        for (TeamColor teamColor : TeamColor.values()) {
+            assertTrue(game.getRecruitedCards(teamColor).isEmpty());
+        }
+
         for (TeamColor teamColor : TeamColor.values()) {
             assertEquals(0, game.getBanishedCards(teamColor).size());
         }
@@ -237,8 +240,12 @@ public class GameFactoryTest {
         }
         assertEquals(1, game.getRecruitableCards().size());
         assertEquals(CharacterCard.Wanderer, game.getRecruitableCards().get(0));
-        assertEquals(1, game.getRecruitedCharacters().size());
-        assertTrue(areSameCharacter(expectedChar2, game.getRecruitedCharacters().get(0)));
+        assertTrue(game.getRecruitedCards(TeamColor.White).isEmpty());
+        assertEquals(1, game.getRecruitedCards(TeamColor.Black).size());
+        assertEquals(
+                expectedChar2.getCharacterType().getCharacterCard(),
+                game.getRecruitedCards(TeamColor.Black).get(0)
+        );
         for (TeamColor teamColor : TeamColor.values()) {
             assertEquals(0, game.getBanishedCards(teamColor).size());
         }
@@ -259,7 +266,6 @@ public class GameFactoryTest {
         }
         assertEquals(1, game.getRecruitableCards().size());
         assertEquals(CharacterCard.Protector, game.getRecruitableCards().get(0));
-        assertTrue(game.getRecruitedCharacters().isEmpty());
 
         assertEquals(0, game.getBanishedCards(TeamColor.Black).size());
         List<CharacterCard> whiteBans = game.getBanishedCards(TeamColor.White);

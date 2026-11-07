@@ -21,7 +21,7 @@ public class BanishmentActionHandlerTest {
         // This state is intentionally invalid as a real game state.
         return new Game(new Board(),
                 new ArrayList<>(), // recruitableCards
-                new ArrayList<>(), // recruitedCharacters
+                new EnumMap<>(TeamColor.class), // playerRecruitedCharacters
                 new EnumMap<>(TeamColor.class), // playerBanishedCards
                 new EnumMap<>(TeamColor.class) // playerWarnings
         );

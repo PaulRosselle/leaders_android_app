@@ -40,7 +40,7 @@ public class PlayabilityQueryTest {
         // This state is intentionally invalid as a real game state.
         return new Game(board,
                 new ArrayList<>(), // recruitableCards
-                new ArrayList<>(), // recruitedCharacters
+                new EnumMap<>(TeamColor.class), // playerRecruitedCharacters
                 new EnumMap<>(TeamColor.class), // playerBanishedCards
                 new EnumMap<>(TeamColor.class) // playerWarnings
         );

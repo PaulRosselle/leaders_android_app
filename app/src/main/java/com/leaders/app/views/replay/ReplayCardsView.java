@@ -20,7 +20,6 @@ import com.leaders.app.enums.PortraitDisplayMode;
 import com.leaders.app.utilities.CharacterCardUtils;
 import com.leaders.app.views.portrait.PortraitGroupView;
 import com.leaders.app.views.portrait.PortraitView;
-import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.GameMode;
@@ -29,10 +28,8 @@ import com.leaders.gamelogic.queries.SelectableCardsQuery;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 public final class ReplayCardsView extends ConstraintLayout {
     private static final int GROUP_MARGIN_TOP = 4;
@@ -251,13 +248,11 @@ public final class ReplayCardsView extends ConstraintLayout {
 
     private List<PortraitInfo> getRecruitedCardsInfos(@NonNull Game game) {
         List<PortraitInfo> recruitedCardsInfos = new ArrayList<>();
-        Set<CharacterCard> recruitedCards = new HashSet<>();
 
-        for (Character recruitedCharacter : game.getRecruitedCharacters()) {
-            CharacterCard card = recruitedCharacter.getCharacterType().getCharacterCard();
-            if (card.canBeRecruited() && recruitedCards.add(card)) {
+        for (TeamColor teamColor : TeamColor.values()) {
+            for (CharacterCard recruitedCard : game.getRecruitedCards(teamColor)) {
                 recruitedCardsInfos.add(new PortraitInfo(
-                        card,
+                        recruitedCard,
                         CharacterSkinType.Default,
                         false,
                         PortraitDisplayMode.Hexagonal

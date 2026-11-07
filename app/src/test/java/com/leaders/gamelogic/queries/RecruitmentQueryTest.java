@@ -60,7 +60,7 @@ public class RecruitmentQueryTest {
         // This state is intentionally invalid as a real game state.
         return new Game(board,
                 new ArrayList<>(), // recruitableCards
-                new ArrayList<>(), // recruitedCharacters
+                new EnumMap<>(TeamColor.class), // playerRecruitedCharacters
                 new EnumMap<>(TeamColor.class), // playerBanishedCards
                 new EnumMap<>(TeamColor.class) // playerWarnings
         );
@@ -75,12 +75,6 @@ public class RecruitmentQueryTest {
         gameHistory.getEntries().add(turn);
 
         turn.getSubPhasesInOrder()[2].start();
-    }
-
-    private void addRecruitedCharacter(@NonNull Game game,
-                                       @NonNull CharacterType characterType,
-                                       @NonNull TeamColor teamColor) {
-        game.getRecruitedCharacters().add(Character.create(characterType, teamColor));
     }
 
     @Test
@@ -167,61 +161,6 @@ public class RecruitmentQueryTest {
         addRecruitmentPhase(history);
 
         assertFalse(RecruitmentQuery.canRecruit(game, history, TeamColor.Black));
-    }
-
-    @Test
-    public void getRecruitedCards_shouldExcludeLeadersByDefault() {
-        Game game = createTestGame(new Board());
-
-        addRecruitedCharacter(game, CharacterType.LeaderKing, TeamColor.Black);
-        addRecruitedCharacter(game, CharacterType.Archer, TeamColor.Black);
-
-        Set<CharacterCard> cards =
-                RecruitmentQuery.getRecruitedCards(game, TeamColor.Black, false);
-
-        assertEquals(
-                Set.of(CharacterCard.Archer),
-                cards
-        );
-    }
-
-    @Test
-    public void getRecruitedCards_shouldIncludeLeadersWhenRequested() {
-        Game game = createTestGame(new Board());
-
-        addRecruitedCharacter(game, CharacterType.LeaderKing, TeamColor.Black);
-        addRecruitedCharacter(game, CharacterType.Archer, TeamColor.Black);
-
-        Set<CharacterCard> cards = RecruitmentQuery.getRecruitedCards(game, TeamColor.Black, true);
-
-        assertTrue(cards.contains(CharacterCard.Archer));
-        assertTrue(cards.contains(CharacterType.LeaderKing.getCharacterCard()));
-    }
-
-    @Test
-    public void getRecruitedCards_shouldIgnoreCharactersFromOtherTeams() {
-        Game game = createTestGame(new Board());
-
-        addRecruitedCharacter(game, CharacterType.Archer, TeamColor.Black);
-        addRecruitedCharacter(game, CharacterType.Bruiser, TeamColor.White);
-
-        Set<CharacterCard> cards =
-                RecruitmentQuery.getRecruitedCards(game, TeamColor.Black, false);
-
-        assertEquals(Set.of(CharacterCard.Archer), cards);
-    }
-
-    @Test
-    public void getRecruitedCards_shouldReturnDistinctCards() {
-        Game game = createTestGame(new Board());
-
-        addRecruitedCharacter(game, CharacterType.Archer, TeamColor.Black);
-        addRecruitedCharacter(game, CharacterType.Archer, TeamColor.Black);
-
-        Set<CharacterCard> cards = RecruitmentQuery.getRecruitedCards(game, TeamColor.Black, false);
-
-        assertEquals(1, cards.size());
-        assertTrue(cards.contains(CharacterCard.Archer));
     }
 
     @Test

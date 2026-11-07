@@ -2,6 +2,7 @@ package com.leaders.gamelogic.queries;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import com.leaders.gamelogic.actions.CharacterAction;
@@ -29,7 +30,7 @@ public class CharacterAbilityQueryTest {
         // This state is intentionally invalid as a real game state.
         return new Game(board,
                 new ArrayList<>(), // recruitableCards
-                new ArrayList<>(), // recruitedCharacters
+                new EnumMap<>(TeamColor.class), // playerRecruitedCharacters
                 new EnumMap<>(TeamColor.class), // playerBanishedCards
                 new EnumMap<>(TeamColor.class) // playerWarnings
         );
@@ -46,64 +47,162 @@ public class CharacterAbilityQueryTest {
     @Test
     public void getCaptureContribution_shouldReturnOneForAdjacentCharacter() {
         Board board = new Board();
-        Character character = createCharacter(CharacterType.Archer, TeamColor.Black);
 
-        Cell characterCell = board.getCell(new Position(3, 2));
-        characterCell.setCharacter(character);
-        Cell leaderCell = board.getCell(new Position(3, 3));
+        // Character who have specific capture rules are not tested here
+        List<CharacterType> excludedCharacters = List.of(
+                CharacterType.Archer,
+                CharacterType.Assassin,
+                CharacterType.Cub
+        );
 
-        Game game = createTestGame(board);
-        assertEquals(0, CharacterAbilityQuery.getCaptureContribution(game, character, leaderCell));
+        for (CharacterType characterType : CharacterType.values()) {
+            if (excludedCharacters.contains(characterType)) {
+                continue;
+            }
+
+            Character character = createCharacter(characterType, TeamColor.Black);
+            Cell leaderCell = board.getCell(new Position(3, 3));
+
+            List<Position> adjacentPositions = List.of(
+                    new Position(2, 2),
+                    new Position(2, 3),
+                    new Position(3, 2),
+                    new Position(3, 4),
+                    new Position(4, 2),
+                    new Position(4, 3)
+            );
+
+            Position characterPosition = null;
+            for (Cell cell : board.getCells().values()) {
+                if (cell == leaderCell) {
+                    continue;
+                }
+
+                if (characterPosition != null) {
+                    board.getCell(characterPosition).setCharacter(null);
+                }
+                characterPosition = cell.getPosition();
+                Cell characterCell = board.getCell(characterPosition);
+                characterCell.setCharacter(character);
+
+                assertEquals(
+                        adjacentPositions.contains(characterPosition) ? 1 : 0,
+                        CharacterAbilityQuery.getCaptureContribution(leaderCell, characterCell)
+                );
+            }
+
+            if (characterPosition != null) {
+                board.getCell(characterPosition).setCharacter(null);
+            }
+        }
     }
 
     @Test
-    public void getCaptureContribution_shouldReturnOneForArcherAtDistanceTwo() {
+    public void getCaptureCntoribution_shouldReturnOneForArcherAtDistanceTwo() {
         Board board = new Board();
 
-        Character character = createCharacter(CharacterType.Archer, TeamColor.Black);
-        board.getCell(new Position(3, 1)).setCharacter(character);
+        List<Position> archerCapturePositions = List.of(
+                new Position(1, 1),
+                new Position(1, 3),
+                new Position(3, 1),
+                new Position(3, 5),
+                new Position(5, 1),
+                new Position(5, 3)
+        );
+
+        Character archer = createCharacter(CharacterType.Archer, TeamColor.Black);
         Cell leaderCell = board.getCell(new Position(3, 3));
 
-        Game game = createTestGame(board);
-        assertEquals(1, CharacterAbilityQuery.getCaptureContribution(game, character, leaderCell));
+        Position archerPosition = null;
+        for (Cell cell : board.getCells().values()) {
+            if (cell == leaderCell) {
+                continue;
+            }
+
+            if (archerPosition != null) {
+                board.getCell(archerPosition).setCharacter(null);
+            }
+            archerPosition = cell.getPosition();
+            Cell archerCell = board.getCell(archerPosition);
+            archerCell.setCharacter(archer);
+
+            assertEquals(
+                    archerCapturePositions.contains(archerPosition) ? 1 : 0,
+                    CharacterAbilityQuery.getCaptureContribution(leaderCell, archerCell)
+            );
+        }
     }
 
     @Test
     public void getCaptureContribution_shouldReturnTwoForAdjacentAssassin() {
         Board board = new Board();
 
-        Character character = createCharacter(CharacterType.Assassin, TeamColor.Black);
-
-        board.getCell(new Position(3, 2)).setCharacter(character);
+        Character assassin = createCharacter(CharacterType.Assassin, TeamColor.Black);
         Cell leaderCell = board.getCell(new Position(3, 3));
 
-        Game game = createTestGame(board);
-        assertEquals(CharacterAbilityQuery.LEADER_CAPTURE_VALUE, CharacterAbilityQuery.getCaptureContribution(game, character, leaderCell));
+        List<Position> adjacentPositions = List.of(
+                new Position(2, 2),
+                new Position(2, 3),
+                new Position(3, 2),
+                new Position(3, 4),
+                new Position(4, 2),
+                new Position(4, 3)
+        );
+
+        Position assassinPosition = null;
+        for (Cell cell : board.getCells().values()) {
+            if (cell == leaderCell) {
+                continue;
+            }
+
+            if (assassinPosition != null) {
+                board.getCell(assassinPosition).setCharacter(null);
+            }
+            assassinPosition = cell.getPosition();
+            Cell assassinCell = board.getCell(assassinPosition);
+            assassinCell.setCharacter(assassin);
+
+            assertEquals(
+                    adjacentPositions.contains(assassinPosition) ? 2 : 0,
+                    CharacterAbilityQuery.getCaptureContribution(leaderCell, assassinCell)
+            );
+        }
     }
 
     @Test
     public void getCaptureContribution_shouldReturnZeroForCub() {
         Board board = new Board();
 
-        Character character = createCharacter(CharacterType.Cub, TeamColor.Black);
-        board.getCell(new Position(3, 2)).setCharacter(character);
+        Character cub = createCharacter(CharacterType.Cub, TeamColor.Black);
         Cell leaderCell = board.getCell(new Position(3, 3));
 
-        Game game = createTestGame(board);
-        assertEquals(0, CharacterAbilityQuery.getCaptureContribution(game, character, leaderCell));
+        Position cubPosition = null;
+        for (Cell cell : board.getCells().values()) {
+            if (cell == leaderCell) {
+                continue;
+            }
+
+            if (cubPosition != null) {
+                board.getCell(cubPosition).setCharacter(null);
+            }
+            cubPosition = cell.getPosition();
+            Cell cubCell = board.getCell(cubPosition);
+            cubCell.setCharacter(cub);
+
+            assertEquals(0, CharacterAbilityQuery.getCaptureContribution(leaderCell, cubCell));
+        }
     }
 
     @Test
-    public void getCaptureContribution_shouldReturnZeroForNonAdjacentCharacter() {
+    public void getCaptureContribution_shouldThrowWhenCharacterCellIsEmpty() {
         Board board = new Board();
 
-        Character character = createCharacter(CharacterType.Acrobat, TeamColor.Black);
-        board.getCell(new Position(3, 1)).setCharacter(character);
+        Cell characterCell = board.getCell(new Position(3, 2));
         Cell leaderCell = board.getCell(new Position(3, 3));
 
-        Game game = createTestGame(board);
-
-        assertEquals(0, CharacterAbilityQuery.getCaptureContribution(game, character, leaderCell));
+        assertThrows(IllegalArgumentException.class, () ->
+                CharacterAbilityQuery.getCaptureContribution(leaderCell, characterCell)
+        );
     }
 
     @Test
@@ -284,7 +383,7 @@ public class CharacterAbilityQueryTest {
         board.getCell(new Position(0, 0)).setCharacter(vizier);
 
         Game game = createTestGame(board);
-        game.getRecruitedCharacters().add(vizier);
+        game.addRecruitedCharacter(TeamColor.Black, CharacterType.Vizier);
 
         List<CharacterPath> destinations = CharacterAbilityQuery.getNormalMovementPaths(game, leader);
         assertEquals(Direction.values().length * 3, destinations.size());

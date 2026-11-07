@@ -7,7 +7,6 @@ import androidx.annotation.NonNull;
 import com.leaders.gamelogic.actions.RecruitmentAction;
 import com.leaders.gamelogic.actions.RecruitmentActionMotion;
 import com.leaders.gamelogic.entities.Cell;
-import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.SelectableCharacterCard;
@@ -23,8 +22,7 @@ import java.util.List;
 import java.util.Set;
 
 public final class RecruitmentQuery {
-    public final static int FULL_TEAM_SIZE = 5; // Takes into account the leader
-    public final static int FULL_TEAM_WITHOUT_LEADER_SIZE = FULL_TEAM_SIZE - 1;
+    public final static int RECRUITED_TEAM_SIZE = 4; // Doesn't take the Leader into account
 
     private RecruitmentQuery() {
         throw new AssertionError("Cannot instantiate utility class");
@@ -47,7 +45,7 @@ public final class RecruitmentQuery {
      * Returns the number of cards that can be recruited during the current recruitment phase.
      */
     private static int getRecruitmentLimit(@NonNull Game game, @NonNull GameHistory gameHistory, @NonNull TeamColor teamColor) {
-        int recruitmentCount = getRecruitedCards(game, teamColor, false).size();
+        int recruitmentCount = game.getRecruitedCards(teamColor).size();
 
         // The 2nd player is allowed to recruit twice during their first recruitment phase.
         if (recruitmentCount < 2 && teamColor != gameHistory.getConfig().getFirstPlayer().getTeamColor()) {
@@ -55,7 +53,7 @@ public final class RecruitmentQuery {
         }
 
         // 1 card per phase can be recruited until the team is full.
-        return recruitmentCount < FULL_TEAM_WITHOUT_LEADER_SIZE ? 1 : 0;
+        return recruitmentCount < RECRUITED_TEAM_SIZE ? 1 : 0;
     }
 
     /**
@@ -113,25 +111,5 @@ public final class RecruitmentQuery {
                 CharacterCardSelectionStatus.Recruitable,
                 CharacterCardSelectionStatus.RecruitmentImpossible
         );
-    }
-
-    /**
-     * Returns the set of character cards already recruited by the given team.
-     *
-     * @param game the current game
-     * @param teamColor the team whose recruited characters are considered
-     * @param includeLeaders whether leader cards should be included
-     */
-    @NonNull
-    public static Set<CharacterCard> getRecruitedCards(@NonNull Game game, @NonNull TeamColor teamColor, boolean includeLeaders) {
-        Set<CharacterCard> teamRecruitmentCards = new HashSet<>();
-        for (Character character : game.getRecruitedCharacters()) {
-            if (character.getTeamColor() == teamColor &&
-                    (includeLeaders || !character.getCharacterType().getCharacterCard().isLeader())) {
-                teamRecruitmentCards.add(character.getCharacterType().getCharacterCard());
-            }
-        }
-
-        return teamRecruitmentCards;
     }
 }

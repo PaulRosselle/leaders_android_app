@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.actions.CharacterActionMotion;
 import com.leaders.gamelogic.actions.CharacterActionTarget;
+import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
@@ -221,7 +222,8 @@ public final class NemesisBlocker {
 
         List<Character> characters = new ArrayList<>();
 
-        for (Character character : game.getRecruitedCharacters()) {
+        for (Cell characterCell : BoardQuery.findCharacterCells(game.getBoard(), null, null)) {
+            Character character = characterCell.getCharacter();
             if (CharacterAbilityQuery.canAct(currentActionsPhase, character)) {
                 characters.add(character);
             }
