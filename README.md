@@ -2,7 +2,7 @@
 
 Leaders is a digital adaptation of the *Leaders* board game, currently in active development.
 
-> ⚠️ **Status**: Under active development, no stable release yet.
+> ⚠️ **Status**: Under active development, version `1.0.0` release planned for 14 november 2026.
 
 ## About
 
@@ -41,6 +41,7 @@ This project follows [Semantic Versioning](https://semver.org/) (`MAJOR.MINOR.PA
 | `0.8.0` | Settings |
 | `0.9.0` | Stabilization, end-to-end tests |
 | `1.0.0` | Stable version |
+| `1.1.0` | Vermilion Expansion |
 
 See the [Milestones](https://github.com/PaulRosselle/leaders_android_app/milestones) page for live progress.
 
