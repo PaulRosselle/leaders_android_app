@@ -18,7 +18,7 @@ public final class PuzzleRulesView extends androidx.appcompat.widget.AppCompatTe
         setBackgroundResource(R.drawable.round_rect_gloden_outline_bg);
 
         setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimensionPixelSize(R.dimen.puzzle_rules_text_font_size));
-        setTypeface(ResourcesCompat.getFont(context, R.font.bourbon_test_regular));
+        setTypeface(ResourcesCompat.getFont(context, R.font.bourbon_regular));
         setTextColor(getContext().getColor(R.color.font));
         setIncludeFontPadding(false);
         setGravity(Gravity.CENTER);
