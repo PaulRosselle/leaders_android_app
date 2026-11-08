@@ -36,7 +36,7 @@
         android:backgroundTint="@color/transparent"
         android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 "
         android:ems="10"
-        android:fontFamily="@font/bourbon_test_regular"
+        android:fontFamily="@font/bourbon_regular"
         android:foreground="@drawable/round_rect_stroke"
         android:foregroundTint="@color/darker_font"
         android:importantForAutofill="no"

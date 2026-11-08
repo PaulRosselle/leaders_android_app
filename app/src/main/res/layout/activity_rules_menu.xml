@@ -54,7 +54,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:fontFamily="@font/bourbon_test_regular"
+        android:fontFamily="@font/bourbon_regular"
         android:text="@string/game_rules"
         android:textAllCaps="false"
         android:textColor="@color/app_golden"

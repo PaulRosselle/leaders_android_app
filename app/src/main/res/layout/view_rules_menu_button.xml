@@ -43,7 +43,7 @@
         android:autoSizeMinTextSize="14dp"
         android:autoSizeStepGranularity="1dp"
         android:autoSizeTextType="uniform"
-        android:fontFamily="@font/bourbon_test_regular"
+        android:fontFamily="@font/bourbon_regular"
         android:gravity="center"
         android:paddingStart="8dp"
         android:text="@string/learn_using_the_tutorial"
