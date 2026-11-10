@@ -108,6 +108,11 @@ public final class CharacterAbilityQuery {
             case Assassin: {
                 return getLeaderDistance(enemyLeaderCell, characterCell) == 1 ? LEADER_CAPTURE_VALUE : 0;
             }
+            // The elite archer takes part in the capture in a straight line under 2 cells
+            case EliteArcher: {
+                return isLeaderAligned(enemyLeaderCell, characterCell) &&
+                        getLeaderDistance(enemyLeaderCell, characterCell) <= 2 ? 1 : 0;
+            }
             case Sniper: {
                 int leaderDistance = getLeaderDistance(enemyLeaderCell, characterCell);
 

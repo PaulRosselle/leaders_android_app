@@ -112,7 +112,8 @@ public class CharacterAbilityQueryTest {
         // Character who have specific capture rules are not tested here
         List<CharacterType> excludedCharacters = List.of(
                 CharacterType.Archer,
-                CharacterType.Assassin
+                CharacterType.Assassin,
+                CharacterType.EliteArcher
         );
 
         for (CharacterType characterType : CharacterType.values()) {
@@ -193,6 +194,88 @@ public class CharacterAbilityQueryTest {
             );
         }
     }
+
+
+    @Test
+    public void getCaptureContribution_shouldReturnOneForAlignedEliteArcherAtDistanceOne() {
+        Board board = new Board();
+
+        Character eliteArcher = createCharacter(CharacterType.EliteArcher, TeamColor.Black);
+        Cell leaderCell = board.getCell(new Position(3, 3));
+        Cell eliteArcherCell = board.getCell(new Position(3, 2));
+
+        eliteArcherCell.setCharacter(eliteArcher);
+
+        assertEquals(
+                1,
+                CharacterAbilityQuery.getCaptureContribution(
+                        leaderCell,
+                        eliteArcherCell,
+                        getCurrentPhase(GamePhaseType.Actions)
+                )
+        );
+    }
+
+    @Test
+    public void getCaptureContribution_shouldReturnOneForAlignedEliteArcherAtDistanceTwo() {
+        Board board = new Board();
+
+        Character eliteArcher = createCharacter(CharacterType.EliteArcher, TeamColor.Black);
+        Cell leaderCell = board.getCell(new Position(3, 3));
+        Cell eliteArcherCell = board.getCell(new Position(3, 1));
+
+        eliteArcherCell.setCharacter(eliteArcher);
+
+        assertEquals(
+                1,
+                CharacterAbilityQuery.getCaptureContribution(
+                        leaderCell,
+                        eliteArcherCell,
+                        getCurrentPhase(GamePhaseType.Actions)
+                )
+        );
+    }
+
+    @Test
+    public void getCaptureContribution_shouldReturnZeroForUnalignedEliteArcherAtDistanceTwo() {
+        Board board = new Board();
+
+        Character eliteArcher = createCharacter(CharacterType.EliteArcher, TeamColor.Black);
+        Cell leaderCell = board.getCell(new Position(3, 3));
+        Cell eliteArcherCell = board.getCell(new Position(2, 1));
+
+        eliteArcherCell.setCharacter(eliteArcher);
+
+        assertEquals(
+                0,
+                CharacterAbilityQuery.getCaptureContribution(
+                        leaderCell,
+                        eliteArcherCell,
+                        getCurrentPhase(GamePhaseType.Actions)
+                )
+        );
+    }
+
+    @Test
+    public void getCaptureContribution_shouldReturnZeroForAlignedEliteArcherAtDistanceThree() {
+        Board board = new Board();
+
+        Character eliteArcher = createCharacter(CharacterType.EliteArcher, TeamColor.Black);
+        Cell leaderCell = board.getCell(new Position(3, 3));
+        Cell eliteArcherCell = board.getCell(new Position(3, 0));
+
+        eliteArcherCell.setCharacter(eliteArcher);
+
+        assertEquals(
+                0,
+                CharacterAbilityQuery.getCaptureContribution(
+                        leaderCell,
+                        eliteArcherCell,
+                        getCurrentPhase(GamePhaseType.Actions)
+                )
+        );
+    }
+
 
     @Test
     public void getCaptureContribution_shouldReturnTwoForAdjacentAssassin() {

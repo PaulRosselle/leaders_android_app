@@ -50,10 +50,13 @@ public enum CharacterExpansion {
             case RoyalGuard:
             case Vizier:
             case Wanderer:
+            case EliteArcher:
                 return BASE_GAME;
 
-            case Wisp:
+            case LeaderVermilion:
             case Sniper:
+            case Tactician:
+            case Wisp:
                 // TODO - update during 1.1.0-beta.1
                 return VERMILION;
 

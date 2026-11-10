@@ -27,7 +27,8 @@ public enum CharacterType {
     LeaderVermilion,
     Sniper,
     Tactician,
-    Wisp;
+    Wisp,
+    EliteArcher;
 
     /**
      * Returns the {@link CharacterCard} corresponding to this character type.
@@ -61,6 +62,7 @@ public enum CharacterType {
             case Sniper: return CharacterCard.Sniper;
             case Tactician: return CharacterCard.Tactician;
             case Wisp: return CharacterCard.Wisp;
+            case EliteArcher: return CharacterCard.EliteArcher;
             default: throw new NoSuchElementException(String.format("No character card found matching %s", this));
         }
     }
