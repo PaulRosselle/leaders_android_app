@@ -20,7 +20,8 @@ public enum CharacterCard {
     Rider,
     RoyalGuard,
     Vizier,
-    Wanderer;
+    Wanderer,
+    Wisp;
 
     /**
      * Returns the ability types associated with this character card.
@@ -48,6 +49,7 @@ public enum CharacterCard {
                 return new AbilityType[] { AbilityType.Passive };
             case HermitAndCub:
             case Nemesis:
+            case Wisp:
                 return new AbilityType[] { AbilityType.Special };
             case LeaderKing:
             case LeaderQueen:

@@ -23,7 +23,8 @@ public enum CharacterType {
     Rider,
     RoyalGuard,
     Vizier,
-    Wanderer;
+    Wanderer,
+    Wisp;
 
     /**
      * Returns the {@link CharacterCard} corresponding to this character type.
@@ -53,6 +54,7 @@ public enum CharacterType {
             case RoyalGuard: return CharacterCard.RoyalGuard;
             case Vizier: return CharacterCard.Vizier;
             case Wanderer: return CharacterCard.Wanderer;
+            case Wisp: return CharacterCard.Wisp;
             default: throw new NoSuchElementException(String.format("No character card found matching %s", this));
         }
     }
@@ -71,5 +73,10 @@ public enum CharacterType {
             }
         }
         return matchingTypes;
+    }
+
+    // TODO - javadoc
+    public boolean canCapture() {
+        return this != Cub && this != Wisp;
     }
 }

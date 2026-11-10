@@ -51,12 +51,12 @@ public class CharacterAbilityQueryTest {
         // Character who have specific capture rules are not tested here
         List<CharacterType> excludedCharacters = List.of(
                 CharacterType.Archer,
-                CharacterType.Assassin,
-                CharacterType.Cub
+                CharacterType.Assassin
         );
 
         for (CharacterType characterType : CharacterType.values()) {
-            if (excludedCharacters.contains(characterType)) {
+            // Characters unable to capture are also excluded
+            if (!characterType.canCapture() || excludedCharacters.contains(characterType)) {
                 continue;
             }
 
@@ -170,26 +170,32 @@ public class CharacterAbilityQueryTest {
     }
 
     @Test
-    public void getCaptureContribution_shouldReturnZeroForCub() {
+    public void getCaptureContribution_shouldReturnZeroWhenCanCaptureIsFalse() {
         Board board = new Board();
 
-        Character cub = createCharacter(CharacterType.Cub, TeamColor.Black);
-        Cell leaderCell = board.getCell(new Position(3, 3));
-
-        Position cubPosition = null;
-        for (Cell cell : board.getCells().values()) {
-            if (cell == leaderCell) {
+        for (CharacterType characterType : CharacterType.values()) {
+            if (characterType.canCapture()) {
                 continue;
             }
 
-            if (cubPosition != null) {
-                board.getCell(cubPosition).setCharacter(null);
-            }
-            cubPosition = cell.getPosition();
-            Cell cubCell = board.getCell(cubPosition);
-            cubCell.setCharacter(cub);
+            Character character = createCharacter(characterType, TeamColor.Black);
+            Cell leaderCell = board.getCell(new Position(3, 3));
 
-            assertEquals(0, CharacterAbilityQuery.getCaptureContribution(leaderCell, cubCell));
+            Position characterPosition = null;
+            for (Cell cell : board.getCells().values()) {
+                if (cell == leaderCell) {
+                    continue;
+                }
+
+                if (characterPosition != null) {
+                    board.getCell(characterPosition).setCharacter(null);
+                }
+                characterPosition = cell.getPosition();
+                Cell characterCell = board.getCell(characterPosition);
+                characterCell.setCharacter(character);
+
+                assertEquals(0, CharacterAbilityQuery.getCaptureContribution(leaderCell, characterCell));
+            }
         }
     }
 
