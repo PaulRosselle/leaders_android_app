@@ -145,6 +145,7 @@ public final class PortraitView extends AppCompatImageView {
                 return R.drawable.card_portrait_vizier;
             }
             case Wanderer: return R.drawable.card_portrait_wanderer;
+            case Wisp: return R.drawable.card_portrait_wisp;
             default: throw new IllegalArgumentException("No portrait drawable for card: " + info.getCard());
         }
     }
@@ -182,6 +183,7 @@ public final class PortraitView extends AppCompatImageView {
                 return R.drawable.card_portrait_banned_vizier;
             }
             case Wanderer: return R.drawable.card_portrait_banned_wanderer;
+            case Wisp: return R.drawable.card_portrait_banned_wisp;
             default: throw new IllegalArgumentException("No portrait drawable for card: " + info.getCard());
         }
     }
@@ -225,6 +227,7 @@ public final class PortraitView extends AppCompatImageView {
                 return R.drawable.card_hex_portrait_vizier;
             }
             case Wanderer: return R.drawable.card_hex_portrait_wanderer;
+            case Wisp: return R.drawable.card_hex_portrait_wisp;
             default: throw new IllegalArgumentException("No portrait drawable for card: " + info.getCard());
         }
     }
@@ -262,6 +265,7 @@ public final class PortraitView extends AppCompatImageView {
                 return R.drawable.card_hex_portrait_banned_vizier;
             }
             case Wanderer: return R.drawable.card_hex_portrait_banned_wanderer;
+            case Wisp: return R.drawable.card_hex_portrait_banned_wisp;
             default: throw new IllegalArgumentException("No hex portrait drawable for card: " + info.getCard());
         }
     }

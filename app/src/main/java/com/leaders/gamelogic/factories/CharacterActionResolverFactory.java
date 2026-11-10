@@ -16,6 +16,7 @@ import com.leaders.gamelogic.resolvers.characters.NemesisActionResolver;
 import com.leaders.gamelogic.resolvers.characters.RiderActionResolver;
 import com.leaders.gamelogic.resolvers.characters.RoyalGuardActionResolver;
 import com.leaders.gamelogic.resolvers.characters.WandererActionResolver;
+import com.leaders.gamelogic.resolvers.characters.WispActionResolver;
 
 public final class CharacterActionResolverFactory {
     private CharacterActionResolverFactory(){
@@ -36,6 +37,7 @@ public final class CharacterActionResolverFactory {
             case Rider: return new RiderActionResolver(game, gameHistory, character);
             case RoyalGuard: return new RoyalGuardActionResolver(game, gameHistory, character);
             case Wanderer: return new WandererActionResolver(game, gameHistory, character);
+            case Wisp: return new WispActionResolver(game, gameHistory, character);
             default: return new CharacterActionResolver(game, gameHistory, character);
         }
     }

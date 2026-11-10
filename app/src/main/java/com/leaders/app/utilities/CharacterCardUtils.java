@@ -60,6 +60,7 @@ public final  class CharacterCardUtils {
             case RoyalGuard: return R.string.card_name_royal_guard;
             case Vizier: return R.string.card_name_vizier;
             case Wanderer: return R.string.card_name_wanderer;
+            case Wisp: return R.string.card_name_wisp;
             default: throw new IllegalArgumentException("No name found for character card: " + characterCard);
         }
     }
@@ -85,6 +86,7 @@ public final  class CharacterCardUtils {
             case RoyalGuard: return R.string.card_formatted_name_royal_guard;
             case Vizier: return R.string.card_formatted_name_vizier;
             case Wanderer: return R.string.card_formatted_name_wanderer;
+            case Wisp: return R.string.card_formatted_name_wisp;
             default: throw new IllegalArgumentException("No formatted name found for character card: " + characterCard);
         }
     }
@@ -110,6 +112,7 @@ public final  class CharacterCardUtils {
             case RoyalGuard: return R.string.card_description_royal_guard;
             case Vizier: return R.string.card_description_vizier;
             case Wanderer: return R.string.card_description_wanderer;
+            case Wisp: return R.string.card_description_wisp;
             default: throw new IllegalArgumentException("No name found for character card: " + characterCard);
         }
     }

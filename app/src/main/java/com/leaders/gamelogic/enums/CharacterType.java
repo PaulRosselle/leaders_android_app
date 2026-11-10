@@ -75,7 +75,11 @@ public enum CharacterType {
         return matchingTypes;
     }
 
-    // TODO - javadoc
+    /**
+     * Checks whether this character type can capture.
+     *
+     * @return {@code true} if this type can capture, otherwise {@code false}
+     */
     public boolean canCapture() {
         return this != Cub && this != Wisp;
     }
