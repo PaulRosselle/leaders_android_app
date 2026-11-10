@@ -21,8 +21,9 @@ public enum CharacterCard {
     RoyalGuard,
     Vizier,
     Wanderer,
-    Wisp,
-    Sniper;
+    LeaderVermilion,
+    Sniper,
+    Wisp;
 
     /**
      * Returns the ability types associated with this character card.
@@ -55,6 +56,7 @@ public enum CharacterCard {
                 return new AbilityType[] { AbilityType.Special };
             case LeaderKing:
             case LeaderQueen:
+            case LeaderVermilion:
                 return new AbilityType[0];
             default: throw new NoSuchElementException(String.format("No ability type found matching %s", this));
         }
@@ -62,7 +64,7 @@ public enum CharacterCard {
 
     /** Indicates whether this character card is a leader.*/
     public boolean isLeader() {
-        return this == LeaderKing || this == LeaderQueen;
+        return this == LeaderKing || this == LeaderQueen || this == LeaderVermilion;
     }
 
     /** Indicates whether this character card can be recruited.*/
