@@ -45,8 +45,9 @@ public final  class CharacterCardUtils {
             case RoyalGuard: return R.string.card_name_royal_guard;
             case Vizier: return R.string.card_name_vizier;
             case Wanderer: return R.string.card_name_wanderer;
-            case Wisp: return R.string.card_name_wisp;
+            case LeaderVermilion: return R.string.card_name_leader_vermilion;
             case Sniper: return R.string.card_name_sniper;
+            case Wisp: return R.string.card_name_wisp;
             default: throw new IllegalArgumentException("No name found for character card: " + characterCard);
         }
     }
@@ -65,6 +66,7 @@ public final  class CharacterCardUtils {
             case Jailer: return R.string.card_formatted_name_jailer;
             case LeaderKing:
             case LeaderQueen:
+            case LeaderVermilion:
                 return R.string.card_formatted_name_leader;
             case Manipulator: return R.string.card_formatted_name_manipulator;
             case Nemesis: return R.string.card_formatted_name_nemesis;
@@ -73,8 +75,8 @@ public final  class CharacterCardUtils {
             case RoyalGuard: return R.string.card_formatted_name_royal_guard;
             case Vizier: return R.string.card_formatted_name_vizier;
             case Wanderer: return R.string.card_formatted_name_wanderer;
-            case Wisp: return R.string.card_formatted_name_wisp;
             case Sniper: return R.string.card_formatted_name_sniper;
+            case Wisp: return R.string.card_formatted_name_wisp;
             default: throw new IllegalArgumentException("No formatted name found for character card: " + characterCard);
         }
     }
@@ -93,6 +95,7 @@ public final  class CharacterCardUtils {
             case Jailer: return R.string.card_description_jailer;
             case LeaderKing:
             case LeaderQueen:
+            case LeaderVermilion:
                 return R.string.card_description_leader;
             case Manipulator: return R.string.card_description_manipulator;
             case Nemesis: return R.string.card_description_nemesis;
@@ -101,8 +104,8 @@ public final  class CharacterCardUtils {
             case RoyalGuard: return R.string.card_description_royal_guard;
             case Vizier: return R.string.card_description_vizier;
             case Wanderer: return R.string.card_description_wanderer;
-            case Wisp: return R.string.card_description_wisp;
             case Sniper: return R.string.card_description_sniper;
+            case Wisp: return R.string.card_description_wisp;
             default: throw new IllegalArgumentException("No name found for character card: " + characterCard);
         }
     }
@@ -148,8 +151,9 @@ public final  class CharacterCardUtils {
                 return R.drawable.card_portrait_vizier;
             }
             case Wanderer: return R.drawable.card_portrait_wanderer;
-            case Wisp: return R.drawable.card_portrait_wisp;
+            case LeaderVermilion: return R.drawable.card_portrait_leader_vermilion;
             case Sniper: return R.drawable.card_portrait_sniper;
+            case Wisp: return R.drawable.card_portrait_wisp;
             default: throw new IllegalArgumentException("No portrait drawable for card: " + card);
         }
     }
@@ -189,9 +193,9 @@ public final  class CharacterCardUtils {
                 return R.drawable.card_portrait_banned_vizier;
             }
             case Wanderer: return R.drawable.card_portrait_banned_wanderer;
-            case Wisp: return R.drawable.card_portrait_banned_wisp;
             case Sniper: return R.drawable.card_portrait_banned_sniper;
-            default: throw new IllegalArgumentException("No portrait drawable for card: " + card);
+            case Wisp: return R.drawable.card_portrait_banned_wisp;
+            default: throw new IllegalArgumentException("No banned portrait drawable for card: " + card);
         }
     }
 
@@ -232,8 +236,9 @@ public final  class CharacterCardUtils {
                 return R.drawable.card_hex_portrait_vizier;
             }
             case Wanderer: return R.drawable.card_hex_portrait_wanderer;
-            case Wisp: return R.drawable.card_hex_portrait_wisp;
+            case LeaderVermilion: return R.drawable.card_hex_portrait_leader_vermilion;
             case Sniper: return R.drawable.card_hex_portrait_sniper;
+            case Wisp: return R.drawable.card_hex_portrait_wisp;
             default: throw new IllegalArgumentException("No portrait hex drawable for card: " + card);
         }
     }
@@ -273,9 +278,9 @@ public final  class CharacterCardUtils {
                 return R.drawable.card_hex_portrait_banned_vizier;
             }
             case Wanderer: return R.drawable.card_hex_portrait_banned_wanderer;
-            case Wisp: return R.drawable.card_hex_portrait_banned_wisp;
             case Sniper: return R.drawable.card_hex_portrait_banned_sniper;
-            default: throw new IllegalArgumentException("No hex portrait drawable for card: " + card);
+            case Wisp: return R.drawable.card_hex_portrait_banned_wisp;
+            default: throw new IllegalArgumentException("No banned portrait hex drawable for card: " + card);
         }
     }
 
@@ -300,8 +305,9 @@ public final  class CharacterCardUtils {
             case RoyalGuard: return R.drawable.character_artwork_royal_guard;
             case Vizier: return R.drawable.character_artwork_vizier;
             case Wanderer: return R.drawable.character_artwork_wanderer;
-            case Wisp: return R.drawable.character_artwork_wisp;
+            case LeaderVermilion: return R.drawable.character_artwork_leader_vermilion;
             case Sniper: return R.drawable.character_artwork_sniper;
+            case Wisp: return R.drawable.character_artwork_wisp;
             default: throw new IllegalArgumentException("No formatted name found for character card: " + characterCard);
         }
     }
@@ -362,8 +368,9 @@ public final  class CharacterCardUtils {
             case RoyalGuard: return R.raw.character_demo_royal_guard;
             case Vizier: return R.raw.character_demo_vizier;
             case Wanderer: return R.raw.character_demo_wanderer;
-            case Wisp: return R.raw.character_demo_wisp;
+            case LeaderVermilion: return R.raw.character_demo_leader_vermilion;
             case Sniper: return R.raw.character_demo_sniper;
+            case Wisp: return R.raw.character_demo_wisp;
             default: throw new IllegalStateException("No character demo file found for character card: " + characterCard);
         }
     }
