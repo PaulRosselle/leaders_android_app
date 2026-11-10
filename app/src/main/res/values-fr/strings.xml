@@ -344,4 +344,5 @@
     <string name="card_name_sniper">sniper</string>
     <string name="card_formatted_name_sniper">SNiPER</string>
     <string name="card_description_sniper">Au début de votre tour, capture le leader adverse seul s\'il est à une distance de trois cases ou plus, en ligne droite, même s\'il n\'est pas visible.</string>
+    <string name="demo_defeat_subtitle">Le leader adverse n\'est pas capturé</string>
 </resources>
