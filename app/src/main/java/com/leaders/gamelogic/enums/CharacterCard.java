@@ -24,7 +24,8 @@ public enum CharacterCard {
     LeaderVermilion,
     Sniper,
     Tactician,
-    Wisp;
+    Wisp,
+    EliteArcher;
 
     /**
      * Returns the ability types associated with this character card.
@@ -51,6 +52,7 @@ public enum CharacterCard {
             case Protector:
             case Vizier:
             case Sniper:
+            case EliteArcher:
                 return new AbilityType[] { AbilityType.Passive };
             case HermitAndCub:
             case Nemesis:

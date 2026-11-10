@@ -350,10 +350,13 @@
     <string name="card_description_wisp">Move to any empty space on the board. Cannot help capture the opponent\'s Leader.</string>
     <string name="card_name_sniper">sniper</string>
     <string name="card_formatted_name_sniper">SNiPER</string>
-    <string name="card_description_sniper">At the start of your turn, the Sniper Captures alone the opponent\'s Leader from three or more spaces away in a straight line, even if the Leader is not visible.</string>
+    <string name="card_description_sniper">At the start of your turn, the Sniper captures alone the opponent\'s Leader from three or more spaces away in a straight line, even if the Leader is not visible.</string>
     <string name="demo_defeat_subtitle">Opponent leader not captured</string>
     <string name="card_name_leader_vermilion">vermilion emperor</string>
     <string name="card_name_tactician">tactician</string>
     <string name="card_formatted_name_tactician">TACtiCAn</string>
     <string name="card_description_tactician">If an ally (Tactician included) is adjacent to the opponent\'s Leader, the Tactician moves a non-Leader ally by one space. The relocated ally can no longer use their active ability this turn.</string>
+    <string name="card_name_elite_archer">elite archer</string>
+    <string name="card_formatted_name_elite_archer">ELiTE ARcHER</string>
+    <string name="card_description_elite_archer">Also helps capture the oppponent\'s leader from two spaces away in a straight line, even if they are not visible.</string>
 </resources>
