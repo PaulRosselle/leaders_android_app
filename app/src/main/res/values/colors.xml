@@ -34,4 +34,6 @@
     <color name="difficulty_easy">#B8B221</color>
     <color name="difficulty_hard">#E67409</color>
     <color name="difficulty_extreme">#C34200</color>
+    <color name="expansion_base_game">#11A2A7</color>
+    <color name="expansion_vermilion">#B14285</color>
 </resources>
