@@ -10,9 +10,10 @@ import androidx.appcompat.content.res.AppCompatResources;
 
 import com.leaders.R;
 import com.leaders.app.enums.CharacterSkinType;
-import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.TeamColor;
+
+import java.util.Objects;
 
 public class CharacterPiece {
     @Nullable
@@ -30,22 +31,9 @@ public class CharacterPiece {
         this.teamColor = teamColor;
     }
 
-    public CharacterPiece(@NonNull Character character,
-                          @NonNull CharacterSkinType skinType) {
-        this.characterType = character.getCharacterType();
-        this.skinType = skinType;
-        this.teamColor = character.getTeamColor();
-    }
-
-
     @Nullable
     public CharacterType getCharacterType() {
         return characterType;
-    }
-
-    @NonNull
-    public CharacterSkinType getSkinType() {
-        return skinType;
     }
 
     @NonNull
@@ -56,13 +44,15 @@ public class CharacterPiece {
     @NonNull
     public Drawable getDrawable(@NonNull Context context) {
 
-        boolean hasCharacter = characterType == null;
+        boolean hasNoCharacter = characterType == null;
         // Without a character, the alt white piece is used since it has a better contrast
         Drawable teamColorDrawable = AppCompatResources.getDrawable(
-                context, getTeamColorResId(teamColor, hasCharacter)
+                context, getTeamColorResId(teamColor, hasNoCharacter)
         );
-        if (hasCharacter) {
-            return teamColorDrawable;
+        if (hasNoCharacter) {
+            return Objects.requireNonNull(teamColorDrawable,
+                    "No character piece drawable found for team color: " + teamColor
+            );
         }
 
         Drawable characterDrawable = AppCompatResources.getDrawable(
@@ -139,6 +129,7 @@ public class CharacterPiece {
                 return R.drawable.character_piece_vizier;
             }
             case Wanderer: return R.drawable.character_piece_wanderer;
+            case Wisp: return R.drawable.character_piece_wisp;
             default: throw new IllegalArgumentException("No drawable found for character: " + characterType);
         }
 

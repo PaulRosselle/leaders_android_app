@@ -190,6 +190,7 @@ public final class RulesCharacterDemoActivity extends PlayableActivity {
             case RoyalGuard: return R.drawable.character_artwork_royal_guard;
             case Vizier: return R.drawable.character_artwork_vizier;
             case Wanderer: return R.drawable.character_artwork_wanderer;
+            case Wisp: return R.drawable.character_artwork_wisp;
             default: throw new IllegalArgumentException("No formatted name found for character card: " + characterCard);
         }
     }

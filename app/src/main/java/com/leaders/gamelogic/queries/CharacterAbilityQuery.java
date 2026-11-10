@@ -13,8 +13,6 @@ import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.AbilityType;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
-import com.leaders.gamelogic.enums.Direction;
-import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.historyentries.segments.ActionsPhase;
 
 import java.util.Arrays;
@@ -88,6 +86,10 @@ public final class CharacterAbilityQuery {
             throw new IllegalArgumentException("Invalid capture cell, no character: " + characterCell.getPosition());
         }
 
+        if (!characterCell.getCharacter().getCharacterType().canCapture()) {
+            return 0;
+        }
+
         switch (characterCell.getCharacter().getCharacterType()) {
             // The archer only takes part in the capture in a straight line from a distance of two
             case Archer: {
@@ -98,8 +100,6 @@ public final class CharacterAbilityQuery {
             case Assassin: {
                 return getLeaderDistance(enemyLeaderCell, characterCell) == 1 ? LEADER_CAPTURE_VALUE : 0;
             }
-            // The cub never takes part to the capture
-            case Cub: return 0;
             // By default, a character count as 1 and must be adjacent to be taken into account
             default: return getLeaderDistance(enemyLeaderCell, characterCell) == 1 ? 1 : 0;
         }
@@ -212,35 +212,6 @@ public final class CharacterAbilityQuery {
         return false;
     }
 
-
-    /**
-     * Checks whether a character matching the given type and team color is adjacent
-     * to the reference character.
-     *
-     * @param game the current game state
-     * @param refCharacter the character used as the position reference
-     * @param searchedCharacterType the character type to search for
-     * @param searchedTeamColor the team color to search for
-     * @return {@code true} if a matching adjacent character exists, {@code false} otherwise
-     */
-    private static boolean hasAdjacentCharacter(@NonNull Game game, @NonNull Character refCharacter,
-                                                @NonNull CharacterType searchedCharacterType,
-                                                @NonNull TeamColor searchedTeamColor) {
-        Cell characterCell = BoardQuery.getCellByCharacterId(game.getBoard(), refCharacter.getId());
-        for (Direction direction : Direction.values()) {
-            Position adjacentPos = characterCell.getPosition().adjacent(direction);
-            if (adjacentPos != null) {
-                Character adjacentCharacter = game.getBoard().getCell(adjacentPos).getCharacter();
-                if (adjacentCharacter != null &&
-                        adjacentCharacter.getCharacterType() == searchedCharacterType &&
-                        adjacentCharacter.getTeamColor() == searchedTeamColor) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     /**
      * Checks whether a character can use their active ability.
      * <p>
@@ -259,7 +230,12 @@ public final class CharacterAbilityQuery {
 
         // Then, their ability activation must not be prevented by a passive ability :
         // 1. Passive ability - Jailer prevents adjacent opponents active ability use
-        return !hasAdjacentCharacter(game, character, CharacterType.Jailer, character.getTeamColor().getOpposite());
+        Cell characterCell = BoardQuery.getCellByCharacterId(game.getBoard(), character.getId());
+        return BoardQuery.getAdjacentCells(game.getBoard(), characterCell.getPosition(),
+                cell -> cell.getCharacter() != null &&
+                        cell.getCharacter().getCharacterType() == CharacterType.Jailer &&
+                        cell.getCharacter().getTeamColor() != character.getTeamColor()
+        ).isEmpty();
     }
 
     /**
@@ -275,8 +251,16 @@ public final class CharacterAbilityQuery {
     public static boolean canBeMovedByEnemyAbilities(@NonNull Game game,
                                                      @NonNull Character character) {
         // The protector prevents himself and its adjacent allies to be moved by enemy abilities
-        return !(character.getCharacterType() == CharacterType.Protector) &&
-                !hasAdjacentCharacter(game, character, CharacterType.Protector, character.getTeamColor());
+        if (character.getCharacterType() == CharacterType.Protector) {
+            return false;
+        }
+
+        Cell characterCell = BoardQuery.getCellByCharacterId(game.getBoard(), character.getId());
+        return BoardQuery.getAdjacentCells(game.getBoard(), characterCell.getPosition(),
+                cell -> cell.getCharacter() != null &&
+                        cell.getCharacter().getCharacterType() == CharacterType.Protector &&
+                        cell.getCharacter().getTeamColor() == character.getTeamColor()
+        ).isEmpty();
     }
 
     /**

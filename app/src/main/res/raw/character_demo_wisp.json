@@ -1,0 +1,190 @@
+{
+  "config": {
+    "players": [
+      {
+        "team_color": "Black",
+        "name": "Player"
+      },
+      {
+        "team_color": "White",
+        "name": "Puzzle"
+      }
+    ],
+    "first_player": {
+      "team_color": "Black",
+      "name": "Player"
+    },
+    "game_mode": "Puzzle",
+    "initial_recruitable_cards": [],
+    "initial_placements": [
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "a4f605be-b236-4a5c-b8a1-ade9b130f285",
+              "character_type": "Hermit",
+              "team_color": "White"
+            },
+            "position": {
+              "x": 5,
+              "y": 1
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "26ec1203-b275-46aa-9907-1e5df2b4e6e4",
+              "character_type": "Wisp",
+              "team_color": "Black"
+            },
+            "position": {
+              "x": 3,
+              "y": 4
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "a9ba51a0-46aa-4b4a-9fda-643e9890eb5e",
+              "character_type": "LeaderQueen",
+              "team_color": "White"
+            },
+            "position": {
+              "x": 6,
+              "y": 0
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "c517ebd1-75e4-44d6-977d-820f5c867792",
+              "character_type": "Cub",
+              "team_color": "White"
+            },
+            "position": {
+              "x": 6,
+              "y": 1
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "cf494da4-d685-48e6-bae9-1485229be177",
+              "character_type": "RoyalGuard",
+              "team_color": "White"
+            },
+            "position": {
+              "x": 4,
+              "y": 0
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "747699ee-effd-40f5-8201-21b03b6cbbec",
+              "character_type": "LeaderKing",
+              "team_color": "Black"
+            },
+            "position": {
+              "x": 6,
+              "y": 2
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "83a4ec3f-ec67-4711-a34f-b4150ca8a949",
+              "character_type": "Protector",
+              "team_color": "White"
+            },
+            "position": {
+              "x": 4,
+              "y": 1
+            }
+          }
+        ],
+        "type": "Recruitment"
+      }
+    ]
+  },
+  "entries": [
+    {
+      "team_color": "Black",
+      "turn_start_phase": {
+        "start_action": {
+          "transition_type": "Start",
+          "transition_target": "TurnStartPhase"
+        },
+        "end_action": {
+          "transition_type": "End",
+          "transition_target": "TurnStartPhase"
+        },
+        "turn_team_color": "Black",
+        "actions": []
+      },
+      "actions_phase": {
+        "start_action": {
+          "transition_type": "Start",
+          "transition_target": "ActionsPhase"
+        },
+        "turn_team_color": "Black",
+        "actions": [
+          {
+            "comment": "This action is an unplayable dummy to prevent this character to move",
+            "src_character": {
+              "uuid": "747699ee-effd-40f5-8201-21b03b6cbbec",
+              "character_type": "LeaderKing",
+              "team_color": "Black"
+            },
+            "motions": [
+              {
+                "motion_type": "Add",
+                "targets": []
+              }
+            ]
+          }
+        ]
+      },
+      "recruitment_phase": {
+        "turn_team_color": "Black",
+        "actions": []
+      },
+      "turn_end_phase": {
+        "turn_team_color": "Black",
+        "actions": []
+      },
+      "type": "turn"
+    }
+  ]
+}

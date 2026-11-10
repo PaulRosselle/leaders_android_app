@@ -638,6 +638,7 @@ public final class JsonUtils {
             case RoyalGuard: return R.raw.character_demo_royal_guard;
             case Vizier: return R.raw.character_demo_vizier;
             case Wanderer: return R.raw.character_demo_wanderer;
+            case Wisp: return R.raw.character_demo_wisp;
             default: throw new IllegalStateException("No character demo file found for character card: " + characterCard);
         }
     }
