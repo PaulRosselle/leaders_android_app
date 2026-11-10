@@ -255,7 +255,6 @@ public final class BoardQuery {
         throw new NoSuchElementException("Character not found on the board");
     }
 
-    // TODO - add unit tests
     /**
      * Gets the character at the given position.
      *
@@ -271,7 +270,6 @@ public final class BoardQuery {
         );
     }
 
-    // TODO - add unit tests
     /**
      * Gets the adjacent cells that match the given predicate.
      *

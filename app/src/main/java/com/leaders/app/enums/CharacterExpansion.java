@@ -31,7 +31,33 @@ public enum CharacterExpansion {
 
     @NonNull
     public static CharacterExpansion getFromCard(@NonNull CharacterCard card) {
-        // TODO - update once Vermilion expansion characters are added
-        return BASE_GAME;
+        switch (card) {
+            case Acrobat:
+            case Archer:
+            case Assassin:
+            case Brewmaster:
+            case Bruiser:
+            case ClawLauncher:
+            case HermitAndCub:
+            case Illusionist:
+            case Jailer:
+            case LeaderKing:
+            case LeaderQueen:
+            case Manipulator:
+            case Nemesis:
+            case Protector:
+            case Rider:
+            case RoyalGuard:
+            case Vizier:
+            case Wanderer:
+                return BASE_GAME;
+
+            case Wisp:
+            case Sniper:
+                // TODO - update during 1.1.0-beta.1
+                return VERMILION;
+
+            default: throw new IllegalStateException("No expansion found for: " + card);
+        }
     }
 }

@@ -341,4 +341,7 @@
     <string name="card_name_wisp">feu follet</string>
     <string name="card_formatted_name_wisp">FeU FolleT</string>
     <string name="card_description_wisp">Se déplace sur n\'importe quelle case vide du plateau. Ne participe pas à la capture du Leader adverse.</string>
+    <string name="card_name_sniper">sniper</string>
+    <string name="card_formatted_name_sniper">SNiPER</string>
+    <string name="card_description_sniper">Au début de votre tour, capture le leader adverse seul s\'il est à une distance de trois cases ou plus, en ligne droite, même s\'il n\'est pas visible.</string>
 </resources>
