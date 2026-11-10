@@ -9,10 +9,12 @@ import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.CharacterPath;
 import com.leaders.gamelogic.entities.Game;
+import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.AbilityType;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
+import com.leaders.gamelogic.enums.GamePhaseType;
 import com.leaders.gamelogic.historyentries.segments.ActionsPhase;
 
 import java.util.Arrays;
@@ -72,25 +74,28 @@ public final class CharacterAbilityQuery {
         return leaderCell.getPosition().isAligned(cell.getPosition());
     }
 
-
     /**
      * Returns the contribution of a character to the capture of an enemy leader.
      *
      * @param enemyLeaderCell the cell containing the enemy leader
      * @param characterCell the cell containing the character to evaluate
+     * @param currentPhase current game phase
      * @return the character's contribution to the capture
      * @throws IllegalArgumentException if the character cell contains no character
      */
-    public static int getCaptureContribution(@NonNull Cell enemyLeaderCell, @NonNull Cell characterCell) {
+    public static int getCaptureContribution(@NonNull Cell enemyLeaderCell,
+                                             @NonNull Cell characterCell,
+                                             @NonNull GamePhase currentPhase) {
         if (characterCell.getCharacter() == null) {
             throw new IllegalArgumentException("Invalid capture cell, no character: " + characterCell.getPosition());
         }
 
-        if (!characterCell.getCharacter().getCharacterType().canCapture()) {
+        Character character = characterCell.getCharacter();
+        if (!character.getCharacterType().canCapture()) {
             return 0;
         }
 
-        switch (characterCell.getCharacter().getCharacterType()) {
+        switch (character.getCharacterType()) {
             // The archer only takes part in the capture in a straight line from a distance of two
             case Archer: {
                 return isLeaderAligned(enemyLeaderCell, characterCell) &&
@@ -100,11 +105,21 @@ public final class CharacterAbilityQuery {
             case Assassin: {
                 return getLeaderDistance(enemyLeaderCell, characterCell) == 1 ? LEADER_CAPTURE_VALUE : 0;
             }
+            case Sniper: {
+                int leaderDistance = getLeaderDistance(enemyLeaderCell, characterCell);
+
+                if (currentPhase.getPhaseType() == GamePhaseType.TurnStart &&
+                        character.getTeamColor() == currentPhase.getPhasePlayer().getTeamColor() &&
+                        isLeaderAligned(enemyLeaderCell, characterCell) &&
+                        leaderDistance >= 3) {
+                    return LEADER_CAPTURE_VALUE;
+                }
+                return leaderDistance == 1 ? 1 : 0;
+            }
             // By default, a character count as 1 and must be adjacent to be taken into account
             default: return getLeaderDistance(enemyLeaderCell, characterCell) == 1 ? 1 : 0;
         }
     }
-
 
     /**
      * Determines whether a character can act during the current actions phase.

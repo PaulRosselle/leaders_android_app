@@ -5,15 +5,20 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
+import androidx.annotation.NonNull;
+
 import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.CharacterPath;
 import com.leaders.gamelogic.entities.Game;
+import com.leaders.gamelogic.entities.GamePhase;
+import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.Direction;
+import com.leaders.gamelogic.enums.GamePhaseType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.historyentries.segments.ActionsPhase;
 
@@ -38,6 +43,10 @@ public class CharacterAbilityQueryTest {
 
     private ActionsPhase createActionsPhase() {
         return new ActionsPhase(TeamColor.Black);
+    }
+
+    private GamePhase getCurrentPhase(@NonNull GamePhaseType phaseType) {
+        return new GamePhase(phaseType, new Player(TeamColor.Black, "Test"));
     }
 
     private Character createCharacter(CharacterType characterType, TeamColor teamColor) {
@@ -87,7 +96,7 @@ public class CharacterAbilityQueryTest {
 
                 assertEquals(
                         adjacentPositions.contains(characterPosition) ? 1 : 0,
-                        CharacterAbilityQuery.getCaptureContribution(leaderCell, characterCell)
+                        CharacterAbilityQuery.getCaptureContribution(leaderCell, characterCell, getCurrentPhase(GamePhaseType.Actions))
                 );
             }
 
@@ -128,7 +137,7 @@ public class CharacterAbilityQueryTest {
 
             assertEquals(
                     archerCapturePositions.contains(archerPosition) ? 1 : 0,
-                    CharacterAbilityQuery.getCaptureContribution(leaderCell, archerCell)
+                    CharacterAbilityQuery.getCaptureContribution(leaderCell, archerCell, getCurrentPhase(GamePhaseType.Actions))
             );
         }
     }
@@ -164,7 +173,7 @@ public class CharacterAbilityQueryTest {
 
             assertEquals(
                     adjacentPositions.contains(assassinPosition) ? 2 : 0,
-                    CharacterAbilityQuery.getCaptureContribution(leaderCell, assassinCell)
+                    CharacterAbilityQuery.getCaptureContribution(leaderCell, assassinCell, getCurrentPhase(GamePhaseType.Actions))
             );
         }
     }
@@ -194,7 +203,7 @@ public class CharacterAbilityQueryTest {
                 Cell characterCell = board.getCell(characterPosition);
                 characterCell.setCharacter(character);
 
-                assertEquals(0, CharacterAbilityQuery.getCaptureContribution(leaderCell, characterCell));
+                assertEquals(0, CharacterAbilityQuery.getCaptureContribution(leaderCell, characterCell, getCurrentPhase(GamePhaseType.Actions)));
             }
         }
     }
@@ -207,8 +216,86 @@ public class CharacterAbilityQueryTest {
         Cell leaderCell = board.getCell(new Position(3, 3));
 
         assertThrows(IllegalArgumentException.class, () ->
-                CharacterAbilityQuery.getCaptureContribution(leaderCell, characterCell)
+                CharacterAbilityQuery.getCaptureContribution(leaderCell, characterCell, getCurrentPhase(GamePhaseType.Actions))
         );
+    }
+
+    @Test
+    public void getCaptureContribution_shouldReturnLeaderCaptureValueForAlignedSniperAtTurnStart() {
+        Board board = new Board();
+
+        Character sniper = createCharacter(CharacterType.Sniper, TeamColor.Black);
+        Cell leaderCell = board.getCell(new Position(3, 3));
+        Cell sniperCell = board.getCell(new Position(3, 0));
+
+        sniperCell.setCharacter(sniper);
+
+        GamePhase turnStartPhase = getCurrentPhase(GamePhaseType.TurnStart);
+
+        assertEquals(
+                CharacterAbilityQuery.LEADER_CAPTURE_VALUE,
+                CharacterAbilityQuery.getCaptureContribution(
+                        leaderCell,
+                        sniperCell,
+                        turnStartPhase
+                )
+        );
+    }
+
+    @Test
+    public void getCaptureContribution_shouldReturnZeroForUnalignedSniperAtTurnStart() {
+        Board board = new Board();
+
+        Character sniper = createCharacter(CharacterType.Sniper, TeamColor.Black);
+        Cell leaderCell = board.getCell(new Position(3, 3));
+        Cell sniperCell = board.getCell(new Position(1, 1));
+
+        sniperCell.setCharacter(sniper);
+
+        assertEquals(0, CharacterAbilityQuery.getCaptureContribution(leaderCell, sniperCell,
+                getCurrentPhase(GamePhaseType.TurnStart)));
+    }
+
+    @Test
+    public void getCaptureContribution_shouldReturnZeroForSniperDuringActionsPhaseAtDistanceTwoOrMore() {
+        Board board = new Board();
+
+        Character sniper = createCharacter(CharacterType.Sniper, TeamColor.Black);
+        Cell leaderCell = board.getCell(new Position(3, 3));
+        Cell sniperCell = board.getCell(new Position(3, 0));
+
+        sniperCell.setCharacter(sniper);
+
+        assertEquals(0, CharacterAbilityQuery.getCaptureContribution(leaderCell, sniperCell,
+                getCurrentPhase(GamePhaseType.Actions)));
+    }
+
+    @Test
+    public void getCaptureContribution_shouldReturnZeroForEnemySniperAtTurnStart() {
+        Board board = new Board();
+
+        Character sniper = createCharacter(CharacterType.Sniper, TeamColor.White);
+        Cell leaderCell = board.getCell(new Position(3, 3));
+        Cell sniperCell = board.getCell(new Position(3, 0));
+
+        sniperCell.setCharacter(sniper);
+
+        assertEquals(0, CharacterAbilityQuery.getCaptureContribution(leaderCell, sniperCell,
+                getCurrentPhase(GamePhaseType.TurnStart)));
+    }
+
+    @Test
+    public void getCaptureContribution_shouldReturnOneForAdjacentSniperOutsideTurnStart() {
+        Board board = new Board();
+
+        Character sniper = createCharacter(CharacterType.Sniper, TeamColor.Black);
+        Cell leaderCell = board.getCell(new Position(3, 3));
+        Cell sniperCell = board.getCell(new Position(3, 2));
+
+        sniperCell.setCharacter(sniper);
+
+        assertEquals(1, CharacterAbilityQuery.getCaptureContribution(leaderCell, sniperCell,
+                getCurrentPhase(GamePhaseType.Actions)));
     }
 
     @Test

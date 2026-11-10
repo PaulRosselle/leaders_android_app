@@ -6,7 +6,9 @@ import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
+import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.PlayableCharacter;
+import com.leaders.gamelogic.enums.GamePhaseType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.factories.GameActionHandlerFactory;
 import com.leaders.gamelogic.handlers.GameActionHandler;
@@ -277,7 +279,8 @@ public final class PuzzleSolverUtils {
                                           @NonNull Set<String> deadEndStates) throws InterruptedException {
         TeamColor playerTeamColor = actionsPhase.getTurnTeamColor();
 
-        TeamColor winnerTeamColor = GameQuery.getWinnerTeam(game, playerTeamColor);
+        TeamColor winnerTeamColor = GameQuery.getWinnerTeam(game,
+                new GamePhase(GamePhaseType.Actions, GameHistoryQuery.getPlayerFromTeam(history, playerTeamColor)));
 
         if (winnerTeamColor == playerTeamColor) {
             collector.add(new ArrayList<>(actionsPhase.getCharacterActions()));

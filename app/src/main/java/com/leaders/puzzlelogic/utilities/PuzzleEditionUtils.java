@@ -14,6 +14,7 @@ import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameConfig;
 import com.leaders.gamelogic.entities.GameHistory;
+import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
@@ -92,7 +93,7 @@ public final class PuzzleEditionUtils {
                 continue;
             }
 
-            if (GameQuery.isLeaderCaptured(game, teamColor)) {
+            if (GameQuery.isLeaderCaptured(game, new GamePhase(GamePhaseType.Actions, getDefaultPlayer()), teamColor)) {
                 builder.append(prefix).append(String.format(context.getString(R.string.puzzle_error_leader_captured), teamColor));
             }
             if (GameQuery.isLeaderSurrounded(game, teamColor)) {
@@ -182,22 +183,26 @@ public final class PuzzleEditionUtils {
         return characterCard == CharacterCard.Nemesis;
     }
 
+    private static Player getDefaultPlayer() {
+        return new Player(AutoPlayQuery.getAutoPlayableTeam().getOpposite(), "Player");
+    }
+
     @NonNull
     public static GameHistory getDefaultHistory(@NonNull List<IGameAction> initialActions) {
         // The black player represents the human player (official puzzles convention)
-        Player playerBlack = new Player(TeamColor.Black, "Player");
-        Player playerWhite = new Player(TeamColor.White, "Puzzle");
+        Player player = getDefaultPlayer();
+        Player opponent = new Player(player.getTeamColor().getOpposite(), "Puzzle");
 
         GameConfig gameConfig =new GameConfig(
-                List.of(playerBlack, playerWhite),
-                playerBlack, // firstPlayer ; the human player
+                List.of(player, opponent),
+                player, // firstPlayer ; the human player
                 GameMode.Puzzle,
                 Collections.emptyList(), // initialRecruitableCards ; no recruitment in puzzles
                 initialActions
         );
 
         ArrayList<IHistoryEntry> entries = new ArrayList<>();
-        Turn turn = new Turn(playerBlack.getTeamColor());
+        Turn turn = new Turn(player.getTeamColor());
 
         // We start and end immediately the turn start phase to skip to the actions phase
         TurnPhase turnStartPhase = turn.getSubPhase(GamePhaseType.TurnStart);

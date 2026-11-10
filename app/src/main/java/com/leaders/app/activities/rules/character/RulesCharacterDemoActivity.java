@@ -14,14 +14,22 @@ import com.leaders.app.entities.CharacterSkins;
 import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.EndGameType;
+import com.leaders.app.utilities.ButtonUtils;
 import com.leaders.app.utilities.CharacterCardUtils;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.JsonUtils;
+import com.leaders.app.views.character.HighlightView;
+import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.enums.CharacterCard;
+import com.leaders.gamelogic.enums.GamePhaseType;
+import com.leaders.gamelogic.enums.TeamColor;
+import com.leaders.gamelogic.factories.GameFactory;
+import com.leaders.gamelogic.interactions.InteractionRequest;
+import com.leaders.gamelogic.queries.GameQuery;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
 
 import org.json.JSONException;
@@ -33,8 +41,10 @@ public final class RulesCharacterDemoActivity extends PlayableActivity {
     private ImageView imvArtwork;
 
     private MaterialButton btnReset;
+    private MaterialButton btnNextPhase;
+    private HighlightView hlvNextPhase;
 
-
+    private CharacterCard card;
     private GameHistory startHistory;
     private String startHistoryHash;
 
@@ -58,6 +68,8 @@ public final class RulesCharacterDemoActivity extends PlayableActivity {
         imvArtwork = findViewById(R.id.imvArtwork_actRulesCharacterDemo);
 
         btnReset = findViewById(R.id.btnReset_actRulesCharacterDemo);
+        btnNextPhase = findViewById(R.id.btnNextPhase_actRulesCharacterDemo);
+        hlvNextPhase = findViewById(R.id.hlvNextPhase_actRulesCharacterDemo);
     }
 
     @Override
@@ -65,16 +77,17 @@ public final class RulesCharacterDemoActivity extends PlayableActivity {
         super.initListeners();
 
         btnReset.setOnClickListener(this::onResetClick);
+        btnNextPhase.setOnClickListener(this::onNextPhaseClick);
     }
 
     @Override
     protected void initDatas() {
         super.initDatas();
 
-        CharacterCard characterCard = CharacterCard.valueOf(getIntent().getStringExtra(ExtraUtils.EXTRA_CHARACTER_CARD));
-        initCharacter(characterCard);
+        card = CharacterCard.valueOf(getIntent().getStringExtra(ExtraUtils.EXTRA_CHARACTER_CARD));
+        initCharacter();
 
-        startHistory = JsonUtils.loadCharacterDemo(this, characterCard);
+        startHistory = JsonUtils.loadCharacterDemo(this, card);
         startHistoryHash = getHistoryHash(startHistory);
 
         controller = new GameController(this);
@@ -143,14 +156,65 @@ public final class RulesCharacterDemoActivity extends PlayableActivity {
 
     //region CHARACTER INFOS INITIALIZATION
 
-    private void initCharacter(@NonNull CharacterCard card) {
+    private void initCharacter() {
         txvName.setText(CharacterCardUtils.getFormattedNameId(card));
         txvDescription.setText(CharacterCardUtils.getDescriptionId(card));
         imvAbility.setImageResource(CharacterCardUtils.getAbilityResId(card));
         imvArtwork.setImageResource(CharacterCardUtils.getArtworkResId(card));
+
+        btnNextPhase.setVisibility(canEndTurn() ? View.VISIBLE : View.GONE);
     }
 
+    //region END TURN METHODS
+
+    private boolean canEndTurn() {
+        return card == CharacterCard.Sniper;
+    }
+
+    private void endTurn() {
+        GameHistory history = controller.getHistory();
+
+        Player player = history.getConfig().getFirstPlayer();
+        Game game = GameFactory.create(history);
+        TeamColor opponentTeamColor = player.getTeamColor().getOpposite();
+        GamePhase gamePhase = new GamePhase(GamePhaseType.TurnStart, player);
+
+        if (GameQuery.isLeaderCaptured(game, gamePhase, opponentTeamColor)) {
+            showEndGame(player);
+        } else {
+            showEndGame(controller.getCurrentContext(),
+                    opponentTeamColor,
+                    EndGameType.Defeat,
+                    getString(R.string.defeat_title),
+                    getString(R.string.demo_defeat_subtitle)
+            );
+        }
+    }
+
+    //endregion
+
     //region INTERACTION UI METHODS
+
+    @Override
+    protected void updateInteractionUI(@NonNull GameContext gameContext,
+                                       @NonNull InteractionRequest request) {
+        super.updateInteractionUI(gameContext, request);
+
+        if (canEndTurn()) {
+            setBtnNextPhaseEnabled(controller.canEndPhase(), request.getLegalTargets().isEmpty());
+        }
+    }
+
+    private void setBtnNextPhaseEnabled(boolean enabled, boolean highlight) {
+        ButtonUtils.setEnabled(btnNextPhase, enabled);
+        hlvNextPhase.setVisibility(highlight ? View.VISIBLE : View.GONE);
+
+        if (highlight) {
+            hlvNextPhase.startAnimation();
+        } else {
+            hlvNextPhase.stopAnimation();
+        }
+    }
 
     @Override
     protected boolean canUndoLastAction() {
@@ -201,6 +265,11 @@ public final class RulesCharacterDemoActivity extends PlayableActivity {
 
     private void onResetClick(View v) {
         controller.restartGame(new GameHistory(startHistory));
+    }
+
+    private void onNextPhaseClick(View v) {
+        setBtnNextPhaseEnabled(false, false);
+        endTurn();
     }
 
     //endregion

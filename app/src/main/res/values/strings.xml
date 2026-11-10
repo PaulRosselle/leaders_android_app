@@ -348,4 +348,8 @@
     <string name="card_name_wisp">wisp</string>
     <string name="card_formatted_name_wisp">WiSP</string>
     <string name="card_description_wisp">Move to any empty space on the board. Cannot help capture the opponent\'s Leader.</string>
+    <string name="card_name_sniper">sniper</string>
+    <string name="card_formatted_name_sniper">SNiPER</string>
+    <string name="card_description_sniper">At the start of your turn, the Sniper Captures alone the opponent\'s Leader from three or more spaces away in a straight line, even if the Leader is not visible.</string>
+    <string name="demo_defeat_subtitle">Opponent leader not captured</string>
 </resources>

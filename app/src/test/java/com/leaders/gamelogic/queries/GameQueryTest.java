@@ -10,9 +10,12 @@ import androidx.annotation.NonNull;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
+import com.leaders.gamelogic.entities.GamePhase;
+import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.Direction;
+import com.leaders.gamelogic.enums.GamePhaseType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.enums.WarningType;
 
@@ -37,6 +40,10 @@ public class GameQueryTest {
                 new EnumMap<>(TeamColor.class), // playerBanishedCards
                 new EnumMap<>(TeamColor.class) // playerWarnings
         );
+    }
+
+    private GamePhase createTestPhase() {
+        return new GamePhase(GamePhaseType.Actions, new Player(TeamColor.Black, "Test"));
     }
 
     private void placeCharacter(@NonNull Board board, @NonNull Position position,
@@ -65,7 +72,7 @@ public class GameQueryTest {
         Game game = createTestGame(board);
         placeCharacter(game, new Position(3, 1), CharacterType.Archer, TeamColor.White);
 
-        assertFalse(GameQuery.isLeaderCaptured(game, TeamColor.White));
+        assertFalse(GameQuery.isLeaderCaptured(game, createTestPhase(), TeamColor.White));
     }
 
     @Test
@@ -77,7 +84,7 @@ public class GameQueryTest {
         placeCharacter(game, new Position(3, 2), CharacterType.Acrobat, TeamColor.Black);
         placeCharacter(game, new Position(2, 2), CharacterType.Bruiser, TeamColor.Black);
 
-        assertTrue(GameQuery.isLeaderCaptured(game, TeamColor.White));
+        assertTrue(GameQuery.isLeaderCaptured(game, createTestPhase(), TeamColor.White));
     }
 
     @Test
@@ -89,14 +96,14 @@ public class GameQueryTest {
         placeCharacter(game, new Position(3, 1), CharacterType.Archer, TeamColor.Black);
         placeCharacter(game, new Position(1, 3), CharacterType.Archer, TeamColor.Black);
 
-        assertTrue(GameQuery.isLeaderCaptured(game, TeamColor.White));
+        assertTrue(GameQuery.isLeaderCaptured(game, createTestPhase(), TeamColor.White));
     }
 
     @Test(expected = NullPointerException.class)
     public void isLeaderCaptured_shouldThrowWhenLeaderIsMissing() {
         Game game = createTestGame(new Board());
 
-        GameQuery.isLeaderCaptured(game, TeamColor.White);
+        GameQuery.isLeaderCaptured(game, createTestPhase(), TeamColor.White);
     }
 
     @Test
@@ -108,7 +115,7 @@ public class GameQueryTest {
         Game game = createTestGame(board);
         placeCharacter(game, new Position(3, 2), CharacterType.Assassin, TeamColor.Black);
 
-        assertTrue(GameQuery.isLeaderCaptured(game, TeamColor.White));
+        assertTrue(GameQuery.isLeaderCaptured(game, createTestPhase(), TeamColor.White));
     }
 
     @Test
@@ -121,11 +128,11 @@ public class GameQueryTest {
         placeCharacter(game, new Position(3, 2), CharacterType.Acrobat, TeamColor.Black);
         placeCharacter(game, new Position(2, 2), CharacterType.Archer, TeamColor.Black);
 
-        assertFalse(GameQuery.isLeaderCaptured(game, TeamColor.White));
+        assertFalse(GameQuery.isLeaderCaptured(game, createTestPhase(), TeamColor.White));
 
         placeCharacter(game, new Position(3, 1), CharacterType.Archer, TeamColor.Black);
 
-        assertTrue(GameQuery.isLeaderCaptured(game, TeamColor.White));
+        assertTrue(GameQuery.isLeaderCaptured(game, createTestPhase(), TeamColor.White));
     }
 
     @Test
@@ -139,12 +146,12 @@ public class GameQueryTest {
         placeCharacter(game, new Position(2, 2), CharacterType.Cub, TeamColor.Black);
         placeCharacter(game, new Position(3, 2), CharacterType.Acrobat, TeamColor.Black);
 
-        assertFalse(GameQuery.isLeaderCaptured(game, TeamColor.White));
+        assertFalse(GameQuery.isLeaderCaptured(game, createTestPhase(), TeamColor.White));
 
 
         placeCharacter(game, new Position(4, 2), CharacterType.Bruiser, TeamColor.Black);
 
-        assertTrue(GameQuery.isLeaderCaptured(game, TeamColor.White));
+        assertTrue(GameQuery.isLeaderCaptured(game, createTestPhase(), TeamColor.White));
     }
 
     @Test
@@ -261,7 +268,7 @@ public class GameQueryTest {
 
         Game game = createTestGame(board);
 
-        assertNull(GameQuery.getWinnerTeam(game, TeamColor.Black));
+        assertNull(GameQuery.getWinnerTeam(game, createTestPhase()));
     }
 
     @Test
@@ -273,7 +280,7 @@ public class GameQueryTest {
         Game game = createTestGame(board);
         game.setPlayerWarningCount(TeamColor.Black, WarningType.Barrage,2);
 
-        assertEquals(TeamColor.White, GameQuery.getWinnerTeam(game, TeamColor.Black));
+        assertEquals(TeamColor.White, GameQuery.getWinnerTeam(game, createTestPhase()));
     }
 
     @Test
@@ -285,7 +292,7 @@ public class GameQueryTest {
         Game game = createTestGame(board);
         placeCharacter(game, new Position(3, 2), CharacterType.Assassin, TeamColor.White);
 
-        assertEquals(TeamColor.White, GameQuery.getWinnerTeam(game, TeamColor.Black));
+        assertEquals(TeamColor.White, GameQuery.getWinnerTeam(game, createTestPhase()));
     }
 
     @Test
@@ -304,7 +311,7 @@ public class GameQueryTest {
 
         Game game = createTestGame(board);
 
-        assertEquals(TeamColor.White, GameQuery.getWinnerTeam(game, TeamColor.Black));
+        assertEquals(TeamColor.White, GameQuery.getWinnerTeam(game, createTestPhase()));
     }
 
     @Test
@@ -316,7 +323,7 @@ public class GameQueryTest {
         Game game = createTestGame(board);
         placeCharacter(game, new Position(3, 5), CharacterType.Assassin, TeamColor.Black);
 
-        assertEquals(TeamColor.Black, GameQuery.getWinnerTeam(game, TeamColor.Black));
+        assertEquals(TeamColor.Black, GameQuery.getWinnerTeam(game, createTestPhase()));
     }
 
     @Test
@@ -335,6 +342,6 @@ public class GameQueryTest {
 
         Game game = createTestGame(board);
 
-        assertEquals(TeamColor.Black, GameQuery.getWinnerTeam(game, TeamColor.Black));
+        assertEquals(TeamColor.Black, GameQuery.getWinnerTeam(game, createTestPhase()));
     }
 }
