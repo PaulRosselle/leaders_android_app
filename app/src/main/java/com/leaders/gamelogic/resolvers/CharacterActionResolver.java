@@ -29,14 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static com.leaders.gamelogic.resolvers.ResolverUtils.addTargets;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.createPathFeedback;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.createPositionRequest;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.createPositionResult;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.createSingleMotionFeedback;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.getChosenPosition;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.isPositionResult;
-
 /**
  * Base class responsible for resolving the interaction flow required to build
  * and validate a {@link CharacterAction}.
@@ -140,9 +132,9 @@ public class CharacterActionResolver {
             Position destPos = path.getDestination();
             // The tested position choice is turned into a temporary action in order to validate it
             // before exposing the destination as a legal interaction option.
-            InteractionResult movementResult = createPositionResult(
+            InteractionResult movementResult = ResolverUtils.createPositionResult(
                     new InteractionContext(character), TargetCategory.MovementDestination, destPos);
-            InteractionFeedback movementFeedback = createSingleMotionFeedback(
+            InteractionFeedback movementFeedback = ResolverUtils.createSingleMotionFeedback(
                     CharacterMotionType.Move, character, characterPos, destPos);
 
             if (isValidWith(builder, movementResult, movementFeedback)) {
@@ -179,11 +171,11 @@ public class CharacterActionResolver {
         // Build the list of legal movement destinations.
         // Invalid destinations are filtered out before being exposed to the interaction layer.
         List<InteractionTarget> legalTargets = new ArrayList<>();
-        addTargets(legalTargets, TargetCategory.MovementDestination, getNormalMovementValidDestinations(builder));
+        ResolverUtils.addTargets(legalTargets, TargetCategory.MovementDestination, getNormalMovementValidDestinations(builder));
 
         // A movement action requires the player to choose a position.
         // Cancelling remains available while the action is being built.
-        return createPositionRequest(new InteractionContext(character), legalTargets);
+        return ResolverUtils.createPositionRequest(new InteractionContext(character), legalTargets);
     }
 
     /**
@@ -237,7 +229,7 @@ public class CharacterActionResolver {
     @NonNull
     protected final CharacterPath getPathMatchingResult(@NonNull InteractionResult result,
                                                         @NonNull List<CharacterPath> paths) {
-        Position destPos = getChosenPosition(result);
+        Position destPos = ResolverUtils.getChosenPosition(result);
 
         // We search for the shortest path matching the result
         CharacterPath bestMatchingPath = null;
@@ -259,25 +251,25 @@ public class CharacterActionResolver {
 
     @NonNull
     protected final InteractionFeedback buildNormalMovementFeedback(@NonNull CharacterPath path) {
-        return createPathFeedback(character, path, CharacterMotionType.Move);
+        return ResolverUtils.createPathFeedback(character, path, CharacterMotionType.Move);
     }
 
     protected boolean isNormalMovementResult(@NonNull InteractionResult result) {
-        return isPositionResult(result, TargetCategory.MovementDestination);
+        return ResolverUtils.isPositionResult(result, TargetCategory.MovementDestination);
     }
 
     /**
      * Checks whether a result is the selection of the target of an active ability.
      */
     protected final boolean isAbilityTargetResult(@NonNull InteractionResult result) {
-        return isPositionResult(result, TargetCategory.ActiveAbilityTargetPosition);
+        return ResolverUtils.isPositionResult(result, TargetCategory.ActiveAbilityTargetPosition);
     }
 
     /**
      * Checks whether a result is the selection of the destination of an active ability.
      */
     protected final boolean isAbilityDestinationResult(@NonNull InteractionResult result) {
-        return isPositionResult(result, TargetCategory.ActiveAbilityDestination);
+        return ResolverUtils.isPositionResult(result, TargetCategory.ActiveAbilityDestination);
     }
 
     /**
@@ -292,7 +284,7 @@ public class CharacterActionResolver {
                                                                      @NonNull Position targetPos) {
         CharacterActionBuilder targetBuilder = new CharacterActionBuilder(builder);
         if (targetBuilder.getResults().isEmpty()) {
-            targetBuilder.addResult(createPositionResult(new InteractionContext(character),
+            targetBuilder.addResult(ResolverUtils.createPositionResult(new InteractionContext(character),
                     TargetCategory.ActiveAbilityTargetPosition, targetPos));
         }
         return targetBuilder;

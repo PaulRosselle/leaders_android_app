@@ -20,16 +20,10 @@ import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.gamelogic.queries.CharacterAbilityQuery;
 import com.leaders.gamelogic.resolvers.CharacterActionResolver;
+import com.leaders.gamelogic.resolvers.ResolverUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.leaders.gamelogic.resolvers.ResolverUtils.addTargets;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.createPositionRequest;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.createPositionResult;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.createSingleMotionFeedback;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.getChosenPosition;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.isFeedbackExpected;
 
 /**
  * Resolves the Manipulator's active ability.
@@ -81,7 +75,7 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
     @Override
     @Nullable
     public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
-        if (!isFeedbackExpected(builder)) {
+        if (!ResolverUtils.isFeedbackExpected(builder)) {
             return null;
         }
 
@@ -102,18 +96,18 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
             throw new IllegalArgumentException("Invalid result types for a Manipulator ability activation");
         }
 
-        Position targetOrigin = getChosenPosition(firstResult);
-        Position targetDestination = getChosenPosition(destinationResult);
+        Position targetOrigin = ResolverUtils.getChosenPosition(firstResult);
+        Position targetDestination = ResolverUtils.getChosenPosition(destinationResult);
         Character target = getCharacterAt(targetOrigin);
 
-        return createSingleMotionFeedback(CharacterMotionType.Move, target, targetOrigin, targetDestination);
+        return ResolverUtils.createSingleMotionFeedback(CharacterMotionType.Move, target, targetOrigin, targetDestination);
     }
 
     @NonNull
     private InteractionRequest buildInitialInteraction(@NonNull CharacterActionBuilder builder) {
         List<InteractionTarget> legalTargets = new ArrayList<>();
 
-        addTargets(legalTargets, TargetCategory.MovementDestination, getNormalMovementValidDestinations(builder));
+        ResolverUtils.addTargets(legalTargets, TargetCategory.MovementDestination, getNormalMovementValidDestinations(builder));
 
         if (CharacterAbilityQuery.canUseActiveAbility(game, character)) {
             for (Position enemyPosition : getManipulatorTargetPositions()) {
@@ -123,7 +117,7 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
             }
         }
 
-        return createPositionRequest(new InteractionContext(character), legalTargets);
+        return ResolverUtils.createPositionRequest(new InteractionContext(character), legalTargets);
     }
 
     @NonNull
@@ -134,15 +128,15 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
                     "A Manipulator target must be selected through a PositionChosen result");
         }
 
-        Position targetPos = getChosenPosition(result);
+        Position targetPos = ResolverUtils.getChosenPosition(result);
 
         List<InteractionTarget> legalTargets = new ArrayList<>();
 
-        addTargets(legalTargets, TargetCategory.ActiveAbilityDestination,
+        ResolverUtils.addTargets(legalTargets, TargetCategory.ActiveAbilityDestination,
                 getValidTargetDestinations(builder, targetPos, false));
 
         Character targetedEnemy = getCharacterAt(targetPos);
-        return createPositionRequest(new InteractionContext(character, targetedEnemy), legalTargets);
+        return ResolverUtils.createPositionRequest(new InteractionContext(character, targetedEnemy), legalTargets);
     }
 
     /**
@@ -197,9 +191,9 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
         for (Cell destinationCell : BoardQuery.findEmptyCellsAround(game.getBoard(), targetPos, 1)) {
             Position destination = destinationCell.getPosition();
 
-            InteractionResult destinationResult = createPositionResult(new InteractionContext(character, target),
+            InteractionResult destinationResult = ResolverUtils.createPositionResult(new InteractionContext(character, target),
                     TargetCategory.ActiveAbilityDestination, destination);
-            InteractionFeedback destinationFeedback = createSingleMotionFeedback(
+            InteractionFeedback destinationFeedback = ResolverUtils.createSingleMotionFeedback(
                     CharacterMotionType.Move, target, targetPos, destination);
 
             if (isValidWith(targetBuilder, destinationResult, destinationFeedback)) {

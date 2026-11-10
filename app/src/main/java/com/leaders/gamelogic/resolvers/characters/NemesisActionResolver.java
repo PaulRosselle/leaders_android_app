@@ -17,15 +17,12 @@ import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.gamelogic.resolvers.CharacterActionResolver;
+import com.leaders.gamelogic.resolvers.ResolverUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static com.leaders.gamelogic.resolvers.ResolverUtils.createPositionRequest;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.createPositionResult;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.isFeedbackExpected;
 
 /**
  * Resolves the Nemesis' movement.
@@ -55,13 +52,13 @@ public final class NemesisActionResolver extends CharacterActionResolver {
             legalTargets.add(new InteractionTarget(TargetCategory.MovementDestination, path.getDestination()));
         }
 
-        return createPositionRequest(new InteractionContext(character), legalTargets);
+        return ResolverUtils.createPositionRequest(new InteractionContext(character), legalTargets);
     }
 
     @Override
     @Nullable
     public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
-        if (!isFeedbackExpected(builder)) {
+        if (!ResolverUtils.isFeedbackExpected(builder)) {
             return null;
         }
 
@@ -136,7 +133,7 @@ public final class NemesisActionResolver extends CharacterActionResolver {
         List<CharacterPath> validPaths = new ArrayList<>();
 
         for (CharacterPath path : paths) {
-            InteractionResult result = createPositionResult(new InteractionContext(character),
+            InteractionResult result = ResolverUtils.createPositionResult(new InteractionContext(character),
                     TargetCategory.MovementDestination, path.getDestination());
 
             if (isValidWith(builder, result, buildNormalMovementFeedback(path))) {

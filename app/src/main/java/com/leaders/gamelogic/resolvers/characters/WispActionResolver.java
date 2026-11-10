@@ -1,9 +1,5 @@
 package com.leaders.gamelogic.resolvers.characters;
 
-import static com.leaders.gamelogic.resolvers.ResolverUtils.createSingleMotionFeedback;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.getChosenPosition;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.isFeedbackExpected;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -60,7 +56,7 @@ public class WispActionResolver extends CharacterActionResolver {
     @Override
     @Nullable
     public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
-        if (!isFeedbackExpected(builder)) {
+        if (!ResolverUtils.isFeedbackExpected(builder)) {
             return null;
         }
 
@@ -99,8 +95,8 @@ public class WispActionResolver extends CharacterActionResolver {
 
     @NonNull
     private InteractionFeedback buildWispMovementFeedback(@NonNull InteractionResult result) {
-        Position destination = getChosenPosition(result);
+        Position destination = ResolverUtils.getChosenPosition(result);
 
-        return createSingleMotionFeedback(CharacterMotionType.Fly, character, characterPos, destination);
+        return ResolverUtils.createSingleMotionFeedback(CharacterMotionType.Fly, character, characterPos, destination);
     }
 }

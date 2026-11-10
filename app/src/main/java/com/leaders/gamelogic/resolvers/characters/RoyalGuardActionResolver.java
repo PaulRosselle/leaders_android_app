@@ -23,17 +23,13 @@ import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.gamelogic.queries.CharacterAbilityQuery;
 import com.leaders.gamelogic.resolvers.CharacterActionResolver;
+import com.leaders.gamelogic.resolvers.ResolverUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static com.leaders.gamelogic.resolvers.ResolverUtils.addTargets;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.createPositionRequest;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.createPositionResult;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.isFeedbackExpected;
 
 /**
  * Resolves the Royal Guard's active ability.
@@ -46,7 +42,6 @@ import static com.leaders.gamelogic.resolvers.ResolverUtils.isFeedbackExpected;
  * determined automatically.</p>
  */
 public final class RoyalGuardActionResolver extends CharacterActionResolver {
-
     public RoyalGuardActionResolver(@NonNull Game game, @NonNull GameHistory gameHistory,
                                     @NonNull Character character) {
         super(game, gameHistory, character);
@@ -67,7 +62,7 @@ public final class RoyalGuardActionResolver extends CharacterActionResolver {
         // Normal movement has priority in that case.
         List<Position> movementDestinations = getNormalMovementValidDestinations(builder);
 
-        addTargets(legalTargets, TargetCategory.MovementDestination, movementDestinations);
+        ResolverUtils.addTargets(legalTargets, TargetCategory.MovementDestination, movementDestinations);
 
 
         if (CharacterAbilityQuery.canUseActiveAbility(game, character)) {
@@ -79,13 +74,13 @@ public final class RoyalGuardActionResolver extends CharacterActionResolver {
             }
         }
 
-        return createPositionRequest(new InteractionContext(character), legalTargets);
+        return ResolverUtils.createPositionRequest(new InteractionContext(character), legalTargets);
     }
 
     @Override
     @Nullable
     public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
-        if (!isFeedbackExpected(builder)) {
+        if (!ResolverUtils.isFeedbackExpected(builder)) {
             return null;
         }
 
@@ -159,7 +154,7 @@ public final class RoyalGuardActionResolver extends CharacterActionResolver {
     }
 
     private boolean isPathValid(@NonNull CharacterActionBuilder builder, @NonNull CharacterPath path) {
-        InteractionResult result = createPositionResult(new InteractionContext(character),
+        InteractionResult result = ResolverUtils.createPositionResult(new InteractionContext(character),
                 TargetCategory.ActiveAbilityDestination, path.getDestination());
 
         return isValidWith(builder, result, buildRoyalGuardMovementFeedback(path));

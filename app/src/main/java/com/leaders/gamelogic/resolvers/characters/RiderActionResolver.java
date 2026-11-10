@@ -20,16 +20,10 @@ import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.gamelogic.queries.CharacterAbilityQuery;
 import com.leaders.gamelogic.resolvers.CharacterActionResolver;
+import com.leaders.gamelogic.resolvers.ResolverUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.leaders.gamelogic.resolvers.ResolverUtils.addTargets;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.createPositionRequest;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.createPositionResult;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.createSingleMotionFeedback;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.getChosenPosition;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.isFeedbackExpected;
 
 /**
  * Resolves the Rider's active ability.
@@ -55,19 +49,19 @@ public final class RiderActionResolver extends CharacterActionResolver {
         // Normal movement and Rider dash destinations cannot overlap:
         // a normal move requires an adjacent cell, while a dash destination is at exactly two cells away.
         // For this reason, we can add both destinations without further treatment to avoid duplicates
-        addTargets(legalTargets, TargetCategory.MovementDestination, getNormalMovementValidDestinations(builder));
+        ResolverUtils.addTargets(legalTargets, TargetCategory.MovementDestination, getNormalMovementValidDestinations(builder));
 
         if (CharacterAbilityQuery.canUseActiveAbility(game, character)) {
-            addTargets(legalTargets, TargetCategory.ActiveAbilityDestination, getRiderDashDestinations(builder));
+            ResolverUtils.addTargets(legalTargets, TargetCategory.ActiveAbilityDestination, getRiderDashDestinations(builder));
         }
 
-        return createPositionRequest(new InteractionContext(character), legalTargets);
+        return ResolverUtils.createPositionRequest(new InteractionContext(character), legalTargets);
     }
 
     @Override
     @Nullable
     public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
-        if (!isFeedbackExpected(builder)) {
+        if (!ResolverUtils.isFeedbackExpected(builder)) {
             return null;
         }
 
@@ -101,7 +95,7 @@ public final class RiderActionResolver extends CharacterActionResolver {
                 if (destCell != null && destCell.getCharacter() == null) {
                     Position destPos = destCell.getPosition();
 
-                    InteractionResult dashResult = createPositionResult(new InteractionContext(character),
+                    InteractionResult dashResult = ResolverUtils.createPositionResult(new InteractionContext(character),
                             TargetCategory.ActiveAbilityDestination, destPos);
 
                     if (isValidWith(builder, dashResult, buildRiderDashFeedback(dashResult))) {
@@ -115,8 +109,8 @@ public final class RiderActionResolver extends CharacterActionResolver {
     }
 
     private InteractionFeedback buildRiderDashFeedback(@NonNull InteractionResult result) {
-        Position destination = getChosenPosition(result);
+        Position destination = ResolverUtils.getChosenPosition(result);
 
-        return createSingleMotionFeedback(CharacterMotionType.Move, character, characterPos, destination);
+        return ResolverUtils.createSingleMotionFeedback(CharacterMotionType.Move, character, characterPos, destination);
     }
 }

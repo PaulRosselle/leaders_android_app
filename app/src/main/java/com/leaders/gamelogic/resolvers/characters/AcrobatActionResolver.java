@@ -21,16 +21,12 @@ import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.gamelogic.queries.CharacterAbilityQuery;
 import com.leaders.gamelogic.resolvers.CharacterActionResolver;
+import com.leaders.gamelogic.resolvers.ResolverUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static com.leaders.gamelogic.resolvers.ResolverUtils.addTargets;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.createPathFeedback;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.createPositionRequest;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.createPositionResult;
 
 
 /**
@@ -60,14 +56,14 @@ public final class AcrobatActionResolver extends CharacterActionResolver {
         // a normal move requires an adjacent cell, while a jump destination is at least two cells away.
         // For this reason, we can add both destinations without further treatment to avoid duplicates
         List<InteractionTarget> legalTargets = new ArrayList<>();
-        addTargets(legalTargets, TargetCategory.MovementDestination, getNormalMovementValidDestinations(builder));
+        ResolverUtils.addTargets(legalTargets, TargetCategory.MovementDestination, getNormalMovementValidDestinations(builder));
         if (CharacterAbilityQuery.canUseActiveAbility(game, character)) {
             for (CharacterPath jumpPath : getAcrobatJumpPaths(builder)) {
                 legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityDestination, jumpPath.getDestination()));
             }
         }
 
-        return createPositionRequest(new InteractionContext(character), legalTargets);
+        return ResolverUtils.createPositionRequest(new InteractionContext(character), legalTargets);
     }
 
     @Override
@@ -91,7 +87,7 @@ public final class AcrobatActionResolver extends CharacterActionResolver {
             // We recover all legal paths using an empty builder to find one matching the result
             List<CharacterPath> legalPaths = getAcrobatJumpPaths(new CharacterActionBuilder(character));
             CharacterPath resultPath = getPathMatchingResult(result, legalPaths);
-            feedback = createPathFeedback(character, resultPath, CharacterMotionType.Jump);
+            feedback = ResolverUtils.createPathFeedback(character, resultPath, CharacterMotionType.Jump);
         } else {
             throw new IllegalArgumentException("Invalid Acrobat interaction type " + result.getResultType());
         }
@@ -134,9 +130,9 @@ public final class AcrobatActionResolver extends CharacterActionResolver {
         for (int i = jumpPaths.size() - 1; i >= 0; i--) {
             CharacterPath jumpPath = jumpPaths.get(i);
 
-            InteractionResult jumpResult = createPositionResult(new InteractionContext(character),
+            InteractionResult jumpResult = ResolverUtils.createPositionResult(new InteractionContext(character),
                     TargetCategory.ActiveAbilityDestination, jumpPath.getDestination());
-            InteractionFeedback jumpFeedback = createPathFeedback(character, jumpPath, CharacterMotionType.Jump);
+            InteractionFeedback jumpFeedback = ResolverUtils.createPathFeedback(character, jumpPath, CharacterMotionType.Jump);
 
             if (!isValidWith(builder, jumpResult, jumpFeedback)) {
                 jumpPaths.remove(i);

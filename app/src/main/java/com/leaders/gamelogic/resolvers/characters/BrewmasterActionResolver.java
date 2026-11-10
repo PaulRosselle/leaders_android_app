@@ -19,17 +19,10 @@ import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.gamelogic.queries.CharacterAbilityQuery;
 import com.leaders.gamelogic.resolvers.CharacterActionResolver;
+import com.leaders.gamelogic.resolvers.ResolverUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.leaders.gamelogic.resolvers.ResolverUtils.addTargets;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.createPositionRequest;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.createPositionResult;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.createSingleMotionFeedback;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.getChosenPosition;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.getPositions;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.isFeedbackExpected;
 
 /**
  * Resolves the Brewmaster's active ability.
@@ -82,7 +75,7 @@ public final class BrewmasterActionResolver extends CharacterActionResolver {
     @Nullable
     public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
         // Brewmaster actions generate a single feedback.
-        if (!isFeedbackExpected(builder)) {
+        if (!ResolverUtils.isFeedbackExpected(builder)) {
             return null;
         }
 
@@ -107,11 +100,11 @@ public final class BrewmasterActionResolver extends CharacterActionResolver {
             throw new IllegalArgumentException("Invalid result type for a Brewmaster ability activation");
         }
 
-        Position targetOrigin = getChosenPosition(firstResult);
+        Position targetOrigin = ResolverUtils.getChosenPosition(firstResult);
         Character target = getCharacterAt(targetOrigin);
-        Position targetDest = getChosenPosition(targetDestResult);
+        Position targetDest = ResolverUtils.getChosenPosition(targetDestResult);
 
-        return createSingleMotionFeedback(CharacterMotionType.Move, target, targetOrigin, targetDest);
+        return ResolverUtils.createSingleMotionFeedback(CharacterMotionType.Move, target, targetOrigin, targetDest);
     }
 
     /** * Builds the first interaction of the action.
@@ -125,7 +118,7 @@ public final class BrewmasterActionResolver extends CharacterActionResolver {
         // Normal movement and Brewmaster ability target cannot overlap:
         // a normal move requires an adjacent empty cell, while the brewmaster can only target adjacent allies.
         // For this reason, we can add both set of positions without further treatment to avoid duplicates
-        addTargets(legalTargets, TargetCategory.MovementDestination, getNormalMovementValidDestinations(builder));
+        ResolverUtils.addTargets(legalTargets, TargetCategory.MovementDestination, getNormalMovementValidDestinations(builder));
 
         if (CharacterAbilityQuery.canUseActiveAbility(game, character)) {
             for (Position adjacentAllyPos : getAdjacentAllyPositions()) {
@@ -135,7 +128,7 @@ public final class BrewmasterActionResolver extends CharacterActionResolver {
             }
         }
 
-        return createPositionRequest(new InteractionContext(character), legalTargets);
+        return ResolverUtils.createPositionRequest(new InteractionContext(character), legalTargets);
     }
 
     /** * Builds the second interaction required by the Brewmaster's active ability.
@@ -147,15 +140,15 @@ public final class BrewmasterActionResolver extends CharacterActionResolver {
         if (!isAbilityTargetResult(result)) {
             throw new IllegalArgumentException("A target position must be transmitted through a PositionChosen InteractionResult");
         }
-        Position targetPos = getChosenPosition(result);
+        Position targetPos = ResolverUtils.getChosenPosition(result);
 
 
         List<InteractionTarget> legalTargets = new ArrayList<>();
-        addTargets(legalTargets, TargetCategory.ActiveAbilityDestination,
+        ResolverUtils.addTargets(legalTargets, TargetCategory.ActiveAbilityDestination,
                 getValidTargetDestinations(builder, targetPos, false));
 
         Character targetedAlly = getCharacterAt(targetPos);
-        return createPositionRequest(new InteractionContext(character, targetedAlly), legalTargets);
+        return ResolverUtils.createPositionRequest(new InteractionContext(character, targetedAlly), legalTargets);
     }
 
     /** Returns the positions of all allied characters adjacent to the Brewmaster.
@@ -166,7 +159,7 @@ public final class BrewmasterActionResolver extends CharacterActionResolver {
         List<Cell> allyCells = BoardQuery.getAdjacentCells(game.getBoard(), characterPos, cell ->
                 cell.getCharacter() != null && cell.getCharacter().getTeamColor() == character.getTeamColor()
         );
-        return getPositions(allyCells);
+        return ResolverUtils.getPositions(allyCells);
     }
 
     /** * Returns the valid destinations for the character targeted by the Brewmaster.
@@ -192,9 +185,9 @@ public final class BrewmasterActionResolver extends CharacterActionResolver {
         for (Cell destination : BoardQuery.findEmptyCellsAround(game.getBoard(), targetPos, 1)) {
             Position destPos = destination.getPosition();
 
-            InteractionResult destResult = createPositionResult(new InteractionContext(character, target),
+            InteractionResult destResult = ResolverUtils.createPositionResult(new InteractionContext(character, target),
                     TargetCategory.ActiveAbilityDestination, destPos);
-            InteractionFeedback destFeedback = createSingleMotionFeedback(
+            InteractionFeedback destFeedback = ResolverUtils.createSingleMotionFeedback(
                     CharacterMotionType.Move, target, targetPos, destPos);
 
             if (isValidWith(targetBuilder, destResult, destFeedback)) {

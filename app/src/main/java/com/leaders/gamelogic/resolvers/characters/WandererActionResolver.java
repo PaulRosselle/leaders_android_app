@@ -19,16 +19,10 @@ import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.gamelogic.queries.CharacterAbilityQuery;
 import com.leaders.gamelogic.resolvers.CharacterActionResolver;
+import com.leaders.gamelogic.resolvers.ResolverUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.leaders.gamelogic.resolvers.ResolverUtils.addTargets;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.createPositionRequest;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.createPositionResult;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.createSingleMotionFeedback;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.getChosenPosition;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.isFeedbackExpected;
 
 /**
  * Resolves the Wanderer's active ability.
@@ -60,7 +54,7 @@ public final class WandererActionResolver extends CharacterActionResolver {
         // Normal movement and Wanderer destinations may overlap. We give priority to movement
         // meaning a cell reachable via normal movement won't be added from the active ability cells
         List<Position> movementDestinations = getNormalMovementValidDestinations(builder);
-        addTargets(legalTargets, TargetCategory.MovementDestination, movementDestinations);
+        ResolverUtils.addTargets(legalTargets, TargetCategory.MovementDestination, movementDestinations);
 
         if (CharacterAbilityQuery.canUseActiveAbility(game, character)) {
             for (Position flightDest : getWandererFlightDestinations(builder)) {
@@ -70,13 +64,13 @@ public final class WandererActionResolver extends CharacterActionResolver {
             }
         }
 
-        return createPositionRequest(new InteractionContext(character), legalTargets);
+        return ResolverUtils.createPositionRequest(new InteractionContext(character), legalTargets);
     }
 
     @Override
     @Nullable
     public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
-        if (!isFeedbackExpected(builder)) {
+        if (!ResolverUtils.isFeedbackExpected(builder)) {
             return null;
         }
 
@@ -107,7 +101,7 @@ public final class WandererActionResolver extends CharacterActionResolver {
             if (cell.getCharacter() == null && !isCellAdjacentToEnemy(cell.getPosition())) {
                 Position destPos = cell.getPosition();
 
-                InteractionResult flightResult = createPositionResult(new InteractionContext(character),
+                InteractionResult flightResult = ResolverUtils.createPositionResult(new InteractionContext(character),
                         TargetCategory.ActiveAbilityDestination, destPos);
 
                 if (isValidWith(builder, flightResult, buildWandererMovementFeedback(flightResult))) {
@@ -128,8 +122,8 @@ public final class WandererActionResolver extends CharacterActionResolver {
 
     @NonNull
     private InteractionFeedback buildWandererMovementFeedback(@NonNull InteractionResult result) {
-        Position destination = getChosenPosition(result);
+        Position destination = ResolverUtils.getChosenPosition(result);
 
-        return createSingleMotionFeedback(CharacterMotionType.Fly, character, characterPos, destination);
+        return ResolverUtils.createSingleMotionFeedback(CharacterMotionType.Fly, character, characterPos, destination);
     }
 }
