@@ -56,7 +56,7 @@ public final class TacticianActionResolver extends MoverActionResolver {
     }
 
     /**
-     * Gets the positions of all characters belonging to the Tactician's team.
+     * Gets the positions of all other non-leader characters belonging to the Tactician's team.
      *
      * @return the list of positions occupied by friendly characters
      */
@@ -65,6 +65,8 @@ public final class TacticianActionResolver extends MoverActionResolver {
     protected List<Position> getTargetPositions() {
         return BoardQuery.findCharacterCells(game.getBoard(), character.getTeamColor(), null)
                 .stream()
+                .filter(cell -> !character.getId().equals(cell.getCharacter().getId()) &&
+                        !cell.getCharacter().getCharacterType().getCharacterCard().isLeader())
                 .map(Cell::getPosition)
                 .collect(Collectors.toList());
     }

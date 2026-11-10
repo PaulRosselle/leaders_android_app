@@ -53,6 +53,7 @@ public class CharacterTypeUtils {
             case Wanderer: return R.drawable.character_piece_wanderer;
             case LeaderVermilion: return R.drawable.character_piece_leader_vermilion;
             case Sniper: return R.drawable.character_piece_sniper;
+            case Tactician: return R.drawable.character_piece_tactician;
             case Wisp: return R.drawable.character_piece_wisp;
             default: throw new IllegalArgumentException("No drawable found for character: " + characterType);
         }
@@ -85,6 +86,7 @@ public class CharacterTypeUtils {
             case Archer: return 4;
             case LeaderVermilion: return 25;
             case Sniper: return 23;
+            case Tactician: return 24;
             case Wisp: return 20;
             default: throw new NoSuchElementException("No LBE ID found for: " + characterType);
         }

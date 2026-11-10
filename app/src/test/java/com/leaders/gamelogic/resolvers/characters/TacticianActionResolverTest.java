@@ -166,17 +166,7 @@ public class TacticianActionResolverTest {
     }
 
     @Test
-    public void getNextInteraction_shouldExposeAbilityTargetsWhenAllyIsAdjacentToEnemyLeader() {
-        enableAbility();
-
-        InteractionRequest request = resolver.getNextInteraction(createBuilder());
-
-        assertNotNull(request);
-        assertTrue(containsTarget(request, TargetCategory.ActiveAbilityTargetPosition, TACTICIAN_POSITION));
-    }
-
-    @Test
-    public void getNextInteraction_shouldExposeAllFriendlyCharactersAsTargets() {
+    public void getNextInteraction_shouldExposeOtherNonLeaderAlliesAsTargets() {
         enableAbility();
 
         Position allyPosition = ALLY_POSITION;
@@ -185,7 +175,8 @@ public class TacticianActionResolverTest {
         InteractionRequest request = resolver.getNextInteraction(createBuilder());
 
         assertNotNull(request);
-        assertTrue(containsTarget(request, TargetCategory.ActiveAbilityTargetPosition, TACTICIAN_POSITION));
+        assertFalse(containsTarget(request, TargetCategory.ActiveAbilityTargetPosition, TACTICIAN_POSITION));
+        assertFalse(containsTarget(request, TargetCategory.ActiveAbilityTargetPosition, ALLY_LEADER_POSITION));
         assertTrue(containsTarget(request, TargetCategory.ActiveAbilityTargetPosition, allyPosition));
     }
 
