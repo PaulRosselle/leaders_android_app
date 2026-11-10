@@ -51,7 +51,7 @@ public final class RiderActionResolver extends CharacterActionResolver {
         // For this reason, we can add both destinations without further treatment to avoid duplicates
         ResolverUtils.addTargets(legalTargets, TargetCategory.MovementDestination, getNormalMovementValidDestinations(builder));
 
-        if (CharacterAbilityQuery.canUseActiveAbility(game, character)) {
+        if (CharacterAbilityQuery.canUseActiveAbility(game, gameHistory, character)) {
             ResolverUtils.addTargets(legalTargets, TargetCategory.ActiveAbilityDestination, getRiderDashDestinations(builder));
         }
 

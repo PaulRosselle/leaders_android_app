@@ -23,6 +23,7 @@ public enum CharacterCard {
     Wanderer,
     LeaderVermilion,
     Sniper,
+    Tactician,
     Wisp;
 
     /**
@@ -42,6 +43,7 @@ public enum CharacterCard {
             case Rider:
             case RoyalGuard:
             case Wanderer:
+            case Tactician:
                 return new AbilityType[] { AbilityType.Active };
             case Archer:
             case Assassin:

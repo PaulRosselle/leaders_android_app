@@ -8,25 +8,33 @@ import static org.junit.Assert.assertTrue;
 import androidx.annotation.NonNull;
 
 import com.leaders.gamelogic.actions.CharacterAction;
+import com.leaders.gamelogic.actions.CharacterActionMotion;
+import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.CharacterPath;
 import com.leaders.gamelogic.entities.Game;
+import com.leaders.gamelogic.entities.GameConfig;
+import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.entities.Position;
+import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.Direction;
+import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.GamePhaseType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.historyentries.segments.ActionsPhase;
+import com.leaders.gamelogic.historyentries.segments.Turn;
 
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Objects;
 
 public class CharacterAbilityQueryTest {
 
@@ -39,6 +47,50 @@ public class CharacterAbilityQueryTest {
                 new EnumMap<>(TeamColor.class), // playerBanishedCards
                 new EnumMap<>(TeamColor.class) // playerWarnings
         );
+    }
+
+    private GameHistory createTestGameHistory() {
+        // Build the minimal GameHistory state required by the tests.
+        // This state is intentionally invalid as a real game state.
+        ArrayList<Player> players = new ArrayList<>();
+        players.add(new Player(TeamColor.Black, "Paul"));
+        players.add(new Player(TeamColor.White, "Elise"));
+        GameHistory history = new GameHistory(new GameConfig(
+                players,
+                players.get(1), // firstPlayer
+                GameMode.Discovery,
+                new ArrayList<>(), // initialRecruitableCards
+                new ArrayList<>() // initialPlacements
+        ), new ArrayList<>());
+
+        Turn turn = new Turn(TeamColor.White);
+        history.getEntries().add(turn);
+
+        turn.getSubPhase(GamePhaseType.TurnStart).start();
+        turn.getSubPhase(GamePhaseType.TurnStart).end();
+        turn.getSubPhase(GamePhaseType.Actions).start();
+
+        return history;
+    }
+
+    private void addCharacterMovementAction(@NonNull GameHistory history,
+                                            @NonNull Character sourceCharacter,
+                                            @NonNull Character targetCharacter,
+                                            @NonNull Position source,
+                                            @NonNull Position destination) {
+        CharacterAction action = new CharacterAction(
+                sourceCharacter,
+                List.of(new CharacterActionMotion(
+                        CharacterMotionType.Move,
+                        List.of(new CharacterActionTarget(
+                                targetCharacter,
+                                source,
+                                destination
+                        ))
+                ))
+        );
+
+        Objects.requireNonNull(GameHistoryQuery.findCurrentPhase(history)).getActions().add(action);
     }
 
     private ActionsPhase createActionsPhase() {
@@ -389,8 +441,9 @@ public class CharacterAbilityQueryTest {
     @Test
     public void canUseActiveAbility_shouldReturnFalseForCharacterWithoutActiveAbility() {
         Game game = createTestGame(new Board());
+        GameHistory gameHistory = createTestGameHistory();
         Character character = createCharacter(CharacterType.Archer, TeamColor.Black);
-        assertFalse(CharacterAbilityQuery.canUseActiveAbility(game, character));
+        assertFalse(CharacterAbilityQuery.canUseActiveAbility(game, gameHistory, character));
     }
 
     @Test
@@ -400,7 +453,8 @@ public class CharacterAbilityQueryTest {
         Character character = createCharacter(CharacterType.Bruiser, TeamColor.Black);
         board.getCell(new Position(3, 3)).setCharacter(character);
         Game game = createTestGame(board);
-        assertTrue(CharacterAbilityQuery.canUseActiveAbility(game, character));
+        GameHistory gameHistory = createTestGameHistory();
+        assertTrue(CharacterAbilityQuery.canUseActiveAbility(game, gameHistory, character));
     }
 
     @Test
@@ -415,7 +469,117 @@ public class CharacterAbilityQueryTest {
         board.getCell(new Position(3, 2)).setCharacter(jailer);
 
         Game game = createTestGame(board);
-        assertFalse(CharacterAbilityQuery.canUseActiveAbility(game, character));
+        GameHistory gameHistory = createTestGameHistory();
+        assertFalse(CharacterAbilityQuery.canUseActiveAbility(game, gameHistory, character));
+    }
+
+    @Test
+    public void canUseActiveAbility_shouldReturnTrueWhenNoCurrentPhaseExists() {
+        Board board = new Board();
+
+        Character bruiser = createCharacter(CharacterType.Bruiser, TeamColor.Black);
+        board.getCell(new Position(3, 3)).setCharacter(bruiser);
+
+        Game game = createTestGame(board);
+
+        GameHistory history = createTestGameHistory();
+        history.getEntries().clear();
+
+        assertTrue(CharacterAbilityQuery.canUseActiveAbility(game, history, bruiser));
+    }
+
+    @Test
+    public void canUseActiveAbility_shouldReturnTrueWhenMovedByNonTactician() {
+        Board board = new Board();
+
+        Character bruiser = createCharacter(CharacterType.Bruiser, TeamColor.Black);
+        Character manipulator = createCharacter(CharacterType.Manipulator, TeamColor.Black);
+
+        Position bruiserPos = new Position(3, 3);
+        board.getCell(bruiserPos).setCharacter(bruiser);
+
+        Game game = createTestGame(board);
+        GameHistory history = createTestGameHistory();
+
+        addCharacterMovementAction(history, manipulator, bruiser, bruiserPos, new Position(3, 2));
+
+        assertTrue(CharacterAbilityQuery.canUseActiveAbility(game, history, bruiser));
+    }
+
+    @Test
+    public void canUseActiveAbility_shouldReturnTrueWhenTacticianMovesAnotherCharacter() {
+        Board board = new Board();
+
+        Character bruiser = createCharacter(CharacterType.Bruiser, TeamColor.Black);
+        Character tactician = createCharacter(CharacterType.Tactician, TeamColor.Black);
+        Character acrobat = createCharacter(CharacterType.Acrobat, TeamColor.Black);
+
+        board.getCell(new Position(3, 3)).setCharacter(bruiser);
+        Position acrobatPos = new Position(2, 2);
+        board.getCell(acrobatPos).setCharacter(acrobat);
+
+        Game game = createTestGame(board);
+        GameHistory history = createTestGameHistory();
+
+        addCharacterMovementAction(history, tactician, acrobat, acrobatPos, new Position(3, 2));
+
+        assertTrue(CharacterAbilityQuery.canUseActiveAbility(game, history, bruiser));
+    }
+
+    @Test
+    public void canUseActiveAbility_shouldReturnFalseWhenMovedByFriendlyTactician() {
+        Board board = new Board();
+
+        Character bruiser = createCharacter(CharacterType.Bruiser, TeamColor.Black);
+        Character tactician = createCharacter(CharacterType.Tactician, TeamColor.Black);
+
+        Position bruiserPos = new Position(3, 3);
+        board.getCell(bruiserPos).setCharacter(bruiser);
+
+        Game game = createTestGame(board);
+        GameHistory history = createTestGameHistory();
+
+        addCharacterMovementAction(history, tactician, bruiser, bruiserPos, new Position(3, 2));
+
+        assertFalse(CharacterAbilityQuery.canUseActiveAbility(game, history, bruiser));
+    }
+
+    @Test
+    public void canUseActiveAbility_shouldReturnTrueWhenMovedByEnemyTactician() {
+        Board board = new Board();
+
+        Character bruiser = createCharacter(CharacterType.Bruiser, TeamColor.Black);
+        Character tactician = createCharacter(CharacterType.Tactician, TeamColor.White);
+
+        Position bruiserPos = new Position(3, 3);
+        board.getCell(bruiserPos).setCharacter(bruiser);
+
+        Game game = createTestGame(board);
+        GameHistory history = createTestGameHistory();
+
+        addCharacterMovementAction(history, tactician, bruiser, bruiserPos, new Position(3, 2));
+
+        assertTrue(CharacterAbilityQuery.canUseActiveAbility(game, history, bruiser));
+    }
+
+    @Test
+    public void canUseActiveAbility_shouldReturnFalseWhenTransformedCharacterWasMovedByFriendlyTactician() {
+        Board board = new Board();
+
+        Character bruiser = createCharacter(CharacterType.Bruiser, TeamColor.Black);
+        Character transformedBruiser = Character.transform(bruiser, CharacterType.Cub, TeamColor.Black);
+
+        Character tactician = createCharacter(CharacterType.Tactician, TeamColor.Black);
+
+        Position bruiserPos = new Position(3, 3);
+        board.getCell(bruiserPos).setCharacter(transformedBruiser);
+
+        Game game = createTestGame(board);
+        GameHistory history = createTestGameHistory();
+
+        addCharacterMovementAction(history, tactician, bruiser, bruiserPos, new Position(3, 2));
+
+        assertFalse(CharacterAbilityQuery.canUseActiveAbility(game, history, bruiser));
     }
 
     @Test

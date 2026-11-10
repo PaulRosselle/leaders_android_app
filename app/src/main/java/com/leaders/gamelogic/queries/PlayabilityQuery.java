@@ -33,10 +33,12 @@ public final class PlayabilityQuery {
      * @return the playable state of the character
      */
     @NonNull
-    private static PlayableCharacter getState(@NonNull Game game, @NonNull Cell characterCell, boolean mandatory) {
+    private static PlayableCharacter getState(@NonNull Game game, @NonNull GameHistory gameHistory,
+                                              @NonNull Cell characterCell, boolean mandatory) {
         return new PlayableCharacter(
                 characterCell.getCharacter(), characterCell.getPosition(), mandatory,
-                CharacterAbilityQuery.canUseActiveAbility(game, characterCell.getCharacter()));
+                CharacterAbilityQuery.canUseActiveAbility(game, gameHistory, characterCell.getCharacter())
+        );
     }
 
     @Nullable
@@ -87,11 +89,11 @@ public final class PlayabilityQuery {
             // If there is a character forced to play immediately, we return them alone
             if (CharacterAbilityQuery.mustActNow(actionsPhase, character) &&
                 hasValidAction(game, gameHistory, character)) {
-                return Collections.singletonList(getState(game, characterCell, true));
+                return Collections.singletonList(getState(game, gameHistory, characterCell, true));
             }
             // If a character is allowed to act, we add them to the list
             if (CharacterAbilityQuery.canAct(actionsPhase, character)) {
-                playableCharacters.add(getState(game, characterCell, CharacterAbilityQuery.mustAct()));
+                playableCharacters.add(getState(game, gameHistory, characterCell, CharacterAbilityQuery.mustAct()));
             }
         }
         return playableCharacters;
