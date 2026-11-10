@@ -60,7 +60,7 @@ public class ContributorView extends LinearLayout {
             case Jailer: return R.drawable.character_piece_jailer;
             case LeaderKing: return R.drawable.character_piece_leader_king;
             case LeaderQueen: return R.drawable.character_piece_leader_queen;
-            case LeaderVermillion: return R.drawable.character_piece_leader_vermillion;
+            case LeaderVermilion: return R.drawable.character_piece_leader_vermilion;
             case Nemesis: return R.drawable.character_piece_nemesis;
             case Protector: return R.drawable.character_piece_protector;
             case Rider: return R.drawable.character_piece_rider;

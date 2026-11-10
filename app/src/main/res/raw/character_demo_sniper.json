@@ -23,7 +23,7 @@
             "motion_type": "Add",
             "character": {
               "uuid": "71e486b0-0e6c-4ee0-ba35-f369660b699d",
-              "character_type": "LeaderQueen",
+              "character_type": "LeaderVermilion",
               "team_color": "Black"
             },
             "position": {
@@ -96,7 +96,7 @@
             "comment": "This action is an unplayable dummy to prevent this character to move",
             "src_character": {
               "uuid": "71e486b0-0e6c-4ee0-ba35-f369660b699d",
-              "character_type": "LeaderKing",
+              "character_type": "LeaderVermilion",
               "team_color": "Black"
             },
             "motions": [
