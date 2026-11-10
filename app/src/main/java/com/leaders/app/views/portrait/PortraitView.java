@@ -7,6 +7,7 @@ import android.graphics.drawable.LayerDrawable;
 import android.util.AttributeSet;
 import android.view.View;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
@@ -16,6 +17,7 @@ import com.leaders.R;
 import com.leaders.app.entities.PortraitInfo;
 import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.app.enums.PortraitDisplayMode;
+import com.leaders.app.utilities.CharacterCardUtils;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.interactions.InteractionTarget;
@@ -80,12 +82,26 @@ public final class PortraitView extends AppCompatImageView {
         int characterResId;
 
         switch (info.getDisplayMode()) {
-            case Default: characterResId = getPortraitDrawableId(); break;
-            case Hexagonal: characterResId = getPortraitHexagonalDrawableId(); break;
+            case Default: characterResId = getCharacterDrawableResId(); break;
+            case Hexagonal: characterResId = getCharacterHexagonalDrawableResId(); break;
             default: throw new IllegalStateException("Unexpected display mode: " + info.getDisplayMode());
         }
 
         return AppCompatResources.getDrawable(getContext(), characterResId);
+    }
+
+    @DrawableRes
+    private int getCharacterDrawableResId() {
+        return info.isBanned() ?
+                CharacterCardUtils.getPortraitBannedDrawableId(info.getCard(), info.getSkinType()) :
+                CharacterCardUtils.getPortraitDrawableId(info.getCard(), info.getSkinType());
+    }
+
+    @DrawableRes
+    private int getCharacterHexagonalDrawableResId() {
+        return info.isBanned() ?
+                CharacterCardUtils.getPortraitHexagonalBannedDrawableId(info.getCard(), info.getSkinType()) :
+                CharacterCardUtils.getPortraitHexagonalDrawableId(info.getCard(), info.getSkinType());
     }
 
     @Nullable
@@ -104,170 +120,6 @@ public final class PortraitView extends AppCompatImageView {
         }
 
         return AppCompatResources.getDrawable(getContext(), foregroundResId);
-    }
-
-    private int getPortraitDrawableId() {
-        if (info.isBanned()) {
-            return getPortraitBannedDrawableId();
-        }
-
-        switch (info.getCard()) {
-            case Acrobat: return R.drawable.card_portrait_acrobat;
-            case Archer: return R.drawable.card_portrait_archer;
-            case Assassin: return R.drawable.card_portrait_assassin;
-            case Brewmaster: return R.drawable.card_portrait_brewmaster;
-            case Bruiser: return R.drawable.card_portrait_bruiser;
-            case ClawLauncher: return R.drawable.card_portrait_claw_launcher;
-            case HermitAndCub: return R.drawable.card_portrait_hermit_and_cub;
-            case Illusionist: {
-                if (info.getSkinType() == CharacterSkinType.LaughingMoonSage) {
-                    return R.drawable.card_portrait_illusionist_lms;
-                }
-                return R.drawable.card_portrait_illusionist;
-            }
-            case Jailer: return R.drawable.card_portrait_jailer;
-            case LeaderKing: return R.drawable.card_portrait_leader_king;
-            case LeaderQueen: return R.drawable.card_portrait_leader_queen;
-            case Manipulator: return R.drawable.card_portrait_manipulator;
-            case Nemesis: return R.drawable.card_portrait_nemesis;
-            case Protector: return R.drawable.card_portrait_protector;
-            case Rider: return R.drawable.card_portrait_rider;
-            case RoyalGuard: {
-                if (info.getSkinType() == CharacterSkinType.LaughingMoonSage) {
-                    return R.drawable.card_portrait_royal_guard_lms;
-                }
-                return R.drawable.card_portrait_royal_guard;
-            }
-            case Vizier: {
-                if (info.getSkinType() == CharacterSkinType.LaughingMoonSage) {
-                    return R.drawable.card_portrait_vizier_lms;
-                }
-                return R.drawable.card_portrait_vizier;
-            }
-            case Wanderer: return R.drawable.card_portrait_wanderer;
-            case Wisp: return R.drawable.card_portrait_wisp;
-            default: throw new IllegalArgumentException("No portrait drawable for card: " + info.getCard());
-        }
-    }
-
-    private int getPortraitBannedDrawableId() {
-        switch (info.getCard()) {
-            case Acrobat: return R.drawable.card_portrait_banned_acrobat;
-            case Archer: return R.drawable.card_portrait_banned_archer;
-            case Assassin: return R.drawable.card_portrait_banned_assassin;
-            case Brewmaster: return R.drawable.card_portrait_banned_brewmaster;
-            case Bruiser: return R.drawable.card_portrait_banned_bruiser;
-            case ClawLauncher: return R.drawable.card_portrait_banned_claw_launcher;
-            case HermitAndCub: return R.drawable.card_portrait_banned_hermit_and_cub;
-            case Illusionist: {
-                if (info.getSkinType() == CharacterSkinType.LaughingMoonSage) {
-                    return R.drawable.card_portrait_banned_illusionist_lms;
-                }
-                return R.drawable.card_portrait_banned_illusionist;
-            }
-            case Jailer: return R.drawable.card_portrait_banned_jailer;
-            case Manipulator: return R.drawable.card_portrait_banned_manipulator;
-            case Nemesis: return R.drawable.card_portrait_banned_nemesis;
-            case Protector: return R.drawable.card_portrait_banned_protector;
-            case Rider: return R.drawable.card_portrait_banned_rider;
-            case RoyalGuard: {
-                if (info.getSkinType() == CharacterSkinType.LaughingMoonSage) {
-                    return R.drawable.card_portrait_banned_royal_guard_lms;
-                }
-                return R.drawable.card_portrait_banned_royal_guard;
-            }
-            case Vizier: {
-                if (info.getSkinType() == CharacterSkinType.LaughingMoonSage) {
-                    return R.drawable.card_portrait_banned_vizier_lms;
-                }
-                return R.drawable.card_portrait_banned_vizier;
-            }
-            case Wanderer: return R.drawable.card_portrait_banned_wanderer;
-            case Wisp: return R.drawable.card_portrait_banned_wisp;
-            default: throw new IllegalArgumentException("No portrait drawable for card: " + info.getCard());
-        }
-    }
-
-    private int getPortraitHexagonalDrawableId() {
-        if (info.isBanned()) {
-            return getPortraitHexagonalBannedDrawableId();
-        }
-
-        switch (info.getCard()) {
-            case Acrobat: return R.drawable.card_hex_portrait_acrobat;
-            case Archer: return R.drawable.card_hex_portrait_archer;
-            case Assassin: return R.drawable.card_hex_portrait_assassin;
-            case Brewmaster: return R.drawable.card_hex_portrait_brewmaster;
-            case Bruiser: return R.drawable.card_hex_portrait_bruiser;
-            case ClawLauncher: return R.drawable.card_hex_portrait_claw_launcher;
-            case HermitAndCub: return R.drawable.card_hex_portrait_hermit_and_cub;
-            case Illusionist: {
-                if (info.getSkinType() == CharacterSkinType.LaughingMoonSage) {
-                    return R.drawable.card_hex_portrait_illusionist_lms;
-                }
-                return R.drawable.card_hex_portrait_illusionist;
-            }
-            case Jailer: return R.drawable.card_hex_portrait_jailer;
-            case LeaderKing: return R.drawable.card_hex_portrait_leader_king;
-            case LeaderQueen: return R.drawable.card_hex_portrait_leader_queen;
-            case Manipulator: return R.drawable.card_hex_portrait_manipulator;
-            case Nemesis: return R.drawable.card_hex_portrait_nemesis;
-            case Protector: return R.drawable.card_hex_portrait_protector;
-            case Rider: return R.drawable.card_hex_portrait_rider;
-            case RoyalGuard: {
-                if (info.getSkinType() == CharacterSkinType.LaughingMoonSage) {
-                    return R.drawable.card_hex_portrait_royal_guard_lms;
-                }
-                return R.drawable.card_hex_portrait_royal_guard;
-            }
-            case Vizier: {
-                if (info.getSkinType() == CharacterSkinType.LaughingMoonSage) {
-                    return R.drawable.card_hex_portrait_vizier_lms;
-                }
-                return R.drawable.card_hex_portrait_vizier;
-            }
-            case Wanderer: return R.drawable.card_hex_portrait_wanderer;
-            case Wisp: return R.drawable.card_hex_portrait_wisp;
-            default: throw new IllegalArgumentException("No portrait drawable for card: " + info.getCard());
-        }
-    }
-
-    private int getPortraitHexagonalBannedDrawableId() {
-        switch (info.getCard()) {
-            case Acrobat: return R.drawable.card_hex_portrait_banned_acrobat;
-            case Archer: return R.drawable.card_hex_portrait_banned_archer;
-            case Assassin: return R.drawable.card_hex_portrait_banned_assassin;
-            case Brewmaster: return R.drawable.card_hex_portrait_banned_brewmaster;
-            case Bruiser: return R.drawable.card_hex_portrait_banned_bruiser;
-            case ClawLauncher: return R.drawable.card_hex_portrait_banned_claw_launcher;
-            case HermitAndCub: return R.drawable.card_hex_portrait_banned_hermit_and_cub;
-            case Illusionist: {
-                if (info.getSkinType() == CharacterSkinType.LaughingMoonSage) {
-                    return R.drawable.card_hex_portrait_banned_illusionist_lms;
-                }
-                return R.drawable.card_hex_portrait_banned_illusionist;
-            }
-            case Jailer: return R.drawable.card_hex_portrait_banned_jailer;
-            case Manipulator: return R.drawable.card_hex_portrait_banned_manipulator;
-            case Nemesis: return R.drawable.card_hex_portrait_banned_nemesis;
-            case Protector: return R.drawable.card_hex_portrait_banned_protector;
-            case Rider: return R.drawable.card_hex_portrait_banned_rider;
-            case RoyalGuard: {
-                if (info.getSkinType() == CharacterSkinType.LaughingMoonSage) {
-                    return R.drawable.card_hex_portrait_banned_royal_guard_lms;
-                }
-                return R.drawable.card_hex_portrait_banned_royal_guard;
-            }
-            case Vizier: {
-                if (info.getSkinType() == CharacterSkinType.LaughingMoonSage) {
-                    return R.drawable.card_hex_portrait_banned_vizier_lms;
-                }
-                return R.drawable.card_hex_portrait_banned_vizier;
-            }
-            case Wanderer: return R.drawable.card_hex_portrait_banned_wanderer;
-            case Wisp: return R.drawable.card_hex_portrait_banned_wisp;
-            default: throw new IllegalArgumentException("No hex portrait drawable for card: " + info.getCard());
-        }
     }
 
     @NonNull

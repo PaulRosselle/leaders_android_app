@@ -606,7 +606,8 @@ public final class JsonUtils {
     public static GameHistory loadCharacterDemo(@NonNull Context context,
                                                 @NonNull CharacterCard characterCard) {
         // Character demos are stored within raw resource files
-        try (InputStream fisCharacterDemo = context.getResources().openRawResource(getCharacterDemoResId(characterCard))) {
+        try (InputStream fisCharacterDemo = context.getResources().openRawResource(
+                CharacterCardUtils.getCharacterDemoResId(characterCard))) {
             JSONObject joCharacterDemo = openJsonFile(fisCharacterDemo);
 
             GameHistorySerializer serializer = new GameHistorySerializer();
@@ -615,31 +616,6 @@ public final class JsonUtils {
 
         } catch (IOException | JSONException e) {
             throw new RuntimeException(e);
-        }
-    }
-    
-    private static int getCharacterDemoResId(@NonNull CharacterCard characterCard) {
-        switch (characterCard) {
-            case Acrobat: return R.raw.character_demo_acrobat;
-            case Archer: return R.raw.character_demo_archer;
-            case Assassin: return R.raw.character_demo_assassin;
-            case Brewmaster: return R.raw.character_demo_brewmaster;
-            case Bruiser: return R.raw.character_demo_bruiser;
-            case ClawLauncher: return R.raw.character_demo_claw_launcher;
-            case HermitAndCub: return R.raw.character_demo_hermit_and_cub;
-            case Illusionist: return R.raw.character_demo_illusionist;
-            case Jailer: return R.raw.character_demo_jailer;
-            case LeaderKing: return R.raw.character_demo_leader_king;
-            case LeaderQueen: return R.raw.character_demo_leader_queen;
-            case Manipulator: return R.raw.character_demo_manipulator;
-            case Nemesis: return R.raw.character_demo_nemesis;
-            case Protector: return R.raw.character_demo_protector;
-            case Rider: return R.raw.character_demo_rider;
-            case RoyalGuard: return R.raw.character_demo_royal_guard;
-            case Vizier: return R.raw.character_demo_vizier;
-            case Wanderer: return R.raw.character_demo_wanderer;
-            case Wisp: return R.raw.character_demo_wisp;
-            default: throw new IllegalStateException("No character demo file found for character card: " + characterCard);
         }
     }
 

@@ -21,16 +21,10 @@ import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.gamelogic.queries.CharacterAbilityQuery;
 import com.leaders.gamelogic.resolvers.CharacterActionResolver;
+import com.leaders.gamelogic.resolvers.ResolverUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.leaders.gamelogic.resolvers.ResolverUtils.addTargets;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.createMotionFeedback;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.createPositionRequest;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.createPositionResult;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.getChosenPosition;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.isFeedbackExpected;
 
 /**
  * Resolves the Illusionist's active ability.
@@ -60,19 +54,19 @@ public final class IllusionistActionResolver extends CharacterActionResolver {
         // For this reason, we can add both destinations without further treatment to avoid duplicates
         List<InteractionTarget> legalTargets = new ArrayList<>();
 
-        addTargets(legalTargets, TargetCategory.MovementDestination, getNormalMovementValidDestinations(builder));
+        ResolverUtils.addTargets(legalTargets, TargetCategory.MovementDestination, getNormalMovementValidDestinations(builder));
 
         if (CharacterAbilityQuery.canUseActiveAbility(game, character)) {
-            addTargets(legalTargets, TargetCategory.ActiveAbilityTargetPosition, getIllusionistTargetPositions(builder));
+            ResolverUtils.addTargets(legalTargets, TargetCategory.ActiveAbilityTargetPosition, getIllusionistTargetPositions(builder));
         }
 
-        return createPositionRequest(new InteractionContext(character), legalTargets);
+        return ResolverUtils.createPositionRequest(new InteractionContext(character), legalTargets);
     }
 
     @Override
     @Nullable
     public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
-        if (!isFeedbackExpected(builder)) {
+        if (!ResolverUtils.isFeedbackExpected(builder)) {
             return null;
         }
 
@@ -112,7 +106,7 @@ public final class IllusionistActionResolver extends CharacterActionResolver {
                                 CharacterAbilityQuery.canBeMovedByEnemyAbilities(game, targetCell.getCharacter()))) {
                     Position targetPos = targetCell.getPosition();
 
-                    InteractionResult swapResult = createPositionResult(new InteractionContext(character),
+                    InteractionResult swapResult = ResolverUtils.createPositionResult(new InteractionContext(character),
                             TargetCategory.ActiveAbilityTargetPosition, targetPos);
 
                     if (isValidWith(builder, swapResult, buildSwapFeedback(swapResult))) {
@@ -127,10 +121,10 @@ public final class IllusionistActionResolver extends CharacterActionResolver {
 
     @NonNull
     private InteractionFeedback buildSwapFeedback(@NonNull InteractionResult result) {
-        Position targetPos = getChosenPosition(result);
+        Position targetPos = ResolverUtils.getChosenPosition(result);
         Character target = getCharacterAt(targetPos);
 
-        return createMotionFeedback(CharacterMotionType.Swap,
+        return ResolverUtils.createMotionFeedback(CharacterMotionType.Swap,
                 new CharacterActionTarget(character, characterPos, targetPos),
                 new CharacterActionTarget(target, targetPos, characterPos));
     }

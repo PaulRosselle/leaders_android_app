@@ -20,16 +20,10 @@ import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.gamelogic.queries.CharacterAbilityQuery;
 import com.leaders.gamelogic.resolvers.CharacterActionResolver;
+import com.leaders.gamelogic.resolvers.ResolverUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.leaders.gamelogic.resolvers.ResolverUtils.addTargets;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.createPositionRequest;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.createPositionResult;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.createSingleMotionFeedback;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.getChosenPosition;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.isFeedbackExpected;
 
 /**
  * Resolves the Claw Launcher's active ability.
@@ -59,7 +53,7 @@ public final class ClawLauncherActionResolver extends CharacterActionResolver {
 
         // Normal movement has priority over the Claw Launcher's active ability effect.
         List<Position> movementDestinations = getNormalMovementValidDestinations(builder);
-        addTargets(legalTargets, TargetCategory.MovementDestination, movementDestinations);
+        ResolverUtils.addTargets(legalTargets, TargetCategory.MovementDestination, movementDestinations);
 
         if (CharacterAbilityQuery.canUseActiveAbility(game, character)) {
             for (Position targetPos : getClawLauncherValidTargetPositions()) {
@@ -80,13 +74,13 @@ public final class ClawLauncherActionResolver extends CharacterActionResolver {
             }
         }
 
-        return createPositionRequest(new InteractionContext(character), legalTargets);
+        return ResolverUtils.createPositionRequest(new InteractionContext(character), legalTargets);
     }
 
     @Override
     @Nullable
     public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
-        if (!isFeedbackExpected(builder)) {
+        if (!ResolverUtils.isFeedbackExpected(builder)) {
             return null;
         }
 
@@ -133,7 +127,7 @@ public final class ClawLauncherActionResolver extends CharacterActionResolver {
     private boolean isValidPull(@NonNull CharacterActionBuilder builder,
                                 @NonNull TargetCategory targetCategory,
                                 @NonNull Position targetPos) {
-        InteractionResult pullResult = createPositionResult(
+        InteractionResult pullResult = ResolverUtils.createPositionResult(
                 new InteractionContext(character), targetCategory, targetPos);
 
         return isValidWith(builder, pullResult, buildClawLauncherFeedback(pullResult));
@@ -142,17 +136,17 @@ public final class ClawLauncherActionResolver extends CharacterActionResolver {
     @NonNull
     private InteractionFeedback buildClawLauncherFeedback(@NonNull InteractionResult result) {
         // This can be either a target pos or the claw launcher pull destination
-        Position targetPos = getChosenPosition(result);
+        Position targetPos = ResolverUtils.getChosenPosition(result);
 
         if (isAbilityTargetResult(result)) {
             Character target = getCharacterAt(targetPos);
 
-            return createSingleMotionFeedback(CharacterMotionType.Move,
+            return ResolverUtils.createSingleMotionFeedback(CharacterMotionType.Move,
                     target, targetPos, getAbilityPullDestination(characterPos, targetPos));
         }
 
         if (isAbilityDestinationResult(result)) {
-            return createSingleMotionFeedback(CharacterMotionType.Move, character, characterPos, targetPos);
+            return ResolverUtils.createSingleMotionFeedback(CharacterMotionType.Move, character, characterPos, targetPos);
         }
 
         throw new IllegalArgumentException("Invalid target category for a Claw Launcher ability");

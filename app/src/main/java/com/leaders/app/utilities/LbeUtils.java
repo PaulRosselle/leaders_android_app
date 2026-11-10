@@ -11,8 +11,6 @@ import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterType;
 
-import java.util.NoSuchElementException;
-
 public final class LbeUtils {
     public static final String DEFAULT_URL = "https://mthbrt.github.io/Leaders-editor/#";
     public static final String HEADER_WHITE = "white=";
@@ -28,37 +26,11 @@ public final class LbeUtils {
         throw new AssertionError("Cannot instantiate utility class");
     }
 
-    public static int getCharacterExportId(@NonNull CharacterType characterType) {
-        switch (characterType) {
-            case Acrobat: return 3;
-            case Assassin: return 5;
-            case Brewmaster: return 16;
-            case Bruiser: return 7;
-            case ClawLauncher: return 11;
-            case Cub: return 18;
-            case Hermit: return 17;
-            case Illusionist: return 10;
-            case Jailer: return 9;
-            case LeaderKing: return 1;
-            case LeaderQueen: return 2;
-            case Manipulator: return 12;
-            case Nemesis: return 13;
-            case Protector: return 14;
-            case Rider: return 6;
-            case RoyalGuard: return 8;
-            case Vizier: return 19;
-            case Wanderer: return 15;
-            case Archer: return 4;
-            case Wisp: return 20;
-            default: throw new NoSuchElementException("No LBE ID found for: " + characterType);
-        }
-    }
-
     public static String getCharacterExportStr(@Nullable Character character) {
         if (character == null) {
             throw new IllegalArgumentException("Cannot export an empty character");
         }
-        return String.valueOf(getCharacterExportId(character.getCharacterType()));
+        return String.valueOf(CharacterTypeUtils.getCharacterExportId(character.getCharacterType()));
     }
 
     public static CharacterType getCharacterTypeFromExportStr(@Nullable Context context, @NonNull String exportStr) {
@@ -69,7 +41,7 @@ public final class LbeUtils {
         try {
             int characterExportId = Integer.parseInt(exportStr);
             for (CharacterType characterType : CharacterType.values()) {
-                if (getCharacterExportId(characterType) == characterExportId) {
+                if (CharacterTypeUtils.getCharacterExportId(characterType) == characterExportId) {
                     return characterType;
                 }
             }

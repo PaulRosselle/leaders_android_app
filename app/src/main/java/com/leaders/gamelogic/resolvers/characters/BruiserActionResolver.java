@@ -21,17 +21,10 @@ import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.gamelogic.queries.CharacterAbilityQuery;
 import com.leaders.gamelogic.resolvers.CharacterActionResolver;
+import com.leaders.gamelogic.resolvers.ResolverUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.leaders.gamelogic.resolvers.ResolverUtils.addTargets;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.createMotionFeedback;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.createPositionRequest;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.createPositionResult;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.getChosenPosition;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.getPositions;
-import static com.leaders.gamelogic.resolvers.ResolverUtils.isFeedbackExpected;
 
 /**
  * Resolves the Bruiser's active ability.
@@ -82,7 +75,7 @@ public final class BruiserActionResolver extends CharacterActionResolver {
     @Override
     @Nullable
     public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
-        if (!isFeedbackExpected(builder)) {
+        if (!ResolverUtils.isFeedbackExpected(builder)) {
             return null;
         }
 
@@ -102,11 +95,11 @@ public final class BruiserActionResolver extends CharacterActionResolver {
             throw new IllegalArgumentException("Invalid result types for a Bruiser ability activation");
         }
 
-        Position targetOrigin = getChosenPosition(firstResult);
-        Position destination = getChosenPosition(destinationResult);
+        Position targetOrigin = ResolverUtils.getChosenPosition(firstResult);
+        Position destination = ResolverUtils.getChosenPosition(destinationResult);
         Character target = getCharacterAt(targetOrigin);
 
-        return createMotionFeedback(CharacterMotionType.Push,
+        return ResolverUtils.createMotionFeedback(CharacterMotionType.Push,
                 new CharacterActionTarget(character, characterPos, targetOrigin),
                 new CharacterActionTarget(target, targetOrigin, destination));
     }
@@ -115,7 +108,7 @@ public final class BruiserActionResolver extends CharacterActionResolver {
     private InteractionRequest buildInitialInteraction(@NonNull CharacterActionBuilder builder) {
         List<InteractionTarget> legalTargets = new ArrayList<>();
 
-        addTargets(legalTargets, TargetCategory.MovementDestination, getNormalMovementValidDestinations(builder));
+        ResolverUtils.addTargets(legalTargets, TargetCategory.MovementDestination, getNormalMovementValidDestinations(builder));
 
         if (CharacterAbilityQuery.canUseActiveAbility(game, character)) {
             for (Position enemyPosition : getAdjacentEnemyPositions()) {
@@ -125,7 +118,7 @@ public final class BruiserActionResolver extends CharacterActionResolver {
             }
         }
 
-        return createPositionRequest(new InteractionContext(character), legalTargets);
+        return ResolverUtils.createPositionRequest(new InteractionContext(character), legalTargets);
     }
 
     @NonNull
@@ -135,15 +128,15 @@ public final class BruiserActionResolver extends CharacterActionResolver {
             throw new IllegalArgumentException("A Bruiser ability target must be selected through a PositionChosen result");
         }
 
-        Position targetPos = getChosenPosition(result);
+        Position targetPos = ResolverUtils.getChosenPosition(result);
 
         List<InteractionTarget> legalTargets = new ArrayList<>();
 
-        addTargets(legalTargets, TargetCategory.ActiveAbilityDestination,
+        ResolverUtils.addTargets(legalTargets, TargetCategory.ActiveAbilityDestination,
                 getValidPushDestinations(builder, targetPos, false));
 
         Character targetedEnemy = getCharacterAt(targetPos);
-        return createPositionRequest(new InteractionContext(character, targetedEnemy), legalTargets);
+        return ResolverUtils.createPositionRequest(new InteractionContext(character, targetedEnemy), legalTargets);
     }
 
     /**
@@ -159,7 +152,7 @@ public final class BruiserActionResolver extends CharacterActionResolver {
             return target != null && target.getTeamColor() != character.getTeamColor() &&
                     CharacterAbilityQuery.canBeMovedByEnemyAbilities(game, target);
         });
-        return getPositions(enemyCells);
+        return ResolverUtils.getPositions(enemyCells);
     }
 
     /**
@@ -200,9 +193,9 @@ public final class BruiserActionResolver extends CharacterActionResolver {
             if (pushCell != null && pushCell.getCharacter() == null) {
                 Position pushDestPos = pushCell.getPosition();
 
-                InteractionResult pushResult = createPositionResult(new InteractionContext(character, target),
+                InteractionResult pushResult = ResolverUtils.createPositionResult(new InteractionContext(character, target),
                         TargetCategory.ActiveAbilityDestination, pushDestPos);
-                InteractionFeedback pushFeedback = createMotionFeedback(CharacterMotionType.Push,
+                InteractionFeedback pushFeedback = ResolverUtils.createMotionFeedback(CharacterMotionType.Push,
                         new CharacterActionTarget(character, characterPos, targetPos),
                         new CharacterActionTarget(target, targetPos, pushDestPos));
 
