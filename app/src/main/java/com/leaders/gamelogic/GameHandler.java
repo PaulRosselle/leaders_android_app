@@ -723,7 +723,9 @@ public final class GameHandler {
                 new ArrayList<>()
         );
 
-        RecruitmentActionResolver resolver = new RecruitmentActionResolver(currentGame, recruitedCard, recruitmentColor);
+        RecruitmentActionResolver resolver = new RecruitmentActionResolver(
+                currentGame, currentHistory, recruitedCard, recruitmentColor
+        );
 
         return resolveRecruitmentActionAsync(currentPhase, builder, resolver);
     }
@@ -925,7 +927,7 @@ public final class GameHandler {
      * @param currentPhase current game phase
      */
     private void checkGameEnded(@NonNull GamePhase currentPhase) {
-        TeamColor winnerTeam = GameQuery.getWinnerTeam(currentGame, currentPhase.getPhasePlayer().getTeamColor());
+        TeamColor winnerTeam = GameQuery.getWinnerTeam(currentGame, currentPhase);
 
         if (winnerTeam != null) {
             Player winner = GameHistoryQuery.getPlayerFromTeam(currentHistory, winnerTeam);

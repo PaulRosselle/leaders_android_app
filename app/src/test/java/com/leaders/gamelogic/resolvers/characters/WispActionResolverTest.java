@@ -21,7 +21,9 @@ import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.GameMode;
+import com.leaders.gamelogic.enums.GamePhaseType;
 import com.leaders.gamelogic.enums.TeamColor;
+import com.leaders.gamelogic.historyentries.segments.Turn;
 import com.leaders.gamelogic.interactions.CharacterActionBuilder;
 import com.leaders.gamelogic.interactions.InteractionContext;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
@@ -61,14 +63,27 @@ public class WispActionResolverTest {
     }
 
     private GameHistory createTestGameHistory() {
+        // Build the minimal GameHistory state required by the tests.
+        // This state is intentionally invalid as a real game state.
         ArrayList<Player> players = new ArrayList<>();
         players.add(new Player(TeamColor.Black, "Paul"));
         players.add(new Player(TeamColor.White, "Elise"));
+        GameHistory history = new GameHistory(new GameConfig(
+                players,
+                players.get(1), // firstPlayer
+                GameMode.Discovery,
+                new ArrayList<>(), // initialRecruitableCards
+                new ArrayList<>() // initialPlacements
+        ), new ArrayList<>());
 
-        return new GameHistory(
-                new GameConfig(players, players.get(1), GameMode.Discovery, new ArrayList<>(), new ArrayList<>()),
-                new ArrayList<>()
-        );
+        Turn turn = new Turn(TeamColor.White);
+        history.getEntries().add(turn);
+
+        turn.getSubPhase(GamePhaseType.TurnStart).start();
+        turn.getSubPhase(GamePhaseType.TurnStart).end();
+        turn.getSubPhase(GamePhaseType.Actions).start();
+
+        return history;
     }
 
     private CharacterActionBuilder createBuilder() {

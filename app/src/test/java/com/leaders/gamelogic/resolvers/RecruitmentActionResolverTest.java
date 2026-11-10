@@ -14,11 +14,17 @@ import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
+import com.leaders.gamelogic.entities.GameConfig;
+import com.leaders.gamelogic.entities.GameHistory;
+import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
+import com.leaders.gamelogic.enums.GameMode;
+import com.leaders.gamelogic.enums.GamePhaseType;
 import com.leaders.gamelogic.enums.RecruitmentMotionType;
 import com.leaders.gamelogic.enums.TeamColor;
+import com.leaders.gamelogic.historyentries.segments.Turn;
 import com.leaders.gamelogic.interactions.InteractionContext;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
@@ -40,10 +46,12 @@ public class RecruitmentActionResolverTest {
     private static final TeamColor TEAM = TeamColor.White;
 
     private Game game;
+    private GameHistory history;
 
     @Before
     public void setUp() {
         game = createTestGame();
+        history = createTestGameHistory();
         // A leader on the same team is mandatory on the board for action validity checks
         Character leader = Character.create(CharacterType.LeaderKing, TeamColor.White);
         game.getBoard().getCell(new Position(3, 3)).setCharacter(leader);
@@ -52,16 +60,11 @@ public class RecruitmentActionResolverTest {
     @Test
     public void getNextInteraction_returnsRequestForFirstCharacter() {
         CharacterCard card = getSingleCharacterCard();
-        RecruitmentActionResolver resolver =
-                new RecruitmentActionResolver(game, card, TEAM);
+        RecruitmentActionResolver resolver = new RecruitmentActionResolver(game, history, card, TEAM);
 
-        RecruitmentActionBuilder builder =
-                new RecruitmentActionBuilder(
-                        card,
-                        TEAM,
-                        new ArrayList<>(),
-                        new ArrayList<>()
-                );
+        RecruitmentActionBuilder builder = new RecruitmentActionBuilder(
+                card, TEAM, new ArrayList<>(), new ArrayList<>()
+        );
 
         InteractionRequest request = resolver.getNextInteraction(builder);
 
@@ -77,12 +80,8 @@ public class RecruitmentActionResolverTest {
                 request.getContext().getTargetCharacter().getCharacterType()
         );
 
-        assertTrue(
-                request.getLegalResults().contains(InteractionResultType.PositionChosen)
-        );
-        assertTrue(
-                request.getLegalResults().contains(InteractionResultType.CancelAction)
-        );
+        assertTrue(request.getLegalResults().contains(InteractionResultType.PositionChosen));
+        assertTrue(request.getLegalResults().contains(InteractionResultType.CancelAction));
 
         assertTrue(
                 request.getLegalTargets().stream()
@@ -94,11 +93,9 @@ public class RecruitmentActionResolverTest {
     @Test
     public void getNextInteraction_returnsNextCharacterAfterPreviousRecruitment() {
         CharacterCard card = getMultiCharacterCard();
-        RecruitmentActionResolver resolver =
-                new RecruitmentActionResolver(game, card, TEAM);
+        RecruitmentActionResolver resolver = new RecruitmentActionResolver(game, history, card, TEAM);
 
-        CharacterType firstType =
-                CharacterType.getCharacterTypesMatchingCard(card).get(0);
+        CharacterType firstType = CharacterType.getCharacterTypesMatchingCard(card).get(0);
         Character firstCharacter = Character.create(firstType, TEAM);
 
         Position position = getFirstLegalRecruitmentPosition();
@@ -112,8 +109,7 @@ public class RecruitmentActionResolverTest {
                 )
         );
 
-        InteractionFeedback feedback =
-                InteractionFeedback.createForRecruitmentAction(
+        InteractionFeedback feedback = InteractionFeedback.createForRecruitmentAction(
                         List.of(new RecruitmentActionMotion(
                                 RecruitmentMotionType.Add,
                                 firstCharacter,
@@ -121,13 +117,9 @@ public class RecruitmentActionResolverTest {
                         ))
                 );
 
-        RecruitmentActionBuilder builder =
-                new RecruitmentActionBuilder(
-                        card,
-                        TEAM,
-                        List.of(result),
-                        List.of(feedback)
-                );
+        RecruitmentActionBuilder builder = new RecruitmentActionBuilder(
+                card, TEAM, List.of(result), List.of(feedback)
+        );
 
         InteractionRequest request = resolver.getNextInteraction(builder);
 
@@ -142,11 +134,9 @@ public class RecruitmentActionResolverTest {
     @Test
     public void getNextInteraction_returnsNullWhenRecruitmentIsComplete() {
         CharacterCard card = getSingleCharacterCard();
-        RecruitmentActionResolver resolver =
-                new RecruitmentActionResolver(game, card, TEAM);
+        RecruitmentActionResolver resolver = new RecruitmentActionResolver(game, history, card, TEAM);
 
-        CharacterType characterType =
-                CharacterType.getCharacterTypesMatchingCard(card).get(0);
+        CharacterType characterType = CharacterType.getCharacterTypesMatchingCard(card).get(0);
 
         Character character = Character.create(characterType, TEAM);
         Position position = getFirstLegalRecruitmentPosition();
@@ -160,22 +150,17 @@ public class RecruitmentActionResolverTest {
                 )
         );
 
-        InteractionFeedback feedback =
-                InteractionFeedback.createForRecruitmentAction(
-                        List.of(new RecruitmentActionMotion(
-                                RecruitmentMotionType.Add,
-                                character,
-                                position
-                        ))
-                );
+        InteractionFeedback feedback = InteractionFeedback.createForRecruitmentAction(
+                List.of(new RecruitmentActionMotion(
+                        RecruitmentMotionType.Add,
+                        character,
+                        position
+                ))
+        );
 
-        RecruitmentActionBuilder builder =
-                new RecruitmentActionBuilder(
-                        card,
-                        TEAM,
-                        List.of(result),
-                        List.of(feedback)
-                );
+        RecruitmentActionBuilder builder = new RecruitmentActionBuilder(
+                card, TEAM, List.of(result), List.of(feedback)
+        );
 
         assertNull(resolver.getNextInteraction(builder));
     }
@@ -183,7 +168,7 @@ public class RecruitmentActionResolverTest {
     @Test
     public void getNextInteraction_returnsNullAfterCancellation() {
         CharacterCard card = getSingleCharacterCard();
-        RecruitmentActionResolver resolver = new RecruitmentActionResolver(game, card, TEAM);
+        RecruitmentActionResolver resolver = new RecruitmentActionResolver(game, history, card, TEAM);
 
         Character testCharacter = Character.create(
                 CharacterType.getCharacterTypesMatchingCard(card).get(0), TEAM
@@ -194,13 +179,9 @@ public class RecruitmentActionResolverTest {
                 null
         );
 
-        RecruitmentActionBuilder builder =
-                new RecruitmentActionBuilder(
-                        card,
-                        TEAM,
-                        List.of(cancellation),
-                        List.of()
-                );
+        RecruitmentActionBuilder builder = new RecruitmentActionBuilder(
+                card, TEAM, List.of(cancellation), List.of()
+        );
 
         assertNull(resolver.getNextInteraction(builder));
     }
@@ -208,11 +189,9 @@ public class RecruitmentActionResolverTest {
     @Test
     public void getNextFeedback_createsAddMotionFromPositionResult() {
         CharacterCard card = getSingleCharacterCard();
-        RecruitmentActionResolver resolver =
-                new RecruitmentActionResolver(game, card, TEAM);
+        RecruitmentActionResolver resolver = new RecruitmentActionResolver(game, history, card, TEAM);
 
-        CharacterType characterType =
-                CharacterType.getCharacterTypesMatchingCard(card).get(0);
+        CharacterType characterType = CharacterType.getCharacterTypesMatchingCard(card).get(0);
 
         Character character = Character.create(characterType, TEAM);
         Position position = getFirstLegalRecruitmentPosition();
@@ -226,13 +205,9 @@ public class RecruitmentActionResolverTest {
                 )
         );
 
-        RecruitmentActionBuilder builder =
-                new RecruitmentActionBuilder(
-                        card,
-                        TEAM,
-                        List.of(result),
-                        List.of()
-                );
+        RecruitmentActionBuilder builder = new RecruitmentActionBuilder(
+                card, TEAM, List.of(result), List.of()
+        );
 
         InteractionFeedback feedback = resolver.getNextFeedback(builder);
 
@@ -253,11 +228,9 @@ public class RecruitmentActionResolverTest {
     @Test
     public void getNextFeedback_returnsNullWhenFeedbackAlreadyGenerated() {
         CharacterCard card = getSingleCharacterCard();
-        RecruitmentActionResolver resolver =
-                new RecruitmentActionResolver(game, card, TEAM);
+        RecruitmentActionResolver resolver = new RecruitmentActionResolver(game, history, card, TEAM);
 
-        CharacterType characterType =
-                CharacterType.getCharacterTypesMatchingCard(card).get(0);
+        CharacterType characterType = CharacterType.getCharacterTypesMatchingCard(card).get(0);
 
         Character character = Character.create(characterType, TEAM);
         Position position = getFirstLegalRecruitmentPosition();
@@ -271,22 +244,17 @@ public class RecruitmentActionResolverTest {
                 )
         );
 
-        InteractionFeedback feedback =
-                InteractionFeedback.createForRecruitmentAction(
-                        List.of(new RecruitmentActionMotion(
-                                RecruitmentMotionType.Add,
-                                character,
-                                position
-                        ))
-                );
+        InteractionFeedback feedback = InteractionFeedback.createForRecruitmentAction(
+                List.of(new RecruitmentActionMotion(
+                        RecruitmentMotionType.Add,
+                        character,
+                        position
+                ))
+        );
 
-        RecruitmentActionBuilder builder =
-                new RecruitmentActionBuilder(
-                        card,
-                        TEAM,
-                        List.of(result),
-                        List.of(feedback)
-                );
+        RecruitmentActionBuilder builder = new RecruitmentActionBuilder(
+                card, TEAM, List.of(result), List.of(feedback)
+        );
 
         assertNull(resolver.getNextFeedback(builder));
     }
@@ -294,23 +262,22 @@ public class RecruitmentActionResolverTest {
     @Test
     public void getNextFeedback_cancelWithoutPreviousFeedback_createsNoFeedback() {
         CharacterCard card = getSingleCharacterCard();
-        RecruitmentActionResolver resolver = new RecruitmentActionResolver(game, card, TEAM);
+        RecruitmentActionResolver resolver = new RecruitmentActionResolver(game, history, card, TEAM);
 
         CharacterType characterType = CharacterType.getCharacterTypesMatchingCard(card).get(0);
 
         Character character = Character.create(characterType, TEAM);
 
-        RecruitmentActionBuilder builder =
-                new RecruitmentActionBuilder(
-                        card,
-                        TEAM,
-                        List.of(new InteractionResult(
-                                InteractionResultType.CancelAction,
-                                new InteractionContext(character),
-                                null
-                        )),
-                        List.of()
-                );
+        RecruitmentActionBuilder builder = new RecruitmentActionBuilder(
+                card,
+                TEAM,
+                List.of(new InteractionResult(
+                        InteractionResultType.CancelAction,
+                        new InteractionContext(character),
+                        null
+                )),
+                List.of()
+        );
 
         InteractionFeedback feedback = resolver.getNextFeedback(builder);
 
@@ -320,7 +287,7 @@ public class RecruitmentActionResolverTest {
     @Test
     public void getNextFeedback_cancelAfterOnePlacement_createsRemoveMotion() {
         CharacterCard card = getSingleCharacterCard();
-        RecruitmentActionResolver resolver = new RecruitmentActionResolver(game, card, TEAM);
+        RecruitmentActionResolver resolver = new RecruitmentActionResolver(game, history, card, TEAM);
 
         CharacterType characterType = CharacterType.getCharacterTypesMatchingCard(card).get(0);
 
@@ -336,26 +303,20 @@ public class RecruitmentActionResolverTest {
                 )
         );
 
-        InteractionFeedback addFeedback =
-                InteractionFeedback.createForRecruitmentAction(
-                        List.of(new RecruitmentActionMotion(
-                                RecruitmentMotionType.Add,
-                                character,
-                                position
-                        ))
-                );
+        InteractionFeedback addFeedback = InteractionFeedback.createForRecruitmentAction(
+                List.of(new RecruitmentActionMotion(
+                        RecruitmentMotionType.Add,
+                        character,
+                        position
+                ))
+        );
 
-        InteractionResult cancelResult =
-                new InteractionResult(InteractionResultType.CancelAction,
-                        new InteractionContext(character), null);
+        InteractionResult cancelResult = new InteractionResult(InteractionResultType.CancelAction,
+                new InteractionContext(character), null);
 
-        RecruitmentActionBuilder builder =
-                new RecruitmentActionBuilder(
-                        card,
-                        TEAM,
-                        List.of(positionResult, cancelResult),
-                        List.of(addFeedback)
-                );
+        RecruitmentActionBuilder builder = new RecruitmentActionBuilder(
+                card, TEAM, List.of(positionResult, cancelResult), List.of(addFeedback)
+        );
 
         InteractionFeedback cancellationFeedback = resolver.getNextFeedback(builder);
 
@@ -375,11 +336,9 @@ public class RecruitmentActionResolverTest {
     @Test
     public void buildAction_collectsMotionsFromAllFeedbacks() {
         CharacterCard card = getMultiCharacterCard();
-        RecruitmentActionResolver resolver =
-                new RecruitmentActionResolver(game, card, TEAM);
+        RecruitmentActionResolver resolver = new RecruitmentActionResolver(game, history, card, TEAM);
 
-        List<CharacterType> characterTypes =
-                CharacterType.getCharacterTypesMatchingCard(card);
+        List<CharacterType> characterTypes = CharacterType.getCharacterTypesMatchingCard(card);
 
         Character firstCharacter = Character.create(characterTypes.get(0), TEAM);
         Character secondCharacter = Character.create(characterTypes.get(1), TEAM);
@@ -387,44 +346,32 @@ public class RecruitmentActionResolverTest {
         Position firstPosition = getFirstLegalRecruitmentPosition();
         Position secondPosition = getSecondLegalRecruitmentPosition();
 
-        InteractionFeedback firstFeedback =
-                InteractionFeedback.createForRecruitmentAction(
-                        List.of(new RecruitmentActionMotion(
-                                RecruitmentMotionType.Add,
-                                firstCharacter,
-                                firstPosition
-                        ))
-                );
+        InteractionFeedback firstFeedback = InteractionFeedback.createForRecruitmentAction(
+                List.of(new RecruitmentActionMotion(
+                        RecruitmentMotionType.Add,
+                        firstCharacter,
+                        firstPosition
+                ))
+        );
 
-        InteractionFeedback secondFeedback =
-                InteractionFeedback.createForRecruitmentAction(
-                        List.of(new RecruitmentActionMotion(
-                                RecruitmentMotionType.Add,
-                                secondCharacter,
-                                secondPosition
-                        ))
-                );
+        InteractionFeedback secondFeedback = InteractionFeedback.createForRecruitmentAction(
+                List.of(new RecruitmentActionMotion(
+                        RecruitmentMotionType.Add,
+                        secondCharacter,
+                        secondPosition
+                ))
+        );
 
-        RecruitmentActionBuilder builder =
-                new RecruitmentActionBuilder(
-                        card,
-                        TEAM,
-                        List.of(),
-                        List.of(firstFeedback, secondFeedback)
-                );
+        RecruitmentActionBuilder builder = new RecruitmentActionBuilder(
+                card, TEAM, List.of(), List.of(firstFeedback, secondFeedback)
+        );
 
         RecruitmentAction action = resolver.buildAction(builder);
 
         assertEquals(2, action.getMotions().size());
 
-        assertEquals(
-                firstPosition,
-                action.getMotions().get(0).getPosition()
-        );
-        assertEquals(
-                secondPosition,
-                action.getMotions().get(1).getPosition()
-        );
+        assertEquals(firstPosition, action.getMotions().get(0).getPosition());
+        assertEquals(secondPosition, action.getMotions().get(1).getPosition());
     }
 
     /*
@@ -441,6 +388,30 @@ public class RecruitmentActionResolverTest {
                 new EnumMap<>(TeamColor.class), // playerBanishedCards
                 new EnumMap<>(TeamColor.class) // playerWarnings
         );
+    }
+
+    private GameHistory createTestGameHistory() {
+        // Build the minimal GameHistory state required by the tests.
+        // This state is intentionally invalid as a real game state.
+        ArrayList<Player> players = new ArrayList<>();
+        players.add(new Player(TeamColor.Black, "Paul"));
+        players.add(new Player(TeamColor.White, "Elise"));
+        GameHistory history = new GameHistory(new GameConfig(
+                players,
+                players.get(1), // firstPlayer
+                GameMode.Discovery,
+                new ArrayList<>(), // initialRecruitableCards
+                new ArrayList<>() // initialPlacements
+        ), new ArrayList<>());
+
+        Turn turn = new Turn(TeamColor.White);
+        history.getEntries().add(turn);
+
+        turn.getSubPhase(GamePhaseType.TurnStart).start();
+        turn.getSubPhase(GamePhaseType.TurnStart).end();
+        turn.getSubPhase(GamePhaseType.Actions).start();
+
+        return history;
     }
 
     @NonNull

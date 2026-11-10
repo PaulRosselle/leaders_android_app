@@ -9,6 +9,7 @@ import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.CharacterPath;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
+import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.TeamColor;
@@ -23,6 +24,7 @@ import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.gamelogic.queries.CharacterAbilityQuery;
+import com.leaders.gamelogic.queries.GameHistoryQuery;
 import com.leaders.gamelogic.queries.GameQuery;
 
 import java.util.ArrayList;
@@ -50,6 +52,9 @@ public class CharacterActionResolver {
     @NonNull
     protected final Position characterPos;
 
+    @NonNull
+    private final GamePhase currentPhase;
+
     /**
      * Creates a resolver for a specific character in a given game context.
      *
@@ -62,6 +67,10 @@ public class CharacterActionResolver {
         this.gameHistory = gameHistory;
         this.character = character;
         this.characterPos = BoardQuery.getCellByCharacterId(game.getBoard(), character.getId()).getPosition();
+        this.currentPhase = GameHistoryQuery.getGamePhase(gameHistory,
+                Objects.requireNonNull(GameHistoryQuery.findCurrentPhase(gameHistory),
+                        "No current phase during resolver initialization")
+        );
     }
 
     /**
@@ -85,7 +94,7 @@ public class CharacterActionResolver {
             // The action is applied temporarily to evaluate its consequences.
             // Validation is performed against the resulting game state.
             actionHandler.doAction();
-            return !GameQuery.isLeaderCaptured(game, teamColor)
+            return !GameQuery.isLeaderCaptured(game, currentPhase, teamColor)
                     && !GameQuery.isLeaderSurrounded(game, teamColor);
         } finally {
             // The temporary state modification must always be reverted in order

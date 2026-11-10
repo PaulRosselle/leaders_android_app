@@ -21,7 +21,8 @@ public enum CharacterCard {
     RoyalGuard,
     Vizier,
     Wanderer,
-    Wisp;
+    Wisp,
+    Sniper;
 
     /**
      * Returns the ability types associated with this character card.
@@ -46,6 +47,7 @@ public enum CharacterCard {
             case Jailer:
             case Protector:
             case Vizier:
+            case Sniper:
                 return new AbilityType[] { AbilityType.Passive };
             case HermitAndCub:
             case Nemesis:
