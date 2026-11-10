@@ -5,16 +5,19 @@ import androidx.annotation.NonNull;
 import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.actions.CharacterActionMotion;
 import com.leaders.gamelogic.actions.CharacterActionTarget;
+import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.CharacterPath;
 import com.leaders.gamelogic.entities.Game;
+import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.AbilityType;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.GamePhaseType;
+import com.leaders.gamelogic.historyentries.IPhase;
 import com.leaders.gamelogic.historyentries.segments.ActionsPhase;
 
 import java.util.Arrays;
@@ -231,26 +234,85 @@ public final class CharacterAbilityQuery {
      * Checks whether a character can use their active ability.
      * <p>
      * An active ability cannot be used if the character does not have one
-     * or if it is prevented by an opposing passive ability (e.g. Jailer).
+     * or if it is prevented by an opposing passive ability (e.g. Jailer, Tactician).
      *
-     * @param game the current game state
+     * @param game the game to evaluate
+     * @param gameHistory the game history to evaluate
      * @param character the character attempting to use the ability
      * @return {@code true} if the character can use their active ability, {@code false} otherwise
      */
-    public static boolean canUseActiveAbility(@NonNull Game game, @NonNull Character character) {
+    public static boolean canUseActiveAbility(@NonNull Game game,
+                                              @NonNull GameHistory gameHistory,
+                                              @NonNull Character character) {
         // First, the character must have an active ability
         if (!Arrays.asList(character.getCharacterType().getCharacterCard().getAbilityTypes()).contains(AbilityType.Active)) {
             return false;
         }
 
-        // Then, their ability activation must not be prevented by a passive ability :
-        // 1. Passive ability - Jailer prevents adjacent opponents active ability use
+        // Then, their ability activation must not be prevented by a passive ability:
+        return !isBlockedByJailer(game, character) && !isBlockedByTactician(gameHistory, character);
+    }
+
+    /**
+     * Checks whether the character's active ability is blocked by an opposing Jailer.
+     * <p>
+     * A Jailer prevents adjacent opponents from using their active abilities.
+     *
+     * @param game the game containing the character and board
+     * @param character the character to check
+     * @return {@code true} if the character is blocked by an opposing Jailer,
+     *         {@code false} otherwise
+     */
+    private static boolean isBlockedByJailer(@NonNull Game game, @NonNull Character character) {
+        // The Jailer prevents adjacent opponents active ability use
         Cell characterCell = BoardQuery.getCellByCharacterId(game.getBoard(), character.getId());
-        return BoardQuery.getAdjacentCells(game.getBoard(), characterCell.getPosition(),
+        return !BoardQuery.getAdjacentCells(game.getBoard(), characterCell.getPosition(),
                 cell -> cell.getCharacter() != null &&
                         cell.getCharacter().getCharacterType() == CharacterType.Jailer &&
                         cell.getCharacter().getTeamColor() != character.getTeamColor()
         ).isEmpty();
+    }
+
+    /**
+     * Checks whether the character was moved by a Tactician of the same team
+     * during the current phase.
+     *
+     * @param gameHistory the game history containing the current phase
+     * @param character the character to check
+     * @return {@code true} if the character was moved by a friendly Tactician
+     *         during the current phase, otherwise {@code false}
+     */
+    private static boolean isBlockedByTactician(@NonNull GameHistory gameHistory,
+                                                @NonNull Character character) {
+        // A character moved by the Tactician cannot use its ability during the turn
+        IPhase currentPhase = GameHistoryQuery.findCurrentPhase(gameHistory);
+        if (currentPhase == null) {
+            return false;
+        }
+
+        for (IGameAction action : currentPhase.getActions()) {
+            if (!(action instanceof CharacterAction)) {
+                continue;
+            }
+
+            CharacterAction characterAction = (CharacterAction) action;
+            Character sourceCharacter = characterAction.getSrcCharacter();
+
+            if (sourceCharacter.getCharacterType() != CharacterType.Tactician ||
+                    sourceCharacter.getTeamColor() != character.getTeamColor() ||
+                    characterAction.getMotions().size() != 1) {
+                continue;
+            }
+
+            // Characters are compared by ID to take into account transformed characters
+            CharacterActionMotion motion = characterAction.getMotions().get(0);
+            if (motion.getTargets().size() == 1 &&
+                    motion.getTargets().get(0).getCharacter().getId().equals(character.getId())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

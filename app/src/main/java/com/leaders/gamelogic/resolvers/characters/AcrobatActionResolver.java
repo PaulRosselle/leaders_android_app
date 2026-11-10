@@ -57,7 +57,7 @@ public final class AcrobatActionResolver extends CharacterActionResolver {
         // For this reason, we can add both destinations without further treatment to avoid duplicates
         List<InteractionTarget> legalTargets = new ArrayList<>();
         ResolverUtils.addTargets(legalTargets, TargetCategory.MovementDestination, getNormalMovementValidDestinations(builder));
-        if (CharacterAbilityQuery.canUseActiveAbility(game, character)) {
+        if (CharacterAbilityQuery.canUseActiveAbility(game, gameHistory, character)) {
             for (CharacterPath jumpPath : getAcrobatJumpPaths(builder)) {
                 legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityDestination, jumpPath.getDestination()));
             }

@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
  * interaction. The selected destination is then used to build the movement
  * feedback.</p>
  */
-public class WispActionResolver extends CharacterActionResolver {
+public final class WispActionResolver extends CharacterActionResolver {
     public WispActionResolver(@NonNull Game game, @NonNull GameHistory gameHistory, @NonNull Character character) {
         super(game, gameHistory, character);
     }

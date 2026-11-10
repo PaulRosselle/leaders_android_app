@@ -26,6 +26,7 @@ public enum CharacterType {
     Wanderer,
     LeaderVermilion,
     Sniper,
+    Tactician,
     Wisp;
 
     /**
@@ -58,6 +59,7 @@ public enum CharacterType {
             case Wanderer: return CharacterCard.Wanderer;
             case LeaderVermilion: return CharacterCard.LeaderVermilion;
             case Sniper: return CharacterCard.Sniper;
+            case Tactician: return CharacterCard.Tactician;
             case Wisp: return CharacterCard.Wisp;
             default: throw new NoSuchElementException(String.format("No character card found matching %s", this));
         }

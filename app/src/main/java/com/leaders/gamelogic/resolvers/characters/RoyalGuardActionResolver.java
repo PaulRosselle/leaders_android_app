@@ -65,7 +65,7 @@ public final class RoyalGuardActionResolver extends CharacterActionResolver {
         ResolverUtils.addTargets(legalTargets, TargetCategory.MovementDestination, movementDestinations);
 
 
-        if (CharacterAbilityQuery.canUseActiveAbility(game, character)) {
+        if (CharacterAbilityQuery.canUseActiveAbility(game, gameHistory, character)) {
             for (CharacterPath path : getRoyalGuardAbilityPaths(builder)) {
                 Position pathDestination = path.getDestination();
                 if (!movementDestinations.contains(pathDestination)) {

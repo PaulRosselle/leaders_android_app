@@ -56,7 +56,7 @@ public final class IllusionistActionResolver extends CharacterActionResolver {
 
         ResolverUtils.addTargets(legalTargets, TargetCategory.MovementDestination, getNormalMovementValidDestinations(builder));
 
-        if (CharacterAbilityQuery.canUseActiveAbility(game, character)) {
+        if (CharacterAbilityQuery.canUseActiveAbility(game, gameHistory, character)) {
             ResolverUtils.addTargets(legalTargets, TargetCategory.ActiveAbilityTargetPosition, getIllusionistTargetPositions(builder));
         }
 

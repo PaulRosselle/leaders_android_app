@@ -110,7 +110,7 @@ public final class BruiserActionResolver extends CharacterActionResolver {
 
         ResolverUtils.addTargets(legalTargets, TargetCategory.MovementDestination, getNormalMovementValidDestinations(builder));
 
-        if (CharacterAbilityQuery.canUseActiveAbility(game, character)) {
+        if (CharacterAbilityQuery.canUseActiveAbility(game, gameHistory, character)) {
             for (Position enemyPosition : getAdjacentEnemyPositions()) {
                 if (!getValidPushDestinations(builder, enemyPosition, true).isEmpty()) {
                     legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityTargetPosition, enemyPosition));

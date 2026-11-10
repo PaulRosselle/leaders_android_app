@@ -1,0 +1,141 @@
+{
+  "config": {
+    "players": [
+      {
+        "team_color": "Black",
+        "name": "Player"
+      },
+      {
+        "team_color": "White",
+        "name": "Puzzle"
+      }
+    ],
+    "first_player": {
+      "team_color": "Black",
+      "name": "Player"
+    },
+    "game_mode": "Puzzle",
+    "initial_recruitable_cards": [],
+    "initial_placements": [
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "bb0b4fcd-2d48-4829-ad9e-dc51416f078f",
+              "character_type": "Tactician",
+              "team_color": "Black"
+            },
+            "position": {
+              "x": 2,
+              "y": 3
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "edfbb0c8-cee3-4441-809d-3bbe09f76665",
+              "character_type": "LeaderVermilion",
+              "team_color": "White"
+            },
+            "position": {
+              "x": 5,
+              "y": 1
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "1a5d7340-65cb-4453-ba0e-2d2bda9558f0",
+              "character_type": "Jailer",
+              "team_color": "Black"
+            },
+            "position": {
+              "x": 5,
+              "y": 4
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "b37cafbf-71b1-402b-89b1-ece4c835e58e",
+              "character_type": "Nemesis",
+              "team_color": "Black"
+            },
+            "position": {
+              "x": 6,
+              "y": 1
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "f44a4f71-1600-496f-942a-eaf6fc8f76ed",
+              "character_type": "LeaderKing",
+              "team_color": "Black"
+            },
+            "position": {
+              "x": 2,
+              "y": 0
+            }
+          }
+        ],
+        "type": "Recruitment"
+      }
+    ]
+  },
+  "entries": [
+    {
+      "team_color": "Black",
+      "turn_start_phase": {
+        "start_action": {
+          "transition_type": "Start",
+          "transition_target": "TurnStartPhase"
+        },
+        "end_action": {
+          "transition_type": "End",
+          "transition_target": "TurnStartPhase"
+        },
+        "turn_team_color": "Black",
+        "actions": []
+      },
+      "actions_phase": {
+        "start_action": {
+          "transition_type": "Start",
+          "transition_target": "ActionsPhase"
+        },
+        "turn_team_color": "Black",
+        "actions": []
+      },
+      "recruitment_phase": {
+        "turn_team_color": "Black",
+        "actions": []
+      },
+      "turn_end_phase": {
+        "turn_team_color": "Black",
+        "actions": []
+      },
+      "type": "turn"
+    }
+  ]
+}

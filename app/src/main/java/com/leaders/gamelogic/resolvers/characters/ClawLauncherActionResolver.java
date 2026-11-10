@@ -55,7 +55,7 @@ public final class ClawLauncherActionResolver extends CharacterActionResolver {
         List<Position> movementDestinations = getNormalMovementValidDestinations(builder);
         ResolverUtils.addTargets(legalTargets, TargetCategory.MovementDestination, movementDestinations);
 
-        if (CharacterAbilityQuery.canUseActiveAbility(game, character)) {
+        if (CharacterAbilityQuery.canUseActiveAbility(game, gameHistory, character)) {
             for (Position targetPos : getClawLauncherValidTargetPositions()) {
                 // The claw launcher can pull itself to any valid target
                 Position clawLauncherDestPos = getAbilityPullDestination(targetPos, characterPos);

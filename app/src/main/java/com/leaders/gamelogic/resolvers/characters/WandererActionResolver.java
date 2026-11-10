@@ -56,7 +56,7 @@ public final class WandererActionResolver extends CharacterActionResolver {
         List<Position> movementDestinations = getNormalMovementValidDestinations(builder);
         ResolverUtils.addTargets(legalTargets, TargetCategory.MovementDestination, movementDestinations);
 
-        if (CharacterAbilityQuery.canUseActiveAbility(game, character)) {
+        if (CharacterAbilityQuery.canUseActiveAbility(game, gameHistory, character)) {
             for (Position flightDest : getWandererFlightDestinations(builder)) {
                 if (!movementDestinations.contains(flightDest)) {
                     legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityDestination, flightDest));
