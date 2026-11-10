@@ -21,7 +21,6 @@ import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.Player;
-import com.leaders.gamelogic.enums.AbilityType;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
 
@@ -147,52 +146,8 @@ public final class RulesCharacterDemoActivity extends PlayableActivity {
     private void initCharacter(@NonNull CharacterCard card) {
         txvName.setText(CharacterCardUtils.getFormattedNameId(card));
         txvDescription.setText(CharacterCardUtils.getDescriptionId(card));
-        imvAbility.setImageResource(getAbilityResId(card));
-        imvArtwork.setImageResource(getArtworkResId(card));
-    }
-
-    private int getAbilityResId(@NonNull CharacterCard card) {
-        if (card.isLeader()) {
-            return R.drawable.icon_leader;
-        }
-
-        AbilityType[] abilityTypes = card.getAbilityTypes();
-        if (abilityTypes.length < 1) {
-            throw new IllegalStateException("Non leader cards must have an ability (" + card + ")");
-        }
-
-        AbilityType abilityType = abilityTypes[0];
-        switch (abilityType) {
-            case Active: return R.drawable.icon_ability_active;
-            case Passive: return R.drawable.icon_ability_passive;
-            case Special: return R.drawable.icon_ability_special;
-            default: throw new IllegalStateException("Unexpected ability type: " + abilityType);
-        }
-    }
-    
-    private static int getArtworkResId(@NonNull CharacterCard characterCard) {
-        switch (characterCard) {
-            case Acrobat: return R.drawable.character_artwork_acrobat;
-            case Archer: return R.drawable.character_artwork_archer;
-            case Assassin: return R.drawable.character_artwork_assassin;
-            case Brewmaster: return R.drawable.character_artwork_brewmaster;
-            case Bruiser: return R.drawable.character_artwork_bruiser;
-            case ClawLauncher: return R.drawable.character_artwork_claw_launcher;
-            case HermitAndCub: return R.drawable.character_artwork_hermit_and_cub;
-            case Illusionist: return R.drawable.character_artwork_illusionist;
-            case Jailer: return R.drawable.character_artwork_jailer;
-            case LeaderKing: return R.drawable.character_artwork_leader_king;
-            case LeaderQueen: return R.drawable.character_artwork_leader_queen;
-            case Manipulator: return R.drawable.character_artwork_manipulator;
-            case Nemesis: return R.drawable.character_artwork_nemesis;
-            case Protector: return R.drawable.character_artwork_protector;
-            case Rider: return R.drawable.character_artwork_rider;
-            case RoyalGuard: return R.drawable.character_artwork_royal_guard;
-            case Vizier: return R.drawable.character_artwork_vizier;
-            case Wanderer: return R.drawable.character_artwork_wanderer;
-            case Wisp: return R.drawable.character_artwork_wisp;
-            default: throw new IllegalArgumentException("No formatted name found for character card: " + characterCard);
-        }
+        imvAbility.setImageResource(CharacterCardUtils.getAbilityResId(card));
+        imvArtwork.setImageResource(CharacterCardUtils.getArtworkResId(card));
     }
 
     //region INTERACTION UI METHODS
