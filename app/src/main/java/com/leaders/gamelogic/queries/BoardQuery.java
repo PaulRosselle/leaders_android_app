@@ -255,18 +255,34 @@ public final class BoardQuery {
         throw new NoSuchElementException("Character not found on the board");
     }
 
-    // TODO - javadoc
+    // TODO - add unit tests
+    /**
+     * Gets the character at the given position.
+     *
+     * @param board the board to search
+     * @param characterPos the position to check
+     * @return the character at the given position
+     * @throws NullPointerException if no character is present at the given position
+     */
     @NonNull
-    public Character getNonNullCharacterAt(@NonNull Board board, @NonNull Position characterPos) {
+    public static Character getNonNullCharacterAt(@NonNull Board board, @NonNull Position characterPos) {
         return Objects.requireNonNull(board.getCell(characterPos).getCharacter(),
                 "No character found at position: " + characterPos
         );
     }
 
-    // TODO - javadoc
+    // TODO - add unit tests
+    /**
+     * Gets the adjacent cells that match the given predicate.
+     *
+     * @param board the board to search
+     * @param position the position of the reference cell
+     * @param predicate the predicate used to filter adjacent cells
+     * @return the list of matching adjacent cells
+     */
     @NonNull
-    public List<Cell> getAdjacentCells(@NonNull Board board, @NonNull Position position,
-                                       @NonNull Predicate<Cell> predicate) {
+    public static List<Cell> getAdjacentCells(@NonNull Board board, @NonNull Position position,
+                                              @NonNull Predicate<Cell> predicate) {
         List<Cell> matchingAdjacentCells = new ArrayList<>();
 
         for (Direction direction : Direction.values()) {

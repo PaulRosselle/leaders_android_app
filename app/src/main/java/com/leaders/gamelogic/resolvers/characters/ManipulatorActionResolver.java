@@ -3,8 +3,6 @@ package com.leaders.gamelogic.resolvers.characters;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.leaders.gamelogic.actions.CharacterActionMotion;
-import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
@@ -17,9 +15,7 @@ import com.leaders.gamelogic.interactions.InteractionContext;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
-import com.leaders.gamelogic.interactions.InteractionResultType;
 import com.leaders.gamelogic.interactions.InteractionTarget;
-import com.leaders.gamelogic.interactions.InteractionType;
 import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.gamelogic.queries.CharacterAbilityQuery;
@@ -27,7 +23,13 @@ import com.leaders.gamelogic.resolvers.CharacterActionResolver;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+
+import static com.leaders.gamelogic.resolvers.ResolverUtils.addTargets;
+import static com.leaders.gamelogic.resolvers.ResolverUtils.createPositionRequest;
+import static com.leaders.gamelogic.resolvers.ResolverUtils.createPositionResult;
+import static com.leaders.gamelogic.resolvers.ResolverUtils.createSingleMotionFeedback;
+import static com.leaders.gamelogic.resolvers.ResolverUtils.getChosenPosition;
+import static com.leaders.gamelogic.resolvers.ResolverUtils.isFeedbackExpected;
 
 /**
  * Resolves the Manipulator's active ability.
@@ -62,9 +64,9 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
             return super.getNextInteraction(builder);
         }
 
-        if (isManipulatorTargetResult(firstResult)) {
+        if (isAbilityTargetResult(firstResult)) {
             if (builder.getResults().size() > 1) {
-                if (!isManipulatorTargetDestinationResult(builder.getResults().get(1))) {
+                if (!isAbilityDestinationResult(builder.getResults().get(1))) {
                     throw new IllegalArgumentException("Invalid result type for a Manipulator ability activation");
                 }
                 return null;
@@ -79,9 +81,7 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
     @Override
     @Nullable
     public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
-        if (!builder.getFeedbacks().isEmpty() ||
-                builder.getResults().isEmpty() ||
-                builder.isBuildCancelled()) {
+        if (!isFeedbackExpected(builder)) {
             return null;
         }
 
@@ -97,40 +97,23 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
 
         InteractionResult destinationResult = builder.getResults().get(1);
 
-        if (!isManipulatorTargetResult(firstResult) ||
-                !isManipulatorTargetDestinationResult(destinationResult)) {
+        if (!isAbilityTargetResult(firstResult) ||
+                !isAbilityDestinationResult(destinationResult)) {
             throw new IllegalArgumentException("Invalid result types for a Manipulator ability activation");
         }
 
-        Position targetOrigin = Objects.requireNonNull(
-                Objects.requireNonNull(firstResult.getChosenTarget(),
-                                "Manipulator target interaction result invalid: no data")
-                        .getChosenPosition(),
-                "Manipulator target interaction result invalid: no target position");
+        Position targetOrigin = getChosenPosition(firstResult);
+        Position targetDestination = getChosenPosition(destinationResult);
+        Character target = getCharacterAt(targetOrigin);
 
-        Position targetDestination = Objects.requireNonNull(
-                Objects.requireNonNull(destinationResult.getChosenTarget(),
-                                "Manipulator destination interaction result invalid: no data")
-                        .getChosenPosition(),
-                "Manipulator destination interaction result invalid: no destination");
-
-        Character target = Objects.requireNonNull(
-                game.getBoard().getCell(targetOrigin).getCharacter(),
-                "Manipulator target position should contain a character");
-
-        return InteractionFeedback.createForCharacterAction(List.of(new CharacterActionMotion(
-                CharacterMotionType.Move,
-                List.of(new CharacterActionTarget(target, targetOrigin, targetDestination))
-        )));
+        return createSingleMotionFeedback(CharacterMotionType.Move, target, targetOrigin, targetDestination);
     }
 
     @NonNull
     private InteractionRequest buildInitialInteraction(@NonNull CharacterActionBuilder builder) {
         List<InteractionTarget> legalTargets = new ArrayList<>();
 
-        for (Position destination : getNormalMovementValidDestinations(builder)) {
-            legalTargets.add(new InteractionTarget(TargetCategory.MovementDestination, destination));
-        }
+        addTargets(legalTargets, TargetCategory.MovementDestination, getNormalMovementValidDestinations(builder));
 
         if (CharacterAbilityQuery.canUseActiveAbility(game, character)) {
             for (Position enemyPosition : getManipulatorTargetPositions()) {
@@ -140,41 +123,26 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
             }
         }
 
-        return new InteractionRequest(
-                InteractionType.PositionExpected,
-                new InteractionContext(character),
-                legalTargets,
-                List.of(InteractionResultType.PositionChosen, InteractionResultType.CancelAction)
-        );
+        return createPositionRequest(new InteractionContext(character), legalTargets);
     }
 
     @NonNull
     private InteractionRequest buildTargetDestinationInteraction(@NonNull CharacterActionBuilder builder,
                                                                  @NonNull InteractionResult result) {
-        if (!isManipulatorTargetResult(result)) {
+        if (!isAbilityTargetResult(result)) {
             throw new IllegalArgumentException(
                     "A Manipulator target must be selected through a PositionChosen result");
         }
 
-        Position targetPos = Objects.requireNonNull(Objects.requireNonNull(result.getChosenTarget(),
-                        "Manipulator target interaction invalid : no data"
-                ).getChosenPosition(),
-                "Manipulator target interaction invalid : no target position");
+        Position targetPos = getChosenPosition(result);
 
         List<InteractionTarget> legalTargets = new ArrayList<>();
 
-        for (Position destination : getValidTargetDestinations(builder, targetPos, false)) {
-            legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityDestination, destination));
-        }
+        addTargets(legalTargets, TargetCategory.ActiveAbilityDestination,
+                getValidTargetDestinations(builder, targetPos, false));
 
-        Character targetedEnemy = Objects.requireNonNull(game.getBoard().getCell(targetPos).getCharacter(),
-                "A Manipulator target position must contain an enemy");
-        return new InteractionRequest(
-                InteractionType.PositionExpected,
-                new InteractionContext(character, targetedEnemy),
-                legalTargets,
-                List.of(InteractionResultType.PositionChosen, InteractionResultType.CancelAction)
-        );
+        Character targetedEnemy = getCharacterAt(targetPos);
+        return createPositionRequest(new InteractionContext(character, targetedEnemy), legalTargets);
     }
 
     /**
@@ -189,10 +157,9 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
         List<Position> targets = new ArrayList<>();
 
         for (Direction direction : Direction.values()) {
-            // The Manipulator cannot target adjacent characters.
             Cell adjacentCell = BoardQuery.findAdjacentCell(game.getBoard(), characterPos, direction);
             if (adjacentCell != null && adjacentCell.getCharacter() == null) {
-                Cell targetCell = BoardQuery.findVisibleCharacterCell(game.getBoard(), characterPos,
+                Cell targetCell = BoardQuery.findVisibleCharacterCell(game.getBoard(), adjacentCell.getPosition(),
                         direction, character.getTeamColor().getOpposite(), null);
                 if (targetCell != null &&
                         CharacterAbilityQuery.canBeMovedByEnemyAbilities(game, targetCell.getCharacter())) {
@@ -220,39 +187,22 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
     private List<Position> getValidTargetDestinations(@NonNull CharacterActionBuilder builder,
                                                       @NonNull Position targetPos,
                                                       boolean exitAfterFirstValidDest) {
-        Character target = Objects.requireNonNull(game.getBoard().getCell(targetPos).getCharacter(),
-                "A cell targeted by the Manipulator's ability should always contain a character");
+        Character target = getCharacterAt(targetPos);
 
         List<Position> destinations = new ArrayList<>();
 
 
-        CharacterActionBuilder targetBuilder = new CharacterActionBuilder(builder);
-        if (targetBuilder.getResults().isEmpty()) {
-            targetBuilder.addResult(new InteractionResult(
-                    InteractionResultType.PositionChosen,
-                    new InteractionContext(character),
-                    new InteractionTarget(TargetCategory.ActiveAbilityTargetPosition, targetPos)
-            ));
-        }
+        CharacterActionBuilder targetBuilder = withAbilityTargetSelected(builder, targetPos);
 
         for (Cell destinationCell : BoardQuery.findEmptyCellsAround(game.getBoard(), targetPos, 1)) {
             Position destination = destinationCell.getPosition();
 
-            CharacterActionBuilder destinationBuilder = new CharacterActionBuilder(targetBuilder);
-            destinationBuilder.addResult(new InteractionResult(
-                    InteractionResultType.PositionChosen,
-                    new InteractionContext(character, target),
-                    new InteractionTarget(TargetCategory.ActiveAbilityDestination, destination)
-            ));
+            InteractionResult destinationResult = createPositionResult(new InteractionContext(character, target),
+                    TargetCategory.ActiveAbilityDestination, destination);
+            InteractionFeedback destinationFeedback = createSingleMotionFeedback(
+                    CharacterMotionType.Move, target, targetPos, destination);
 
-            destinationBuilder.addFeedback(InteractionFeedback.createForCharacterAction(
-                    List.of(new CharacterActionMotion(
-                            CharacterMotionType.Move,
-                            List.of(new CharacterActionTarget(target, targetPos, destination))
-                    ))
-            ));
-
-            if (isActionValid(buildAction(destinationBuilder))) {
+            if (isValidWith(targetBuilder, destinationResult, destinationFeedback)) {
                 destinations.add(destination);
 
                 if (exitAfterFirstValidDest) {
@@ -262,17 +212,5 @@ public final class ManipulatorActionResolver extends CharacterActionResolver {
         }
 
         return destinations;
-    }
-
-    private boolean isManipulatorTargetResult(@NonNull InteractionResult result) {
-        return result.getResultType() == InteractionResultType.PositionChosen &&
-                result.getChosenTarget() != null &&
-                result.getChosenTarget().getCategory() == TargetCategory.ActiveAbilityTargetPosition;
-    }
-
-    private boolean isManipulatorTargetDestinationResult(@NonNull InteractionResult result) {
-        return result.getResultType() == InteractionResultType.PositionChosen &&
-                result.getChosenTarget() != null &&
-                result.getChosenTarget().getCategory() == TargetCategory.ActiveAbilityDestination;
     }
 }

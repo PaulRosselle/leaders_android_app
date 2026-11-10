@@ -5,6 +5,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
@@ -175,6 +177,102 @@ public class BoardQueryTest {
         board.getCell(new Position(2, 2)).setCharacter(Character.create(CharacterType.Archer, TeamColor.Black));
         List<Cell> cells = BoardQuery.findEmptyCellsAround(board, center, 2);
         assertEquals(Direction.values().length * 3L - 5, cells.size());
+    }
+
+    @Test
+    public void getNonNullCharacterAt_shouldReturnCharacterAtPosition() {
+        Board board = new Board();
+        Position position = new Position(3, 3);
+        Character character = Character.create(CharacterType.Archer, TeamColor.Black);
+
+        board.getCell(position).setCharacter(character);
+
+        assertSame(character, BoardQuery.getNonNullCharacterAt(board, position));
+    }
+
+    @Test
+    public void getNonNullCharacterAt_shouldThrowWhenCellIsEmpty() {
+        Board board = new Board();
+        Position position = new Position(3, 3);
+
+        assertThrows(NullPointerException.class, () -> BoardQuery.getNonNullCharacterAt(board, position));
+    }
+
+    @Test
+    public void getAdjacentCells_shouldReturnAllAdjacentCellsWhenPredicateMatchesAll() {
+        Board board = new Board();
+        Position position = new Position(3, 3);
+
+        List<Cell> cells = BoardQuery.getAdjacentCells(board, position, cell -> true);
+
+        assertEquals(Direction.values().length, cells.size());
+
+        for (Cell cell : cells) {
+            assertSame(board.getCell(cell.getPosition()), cell);
+        }
+    }
+
+    @Test
+    public void getAdjacentCells_shouldReturnNoCellsWhenPredicateMatchesNone() {
+        Board board = new Board();
+        Position position = new Position(3, 3);
+
+        List<Cell> cells = BoardQuery.getAdjacentCells(board, position, cell -> false);
+
+        assertTrue(cells.isEmpty());
+    }
+
+    @Test
+    public void getAdjacentCells_shouldFilterCellsUsingPredicate() {
+        Board board = new Board();
+        Position position = new Position(3, 3);
+
+        Character blackArcher = Character.create(CharacterType.Archer, TeamColor.Black);
+        Character whiteArcher = Character.create(CharacterType.Archer, TeamColor.White);
+
+        board.getCell(new Position(3, 2)).setCharacter(blackArcher);
+        board.getCell(new Position(3, 4)).setCharacter(whiteArcher);
+
+        List<Cell> cells = BoardQuery.getAdjacentCells(
+                board,
+                position,
+                cell -> cell.getCharacter() != null
+                        && cell.getCharacter().getTeamColor() == TeamColor.Black
+        );
+
+        assertEquals(1, cells.size());
+        assertSame(board.getCell(new Position(3, 2)), cells.get(0));
+    }
+
+    @Test
+    public void getAdjacentCells_shouldReturnOnlyExistingAdjacentCellsAtBoardEdge() {
+        Board board = new Board();
+        Position position = new Position(0, 0);
+
+        List<Cell> cells = BoardQuery.getAdjacentCells(board, position, cell -> true);
+
+        assertEquals(Direction.values().length / 2, cells.size());
+
+        for (Cell cell : cells) {
+            assertSame(board.getCell(cell.getPosition()), cell);
+        }
+    }
+
+    @Test
+    public void getAdjacentCells_shouldReturnOnlyAdjacentCells() {
+        Board board = new Board();
+        Position position = new Position(3, 3);
+
+        Character character = Character.create(CharacterType.Archer, TeamColor.Black);
+        board.getCell(new Position(3, 1)).setCharacter(character);
+
+        List<Cell> cells = BoardQuery.getAdjacentCells(
+                board,
+                position,
+                cell -> cell.getCharacter() != null
+        );
+
+        assertTrue(cells.isEmpty());
     }
 
     @Test

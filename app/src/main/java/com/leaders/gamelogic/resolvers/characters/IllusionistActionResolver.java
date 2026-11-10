@@ -3,7 +3,6 @@ package com.leaders.gamelogic.resolvers.characters;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.leaders.gamelogic.actions.CharacterActionMotion;
 import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
@@ -17,9 +16,7 @@ import com.leaders.gamelogic.interactions.InteractionContext;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
-import com.leaders.gamelogic.interactions.InteractionResultType;
 import com.leaders.gamelogic.interactions.InteractionTarget;
-import com.leaders.gamelogic.interactions.InteractionType;
 import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.gamelogic.queries.CharacterAbilityQuery;
@@ -27,7 +24,13 @@ import com.leaders.gamelogic.resolvers.CharacterActionResolver;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+
+import static com.leaders.gamelogic.resolvers.ResolverUtils.addTargets;
+import static com.leaders.gamelogic.resolvers.ResolverUtils.createMotionFeedback;
+import static com.leaders.gamelogic.resolvers.ResolverUtils.createPositionRequest;
+import static com.leaders.gamelogic.resolvers.ResolverUtils.createPositionResult;
+import static com.leaders.gamelogic.resolvers.ResolverUtils.getChosenPosition;
+import static com.leaders.gamelogic.resolvers.ResolverUtils.isFeedbackExpected;
 
 /**
  * Resolves the Illusionist's active ability.
@@ -48,8 +51,6 @@ public final class IllusionistActionResolver extends CharacterActionResolver {
     @Override
     @Nullable
     public InteractionRequest getNextInteraction(@NonNull CharacterActionBuilder builder) {
-        // Rider actions require a single interaction.
-        // If an interaction has already been selected, no further interaction can be added to this action.
         if (!builder.getResults().isEmpty()) {
             return null;
         }
@@ -59,31 +60,19 @@ public final class IllusionistActionResolver extends CharacterActionResolver {
         // For this reason, we can add both destinations without further treatment to avoid duplicates
         List<InteractionTarget> legalTargets = new ArrayList<>();
 
-        for (Position destination : getNormalMovementValidDestinations(builder)) {
-            legalTargets.add(new InteractionTarget(TargetCategory.MovementDestination, destination));
-        }
+        addTargets(legalTargets, TargetCategory.MovementDestination, getNormalMovementValidDestinations(builder));
 
         if (CharacterAbilityQuery.canUseActiveAbility(game, character)) {
-            for (Position targetPosition : getIllusionistTargetPositions(builder)) {
-                legalTargets.add(new InteractionTarget(
-                        TargetCategory.ActiveAbilityTargetPosition, targetPosition));
-            }
+            addTargets(legalTargets, TargetCategory.ActiveAbilityTargetPosition, getIllusionistTargetPositions(builder));
         }
 
-        return new InteractionRequest(
-                InteractionType.PositionExpected,
-                new InteractionContext(character),
-                legalTargets,
-                List.of(InteractionResultType.PositionChosen, InteractionResultType.CancelAction)
-        );
+        return createPositionRequest(new InteractionContext(character), legalTargets);
     }
 
     @Override
     @Nullable
     public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
-        if (builder.getResults().isEmpty() ||
-                !builder.getFeedbacks().isEmpty() ||
-                builder.isBuildCancelled()) {
+        if (!isFeedbackExpected(builder)) {
             return null;
         }
 
@@ -93,7 +82,7 @@ public final class IllusionistActionResolver extends CharacterActionResolver {
             return super.getNextFeedback(builder);
         }
 
-        if (!isIllusionistTargetResult(result)) {
+        if (!isAbilityTargetResult(result)) {
             throw new IllegalArgumentException(
                     "Invalid Illusionist interaction type " + result.getResultType());
         }
@@ -114,29 +103,19 @@ public final class IllusionistActionResolver extends CharacterActionResolver {
         List<Position> targets = new ArrayList<>();
 
         for (Direction direction : Direction.values()) {
-            // The Illusionist cannot target adjacent characters.
             Cell adjacentCell = BoardQuery.findAdjacentCell(game.getBoard(), characterPos, direction);
             if (adjacentCell != null && adjacentCell.getCharacter() == null) {
-                Cell targetCell = BoardQuery.findVisibleCharacterCell(game.getBoard(), characterPos,
-                        direction, null, null);
+                Cell targetCell = BoardQuery.findVisibleCharacterCell(game.getBoard(),
+                        adjacentCell.getPosition(), direction, null, null);
                 if (targetCell != null &&
                         (targetCell.getCharacter().getTeamColor() == character.getTeamColor() ||
                                 CharacterAbilityQuery.canBeMovedByEnemyAbilities(game, targetCell.getCharacter()))) {
                     Position targetPos = targetCell.getPosition();
 
-                    InteractionResult swapResult = new InteractionResult(
-                            InteractionResultType.PositionChosen,
-                            new InteractionContext(character),
-                            new InteractionTarget(
-                                    TargetCategory.ActiveAbilityTargetPosition,
-                                    targetPos
-                            )
-                    );
-                    CharacterActionBuilder targetBuilder = new CharacterActionBuilder(builder);
-                    targetBuilder.addResult(swapResult);
-                    targetBuilder.addFeedback(buildSwapFeedback(swapResult));
+                    InteractionResult swapResult = createPositionResult(new InteractionContext(character),
+                            TargetCategory.ActiveAbilityTargetPosition, targetPos);
 
-                    if (isActionValid(buildAction(targetBuilder))) {
+                    if (isValidWith(builder, swapResult, buildSwapFeedback(swapResult))) {
                         targets.add(targetPos);
                     }
                 }
@@ -148,31 +127,11 @@ public final class IllusionistActionResolver extends CharacterActionResolver {
 
     @NonNull
     private InteractionFeedback buildSwapFeedback(@NonNull InteractionResult result) {
-        Position targetPos = Objects.requireNonNull(
-                Objects.requireNonNull(
-                        result.getChosenTarget(),
-                        "Illusionist target interaction result invalid: no data"
-                ).getChosenPosition(),
-                "Illusionist target interaction result invalid: no target position"
-        );
+        Position targetPos = getChosenPosition(result);
+        Character target = getCharacterAt(targetPos);
 
-        Character target = Objects.requireNonNull(
-                game.getBoard().getCell(targetPos).getCharacter(),
-                "Illusionist target position should contain a character"
-        );
-
-        return InteractionFeedback.createForCharacterAction(List.of(new CharacterActionMotion(
-                CharacterMotionType.Swap,
-                List.of(
-                        new CharacterActionTarget(character, characterPos, targetPos),
-                        new CharacterActionTarget(target, targetPos, characterPos)
-                )
-        )));
-    }
-
-    private boolean isIllusionistTargetResult(@NonNull InteractionResult result) {
-        return result.getResultType() == InteractionResultType.PositionChosen &&
-                result.getChosenTarget() != null &&
-                result.getChosenTarget().getCategory() == TargetCategory.ActiveAbilityTargetPosition;
+        return createMotionFeedback(CharacterMotionType.Swap,
+                new CharacterActionTarget(character, characterPos, targetPos),
+                new CharacterActionTarget(target, targetPos, characterPos));
     }
 }
