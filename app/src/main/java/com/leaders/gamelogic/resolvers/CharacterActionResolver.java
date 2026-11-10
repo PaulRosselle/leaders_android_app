@@ -97,6 +97,16 @@ public class CharacterActionResolver {
         }
     }
 
+    // TODO - javadoc
+    protected final boolean isValidWith(@NonNull CharacterActionBuilder refBuilder,
+                                        @NonNull InteractionResult result,
+                                        @NonNull InteractionFeedback feedback) {
+        CharacterActionBuilder builder = new CharacterActionBuilder(refBuilder);
+        builder.addResult(result);
+        builder.addFeedback(feedback);
+        return isActionValid(buildAction(builder));
+    }
+
     /**
      * Computes all destinations reachable through a normal movement action and
      * removes those that would result in an invalid game state.
@@ -196,6 +206,7 @@ public class CharacterActionResolver {
         // The default movement action only requires a single interaction.
         // When the result is gotten, a single feedback can be generated containing the movement instructions.
         // No feedback is generated after an action cancellation for the default movement
+        // TODO - refactor
         if (builder.getResults().size() != 1 ||
                 !builder.getFeedbacks().isEmpty() ||
                 builder.isBuildCancelled()) {

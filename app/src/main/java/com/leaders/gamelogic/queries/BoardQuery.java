@@ -18,8 +18,10 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 public final class BoardQuery {
     private BoardQuery(){
@@ -251,6 +253,30 @@ public final class BoardQuery {
             }
         }
         throw new NoSuchElementException("Character not found on the board");
+    }
+
+    // TODO - javadoc
+    @NonNull
+    public Character getNonNullCharacterAt(@NonNull Board board, @NonNull Position characterPos) {
+        return Objects.requireNonNull(board.getCell(characterPos).getCharacter(),
+                "No character found at position: " + characterPos
+        );
+    }
+
+    // TODO - javadoc
+    @NonNull
+    public List<Cell> getAdjacentCells(@NonNull Board board, @NonNull Position position,
+                                       @NonNull Predicate<Cell> predicate) {
+        List<Cell> matchingAdjacentCells = new ArrayList<>();
+
+        for (Direction direction : Direction.values()) {
+            Cell adjacentCell = BoardQuery.findAdjacentCell(board, position, direction);
+            if (adjacentCell != null && predicate.test(adjacentCell)) {
+                matchingAdjacentCells.add(adjacentCell);
+            }
+        }
+
+        return matchingAdjacentCells;
     }
 
     /**
