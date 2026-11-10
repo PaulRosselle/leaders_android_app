@@ -13,9 +13,7 @@ import com.leaders.gamelogic.interactions.InteractionContext;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
-import com.leaders.gamelogic.interactions.InteractionResultType;
 import com.leaders.gamelogic.interactions.InteractionTarget;
-import com.leaders.gamelogic.interactions.InteractionType;
 import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.gamelogic.resolvers.CharacterActionResolver;
@@ -24,6 +22,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static com.leaders.gamelogic.resolvers.ResolverUtils.createPositionRequest;
+import static com.leaders.gamelogic.resolvers.ResolverUtils.createPositionResult;
+import static com.leaders.gamelogic.resolvers.ResolverUtils.isFeedbackExpected;
 
 /**
  * Resolves the Nemesis' movement.
@@ -53,26 +55,19 @@ public final class NemesisActionResolver extends CharacterActionResolver {
             legalTargets.add(new InteractionTarget(TargetCategory.MovementDestination, path.getDestination()));
         }
 
-        return new InteractionRequest(
-                InteractionType.PositionExpected,
-                new InteractionContext(character),
-                legalTargets,
-                List.of(InteractionResultType.PositionChosen, InteractionResultType.CancelAction)
-        );
+        return createPositionRequest(new InteractionContext(character), legalTargets);
     }
 
     @Override
     @Nullable
     public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
-        if (builder.getResults().isEmpty() ||
-                !builder.getFeedbacks().isEmpty() ||
-                builder.isBuildCancelled()) {
+        if (!isFeedbackExpected(builder)) {
             return null;
         }
 
         InteractionResult result = builder.getResults().get(0);
 
-        if (!isMovementResult(result)) {
+        if (!isNormalMovementResult(result)) {
             throw new IllegalArgumentException(
                     "Invalid Nemesis interaction type " + result.getResultType());
         }
@@ -141,27 +136,14 @@ public final class NemesisActionResolver extends CharacterActionResolver {
         List<CharacterPath> validPaths = new ArrayList<>();
 
         for (CharacterPath path : paths) {
-            CharacterActionBuilder destinationBuilder = new CharacterActionBuilder(builder);
-            InteractionResult result = new InteractionResult(
-                    InteractionResultType.PositionChosen,
-                    new InteractionContext(character),
-                    new InteractionTarget(TargetCategory.MovementDestination, path.getDestination())
-            );
+            InteractionResult result = createPositionResult(new InteractionContext(character),
+                    TargetCategory.MovementDestination, path.getDestination());
 
-            destinationBuilder.addResult(result);
-            destinationBuilder.addFeedback(buildNormalMovementFeedback(path));
-
-            if (isActionValid(buildAction(destinationBuilder))) {
+            if (isValidWith(builder, result, buildNormalMovementFeedback(path))) {
                 validPaths.add(path);
             }
         }
 
         return validPaths;
-    }
-
-    private boolean isMovementResult(@NonNull InteractionResult result) {
-        return result.getResultType() == InteractionResultType.PositionChosen &&
-                result.getChosenTarget() != null &&
-                result.getChosenTarget().getCategory() == TargetCategory.MovementDestination;
     }
 }

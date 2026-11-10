@@ -3,7 +3,6 @@ package com.leaders.gamelogic.resolvers.characters;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.leaders.gamelogic.actions.CharacterActionMotion;
 import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
@@ -17,9 +16,7 @@ import com.leaders.gamelogic.interactions.InteractionContext;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
-import com.leaders.gamelogic.interactions.InteractionResultType;
 import com.leaders.gamelogic.interactions.InteractionTarget;
-import com.leaders.gamelogic.interactions.InteractionType;
 import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.gamelogic.queries.CharacterAbilityQuery;
@@ -27,7 +24,14 @@ import com.leaders.gamelogic.resolvers.CharacterActionResolver;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+
+import static com.leaders.gamelogic.resolvers.ResolverUtils.addTargets;
+import static com.leaders.gamelogic.resolvers.ResolverUtils.createMotionFeedback;
+import static com.leaders.gamelogic.resolvers.ResolverUtils.createPositionRequest;
+import static com.leaders.gamelogic.resolvers.ResolverUtils.createPositionResult;
+import static com.leaders.gamelogic.resolvers.ResolverUtils.getChosenPosition;
+import static com.leaders.gamelogic.resolvers.ResolverUtils.getPositions;
+import static com.leaders.gamelogic.resolvers.ResolverUtils.isFeedbackExpected;
 
 /**
  * Resolves the Bruiser's active ability.
@@ -47,7 +51,6 @@ public final class BruiserActionResolver extends CharacterActionResolver {
     @Override
     @Nullable
     public InteractionRequest getNextInteraction(@NonNull CharacterActionBuilder builder) {
-        // For the first interaction, both normal movement and ability activation are possible
         if (builder.getResults().isEmpty()) {
             return buildInitialInteraction(builder);
         }
@@ -62,9 +65,9 @@ public final class BruiserActionResolver extends CharacterActionResolver {
             return super.getNextInteraction(builder);
         }
 
-        if (isBruiserTargetResult(firstResult)) {
+        if (isAbilityTargetResult(firstResult)) {
             if (builder.getResults().size() > 1) {
-                if (!isBruiserPushDestinationResult(builder.getResults().get(1))) {
+                if (!isAbilityDestinationResult(builder.getResults().get(1))) {
                     throw new IllegalArgumentException("Invalid result type for a Bruiser ability activation");
                 }
                 return null;
@@ -79,9 +82,7 @@ public final class BruiserActionResolver extends CharacterActionResolver {
     @Override
     @Nullable
     public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
-        if (!builder.getFeedbacks().isEmpty() ||
-                builder.getResults().isEmpty() ||
-                builder.isBuildCancelled()) {
+        if (!isFeedbackExpected(builder)) {
             return null;
         }
 
@@ -97,43 +98,24 @@ public final class BruiserActionResolver extends CharacterActionResolver {
 
         InteractionResult destinationResult = builder.getResults().get(1);
 
-        if (!isBruiserTargetResult(firstResult) ||
-                !isBruiserPushDestinationResult(destinationResult)) {
+        if (!isAbilityTargetResult(firstResult) || !isAbilityDestinationResult(destinationResult)) {
             throw new IllegalArgumentException("Invalid result types for a Bruiser ability activation");
         }
 
-        Position targetOrigin = Objects.requireNonNull(
-                Objects.requireNonNull(firstResult.getChosenTarget(),
-                                "Bruiser target interaction result invalid: no data")
-                        .getChosenPosition(),
-                "Bruiser target interaction result invalid: no target position");
+        Position targetOrigin = getChosenPosition(firstResult);
+        Position destination = getChosenPosition(destinationResult);
+        Character target = getCharacterAt(targetOrigin);
 
-        Position destination = Objects.requireNonNull(
-                Objects.requireNonNull(destinationResult.getChosenTarget(),
-                                "Bruiser destination interaction result invalid: no data")
-                        .getChosenPosition(),
-                "Bruiser destination interaction result invalid: no destination");
-
-        Character target = Objects.requireNonNull(
-                game.getBoard().getCell(targetOrigin).getCharacter(),
-                "Bruiser target position should contain a character");
-
-        return InteractionFeedback.createForCharacterAction(List.of(new CharacterActionMotion(
-                CharacterMotionType.Push,
-                List.of(
-                        new CharacterActionTarget(character, characterPos, targetOrigin),
-                        new CharacterActionTarget(target, targetOrigin, destination)
-                )
-        )));
+        return createMotionFeedback(CharacterMotionType.Push,
+                new CharacterActionTarget(character, characterPos, targetOrigin),
+                new CharacterActionTarget(target, targetOrigin, destination));
     }
 
     @NonNull
     private InteractionRequest buildInitialInteraction(@NonNull CharacterActionBuilder builder) {
         List<InteractionTarget> legalTargets = new ArrayList<>();
 
-        for (Position destination : getNormalMovementValidDestinations(builder)) {
-            legalTargets.add(new InteractionTarget(TargetCategory.MovementDestination, destination));
-        }
+        addTargets(legalTargets, TargetCategory.MovementDestination, getNormalMovementValidDestinations(builder));
 
         if (CharacterAbilityQuery.canUseActiveAbility(game, character)) {
             for (Position enemyPosition : getAdjacentEnemyPositions()) {
@@ -143,40 +125,25 @@ public final class BruiserActionResolver extends CharacterActionResolver {
             }
         }
 
-        return new InteractionRequest(
-                InteractionType.PositionExpected,
-                new InteractionContext(character),
-                legalTargets,
-                List.of(InteractionResultType.PositionChosen, InteractionResultType.CancelAction)
-        );
+        return createPositionRequest(new InteractionContext(character), legalTargets);
     }
 
     @NonNull
     private InteractionRequest buildPushDestinationInteraction(@NonNull CharacterActionBuilder builder,
                                                                @NonNull InteractionResult result) {
-        if (!isBruiserTargetResult(result)) {
+        if (!isAbilityTargetResult(result)) {
             throw new IllegalArgumentException("A Bruiser ability target must be selected through a PositionChosen result");
         }
 
-        Position targetPos = Objects.requireNonNull(Objects.requireNonNull(result.getChosenTarget(),
-                        "Bruiser target interaction invalid : no data")
-                        .getChosenPosition(),
-                "Bruiser target interaction invalid : no target position");
+        Position targetPos = getChosenPosition(result);
 
         List<InteractionTarget> legalTargets = new ArrayList<>();
 
-        for (Position destination : getValidPushDestinations(builder, targetPos, false)) {
-            legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityDestination, destination));
-        }
+        addTargets(legalTargets, TargetCategory.ActiveAbilityDestination,
+                getValidPushDestinations(builder, targetPos, false));
 
-        Character targetedEnemy = Objects.requireNonNull(game.getBoard().getCell(targetPos).getCharacter(),
-                "A Bruiser target position must contain an enemy");
-        return new InteractionRequest(
-                InteractionType.PositionExpected,
-                new InteractionContext(character, targetedEnemy),
-                legalTargets,
-                List.of(InteractionResultType.PositionChosen, InteractionResultType.CancelAction)
-        );
+        Character targetedEnemy = getCharacterAt(targetPos);
+        return createPositionRequest(new InteractionContext(character, targetedEnemy), legalTargets);
     }
 
     /**
@@ -187,20 +154,12 @@ public final class BruiserActionResolver extends CharacterActionResolver {
      */
     @NonNull
     private List<Position> getAdjacentEnemyPositions() {
-        List<Position> enemies = new ArrayList<>();
-
-        for (Direction direction : Direction.values()) {
-            Cell adjacentCell = BoardQuery.findAdjacentCell(game.getBoard(), characterPos, direction);
-            if (adjacentCell != null) {
-                Character target = adjacentCell.getCharacter();
-                if (target != null && target.getTeamColor() != character.getTeamColor() &&
-                    CharacterAbilityQuery.canBeMovedByEnemyAbilities(game, target)) {
-                    enemies.add(adjacentCell.getPosition());
-                }
-            }
-        }
-
-        return enemies;
+        List<Cell> enemyCells = BoardQuery.getAdjacentCells(game.getBoard(), characterPos, cell -> {
+            Character target = cell.getCharacter();
+            return target != null && target.getTeamColor() != character.getTeamColor() &&
+                    CharacterAbilityQuery.canBeMovedByEnemyAbilities(game, target);
+        });
+        return getPositions(enemyCells);
     }
 
     /**
@@ -222,8 +181,7 @@ public final class BruiserActionResolver extends CharacterActionResolver {
     private List<Position> getValidPushDestinations(@NonNull CharacterActionBuilder builder,
                                                     @NonNull Position targetPos,
                                                     boolean exitAfterFirstValidDest) {
-        Character target = Objects.requireNonNull(game.getBoard().getCell(targetPos).getCharacter(),
-                "A cell targeted by the Bruiser's ability should always contain a character");
+        Character target = getCharacterAt(targetPos);
 
         Direction straightPushDirection = findStraightPushDirection(targetPos);
 
@@ -234,15 +192,7 @@ public final class BruiserActionResolver extends CharacterActionResolver {
         );
 
         // If the target result is missing, we add it before entering the destination loop
-        CharacterActionBuilder targetBuilder = new CharacterActionBuilder(builder);
-        if (builder.getResults().isEmpty()) {
-            targetBuilder.addResult(new InteractionResult(
-                    InteractionResultType.PositionChosen,
-                    new InteractionContext(character),
-                    new InteractionTarget(TargetCategory.ActiveAbilityTargetPosition, targetPos)
-            ));
-        }
-
+        CharacterActionBuilder targetBuilder = withAbilityTargetSelected(builder, targetPos);
 
         List<Position> destinations = new ArrayList<>();
         for (Direction direction : pushDirections) {
@@ -250,24 +200,13 @@ public final class BruiserActionResolver extends CharacterActionResolver {
             if (pushCell != null && pushCell.getCharacter() == null) {
                 Position pushDestPos = pushCell.getPosition();
 
-                CharacterActionBuilder destinationBuilder = new CharacterActionBuilder(targetBuilder);
-                destinationBuilder.addResult(new InteractionResult(
-                        InteractionResultType.PositionChosen,
-                        new InteractionContext(character, target),
-                        new InteractionTarget(TargetCategory.ActiveAbilityDestination, pushDestPos)
-                ));
+                InteractionResult pushResult = createPositionResult(new InteractionContext(character, target),
+                        TargetCategory.ActiveAbilityDestination, pushDestPos);
+                InteractionFeedback pushFeedback = createMotionFeedback(CharacterMotionType.Push,
+                        new CharacterActionTarget(character, characterPos, targetPos),
+                        new CharacterActionTarget(target, targetPos, pushDestPos));
 
-                destinationBuilder.addFeedback(InteractionFeedback.createForCharacterAction(
-                        List.of(new CharacterActionMotion(
-                                CharacterMotionType.Push,
-                                List.of(
-                                        new CharacterActionTarget(character, characterPos, targetPos),
-                                        new CharacterActionTarget(target, targetPos, pushDestPos)
-                                ))
-                        ))
-                );
-
-                if (isActionValid(buildAction(destinationBuilder))) {
+                if (isValidWith(targetBuilder, pushResult, pushFeedback)) {
                     destinations.add(pushDestPos);
 
                     if (exitAfterFirstValidDest) {
@@ -289,17 +228,5 @@ public final class BruiserActionResolver extends CharacterActionResolver {
         }
 
         throw new IllegalArgumentException("Target position is not adjacent to the Bruiser");
-    }
-
-    private boolean isBruiserTargetResult(@NonNull InteractionResult result) {
-        return result.getResultType() == InteractionResultType.PositionChosen &&
-                result.getChosenTarget() != null &&
-                result.getChosenTarget().getCategory() == TargetCategory.ActiveAbilityTargetPosition;
-    }
-
-    private boolean isBruiserPushDestinationResult(@NonNull InteractionResult result) {
-        return result.getResultType() == InteractionResultType.PositionChosen &&
-                result.getChosenTarget() != null &&
-                result.getChosenTarget().getCategory() == TargetCategory.ActiveAbilityDestination;
     }
 }

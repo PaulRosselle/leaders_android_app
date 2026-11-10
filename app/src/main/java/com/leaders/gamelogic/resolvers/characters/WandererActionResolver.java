@@ -3,23 +3,18 @@ package com.leaders.gamelogic.resolvers.characters;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.leaders.gamelogic.actions.CharacterActionMotion;
-import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterMotionType;
-import com.leaders.gamelogic.enums.Direction;
 import com.leaders.gamelogic.interactions.CharacterActionBuilder;
 import com.leaders.gamelogic.interactions.InteractionContext;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
-import com.leaders.gamelogic.interactions.InteractionResultType;
 import com.leaders.gamelogic.interactions.InteractionTarget;
-import com.leaders.gamelogic.interactions.InteractionType;
 import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.gamelogic.queries.CharacterAbilityQuery;
@@ -27,7 +22,13 @@ import com.leaders.gamelogic.resolvers.CharacterActionResolver;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+
+import static com.leaders.gamelogic.resolvers.ResolverUtils.addTargets;
+import static com.leaders.gamelogic.resolvers.ResolverUtils.createPositionRequest;
+import static com.leaders.gamelogic.resolvers.ResolverUtils.createPositionResult;
+import static com.leaders.gamelogic.resolvers.ResolverUtils.createSingleMotionFeedback;
+import static com.leaders.gamelogic.resolvers.ResolverUtils.getChosenPosition;
+import static com.leaders.gamelogic.resolvers.ResolverUtils.isFeedbackExpected;
 
 /**
  * Resolves the Wanderer's active ability.
@@ -59,9 +60,7 @@ public final class WandererActionResolver extends CharacterActionResolver {
         // Normal movement and Wanderer destinations may overlap. We give priority to movement
         // meaning a cell reachable via normal movement won't be added from the active ability cells
         List<Position> movementDestinations = getNormalMovementValidDestinations(builder);
-        for (Position movementDest : movementDestinations) {
-            legalTargets.add(new InteractionTarget(TargetCategory.MovementDestination, movementDest));
-        }
+        addTargets(legalTargets, TargetCategory.MovementDestination, movementDestinations);
 
         if (CharacterAbilityQuery.canUseActiveAbility(game, character)) {
             for (Position flightDest : getWandererFlightDestinations(builder)) {
@@ -71,20 +70,13 @@ public final class WandererActionResolver extends CharacterActionResolver {
             }
         }
 
-        return new InteractionRequest(
-                InteractionType.PositionExpected,
-                new InteractionContext(character),
-                legalTargets,
-                List.of(InteractionResultType.PositionChosen, InteractionResultType.CancelAction)
-        );
+        return createPositionRequest(new InteractionContext(character), legalTargets);
     }
 
     @Override
     @Nullable
     public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
-        if (builder.getResults().isEmpty() ||
-                !builder.getFeedbacks().isEmpty() ||
-                builder.isBuildCancelled()) {
+        if (!isFeedbackExpected(builder)) {
             return null;
         }
 
@@ -93,7 +85,7 @@ public final class WandererActionResolver extends CharacterActionResolver {
         InteractionFeedback feedback;
         if (isNormalMovementResult(result)) {
             feedback = super.getNextFeedback(builder);
-        } else if (isWandererDestinationResult(result)){
+        } else if (isAbilityDestinationResult(result)){
             feedback = buildWandererMovementFeedback(result);
         } else {
             throw new IllegalArgumentException("Invalid Wanderer interaction type " + result.getResultType());
@@ -115,25 +107,10 @@ public final class WandererActionResolver extends CharacterActionResolver {
             if (cell.getCharacter() == null && !isCellAdjacentToEnemy(cell.getPosition())) {
                 Position destPos = cell.getPosition();
 
-                CharacterActionBuilder destinationBuilder = new CharacterActionBuilder(builder);
-                destinationBuilder.addResult(new InteractionResult(
-                        InteractionResultType.PositionChosen,
-                        new InteractionContext(character),
-                        new InteractionTarget(
-                                TargetCategory.ActiveAbilityDestination,
-                                destPos
-                        )
-                ));
+                InteractionResult flightResult = createPositionResult(new InteractionContext(character),
+                        TargetCategory.ActiveAbilityDestination, destPos);
 
-                destinationBuilder.addFeedback(InteractionFeedback.createForCharacterAction(
-                        List.of(new CharacterActionMotion(
-                                CharacterMotionType.Fly,
-                                List.of(new CharacterActionTarget(
-                                        character, characterPos, destPos))
-                        ))
-                ));
-
-                if (isActionValid(buildAction(destinationBuilder))) {
+                if (isValidWith(builder, flightResult, buildWandererMovementFeedback(flightResult))) {
                     destinations.add(destPos);
                 }
             }
@@ -143,35 +120,16 @@ public final class WandererActionResolver extends CharacterActionResolver {
     }
 
     private boolean isCellAdjacentToEnemy(@NonNull Position cellPos) {
-        for (Direction direction : Direction.values()) {
-            Cell adjacentCell = BoardQuery.findAdjacentCell(game.getBoard(), cellPos, direction);
-            if (adjacentCell != null && adjacentCell.getCharacter() != null &&
-                    adjacentCell.getCharacter().getTeamColor() != character.getTeamColor()) {
-                return true;
-            }
-        }
-        return false;
+        return !BoardQuery.getAdjacentCells(game.getBoard(), cellPos, cell ->
+                cell.getCharacter() != null &&
+                        cell.getCharacter().getTeamColor() != character.getTeamColor()
+        ).isEmpty();
     }
 
     @NonNull
     private InteractionFeedback buildWandererMovementFeedback(@NonNull InteractionResult result) {
-        Position destination = Objects.requireNonNull(
-                Objects.requireNonNull(
-                        result.getChosenTarget(),
-                        "Wanderer destination interaction result invalid: no data"
-                ).getChosenPosition(),
-                "Wanderer destination interaction result invalid: no destination position"
-        );
+        Position destination = getChosenPosition(result);
 
-        return InteractionFeedback.createForCharacterAction(List.of(new CharacterActionMotion(
-                CharacterMotionType.Fly,
-                List.of(new CharacterActionTarget(character, characterPos, destination))
-        )));
-    }
-
-    private boolean isWandererDestinationResult(@NonNull InteractionResult result) {
-        return result.getResultType() == InteractionResultType.PositionChosen &&
-                result.getChosenTarget() != null &&
-                result.getChosenTarget().getCategory() == TargetCategory.ActiveAbilityDestination;
+        return createSingleMotionFeedback(CharacterMotionType.Fly, character, characterPos, destination);
     }
 }

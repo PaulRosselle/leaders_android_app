@@ -3,8 +3,6 @@ package com.leaders.gamelogic.resolvers.characters;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.leaders.gamelogic.actions.CharacterActionMotion;
-import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.CharacterPath;
@@ -18,9 +16,7 @@ import com.leaders.gamelogic.interactions.InteractionContext;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
-import com.leaders.gamelogic.interactions.InteractionResultType;
 import com.leaders.gamelogic.interactions.InteractionTarget;
-import com.leaders.gamelogic.interactions.InteractionType;
 import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.gamelogic.queries.CharacterAbilityQuery;
@@ -31,18 +27,19 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public final class AcrobatActionResolver extends CharacterActionResolver {
+import static com.leaders.gamelogic.resolvers.ResolverUtils.addTargets;
+import static com.leaders.gamelogic.resolvers.ResolverUtils.createPathFeedback;
+import static com.leaders.gamelogic.resolvers.ResolverUtils.createPositionRequest;
+import static com.leaders.gamelogic.resolvers.ResolverUtils.createPositionResult;
 
-    /**
-     * Resolves the Acrobat's active ability.
-     *
-     * <p>The Acrobat can jump over an adjacent character and land on the
-     * following empty cell. It can perform up to two consecutive jumps.</p>
-     *
-     * @param game current game projection
-     * @param gameHistory current game history
-     * @param character Acrobat being resolved
-     */
+
+/**
+ * Resolves the Acrobat's active ability.
+ *
+ * <p>The Acrobat can jump over an adjacent character and land on the
+ * following empty cell. It can perform up to two consecutive jumps.</p>
+ */
+public final class AcrobatActionResolver extends CharacterActionResolver {
     public AcrobatActionResolver(@NonNull Game game, @NonNull GameHistory gameHistory, @NonNull Character character) {
         super(game, gameHistory, character);
     }
@@ -63,18 +60,14 @@ public final class AcrobatActionResolver extends CharacterActionResolver {
         // a normal move requires an adjacent cell, while a jump destination is at least two cells away.
         // For this reason, we can add both destinations without further treatment to avoid duplicates
         List<InteractionTarget> legalTargets = new ArrayList<>();
-        for (Position movementDest : getNormalMovementValidDestinations(builder)) {
-            legalTargets.add(new InteractionTarget(TargetCategory.MovementDestination, movementDest));
-        }
+        addTargets(legalTargets, TargetCategory.MovementDestination, getNormalMovementValidDestinations(builder));
         if (CharacterAbilityQuery.canUseActiveAbility(game, character)) {
-            for (CharacterPath jumpPaths : getAcrobatJumpPaths(builder)) {
-                legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityDestination, jumpPaths.getDestination()));
+            for (CharacterPath jumpPath : getAcrobatJumpPaths(builder)) {
+                legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityDestination, jumpPath.getDestination()));
             }
         }
 
-        return new InteractionRequest(InteractionType.PositionExpected,
-                new InteractionContext(character), legalTargets,
-                List.of(InteractionResultType.PositionChosen, InteractionResultType.CancelAction));
+        return createPositionRequest(new InteractionContext(character), legalTargets);
     }
 
     @Override
@@ -94,21 +87,15 @@ public final class AcrobatActionResolver extends CharacterActionResolver {
         InteractionFeedback feedback;
         if (isNormalMovementResult(result)) {
             feedback = super.getNextFeedback(builder);
-        } else if (isInteractionResultAcrobatJump(result)){
+        } else if (isAbilityDestinationResult(result)){
             // We recover all legal paths using an empty builder to find one matching the result
             List<CharacterPath> legalPaths = getAcrobatJumpPaths(new CharacterActionBuilder(character));
             CharacterPath resultPath = getPathMatchingResult(result, legalPaths);
-            feedback = buildAcrobatJumpFeedback(resultPath);
+            feedback = createPathFeedback(character, resultPath, CharacterMotionType.Jump);
         } else {
             throw new IllegalArgumentException("Invalid Acrobat interaction type " + result.getResultType());
         }
         return feedback;
-    }
-
-    private boolean isInteractionResultAcrobatJump(@NonNull InteractionResult result) {
-        return result.getResultType() == InteractionResultType.PositionChosen &&
-                result.getChosenTarget() != null &&
-                result.getChosenTarget().getCategory() == TargetCategory.ActiveAbilityDestination;
     }
 
     @NonNull
@@ -147,15 +134,11 @@ public final class AcrobatActionResolver extends CharacterActionResolver {
         for (int i = jumpPaths.size() - 1; i >= 0; i--) {
             CharacterPath jumpPath = jumpPaths.get(i);
 
-            CharacterActionBuilder jumpBuilder = new CharacterActionBuilder(builder);
-            InteractionResult jumpResult = new InteractionResult(InteractionResultType.PositionChosen,
-                    new InteractionContext(character),
-                    new InteractionTarget(TargetCategory.ActiveAbilityDestination, jumpPath.getDestination())
-            );
-            jumpBuilder.addResult(jumpResult);
-            jumpBuilder.addFeedback(buildAcrobatJumpFeedback(jumpPath));
+            InteractionResult jumpResult = createPositionResult(new InteractionContext(character),
+                    TargetCategory.ActiveAbilityDestination, jumpPath.getDestination());
+            InteractionFeedback jumpFeedback = createPathFeedback(character, jumpPath, CharacterMotionType.Jump);
 
-            if (!isActionValid(buildAction(jumpBuilder))) {
+            if (!isValidWith(builder, jumpResult, jumpFeedback)) {
                 jumpPaths.remove(i);
             }
         }
@@ -177,26 +160,5 @@ public final class AcrobatActionResolver extends CharacterActionResolver {
         }
 
         return jumpDestination;
-    }
-
-    @NonNull
-    private InteractionFeedback buildAcrobatJumpFeedback(@NonNull CharacterPath jumpPath) {
-        List<CharacterActionMotion> jumpMotions = new ArrayList<>();
-
-        if (jumpPath.getStepsCount() > 2) {
-            throw new IllegalArgumentException("Invalid Acrobat jump path: path should not exceed two steps");
-        }
-
-        Position previousPos = jumpPath.getStart();
-        for (Position position : jumpPath.getPositions()) {
-            if (!position.equals(jumpPath.getStart())) {
-                jumpMotions.add(new CharacterActionMotion(CharacterMotionType.Jump,
-                        List.of(new CharacterActionTarget(character, previousPos, position)))
-                );
-                previousPos = position;
-            }
-        }
-
-        return InteractionFeedback.createForCharacterAction(jumpMotions);
     }
 }
