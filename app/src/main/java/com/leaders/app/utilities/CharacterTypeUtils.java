@@ -89,6 +89,8 @@ public class CharacterTypeUtils {
             case Sniper: return 23;
             case Tactician: return 24;
             case Wisp: return 20;
+            // TODO - replace by a dedicated ID once Mathieu implements the Elite Archer
+            case EliteArcher: return 4;
             default: throw new NoSuchElementException("No LBE ID found for: " + characterType);
         }
     }
