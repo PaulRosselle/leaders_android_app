@@ -347,5 +347,5 @@
     <string name="puzzle_import_file_too_large">Puzzle import file too large</string>
     <string name="card_name_wisp">wisp</string>
     <string name="card_formatted_name_wisp">WiSP</string>
-    <string name="card_description_wisp">Move to any empty space on the board. Cannot help capture the opponent\'s Leader</string>
+    <string name="card_description_wisp">Move to any empty space on the board. Cannot help capture the opponent\'s Leader.</string>
 </resources>

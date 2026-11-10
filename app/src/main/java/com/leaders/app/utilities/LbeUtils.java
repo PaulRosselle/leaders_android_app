@@ -49,6 +49,7 @@ public final class LbeUtils {
             case Vizier: return 19;
             case Wanderer: return 15;
             case Archer: return 4;
+            case Wisp: return 20;
             default: throw new NoSuchElementException("No LBE ID found for: " + characterType);
         }
     }
