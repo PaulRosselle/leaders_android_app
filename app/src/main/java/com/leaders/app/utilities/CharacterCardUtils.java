@@ -49,6 +49,7 @@ public final  class CharacterCardUtils {
             case Sniper: return R.string.card_name_sniper;
             case Tactician: return R.string.card_name_tactician;
             case Wisp: return R.string.card_name_wisp;
+            case EliteArcher: return R.string.card_name_elite_archer;
             default: throw new IllegalArgumentException("No name found for character card: " + characterCard);
         }
     }
@@ -79,6 +80,7 @@ public final  class CharacterCardUtils {
             case Sniper: return R.string.card_formatted_name_sniper;
             case Tactician: return R.string.card_formatted_name_tactician;
             case Wisp: return R.string.card_formatted_name_wisp;
+            case EliteArcher: return R.string.card_formatted_name_elite_archer;
             default: throw new IllegalArgumentException("No formatted name found for character card: " + characterCard);
         }
     }
@@ -109,6 +111,7 @@ public final  class CharacterCardUtils {
             case Sniper: return R.string.card_description_sniper;
             case Tactician: return R.string.card_description_tactician;
             case Wisp: return R.string.card_description_wisp;
+            case EliteArcher: return R.string.card_description_elite_archer;
             default: throw new IllegalArgumentException("No name found for character card: " + characterCard);
         }
     }
@@ -158,6 +161,7 @@ public final  class CharacterCardUtils {
             case Sniper: return R.drawable.card_portrait_sniper;
             case Tactician: return R.drawable.card_portrait_tactician;
             case Wisp: return R.drawable.card_portrait_wisp;
+            case EliteArcher: return R.drawable.card_portrait_elite_archer;
             default: throw new IllegalArgumentException("No portrait drawable for card: " + card);
         }
     }
@@ -200,6 +204,7 @@ public final  class CharacterCardUtils {
             case Sniper: return R.drawable.card_portrait_banned_sniper;
             case Tactician: return R.drawable.card_portrait_banned_tactician;
             case Wisp: return R.drawable.card_portrait_banned_wisp;
+            case EliteArcher: return R.drawable.card_portrait_banned_elite_archer;
             default: throw new IllegalArgumentException("No banned portrait drawable for card: " + card);
         }
     }
@@ -245,6 +250,7 @@ public final  class CharacterCardUtils {
             case Sniper: return R.drawable.card_hex_portrait_sniper;
             case Tactician: return R.drawable.card_hex_portrait_tactician;
             case Wisp: return R.drawable.card_hex_portrait_wisp;
+            case EliteArcher: return R.drawable.card_hex_portrait_elite_archer;
             default: throw new IllegalArgumentException("No portrait hex drawable for card: " + card);
         }
     }
@@ -287,6 +293,7 @@ public final  class CharacterCardUtils {
             case Sniper: return R.drawable.card_hex_portrait_banned_sniper;
             case Tactician: return R.drawable.card_hex_portrait_banned_tactician;
             case Wisp: return R.drawable.card_hex_portrait_banned_wisp;
+            case EliteArcher: return R.drawable.card_hex_portrait_banned_elite_archer;
             default: throw new IllegalArgumentException("No banned portrait hex drawable for card: " + card);
         }
     }
@@ -316,6 +323,7 @@ public final  class CharacterCardUtils {
             case Sniper: return R.drawable.character_artwork_sniper;
             case Tactician: return R.drawable.character_artwork_tactician;
             case Wisp: return R.drawable.character_artwork_wisp;
+            case EliteArcher: return R.drawable.character_artwork_elite_archer;
             default: throw new IllegalArgumentException("No formatted name found for character card: " + characterCard);
         }
     }
@@ -380,6 +388,7 @@ public final  class CharacterCardUtils {
             case Sniper: return R.raw.character_demo_sniper;
             case Tactician: return R.raw.character_demo_tactician;
             case Wisp: return R.raw.character_demo_wisp;
+            case EliteArcher: return R.raw.character_demo_elite_archer;
             default: throw new IllegalStateException("No character demo file found for character card: " + characterCard);
         }
     }

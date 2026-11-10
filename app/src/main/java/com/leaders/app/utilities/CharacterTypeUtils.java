@@ -55,6 +55,7 @@ public class CharacterTypeUtils {
             case Sniper: return R.drawable.character_piece_sniper;
             case Tactician: return R.drawable.character_piece_tactician;
             case Wisp: return R.drawable.character_piece_wisp;
+            case EliteArcher: return R.drawable.character_piece_elite_archer;
             default: throw new IllegalArgumentException("No drawable found for character: " + characterType);
         }
     }

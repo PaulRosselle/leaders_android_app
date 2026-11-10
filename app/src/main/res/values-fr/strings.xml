@@ -349,4 +349,7 @@
     <string name="card_name_tactician">tacticienne</string>
     <string name="card_formatted_name_tactician">TACtiCiEnnE</string>
     <string name="card_description_tactician">Si un allié (Tacticienne incluse) est adjacent au Leader adverse : déplace d\'une case un allié non-Leader, qui ne peut plus utiliser sa ce tour-ci.</string>
+    <string name="card_name_elite_archer">archère d\'élite</string>
+    <string name="card_formatted_name_elite_archer">ARcHÈRE D\'ÉLITE</string>
+    <string name="card_description_elite_archer">Participe également à la capture du leader adverse à une distance de deux cases en ligne droite, même s\'il n\'est pas visible.</string>
 </resources>
