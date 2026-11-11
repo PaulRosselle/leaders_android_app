@@ -51,6 +51,14 @@ public class CharacterAbilityQueryTest {
         );
     }
 
+    private Game createTestGameWithTransformedState(Board board, Character before, Character after) {
+        Game game = createTestGame(board);
+
+        game.addTransformedState(before, after);
+
+        return game;
+    }
+
     private GameHistory createTestGameHistory() {
         // Build the minimal GameHistory state required by the tests.
         // This state is intentionally invalid as a real game state.
@@ -105,6 +113,10 @@ public class CharacterAbilityQueryTest {
 
     private Character createCharacter(CharacterType characterType, TeamColor teamColor) {
         return Character.create(characterType, teamColor);
+    }
+
+    private Character frogifyCharacter(Character character, TeamColor teamColor) {
+        return Character.transform(character, CharacterType.Frog, teamColor);
     }
 
     @Test
@@ -437,48 +449,54 @@ public class CharacterAbilityQueryTest {
 
     @Test
     public void canAct_shouldReturnFalseForOpposingTeam() {
+        Game game = createTestGame(new Board());
         ActionsPhase phase = createActionsPhase();
         Character character = createCharacter(CharacterType.Acrobat, TeamColor.White);
-        assertFalse(CharacterAbilityQuery.canAct(phase, character));
+        assertFalse(CharacterAbilityQuery.canAct(game, phase, character));
     }
 
     @Test
     public void canAct_shouldReturnFalseForNemesis() {
+        Game game = createTestGame(new Board());
         ActionsPhase phase = createActionsPhase();
         Character character = createCharacter(CharacterType.Nemesis, TeamColor.Black);
-        assertFalse(CharacterAbilityQuery.canAct(phase, character));
+        assertFalse(CharacterAbilityQuery.canAct(game, phase, character));
     }
 
     @Test
     public void canAct_shouldReturnTrueForCharacterThatHasNotActed() {
+        Game game = createTestGame(new Board());
         ActionsPhase phase = createActionsPhase();
 
         Character character = createCharacter(CharacterType.Acrobat, TeamColor.Black);
-        assertTrue(CharacterAbilityQuery.canAct(phase, character));
+        assertTrue(CharacterAbilityQuery.canAct(game, phase, character));
     }
 
     @Test
     public void canAct_shouldReturnFalseForCharacterThatAlreadyActed() {
+        Game game = createTestGame(new Board());
         ActionsPhase phase = createActionsPhase();
 
         Character character = createCharacter(CharacterType.Acrobat, TeamColor.Black);
         CharacterAction action = new CharacterAction(character, new ArrayList<>());
 
         phase.getActions().add(action);
-        assertFalse(CharacterAbilityQuery.canAct(phase, character));
+        assertFalse(CharacterAbilityQuery.canAct(game, phase, character));
     }
 
     @Test
     public void canAct_shouldAllowHermitWhenCubHasNotActed() {
+        Game game = createTestGame(new Board());
         ActionsPhase phase = createActionsPhase();
 
         Character hermit = createCharacter(CharacterType.Hermit, TeamColor.Black);
 
-        assertTrue(CharacterAbilityQuery.canAct(phase, hermit));
+        assertTrue(CharacterAbilityQuery.canAct(game, phase, hermit));
     }
 
     @Test
     public void canAct_shouldAllowHermitImmediatelyAfterCub() {
+        Game game = createTestGame(new Board());
         ActionsPhase phase = createActionsPhase();
 
         Character hermit = createCharacter(CharacterType.Hermit, TeamColor.Black);
@@ -486,11 +504,12 @@ public class CharacterAbilityQueryTest {
         CharacterAction cubAction = new CharacterAction(cub, new ArrayList<>());
         phase.getActions().add(cubAction);
 
-        assertTrue(CharacterAbilityQuery.canAct(phase, hermit));
+        assertTrue(CharacterAbilityQuery.canAct(game, phase, hermit));
     }
 
     @Test
     public void canAct_shouldNotAllowHermitIfAnotherActionWasPlayedAfterCub() {
+        Game game = createTestGame(new Board());
         ActionsPhase phase = createActionsPhase();
 
         Character hermit = createCharacter(CharacterType.Hermit, TeamColor.Black);
@@ -501,7 +520,116 @@ public class CharacterAbilityQueryTest {
 
         phase.getActions().add(new CharacterAction(acrobat, new ArrayList<>()));
 
-        assertFalse(CharacterAbilityQuery.canAct(phase, hermit));
+        assertFalse(CharacterAbilityQuery.canAct(game, phase, hermit));
+    }
+
+    @Test
+    public void canAct_shouldAllowTransformedHermitWhenCubHasNotActed() {
+        Character hermit = createCharacter(CharacterType.Hermit, TeamColor.Black);
+        Character acrobat = frogifyCharacter(hermit, TeamColor.Black);
+
+        Game game = createTestGameWithTransformedState(new Board(), hermit, acrobat);
+        ActionsPhase phase = createActionsPhase();
+
+        assertTrue(CharacterAbilityQuery.canAct(game, phase, acrobat));
+    }
+
+    @Test
+    public void canAct_shouldAllowTransformedHermitImmediatelyAfterCub() {
+        Character hermit = createCharacter(CharacterType.Hermit, TeamColor.Black);
+        Character cub = createCharacter(CharacterType.Cub, TeamColor.Black);
+        Character acrobat = frogifyCharacter(hermit, TeamColor.Black);
+
+        Game game = createTestGameWithTransformedState(new Board(), hermit, acrobat);
+        ActionsPhase phase = createActionsPhase();
+        phase.getActions().add(new CharacterAction(cub, new ArrayList<>()));
+
+        // Le Cub vient de jouer : l'ex-Hermit conserve la contrainte et peut jouer juste après
+        assertTrue(CharacterAbilityQuery.canAct(game, phase, acrobat));
+    }
+
+    @Test
+    public void canAct_shouldNotAllowTransformedHermitIfAnotherActionWasPlayedAfterCub() {
+        Character hermit = createCharacter(CharacterType.Hermit, TeamColor.Black);
+        Character cub = createCharacter(CharacterType.Cub, TeamColor.Black);
+        Character bruiser = createCharacter(CharacterType.Bruiser, TeamColor.Black);
+        Character acrobat = frogifyCharacter(hermit, TeamColor.Black);
+
+        Game game = createTestGameWithTransformedState(new Board(), hermit, acrobat);
+        ActionsPhase phase = createActionsPhase();
+        phase.getActions().add(new CharacterAction(cub, new ArrayList<>()));
+        phase.getActions().add(new CharacterAction(bruiser, new ArrayList<>()));
+
+        // La contrainte "immédiatement après" s'applique toujours à l'ex-Hermit
+        assertFalse(CharacterAbilityQuery.canAct(game, phase, acrobat));
+    }
+
+    @Test
+    public void canAct_shouldAllowTransformedCubWhenHermitHasNotActed() {
+        Character cub = createCharacter(CharacterType.Cub, TeamColor.Black);
+        Character acrobat = frogifyCharacter(cub, TeamColor.Black);
+
+        Game game = createTestGameWithTransformedState(new Board(), cub, acrobat);
+        ActionsPhase phase = createActionsPhase();
+
+        assertTrue(CharacterAbilityQuery.canAct(game, phase, acrobat));
+    }
+
+    @Test
+    public void canAct_shouldNotAllowTransformedCubIfAnotherActionWasPlayedAfterHermit() {
+        Character cub = createCharacter(CharacterType.Cub, TeamColor.Black);
+        Character hermit = createCharacter(CharacterType.Hermit, TeamColor.Black);
+        Character bruiser = createCharacter(CharacterType.Bruiser, TeamColor.Black);
+        Character froggedCub = frogifyCharacter(cub, TeamColor.Black);
+
+        Game game = createTestGameWithTransformedState(new Board(), cub, froggedCub);
+        ActionsPhase phase = createActionsPhase();
+        phase.getActions().add(new CharacterAction(hermit, new ArrayList<>()));
+        phase.getActions().add(new CharacterAction(bruiser, new ArrayList<>()));
+
+        assertFalse(CharacterAbilityQuery.canAct(game, phase, froggedCub));
+    }
+
+    @Test
+    public void canAct_shouldReturnFalseForTransformedHermitThatAlreadyActed() {
+        Character hermit = createCharacter(CharacterType.Hermit, TeamColor.Black);
+        Character froggedHermit = frogifyCharacter(hermit, TeamColor.Black);
+
+        Game game = createTestGameWithTransformedState(new Board(), hermit, froggedHermit);
+        ActionsPhase phase = createActionsPhase();
+        // L'action a été jouée avec la forme Hermit, puis le personnage a été transformé
+        phase.getActions().add(new CharacterAction(hermit, new ArrayList<>()));
+
+        // Comparaison par ID : le personnage transformé a déjà agi
+        assertFalse(CharacterAbilityQuery.canAct(game, phase, froggedHermit));
+    }
+
+    @Test
+    public void canAct_shouldReturnFalseForTransformedHermitOfOpposingTeam() {
+        Character hermit = createCharacter(CharacterType.Hermit, TeamColor.White);
+        Character froggedHermit = frogifyCharacter(hermit, TeamColor.White);
+
+        Game game = createTestGameWithTransformedState(new Board(), hermit, froggedHermit);
+        ActionsPhase phase = createActionsPhase(); // tour des Black
+
+        assertFalse(CharacterAbilityQuery.canAct(game, phase, froggedHermit));
+    }
+
+    @Test
+    public void canAct_shouldNotAllowHermitIfTransformedCubActedThenAnotherActionWasPlayed() {
+        Character hermit = createCharacter(CharacterType.Hermit, TeamColor.Black);
+        Character cub = createCharacter(CharacterType.Cub, TeamColor.Black);
+
+        Character froggedCub = frogifyCharacter(cub, TeamColor.Black);
+        Character bruiser = createCharacter(CharacterType.Bruiser, TeamColor.Black);
+
+        Game game = createTestGameWithTransformedState(new Board(), cub, froggedCub);
+        ActionsPhase phase = createActionsPhase();
+        // Le Cub a agi, puis a été transformé, puis une autre action a été jouée
+        phase.getActions().add(new CharacterAction(froggedCub, new ArrayList<>()));
+        phase.getActions().add(new CharacterAction(bruiser, new ArrayList<>()));
+
+        assertFalse(CharacterAbilityQuery.canAct(game, phase, hermit));
     }
 
     @Test

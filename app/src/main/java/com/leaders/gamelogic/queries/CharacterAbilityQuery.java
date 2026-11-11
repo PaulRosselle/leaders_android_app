@@ -13,6 +13,7 @@ import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.Position;
+import com.leaders.gamelogic.entities.TransformedState;
 import com.leaders.gamelogic.enums.AbilityType;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
@@ -137,11 +138,13 @@ public final class CharacterAbilityQuery {
      * acted during this phase. Special case: {@code Hermit} and {@code Cub} can only
      * act immediately after one another.</p>
      *
+     * @param game the game to evaluate
      * @param currentActionsPhase the current actions phase
      * @param character the character being evaluated
      * @return {@code true} if the character can act
      */
-    public static boolean canAct(@NonNull ActionsPhase currentActionsPhase,
+    public static boolean canAct(@NonNull Game game,
+                                 @NonNull ActionsPhase currentActionsPhase,
                                  @NonNull Character character) {
         // Characters are only allowed to act during a turn matching their team colors
         if (character.getTeamColor() != currentActionsPhase.getTurnTeamColor()) {
@@ -164,18 +167,11 @@ public final class CharacterAbilityQuery {
         }
 
         // Hermit and Cub can only act immediately after one another
-        if (character.getCharacterType().getCharacterCard() == CharacterCard.HermitAndCub) {
-            // TODO - handle the frog special case
+        if (isHermitOrCub(game, character)) {
             // We search for an action made by the other
-            CharacterType searchedCharacterType;
-            if (character.getCharacterType() == CharacterType.Hermit) {
-                searchedCharacterType = CharacterType.Cub;
-            } else {
-                searchedCharacterType = CharacterType.Hermit;
-            }
             CharacterAction foundAction = null;
             for (CharacterAction characterAction : characterActions) {
-                if (characterAction.getSrcCharacter().getCharacterType() == searchedCharacterType) {
+                if (isHermitOrCub(game, characterAction.getSrcCharacter())) {
                     foundAction = characterAction;
                     break;
                 }
@@ -186,6 +182,34 @@ public final class CharacterAbilityQuery {
 
         // If they have not already acted, it means that they can act
         return true;
+    }
+
+    /**
+     * Checks whether the character is a Hermit or a Cub, either in its current
+     * form or in its original form before transformation.
+     *
+     * @param game the game containing the character's transformed state
+     * @param character the character to check
+     * @return {@code true} if the character is or was a Hermit or a Cub,
+     *         otherwise {@code false}
+     */
+    private static boolean isHermitOrCub(@NonNull Game game, @NonNull Character character) {
+        if (isHermitOrCub(character)) {
+            return true;
+        }
+
+        TransformedState transformedState = game.getTransformedState(character.getId());
+        return transformedState != null && isHermitOrCub(transformedState.getCharacterBefore());
+    }
+
+    /**
+     * Checks whether the character is a Hermit or a Cub.
+     *
+     * @param character the character to check
+     * @return {@code true} if the character belongs to the Hermit and Cub card, otherwise {@code false}
+     */
+    private static boolean isHermitOrCub(@NonNull Character character) {
+        return character.getCharacterType().getCharacterCard() == CharacterCard.HermitAndCub;
     }
 
     /**
