@@ -46,12 +46,23 @@ public final  class CharacterCardUtils {
             case Vizier: return R.string.card_name_vizier;
             case Wanderer: return R.string.card_name_wanderer;
             case LeaderVermilion: return R.string.card_name_leader_vermilion;
+            case Shaman: return R.string.card_name_shaman;
+            case Frog: return R.string.card_name_frog;
             case Sniper: return R.string.card_name_sniper;
             case Tactician: return R.string.card_name_tactician;
             case Wisp: return R.string.card_name_wisp;
             case EliteArcher: return R.string.card_name_elite_archer;
             default: throw new IllegalArgumentException("No name found for character card: " + characterCard);
         }
+    }
+
+    @StringRes
+    public static int getSortNameId(@NonNull CharacterCard characterCard) {
+        // Used to control better character sorting
+        if (characterCard == CharacterCard.EliteArcher) {
+            return R.string.card_sort_name_elite_archer;
+        }
+        return getNameId(characterCard);
     }
 
     @StringRes
@@ -77,6 +88,8 @@ public final  class CharacterCardUtils {
             case RoyalGuard: return R.string.card_formatted_name_royal_guard;
             case Vizier: return R.string.card_formatted_name_vizier;
             case Wanderer: return R.string.card_formatted_name_wanderer;
+            case Shaman: return R.string.card_formatted_name_shaman;
+            case Frog: return R.string.card_formatted_name_frog;
             case Sniper: return R.string.card_formatted_name_sniper;
             case Tactician: return R.string.card_formatted_name_tactician;
             case Wisp: return R.string.card_formatted_name_wisp;
@@ -108,6 +121,8 @@ public final  class CharacterCardUtils {
             case RoyalGuard: return R.string.card_description_royal_guard;
             case Vizier: return R.string.card_description_vizier;
             case Wanderer: return R.string.card_description_wanderer;
+            case Shaman: return R.string.card_description_shaman;
+            case Frog: return R.string.card_description_frog;
             case Sniper: return R.string.card_description_sniper;
             case Tactician: return R.string.card_description_tactician;
             case Wisp: return R.string.card_description_wisp;
@@ -158,6 +173,8 @@ public final  class CharacterCardUtils {
             }
             case Wanderer: return R.drawable.card_portrait_wanderer;
             case LeaderVermilion: return R.drawable.card_portrait_leader_vermilion;
+            case Shaman: return R.drawable.card_portrait_shaman;
+            case Frog: return R.drawable.card_portrait_frog;
             case Sniper: return R.drawable.card_portrait_sniper;
             case Tactician: return R.drawable.card_portrait_tactician;
             case Wisp: return R.drawable.card_portrait_wisp;
@@ -201,6 +218,7 @@ public final  class CharacterCardUtils {
                 return R.drawable.card_portrait_banned_vizier;
             }
             case Wanderer: return R.drawable.card_portrait_banned_wanderer;
+            case Shaman: return R.drawable.card_portrait_banned_shaman;
             case Sniper: return R.drawable.card_portrait_banned_sniper;
             case Tactician: return R.drawable.card_portrait_banned_tactician;
             case Wisp: return R.drawable.card_portrait_banned_wisp;
@@ -247,6 +265,8 @@ public final  class CharacterCardUtils {
             }
             case Wanderer: return R.drawable.card_hex_portrait_wanderer;
             case LeaderVermilion: return R.drawable.card_hex_portrait_leader_vermilion;
+            case Shaman: return R.drawable.card_hex_portrait_shaman;
+            case Frog: return R.drawable.card_hex_portrait_frog;
             case Sniper: return R.drawable.card_hex_portrait_sniper;
             case Tactician: return R.drawable.card_hex_portrait_tactician;
             case Wisp: return R.drawable.card_hex_portrait_wisp;
@@ -290,6 +310,7 @@ public final  class CharacterCardUtils {
                 return R.drawable.card_hex_portrait_banned_vizier;
             }
             case Wanderer: return R.drawable.card_hex_portrait_banned_wanderer;
+            case Shaman: return R.drawable.card_hex_portrait_banned_shaman;
             case Sniper: return R.drawable.card_hex_portrait_banned_sniper;
             case Tactician: return R.drawable.card_hex_portrait_banned_tactician;
             case Wisp: return R.drawable.card_hex_portrait_banned_wisp;
@@ -320,6 +341,8 @@ public final  class CharacterCardUtils {
             case Vizier: return R.drawable.character_artwork_vizier;
             case Wanderer: return R.drawable.character_artwork_wanderer;
             case LeaderVermilion: return R.drawable.character_artwork_leader_vermilion;
+            case Shaman: return R.drawable.character_artwork_shaman;
+            case Frog: return R.drawable.character_artwork_frog;
             case Sniper: return R.drawable.character_artwork_sniper;
             case Tactician: return R.drawable.character_artwork_tactician;
             case Wisp: return R.drawable.character_artwork_wisp;
@@ -385,6 +408,8 @@ public final  class CharacterCardUtils {
             case Vizier: return R.raw.character_demo_vizier;
             case Wanderer: return R.raw.character_demo_wanderer;
             case LeaderVermilion: return R.raw.character_demo_leader_vermilion;
+            case Shaman: return R.raw.character_demo_wisp; // TODO
+            case Frog: return R.raw.character_demo_wisp; // TODO
             case Sniper: return R.raw.character_demo_sniper;
             case Tactician: return R.raw.character_demo_tactician;
             case Wisp: return R.raw.character_demo_wisp;
@@ -422,7 +447,7 @@ public final  class CharacterCardUtils {
         Resources res = context.getResources();
         characterCards.sort(
                 Comparator.comparingInt(o -> getAbilitySortValue((CharacterCard) o))
-                        .thenComparing(o -> res.getString(getNameId((CharacterCard) o)))
+                        .thenComparing(o -> res.getString(getSortNameId((CharacterCard) o)))
         );
     }
 
