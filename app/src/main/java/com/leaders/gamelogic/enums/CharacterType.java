@@ -25,6 +25,8 @@ public enum CharacterType {
     Vizier,
     Wanderer,
     LeaderVermilion,
+    Shaman,
+    Frog,
     Sniper,
     Tactician,
     Wisp,
@@ -59,6 +61,8 @@ public enum CharacterType {
             case Vizier: return CharacterCard.Vizier;
             case Wanderer: return CharacterCard.Wanderer;
             case LeaderVermilion: return CharacterCard.LeaderVermilion;
+            case Shaman: return CharacterCard.Shaman;
+            case Frog: return CharacterCard.Frog;
             case Sniper: return CharacterCard.Sniper;
             case Tactician: return CharacterCard.Tactician;
             case Wisp: return CharacterCard.Wisp;
@@ -89,6 +93,6 @@ public enum CharacterType {
      * @return {@code true} if this type can capture, otherwise {@code false}
      */
     public boolean canCapture() {
-        return this != Cub && this != Wisp;
+        return this != Cub && this != Wisp && this != Frog;
     }
 }
