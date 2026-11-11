@@ -84,7 +84,7 @@ public class GameTest {
     private static UUID addTransformedCharacter(@NonNull Game game) {
         Character before = createCharacter(null);
         Character after = createCharacter(before);
-        game.setTransformedState(before, after);
+        game.addTransformedState(before, after);
         return before.getId();
     }
 
@@ -445,12 +445,12 @@ public class GameTest {
     }
 
     @Test
-    public void setTransformedState_storesBeforeAndAfter() {
+    public void addTransformedState_storesBeforeAndAfter() {
         Game game = createTestGame();
         Character before = createCharacter(null);
         Character after = createCharacter(before);
 
-        game.setTransformedState(before, after);
+        game.addTransformedState(before, after);
 
         TransformedState state = game.getTransformedState(before.getId());
         assertNotNull(state);
@@ -459,31 +459,83 @@ public class GameTest {
     }
 
     @Test
-    public void setTransformedState_sameCharacterTwice_replacesPreviousState() {
-        Game game = createTestGame();
-        Character firstBefore = createCharacter(null);
-        UUID id = firstBefore.getId();
-        game.setTransformedState(firstBefore, createCharacter(firstBefore));
-
-        // Transforming keeps the same id
-        Character newBefore = createCharacter(firstBefore);
-        Character newAfter = createCharacter(newBefore);
-        game.setTransformedState(newBefore, newAfter);
-
-        TransformedState transformedState = game.getTransformedState(id);
-        assertNotNull(transformedState);
-        assertSame(newBefore, transformedState.getCharacterBefore());
-        assertSame(newAfter, transformedState.getCharacterAfter());
-        assertEquals(1, game.getTransformedCharacterIds().size());
-    }
-
-    @Test
-    public void setTransformedState_differentIds_throwsIllegalArgumentException() {
+    public void addTransformedState_differentIds_throwsIllegalArgumentException() {
         Game game = createTestGame();
         Character before = createCharacter(null);
         Character after = createCharacter(null);
 
-        assertThrows(IllegalArgumentException.class, () -> game.setTransformedState(before, after));
+        assertThrows(IllegalArgumentException.class, () -> game.addTransformedState(before, after));
+        assertTrue(game.getTransformedCharacterIds().isEmpty());
+    }
+
+    @Test
+    public void addTransformedState_alreadyTransformed_throwsIllegalStateException() {
+        Game game = createTestGame();
+        Character before = createCharacter(null);
+        Character after = createCharacter(before);
+
+        game.addTransformedState(before, after);
+
+        assertThrows(IllegalStateException.class, () -> game.addTransformedState(before, after));
+
+        assertEquals(1, game.getTransformedCharacterIds().size());
+    }
+
+    @Test
+    public void removeTransformedState_existingCharacter_removesState() {
+        Game game = createTestGame();
+        UUID id = addTransformedCharacter(game);
+
+        game.removeTransformedState(id);
+
+        assertNull(game.getTransformedState(id));
+        assertTrue(game.getTransformedCharacterIds().isEmpty());
+    }
+
+    @Test
+    public void removeTransformedState_oneOfSeveral_removesOnlyRequestedState() {
+        Game game = createTestGame();
+        UUID firstId = addTransformedCharacter(game);
+        UUID secondId = addTransformedCharacter(game);
+
+        game.removeTransformedState(firstId);
+
+        assertNull(game.getTransformedState(firstId));
+        assertNotNull(game.getTransformedState(secondId));
+        assertEquals(Set.of(secondId), game.getTransformedCharacterIds());
+    }
+
+    @Test
+    public void removeTransformedState_removingTwiceThrowsIllegalStateException() {
+        Game game = createTestGame();
+        UUID id = addTransformedCharacter(game);
+
+        game.removeTransformedState(id);
+
+        assertNull(game.getTransformedState(id));
+        assertTrue(game.getTransformedCharacterIds().isEmpty());
+
+        assertThrows(IllegalStateException.class, () -> game.removeTransformedState(id));
+    }
+
+    @Test
+    public void removeTransformedState_updatesPreviouslyObtainedIdsView() {
+        Game game = createTestGame();
+        UUID id = addTransformedCharacter(game);
+
+        Set<UUID> ids = game.getTransformedCharacterIds();
+
+        game.removeTransformedState(id);
+
+        assertTrue(ids.isEmpty());
+    }
+
+    @Test
+    public void removeTransformedState_unknownCharacter_throwsIllegalStateException() {
+        Game game = createTestGame();
+        UUID unknownId = UUID.randomUUID();
+
+        assertThrows(IllegalStateException.class, () -> game.removeTransformedState(unknownId));
         assertTrue(game.getTransformedCharacterIds().isEmpty());
     }
 

@@ -87,7 +87,9 @@ public final class CharacterActionAnimator extends ActionAnimator {
             case Jump: animateJumpCharacter(boardView, targets, onAnimationEnd); break;
             case Fly: animateFlyCharacter(boardView, targets, onAnimationEnd); break;
             case Remove: animateRemoveCharacter(boardView, targets, onAnimationEnd); break;
-            case Transform: animateTransformCharacter(boardView, targets, onAnimationEnd); break;
+            case Transform:
+            case Untransform:
+                animateTransformCharacter(boardView, targets, onAnimationEnd); break;
             default: throw new IllegalArgumentException("Character motion animation not handled: " + motion.getMotionType());
         }
     }

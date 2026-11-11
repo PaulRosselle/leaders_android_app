@@ -10,6 +10,7 @@ import com.leaders.gamelogic.resolvers.characters.AcrobatActionResolver;
 import com.leaders.gamelogic.resolvers.characters.BrewmasterActionResolver;
 import com.leaders.gamelogic.resolvers.characters.BruiserActionResolver;
 import com.leaders.gamelogic.resolvers.characters.ClawLauncherActionResolver;
+import com.leaders.gamelogic.resolvers.characters.FrogActionResolver;
 import com.leaders.gamelogic.resolvers.characters.IllusionistActionResolver;
 import com.leaders.gamelogic.resolvers.characters.ManipulatorActionResolver;
 import com.leaders.gamelogic.resolvers.characters.NemesisActionResolver;
@@ -38,6 +39,7 @@ public final class CharacterActionResolverFactory {
             case Rider: return new RiderActionResolver(game, gameHistory, character);
             case RoyalGuard: return new RoyalGuardActionResolver(game, gameHistory, character);
             case Wanderer: return new WandererActionResolver(game, gameHistory, character);
+            case Frog: return new FrogActionResolver(game, gameHistory, character);
             case Tactician: return new TacticianActionResolver(game, gameHistory, character);
             case Wisp: return new WispActionResolver(game, gameHistory, character);
             default: return new CharacterActionResolver(game, gameHistory, character);

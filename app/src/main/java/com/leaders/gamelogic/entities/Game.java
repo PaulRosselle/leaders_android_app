@@ -268,11 +268,26 @@ public final class Game {
      * @param characterBefore the character before its transformation
      * @param characterAfter  the character after its transformation
      */
-    public void setTransformedState(@NonNull Character characterBefore, @NonNull Character characterAfter) {
+    public void addTransformedState(@NonNull Character characterBefore, @NonNull Character characterAfter) {
+        if (charactersTransformedState.get(characterBefore.getId()) != null) {
+            throw new IllegalStateException("Already transformed character: " + characterBefore);
+        }
         charactersTransformedState.put(
                 characterAfter.getId(),
                 new TransformedState(characterBefore, characterAfter)
         );
+    }
+
+    /**
+     * Removes the transformed state associated with the given character.
+     *
+     * @param characterId the ID of the character whose transformed state should be removed
+     */
+    public void removeTransformedState(@NonNull UUID characterId) {
+        if (charactersTransformedState.get(characterId) == null) {
+            throw new IllegalStateException("No transformed character found for ID: " + characterId);
+        }
+        charactersTransformedState.remove(characterId);
     }
 
     /**
