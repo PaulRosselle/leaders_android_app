@@ -1,6 +1,7 @@
 package com.leaders.gamelogic.entities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
@@ -10,8 +11,11 @@ import com.leaders.gamelogic.enums.WarningType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 
 public final class Game {
     @NonNull
@@ -24,16 +28,20 @@ public final class Game {
     private final EnumMap<TeamColor, List<CharacterCard>> playerBanishedCards;
     @NonNull
     private final EnumMap<TeamColor, EnumMap<WarningType, Integer>> playerWarnings;
+    @NonNull
+    private final HashMap<UUID, TransformedState> charactersTransformedState;
 
     public Game(@NonNull Board board, @NonNull List<CharacterCard> recruitableCards,
                 @NonNull EnumMap<TeamColor, EnumMap<CharacterType, Integer>> playerRecruitedCharacters,
                 @NonNull EnumMap<TeamColor, List<CharacterCard>> playerBanishedCards,
-                @NonNull EnumMap<TeamColor, EnumMap<WarningType, Integer>> playerWarnings) {
+                @NonNull EnumMap<TeamColor, EnumMap<WarningType, Integer>> playerWarnings,
+                @NonNull HashMap<UUID, TransformedState> charactersTransformedState) {
         this.board = board;
         this.recruitableCards = recruitableCards;
         this.playerRecruitedCharacters = playerRecruitedCharacters;
         this.playerBanishedCards = playerBanishedCards;
         this.playerWarnings = playerWarnings;
+        this.charactersTransformedState = charactersTransformedState;
     }
 
     public Game(@NonNull Game refGame) {
@@ -41,7 +49,8 @@ public final class Game {
                 new ArrayList<>(refGame.recruitableCards),
                 copyRecruitedCharacters(refGame.playerRecruitedCharacters),
                 copyBannedCards(refGame.playerBanishedCards),
-                copyWarnings(refGame.playerWarnings)
+                copyWarnings(refGame.playerWarnings),
+                copyTransformedState(refGame.charactersTransformedState)
         );
     }
 
@@ -89,6 +98,21 @@ public final class Game {
             copy.put(entry.getKey(), new EnumMap<>(entry.getValue()));
         }
         return copy;
+    }
+
+    /**
+     * Creates a copy of the transformed states map.
+     *
+     * <p>{@link TransformedState} is immutable, so its instances can be shared safely:
+     * copying the map itself is enough to obtain an independent copy.</p>
+     *
+     * @param source the map to copy
+     * @return an independent copy of the map
+     */
+    @NonNull
+    private static HashMap<UUID, TransformedState> copyTransformedState(@NonNull HashMap<UUID, TransformedState> source) {
+        // TransformedState is an immutable object, a simple hashMap copy is enough
+        return new HashMap<>(source);
     }
 
     @NonNull
@@ -225,5 +249,39 @@ public final class Game {
         // computeIfAbsent avoids creating an unused EnumMap when the team already exists.
         playerWarnings.computeIfAbsent(playerTeamColor, key -> new EnumMap<>(WarningType.class))
                 .put(warningType, warningCount);
+    }
+
+    /**
+     * Returns the transformed state of a character.
+     *
+     * @param characterId the identifier of the character
+     * @return the transformed state, or {@code null} if the character is not transformed
+     */
+    @Nullable
+    public TransformedState getTransformedState(@NonNull UUID characterId) {
+        return charactersTransformedState.get(characterId);
+    }
+
+    /**
+     * Records that a character has been transformed.
+     *
+     * @param characterBefore the character before its transformation
+     * @param characterAfter  the character after its transformation
+     */
+    public void setTransformedState(@NonNull Character characterBefore, @NonNull Character characterAfter) {
+        charactersTransformedState.put(
+                characterAfter.getId(),
+                new TransformedState(characterBefore, characterAfter)
+        );
+    }
+
+    /**
+     * Returns the identifiers of all transformed characters.
+     *
+     * @return an unmodifiable view of the identifiers
+     */
+    @NonNull
+    public Set<UUID> getTransformedCharacterIds() {
+        return Collections.unmodifiableSet(charactersTransformedState.keySet());
     }
 }

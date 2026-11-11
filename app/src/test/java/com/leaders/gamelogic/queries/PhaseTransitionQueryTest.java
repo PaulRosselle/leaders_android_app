@@ -26,17 +26,18 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 
 public class PhaseTransitionQueryTest {
 
     private Game createTestGame() {
-        return new Game(
-                new Board(),
+        return new Game(new Board(),
                 new ArrayList<>(), // recruitableCards
                 new EnumMap<>(TeamColor.class), // playerRecruitedCharacters
                 new EnumMap<>(TeamColor.class), // playerBanishedCards
-                new EnumMap<>(TeamColor.class) // playerWarnings
+                new EnumMap<>(TeamColor.class), // playerWarnings
+                new HashMap<>() // charactersTransformedState
         );
     }
 
