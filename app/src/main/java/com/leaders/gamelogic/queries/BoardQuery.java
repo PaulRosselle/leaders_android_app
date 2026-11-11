@@ -101,6 +101,44 @@ public final class BoardQuery {
     }
 
     /**
+     * Finds visible characters in each direction from the given position.
+     *
+     * @param board the board to search
+     * @param position the reference position
+     * @param characterColor the team color to match, or {@code null} to match any color
+     * @param characterType the character type to match, or {@code null} to match any type
+     * @param ignoreAdjacentCells whether to exclude adjacent cells from the search
+     * @return the list of visible character cells matching the given filters
+     */
+    @NonNull
+    public static List<Cell> findVisibleCharacterCells(@NonNull Board board,
+                                                       @NonNull Position position,
+                                                       @Nullable TeamColor characterColor,
+                                                       @Nullable CharacterType characterType,
+                                                       boolean ignoreAdjacentCells) {
+        List<Cell> visibleCharacterCells = new ArrayList<>();
+
+        for (Direction direction : Direction.values()) {
+            Position startPos = position;
+            if (ignoreAdjacentCells) {
+                Cell adjacentCell = BoardQuery.findAdjacentCell(board, position, direction);
+                if (adjacentCell == null || adjacentCell.getCharacter() != null) {
+                    continue;
+                }
+                startPos = adjacentCell.getPosition();
+            }
+            Cell visibleCharacterCell = BoardQuery.findVisibleCharacterCell(
+                    board, startPos, direction, characterColor, characterType
+            );
+            if (visibleCharacterCell != null) {
+                visibleCharacterCells.add(visibleCharacterCell);
+            }
+        }
+
+        return visibleCharacterCells;
+    }
+
+    /**
      * Returns the cell occupied by the leader of the specified team.
      *
      * @param board the board to search.

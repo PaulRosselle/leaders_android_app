@@ -24,6 +24,7 @@ import com.leaders.gamelogic.resolvers.ResolverUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Resolves the Claw Launcher's active ability.
@@ -107,21 +108,9 @@ public final class ClawLauncherActionResolver extends CharacterActionResolver {
      */
     @NonNull
     private List<Position> getClawLauncherValidTargetPositions() {
-        List<Position> targets = new ArrayList<>();
-
-        for (Direction direction : Direction.values()) {
-            Cell adjacentCell = BoardQuery.findAdjacentCell(game.getBoard(), characterPos, direction);
-            if (adjacentCell != null && adjacentCell.getCharacter() == null) {
-                Cell targetCell = BoardQuery.findVisibleCharacterCell(game.getBoard(), adjacentCell.getPosition(),
-                        direction, null, null);
-
-                if (targetCell != null) {
-                    targets.add(targetCell.getPosition());
-                }
-            }
-        }
-
-        return targets;
+        return BoardQuery.findVisibleCharacterCells(
+                game.getBoard(), characterPos, null, null, true
+        ).stream().map(Cell::getPosition).collect(Collectors.toList());
     }
 
     private boolean isValidPull(@NonNull CharacterActionBuilder builder,

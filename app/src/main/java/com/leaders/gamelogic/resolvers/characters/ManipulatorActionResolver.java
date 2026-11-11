@@ -7,7 +7,6 @@ import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.Position;
-import com.leaders.gamelogic.enums.Direction;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.gamelogic.queries.CharacterAbilityQuery;
 
@@ -42,15 +41,11 @@ public final class ManipulatorActionResolver extends MoverActionResolver {
     protected List<Position> getTargetPositions() {
         List<Position> targets = new ArrayList<>();
 
-        for (Direction direction : Direction.values()) {
-            Cell adjacentCell = BoardQuery.findAdjacentCell(game.getBoard(), characterPos, direction);
-            if (adjacentCell != null && adjacentCell.getCharacter() == null) {
-                Cell targetCell = BoardQuery.findVisibleCharacterCell(game.getBoard(), adjacentCell.getPosition(),
-                        direction, character.getTeamColor().getOpposite(), null);
-                if (targetCell != null &&
-                        CharacterAbilityQuery.canBeMovedByEnemyAbilities(game, targetCell.getCharacter())) {
-                    targets.add(targetCell.getPosition());
-                }
+        for (Cell targetCell : BoardQuery.findVisibleCharacterCells(
+                game.getBoard(), characterPos, character.getTeamColor().getOpposite(),
+                null, true)) {
+            if (CharacterAbilityQuery.canBeMovedByEnemyAbilities(game, targetCell.getCharacter())) {
+                targets.add(targetCell.getPosition());
             }
         }
 

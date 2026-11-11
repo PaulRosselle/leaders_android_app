@@ -2,6 +2,8 @@ package com.leaders.gamelogic.entities;
 
 import androidx.annotation.NonNull;
 
+import java.util.UUID;
+
 public final class TransformedState {
     @NonNull
     private final Character characterBefore;
@@ -15,6 +17,11 @@ public final class TransformedState {
 
         this.characterBefore = characterBefore;
         this.characterAfter = characterAfter;
+    }
+
+    @NonNull
+    public UUID getCharacterId() {
+        return characterAfter.getId();
     }
 
     @NonNull

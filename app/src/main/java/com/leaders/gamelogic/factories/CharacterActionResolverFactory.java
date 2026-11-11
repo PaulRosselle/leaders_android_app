@@ -16,6 +16,7 @@ import com.leaders.gamelogic.resolvers.characters.ManipulatorActionResolver;
 import com.leaders.gamelogic.resolvers.characters.NemesisActionResolver;
 import com.leaders.gamelogic.resolvers.characters.RiderActionResolver;
 import com.leaders.gamelogic.resolvers.characters.RoyalGuardActionResolver;
+import com.leaders.gamelogic.resolvers.characters.ShamanActionResolver;
 import com.leaders.gamelogic.resolvers.characters.TacticianActionResolver;
 import com.leaders.gamelogic.resolvers.characters.WandererActionResolver;
 import com.leaders.gamelogic.resolvers.characters.WispActionResolver;
@@ -25,6 +26,7 @@ public final class CharacterActionResolverFactory {
         throw new AssertionError("Cannot instantiate utility class");
     }
 
+    @NonNull
     public static CharacterActionResolver create(@NonNull Game game,
                                                  @NonNull GameHistory gameHistory,
                                                  @NonNull Character character) {
@@ -39,6 +41,7 @@ public final class CharacterActionResolverFactory {
             case Rider: return new RiderActionResolver(game, gameHistory, character);
             case RoyalGuard: return new RoyalGuardActionResolver(game, gameHistory, character);
             case Wanderer: return new WandererActionResolver(game, gameHistory, character);
+            case Shaman: return new ShamanActionResolver(game, gameHistory, character);
             case Frog: return new FrogActionResolver(game, gameHistory, character);
             case Tactician: return new TacticianActionResolver(game, gameHistory, character);
             case Wisp: return new WispActionResolver(game, gameHistory, character);

@@ -104,7 +104,7 @@ public final class CharacterActionHandler extends GameActionHandler {
      */
     private void applyTransformState(@NonNull TransformedState newState, boolean undoAction) {
         if (undoAction) {
-            game.removeTransformedState(newState.getCharacterAfter().getId());
+            game.removeTransformedState(newState.getCharacterId());
         } else {
             // We add the transformed state (before -> after)
             game.addTransformedState(newState.getCharacterBefore(), newState.getCharacterAfter());
@@ -122,7 +122,7 @@ public final class CharacterActionHandler extends GameActionHandler {
         if (undoAction) {
             game.addTransformedState(newState.getCharacterAfter(), newState.getCharacterBefore());
         } else {
-            game.removeTransformedState(newState.getCharacterAfter().getId());
+            game.removeTransformedState(newState.getCharacterId());
         }
     }
 }
