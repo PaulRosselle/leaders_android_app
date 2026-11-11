@@ -21,7 +21,6 @@ import com.leaders.gamelogic.resolvers.ResolverUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Resolves the Wisp's special ability.
@@ -40,15 +39,12 @@ public final class WispActionResolver extends CharacterActionResolver {
     @Override
     @Nullable
     public InteractionRequest getNextInteraction(@NonNull CharacterActionBuilder builder) {
-        // Wisp actions require a single interaction.
-        // If an interaction has already been selected, no further interaction can be added to this action.
         if (!builder.getResults().isEmpty()) {
             return null;
         }
 
-        List<InteractionTarget> legalTargets = getWispFlightDestinations(builder).stream()
-                .map(dest -> new InteractionTarget(TargetCategory.MovementDestination, dest))
-                .collect(Collectors.toList());
+        List<InteractionTarget> legalTargets = new ArrayList<>();
+        ResolverUtils.addTargets(legalTargets, TargetCategory.MovementDestination, getWispFlightDestinations(builder));
 
         return ResolverUtils.createPositionRequest(new InteractionContext(character), legalTargets);
     }

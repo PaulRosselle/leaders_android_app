@@ -40,6 +40,7 @@ public final class CharacterActionHandler extends GameActionHandler {
                     board.getCell(target.getDestPos()).setCharacter(target.getCharacter());
                 }
             }
+            // TODO - keep track of a transformation
         }
     }
 
@@ -66,6 +67,7 @@ public final class CharacterActionHandler extends GameActionHandler {
                     board.getCell(target.getOriginPos()).setCharacter(target.getCharacter());
                 }
             }
+            // TODO - keep track of a transformation
         }
     }
 }

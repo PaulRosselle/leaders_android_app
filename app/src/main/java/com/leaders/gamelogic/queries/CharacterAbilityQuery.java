@@ -165,6 +165,7 @@ public final class CharacterAbilityQuery {
 
         // Hermit and Cub can only act immediately after one another
         if (character.getCharacterType().getCharacterCard() == CharacterCard.HermitAndCub) {
+            // TODO - handle the frog special case
             // We search for an action made by the other
             CharacterType searchedCharacterType;
             if (character.getCharacterType() == CharacterType.Hermit) {
@@ -344,6 +345,8 @@ public final class CharacterAbilityQuery {
                         cell.getCharacter().getTeamColor() == character.getTeamColor()
         ).isEmpty();
     }
+
+    // TODO - handle frog auto-detransformation (use AutoPlayQuery ?)
 
     /**
      * Returns the paths the specified character can take using its normal movement.
