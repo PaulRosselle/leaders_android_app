@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public final  class CharacterCardUtils {
+public final class CharacterCardUtils {
     private CharacterCardUtils(){
         throw new AssertionError("Cannot instantiate utility class");
     }
@@ -34,8 +34,22 @@ public final  class CharacterCardUtils {
         return null;
     }
 
-    public boolean isAlternativeCharacter(@NonNull CharacterCard characterCard) {
+    public static boolean isAlternativeCharacter(@NonNull CharacterCard characterCard) {
         return getBaseCharacter(characterCard) != null;
+    }
+
+    @Nullable
+    public static CharacterCard getAlternativeCharacter(@NonNull CharacterCard characterCard) {
+        for (CharacterCard card : CharacterCard.values()) {
+            if (getBaseCharacter(card) == characterCard) {
+                return card;
+            }
+        }
+        return null;
+    }
+
+    public static boolean hasAlternativeCharacter(@NonNull CharacterCard characterCard) {
+        return getAlternativeCharacter(characterCard) != null;
     }
 
     //endregion
