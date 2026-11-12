@@ -61,10 +61,7 @@ public class GameTest {
 
     /** Returns a character type matching a recruitable card. */
     private static CharacterType recruitableType() {
-        for (CharacterType type : CharacterType.getCharacterTypesMatchingCard(recruitableCard())) {
-            return type;
-        }
-        throw new IllegalStateException("No character type matches the recruitable card");
+        return CharacterType.getCharacterTypesMatchingCard(recruitableCard()).get(0);
     }
 
     /**
