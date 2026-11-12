@@ -6,18 +6,25 @@ import androidx.annotation.Nullable;
 import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.entities.Character;
+import com.leaders.gamelogic.entities.Game;
+import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.PlayableCharacter;
+import com.leaders.gamelogic.entities.TransformedState;
+import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.GameMode;
+import com.leaders.gamelogic.enums.GamePhaseType;
 import com.leaders.gamelogic.enums.TeamColor;
+import com.leaders.gamelogic.historyentries.segments.Turn;
+import com.leaders.gamelogic.historyentries.segments.TurnPhase;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
 import com.leaders.gamelogic.interactions.InteractionResultType;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.interactions.InteractionType;
 import com.leaders.gamelogic.interactions.TargetCategory;
-import com.leaders.puzzlelogic.utilities.PuzzleEditionUtils;
 
+import java.util.List;
 import java.util.Objects;
 
 public final class AutoPlayQuery {
@@ -166,6 +173,60 @@ public final class AutoPlayQuery {
      */
     private static boolean isAutoCharacterType(@NonNull CharacterType characterType) {
         return characterType == CharacterType.Nemesis;
+    }
+
+    /**
+     * Gets the automatic action to perform at the end of the current turn, if any.
+     *
+     * @param game the current game
+     * @param gameHistory the game history containing the current turn
+     * @return the automatic action to perform, or {@code null} if none is required
+     * @throws IllegalStateException if no turn is in progress or the turn end phase
+     *         is not in progress
+     */
+    @Nullable
+    public static CharacterAction getEndTurnAutoAction(@NonNull Game game,
+                                                       @NonNull GameHistory gameHistory) {
+        Turn turn = GameHistoryQuery.findCurrentTurn(gameHistory);
+        if (turn == null) {
+            throw new IllegalStateException("No turn in progress found for end turn auto feedbacks");
+        }
+        TurnPhase endTurnPhase = turn.getSubPhase(GamePhaseType.TurnEnd);
+        if (!endTurnPhase.hasStarted() || endTurnPhase.hasEnded()) {
+            throw new IllegalStateException("End turn feedback can only be fired from an in progress end turn phase");
+        }
+
+        // For the moment, the only auto action is the frog untransformation
+        return getFrogAutoUntransformAction(game, turn);
+    }
+
+    /**
+     * Creates the automatic untransform action for the current Frog, if required.
+     *
+     * @param game the game containing the transformed Frog
+     * @param turn the turn to check
+     * @return the untransform action if the Frog's transformation has ended,
+     *         or {@code null} otherwise
+     */
+    @Nullable
+    public static CharacterAction getFrogAutoUntransformAction(@NonNull Game game, @NonNull Turn turn) {
+        TransformedState transformedFrogState = CharacterAbilityQuery.getExistingTransformedFrogState(game);
+
+        if (transformedFrogState == null) {
+            return null;
+        }
+
+        if (!CharacterAbilityQuery.isFrogTransformationOver(turn, transformedFrogState)) {
+            return null;
+        }
+
+        Character frog = transformedFrogState.getCharacterAfter();
+        return new CharacterAction(frog, List.of(CharacterTransformUtils.createTransformMotion(
+                CharacterMotionType.Untransform,
+                frog,
+                transformedFrogState.getCharacterBefore(),
+                BoardQuery.getCellByCharacterId(game.getBoard(), frog.getId()).getPosition()
+        )));
     }
 
     /**

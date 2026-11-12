@@ -54,10 +54,11 @@ public enum CharacterExpansion {
                 return BASE_GAME;
 
             case LeaderVermilion:
+            case Shaman:
+            case Frog:
             case Sniper:
             case Tactician:
             case Wisp:
-                // TODO - update during 1.1.0-beta.1
                 return VERMILION;
 
             default: throw new IllegalStateException("No expansion found for: " + card);

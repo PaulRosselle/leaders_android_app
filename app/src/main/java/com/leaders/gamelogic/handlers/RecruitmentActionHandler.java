@@ -6,6 +6,7 @@ import com.leaders.gamelogic.actions.RecruitmentAction;
 import com.leaders.gamelogic.actions.RecruitmentActionMotion;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.enums.CharacterCard;
+import com.leaders.gamelogic.enums.RecruitmentMotionType;
 
 public final class RecruitmentActionHandler extends GameActionHandler {
     @NonNull
@@ -19,12 +20,11 @@ public final class RecruitmentActionHandler extends GameActionHandler {
     @Override
     public void doAction() {
         for (RecruitmentActionMotion motion : recruitmentAction.getMotions()) {
-            game.getBoard().getCell(motion.getPosition()).setCharacter(motion.getCharacter());
-            // We always remove the card matching the recruited character from the recruitable cards pool.
-            // The only cases where the removal can fail (without generating any exception) are
-            // cards like the Hermit & Cub matching multiple characters
-            game.getRecruitableCards().remove(motion.getCharacter().getCharacterType().getCharacterCard());
-            game.addRecruitedCharacter(motion.getCharacter().getTeamColor(), motion.getCharacter().getCharacterType());
+            if (motion.getMotionType() == RecruitmentMotionType.Add) {
+                doAddMotion(motion);
+            } else {
+                doRemoveMotion(motion);
+            }
         }
     }
 
@@ -32,21 +32,35 @@ public final class RecruitmentActionHandler extends GameActionHandler {
     public void undoAction() {
         for (int i = recruitmentAction.getMotions().size() - 1; i >= 0; i--) {
             RecruitmentActionMotion motion = recruitmentAction.getMotions().get(i);
-
-            game.removeRecruitedCharacter(motion.getCharacter().getTeamColor(), motion.getCharacter().getCharacterType());
-
-            // Restore the recruited character's card only once, since the
-            // recruitable cards pool should not contain duplicates.
-            CharacterCard card = motion.getCharacter().getCharacterType().getCharacterCard();
-
-            if (!game.getRecruitableCards().contains(card)) {
-                game.getRecruitableCards().add(0, card);
+            if (motion.getMotionType() == RecruitmentMotionType.Add) {
+                doRemoveMotion(motion);
+            } else {
+                doAddMotion(motion);
             }
-
-            // Remove the character from the board.
-            game.getBoard().getCell(motion.getPosition()).setCharacter(null);
         }
     }
 
+    private void doAddMotion(@NonNull RecruitmentActionMotion motion) {
+        game.getBoard().getCell(motion.getPosition()).setCharacter(motion.getCharacter());
+        // We always remove the card matching the recruited character from the recruitable cards pool.
+        // The only cases where the removal can fail (without generating any exception) are
+        // cards like the Hermit & Cub matching multiple characters
+        game.getRecruitableCards().remove(motion.getCharacter().getCharacterType().getCharacterCard());
+        game.addRecruitedCharacter(motion.getCharacter().getTeamColor(), motion.getCharacter().getCharacterType());
+    }
 
+    private void doRemoveMotion(@NonNull RecruitmentActionMotion motion) {
+        game.removeRecruitedCharacter(motion.getCharacter().getTeamColor(), motion.getCharacter().getCharacterType());
+
+        // Restore the recruited character's card only once, since the
+        // recruitable cards pool should not contain duplicates.
+        CharacterCard card = motion.getCharacter().getCharacterType().getCharacterCard();
+
+        if (!game.getRecruitableCards().contains(card)) {
+            game.getRecruitableCards().add(0, card);
+        }
+
+        // Remove the character from the board.
+        game.getBoard().getCell(motion.getPosition()).setCharacter(null);
+    }
 }

@@ -359,4 +359,11 @@
     <string name="card_name_elite_archer">elite archer</string>
     <string name="card_formatted_name_elite_archer">ELiTE ARcHER</string>
     <string name="card_description_elite_archer">Also helps capture the oppponent\'s leader from two spaces away in a straight line, even if they are not visible.</string>
+    <string name="card_name_shaman">shaman</string>
+    <string name="card_formatted_name_shaman">SHAMAn</string>
+    <string name="card_description_shaman">Transforms a non-leader character, visible in a straight line, into a frog until the end of the opponent\'s turn.</string>
+    <string name="card_name_frog">frog</string>
+    <string name="card_formatted_name_frog">frog</string>
+    <string name="card_description_frog">Moves up to two spaces. May pass through a space occupied by another character. Cannot help capture the opponent\'s leader.</string>
+    <string name="card_sort_name_elite_archer">archer - elite</string>
 </resources>

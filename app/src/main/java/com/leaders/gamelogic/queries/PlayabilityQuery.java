@@ -92,7 +92,7 @@ public final class PlayabilityQuery {
                 return Collections.singletonList(getState(game, gameHistory, characterCell, true));
             }
             // If a character is allowed to act, we add them to the list
-            if (CharacterAbilityQuery.canAct(actionsPhase, character)) {
+            if (CharacterAbilityQuery.canAct(game, actionsPhase, character)) {
                 playableCharacters.add(getState(game, gameHistory, characterCell, CharacterAbilityQuery.mustAct()));
             }
         }

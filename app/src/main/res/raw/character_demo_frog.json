@@ -1,0 +1,173 @@
+{
+  "config": {
+    "players": [
+      {
+        "team_color": "Black",
+        "name": "Player"
+      },
+      {
+        "team_color": "White",
+        "name": "Puzzle"
+      }
+    ],
+    "first_player": {
+      "team_color": "Black",
+      "name": "Player"
+    },
+    "game_mode": "Puzzle",
+    "initial_recruitable_cards": [],
+    "initial_placements": [
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "c2798c4e-be89-479f-9ca1-e88eaa3199b6",
+              "character_type": "LeaderKing",
+              "team_color": "Black"
+            },
+            "position": {
+              "x": 4,
+              "y": 3
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "209121f1-9358-4f9b-9711-5d801d4edf6e",
+              "character_type": "Protector",
+              "team_color": "White"
+            },
+            "position": {
+              "x": 5,
+              "y": 0
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "cd7fbf8f-d1c7-4469-a0d9-83eceacbd3f7",
+              "character_type": "Frog",
+              "team_color": "Black"
+            },
+            "position": {
+              "x": 3,
+              "y": 3
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "82d94b7c-84eb-455d-b7e2-953f125bedd6",
+              "character_type": "LeaderVermilion",
+              "team_color": "White"
+            },
+            "position": {
+              "x": 6,
+              "y": 0
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "6611470a-365d-41a5-b44c-4f795b88cbcf",
+              "character_type": "Hermit",
+              "team_color": "White"
+            },
+            "position": {
+              "x": 6,
+              "y": 1
+            }
+          }
+        ],
+        "type": "Recruitment"
+      },
+      {
+        "motions": [
+          {
+            "motion_type": "Add",
+            "character": {
+              "uuid": "833b2cbc-3a81-42c4-a2fc-cd17625f634e",
+              "character_type": "Cub",
+              "team_color": "White"
+            },
+            "position": {
+              "x": 4,
+              "y": 2
+            }
+          }
+        ],
+        "type": "Recruitment"
+      }
+    ]
+  },
+  "entries": [
+    {
+      "team_color": "Black",
+      "turn_start_phase": {
+        "start_action": {
+          "transition_type": "Start",
+          "transition_target": "TurnStartPhase"
+        },
+        "end_action": {
+          "transition_type": "End",
+          "transition_target": "TurnStartPhase"
+        },
+        "turn_team_color": "Black",
+        "actions": []
+      },
+      "actions_phase": {
+        "start_action": {
+          "transition_type": "Start",
+          "transition_target": "ActionsPhase"
+        },
+        "turn_team_color": "Black",
+        "actions": [
+          {
+            "comment": "This action is an unplayable dummy to prevent this character to move",
+            "src_character": {
+              "uuid": "c2798c4e-be89-479f-9ca1-e88eaa3199b6",
+              "character_type": "LeaderKing",
+              "team_color": "Black"
+            },
+            "motions": [
+              {
+                "motion_type": "Add",
+                "targets": []
+              }
+            ]
+          }
+        ]
+      },
+      "recruitment_phase": {
+        "turn_team_color": "Black",
+        "actions": []
+      },
+      "turn_end_phase": {
+        "turn_team_color": "Black",
+        "actions": []
+      },
+      "type": "turn"
+    }
+  ]
+}

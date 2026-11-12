@@ -780,8 +780,28 @@ public final class GameHandler {
     }
 
     private CompletableFuture<PhaseExecutionResult> runTurnEndPhaseAsync(@NonNull GamePhase currentPhase) {
-        TeamColor teamColor = currentPhase.getPhasePlayer().getTeamColor();
+        CharacterAction autoAction = AutoPlayQuery.getEndTurnAutoAction(currentGame, currentHistory);
 
+        if (autoAction != null) {
+            InteractionFeedback feedback = InteractionFeedback.createForCharacterAction(autoAction.getMotions());
+
+            return gameFlowListener.onFeedback(feedback).thenCompose(igonred -> {
+                doAction(currentPhase, autoAction);
+                return runBarrageCheck(currentPhase);
+            });
+        }
+
+        return runBarrageCheck(currentPhase);
+    }
+
+    /**
+     * Checks whether the current player's team is under Barrage and updates its warning count.
+     *
+     * @param currentPhase the current game phase
+     * @return a completed future containing the phase execution result
+     */
+    private CompletableFuture<PhaseExecutionResult> runBarrageCheck(@NonNull GamePhase currentPhase) {
+        TeamColor teamColor = currentPhase.getPhasePlayer().getTeamColor();
         if (GameQuery.isBarrageDetected(currentGame, teamColor)) {
             doAction(currentPhase, new WarningAction(WarningType.Barrage, teamColor, 1));
             checkGameEnded(currentPhase);

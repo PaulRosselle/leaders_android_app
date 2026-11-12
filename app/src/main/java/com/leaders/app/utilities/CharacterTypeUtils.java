@@ -52,6 +52,8 @@ public class CharacterTypeUtils {
             }
             case Wanderer: return R.drawable.character_piece_wanderer;
             case LeaderVermilion: return R.drawable.character_piece_leader_vermilion;
+            case Shaman: return R.drawable.character_piece_shaman;
+            case Frog: return R.drawable.character_piece_frog;
             case Sniper: return R.drawable.character_piece_sniper;
             case Tactician: return R.drawable.character_piece_tactician;
             case Wisp: return R.drawable.character_piece_wisp;
@@ -86,6 +88,8 @@ public class CharacterTypeUtils {
             case Wanderer: return 15;
             case Archer: return 4;
             case LeaderVermilion: return 25;
+            case Shaman: return 21;
+            case Frog: return 22; // TODO - handle the "frogified" tag
             case Sniper: return 23;
             case Tactician: return 24;
             case Wisp: return 20;

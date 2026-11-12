@@ -7,6 +7,9 @@ import com.leaders.gamelogic.actions.CharacterActionMotion;
 import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Game;
+import com.leaders.gamelogic.entities.TransformedState;
+import com.leaders.gamelogic.enums.CharacterMotionType;
+import com.leaders.gamelogic.queries.CharacterTransformUtils;
 
 /**
  * Four target cases are handled:
@@ -40,6 +43,8 @@ public final class CharacterActionHandler extends GameActionHandler {
                     board.getCell(target.getDestPos()).setCharacter(target.getCharacter());
                 }
             }
+
+            updateTransformedState(motion, false);
         }
     }
 
@@ -66,6 +71,58 @@ public final class CharacterActionHandler extends GameActionHandler {
                     board.getCell(target.getOriginPos()).setCharacter(target.getCharacter());
                 }
             }
+
+            updateTransformedState(motion, true);
+        }
+    }
+
+    /**
+     * Updates the transformed state associated with a character action motion.
+     *
+     * @param motion the motion whose transformed state should be updated
+     * @param undoAction whether the action is being undone
+     */
+    private void updateTransformedState(@NonNull CharacterActionMotion motion, boolean undoAction) {
+        if (!CharacterTransformUtils.isTransformMotion(motion)) {
+            return;
+        }
+
+        TransformedState newState = CharacterTransformUtils.getStateFromTranformMotion(motion);
+
+        if (motion.getMotionType() == CharacterMotionType.Transform) {
+            applyTransformState(newState, undoAction);
+        } else if (motion.getMotionType() == CharacterMotionType.Untransform) {
+            applyUntransformState(newState, undoAction);
+        }
+    }
+
+    /**
+     * Applies or reverses the state change caused by a transform action.
+     *
+     * @param newState the transformed state describing the character before and after transformation
+     * @param undoAction whether the action is being undone
+     */
+    private void applyTransformState(@NonNull TransformedState newState, boolean undoAction) {
+        if (undoAction) {
+            game.removeTransformedState(newState.getCharacterId());
+        } else {
+            // We add the transformed state (before -> after)
+            game.addTransformedState(newState.getCharacterBefore(), newState.getCharacterAfter());
+        }
+    }
+
+    /**
+     * Applies or reverses the state change caused by an untransform action.
+     *
+     * @param newState the transformed state describing the character before and after untransformation
+     * @param undoAction whether the action is being undone
+     */
+    private void applyUntransformState(@NonNull TransformedState newState, boolean undoAction) {
+        // Undoing an "Untransform" action means retransforming the character (after -> before)
+        if (undoAction) {
+            game.addTransformedState(newState.getCharacterAfter(), newState.getCharacterBefore());
+        } else {
+            game.removeTransformedState(newState.getCharacterId());
         }
     }
 }

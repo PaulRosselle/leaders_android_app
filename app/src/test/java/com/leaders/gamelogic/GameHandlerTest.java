@@ -29,6 +29,7 @@ import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.entities.SelectableCharacterCard;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterCardSelectionStatus;
+import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.GamePhaseType;
@@ -51,12 +52,14 @@ import com.leaders.gamelogic.interactions.InteractionResult;
 import com.leaders.gamelogic.interactions.InteractionResultType;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.interactions.InteractionType;
+import com.leaders.gamelogic.interactions.PhaseExecutionResult;
 import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.RecruitmentQuery;
 import com.leaders.puzzlelogic.utilities.GameStateHashUtils;
 
 import org.junit.Test;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -1722,6 +1725,176 @@ public class GameHandlerTest {
         assertTrue(turnEndPhase.getActions().isEmpty());
     }
 
+    // ------------------------------------------------------------------
+// runTurnEndPhaseAsync
+// ------------------------------------------------------------------
+
+    @Test
+    public void runTurnEndPhaseAsync_shouldReturnCompletedWhenNothingToDo() {
+        GameHistory history = createTurnEndGameHistory(false, 0);
+        TestGameFlowListener listener = new TestGameFlowListener(history);
+        GameHandler gameHandler = new GameHandler(history, listener);
+        GamePhase currentPhase = new GamePhase(
+                GamePhaseType.TurnEnd,
+                history.getConfig().getPlayers().get(0)
+        );
+
+        PhaseExecutionResult result = invokeRunTurnEndPhaseAsync(gameHandler, currentPhase).join();
+
+        assertEquals(PhaseExecutionResult.Completed, result);
+        assertEquals(0, listener.getFeedbackCount());
+    }
+
+    @Test
+    public void runTurnEndPhaseAsync_shouldApplyAutoActionAndNotifyFeedback() throws Exception {
+        GameHistory history = createTurnEndGameHistory(false, 0);
+        TestGameFlowListener listener = new TestGameFlowListener(history);
+        GameHandler gameHandler = new GameHandler(history, listener);
+
+        // A white Hermit was turned into a Frog during a previous turn:
+        // nothing in the current (black) turn matches, so it must be untransformed.
+        Position frogPosition = new Position(3, 3);
+        Character hermit = Character.create(CharacterType.Hermit, TeamColor.White);
+        Character frog = Character.transform(hermit, CharacterType.Frog, TeamColor.White);
+        Game internalGame = getInternalGame(gameHandler);
+        internalGame.getBoard().getCell(frogPosition).setCharacter(frog);
+        internalGame.addTransformedState(hermit, frog);
+
+        GamePhase currentPhase = new GamePhase(
+                GamePhaseType.TurnEnd,
+                history.getConfig().getPlayers().get(0)
+        );
+
+        PhaseExecutionResult result = invokeRunTurnEndPhaseAsync(gameHandler, currentPhase).join();
+
+        assertEquals(PhaseExecutionResult.Completed, result);
+
+        // The listener has been notified once with the untransform motion
+        assertEquals(1, listener.getFeedbackCount());
+        assertNotNull(listener.getLastFeedback());
+        assertEquals(1, listener.getLastFeedback().getCharacterActionMotions().size());
+        assertEquals(CharacterMotionType.Untransform,
+                listener.getLastFeedback().getCharacterActionMotions().get(0).getMotionType());
+
+        // The action has been recorded in the turn end phase
+        TurnEndPhase turnEndPhase = (TurnEndPhase) ((Turn) history.getEntries().get(0))
+                .getSubPhase(GamePhaseType.TurnEnd);
+        assertEquals(1, turnEndPhase.getActions().size());
+        assertTrue(turnEndPhase.getActions().get(0) instanceof CharacterAction);
+        assertEquals(frog.getId(),
+                ((CharacterAction) turnEndPhase.getActions().get(0)).getSrcCharacter().getId());
+
+        // The Frog has been reverted to the original character
+        Character characterOnBoard = internalGame.getBoard().getCell(frogPosition).getCharacter();
+        assertNotNull(characterOnBoard);
+        assertEquals(CharacterType.Hermit, characterOnBoard.getCharacterType());
+    }
+
+    @Test
+    public void runTurnEndPhaseAsync_shouldNotNotifyFeedbackWhenBarrageIsDetected() {
+        GameHistory history = createTurnEndGameHistory(true, 0);
+        TestGameFlowListener listener = new TestGameFlowListener(history);
+        GameHandler gameHandler = new GameHandler(history, listener);
+        GamePhase currentPhase = new GamePhase(
+                GamePhaseType.TurnEnd,
+                history.getConfig().getPlayers().get(0)
+        );
+
+        PhaseExecutionResult result = invokeRunTurnEndPhaseAsync(gameHandler, currentPhase).join();
+
+        // The warning is not an auto action: no feedback is sent
+        assertEquals(PhaseExecutionResult.Completed, result);
+        assertEquals(0, listener.getFeedbackCount());
+    }
+
+// ------------------------------------------------------------------
+// runBarrageCheck
+// ------------------------------------------------------------------
+
+    @Test
+    public void runBarrageCheck_shouldReturnCompletedAndAddWarningWhenBarrageIsDetected() {
+        GameHistory history = createTurnEndGameHistory(true, 0);
+        GameHandler gameHandler = new GameHandler(history, new TestGameFlowListener(history));
+        GamePhase currentPhase = new GamePhase(
+                GamePhaseType.TurnEnd,
+                history.getConfig().getPlayers().get(0)
+        );
+
+        PhaseExecutionResult result = invokeRunBarrageCheck(gameHandler, currentPhase);
+
+        assertEquals(PhaseExecutionResult.Completed, result);
+        assertEquals(1, gameHandler.getCurrentGame()
+                .getPlayerWarningCount(TeamColor.Black, WarningType.Barrage));
+
+        TurnEndPhase turnEndPhase = (TurnEndPhase) ((Turn) history.getEntries().get(0))
+                .getSubPhase(GamePhaseType.TurnEnd);
+        assertEquals(1, turnEndPhase.getActions().size());
+        WarningAction warning = (WarningAction) turnEndPhase.getActions().get(0);
+        assertEquals(1, warning.getCountChange());
+    }
+
+    @Test
+    public void runBarrageCheck_shouldRemoveWarningWhenBarrageIsNoLongerDetected() {
+        GameHistory history = createTurnEndGameHistory(false, 1);
+        GameHandler gameHandler = new GameHandler(history, new TestGameFlowListener(history));
+        GamePhase currentPhase = new GamePhase(
+                GamePhaseType.TurnEnd,
+                history.getConfig().getPlayers().get(0)
+        );
+
+        PhaseExecutionResult result = invokeRunBarrageCheck(gameHandler, currentPhase);
+
+        assertEquals(PhaseExecutionResult.Completed, result);
+        assertEquals(0, gameHandler.getCurrentGame()
+                .getPlayerWarningCount(TeamColor.Black, WarningType.Barrage));
+
+        TurnEndPhase turnEndPhase = (TurnEndPhase) ((Turn) history.getEntries().get(0))
+                .getSubPhase(GamePhaseType.TurnEnd);
+        // The initial warning + the removal
+        assertEquals(2, turnEndPhase.getActions().size());
+        WarningAction removal = (WarningAction) turnEndPhase.getActions().get(1);
+        assertEquals(-1, removal.getCountChange());
+    }
+
+    @Test
+    public void runBarrageCheck_shouldDoNothingWhenNoBarrageAndNoWarning() {
+        GameHistory history = createTurnEndGameHistory(false, 0);
+        GameHandler gameHandler = new GameHandler(history, new TestGameFlowListener(history));
+        GamePhase currentPhase = new GamePhase(
+                GamePhaseType.TurnEnd,
+                history.getConfig().getPlayers().get(0)
+        );
+
+        PhaseExecutionResult result = invokeRunBarrageCheck(gameHandler, currentPhase);
+
+        assertEquals(PhaseExecutionResult.Completed, result);
+        assertEquals(0, gameHandler.getCurrentGame()
+                .getPlayerWarningCount(TeamColor.Black, WarningType.Barrage));
+
+        TurnEndPhase turnEndPhase = (TurnEndPhase) ((Turn) history.getEntries().get(0))
+                .getSubPhase(GamePhaseType.TurnEnd);
+        assertTrue(turnEndPhase.getActions().isEmpty());
+    }
+
+    @Test
+    public void runBarrageCheck_shouldEndGameWhenWarningLimitIsReached() {
+        // ADAPT IF NEEDED: 1 initial warning + 1 new one = 2, which is assumed to be the
+        // losing threshold (cf. checkGameEnded_shouldSignalWinnerWhenThereIsAWinner).
+        GameHistory history = createTurnEndGameHistory(true, 1);
+        GameHandler gameHandler = new GameHandler(history, new TestGameFlowListener(history));
+        GamePhase currentPhase = new GamePhase(
+                GamePhaseType.TurnEnd,
+                history.getConfig().getPlayers().get(0)
+        );
+
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> invokeRunBarrageCheck(gameHandler, currentPhase)
+        );
+
+        assertEquals("GameEndedException", exception.getClass().getSimpleName());
+    }
+
     @Test
     public void checkGameEnded_shouldNotThrowWhenThereIsNoWinner() {
         GameHistory history = createCheckGameEndedGameHistory();
@@ -1786,6 +1959,59 @@ public class GameHandlerTest {
             }
             throw exception;
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private CompletableFuture<PhaseExecutionResult> invokeRunTurnEndPhaseAsync(GameHandler gameHandler,
+                                                                               GamePhase currentPhase) {
+        try {
+            Method method = GameHandler.class.getDeclaredMethod(
+                    "runTurnEndPhaseAsync",
+                    GamePhase.class
+            );
+            method.setAccessible(true);
+
+            return (CompletableFuture<PhaseExecutionResult>) method.invoke(gameHandler, currentPhase);
+        } catch (InvocationTargetException exception) {
+            Throwable cause = exception.getCause();
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            }
+            throw new RuntimeException(cause);
+        } catch (ReflectiveOperationException exception) {
+            throw new RuntimeException(exception);
+        }
+    }
+
+    private PhaseExecutionResult invokeRunBarrageCheck(GameHandler gameHandler, GamePhase currentPhase) {
+        try {
+            Method method = GameHandler.class.getDeclaredMethod("runBarrageCheck", GamePhase.class);
+            method.setAccessible(true);
+
+            @SuppressWarnings("unchecked")
+            CompletableFuture<PhaseExecutionResult> future =
+                    (CompletableFuture<PhaseExecutionResult>) method.invoke(gameHandler, currentPhase);
+            assertNotNull(future);
+            return future.join();
+        } catch (InvocationTargetException exception) {
+            Throwable cause = exception.getCause();
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            }
+            throw new RuntimeException(cause);
+        } catch (ReflectiveOperationException exception) {
+            throw new RuntimeException(exception);
+        }
+    }
+
+    /**
+     * Returns the real internal game (getCurrentGame() only returns a copy),
+     * so a test can set up a state that the history alone cannot easily produce.
+     */
+    private Game getInternalGame(GameHandler gameHandler) throws Exception {
+        Field field = GameHandler.class.getDeclaredField("currentGame");
+        field.setAccessible(true);
+        return (Game) field.get(gameHandler);
     }
 
     private void invokeEndCurrentPhase(GameHandler gameHandler) throws Exception {
@@ -2004,28 +2230,6 @@ public class GameHandlerTest {
             GamePhase currentPhase) {
         try {
             Method method = GameHandler.class.getDeclaredMethod("runBanishmentPhaseAsync", GamePhase.class);
-            method.setAccessible(true);
-
-            return (CompletableFuture<Void>) method.invoke(gameHandler, currentPhase);
-        } catch (InvocationTargetException exception) {
-            Throwable cause = exception.getCause();
-            if (cause instanceof RuntimeException) {
-                throw (RuntimeException) cause;
-            }
-            throw new RuntimeException(cause);
-        } catch (ReflectiveOperationException exception) {
-            throw new RuntimeException(exception);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private CompletableFuture<Void> invokeRunTurnEndPhaseAsync(GameHandler gameHandler,
-                                                               GamePhase currentPhase) {
-        try {
-            Method method = GameHandler.class.getDeclaredMethod(
-                    "runTurnEndPhaseAsync",
-                    GamePhase.class
-            );
             method.setAccessible(true);
 
             return (CompletableFuture<Void>) method.invoke(gameHandler, currentPhase);

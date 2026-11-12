@@ -24,6 +24,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 
 public class RecruitmentActionHandlerTest {
@@ -42,13 +43,19 @@ public class RecruitmentActionHandlerTest {
                 new ArrayList<>(), // recruitableCards
                 new EnumMap<>(TeamColor.class), // playerRecruitedCharacters
                 new EnumMap<>(TeamColor.class), // playerBanishedCards
-                new EnumMap<>(TeamColor.class) // playerWarnings
+                new EnumMap<>(TeamColor.class), // playerWarnings
+                new HashMap<>() // charactersTransformedState
         );
     }
 
     @NonNull
     private RecruitmentActionMotion createAddMotion(@NonNull Character character, @NonNull Position position) {
         return new RecruitmentActionMotion(RecruitmentMotionType.Add, character, position);
+    }
+
+    @NonNull
+    private RecruitmentActionMotion createRemoveMotion(@NonNull Character character, @NonNull Position position) {
+        return new RecruitmentActionMotion(RecruitmentMotionType.Remove, character, position);
     }
 
     @NonNull
@@ -135,6 +142,136 @@ public class RecruitmentActionHandlerTest {
     }
 
     @Test
+    public void doAction_removeMotionShouldRemoveCharacterFromBoard() {
+        Game game = createTestGame();
+        Character character = Character.create(CharacterType.Archer, TeamColor.Black);
+        recruit(game, TeamColor.Black, CharacterType.Archer, POS_1);
+
+        RecruitmentAction action = new RecruitmentAction(
+                List.of(createRemoveMotion(character, POS_1))
+        );
+
+        new RecruitmentActionHandler(game, action).doAction();
+
+        assertNull(game.getBoard().getCell(POS_1).getCharacter());
+    }
+
+    @Test
+    public void doAction_removeMotionShouldRemoveCardFromRecruitedCards() {
+        Game game = createTestGame();
+        Character character = Character.create(CharacterType.Archer, TeamColor.Black);
+        recruit(game, TeamColor.Black, CharacterType.Archer, POS_1);
+
+        RecruitmentAction action = new RecruitmentAction(
+                List.of(createRemoveMotion(character, POS_1))
+        );
+
+        new RecruitmentActionHandler(game, action).doAction();
+
+        assertTrue(game.getRecruitedCards(TeamColor.Black).isEmpty());
+    }
+
+    @Test
+    public void doAction_removeMotionShouldRestoreCardToRecruitableCards() {
+        Game game = createTestGame();
+        Character character = Character.create(CharacterType.Archer, TeamColor.Black);
+        recruit(game, TeamColor.Black, CharacterType.Archer, POS_1);
+
+        RecruitmentAction action = new RecruitmentAction(
+                List.of(createRemoveMotion(character, POS_1))
+        );
+
+        new RecruitmentActionHandler(game, action).doAction();
+
+        assertEquals(
+                List.of(CharacterCard.Archer),
+                game.getRecruitableCards()
+        );
+    }
+
+    @Test
+    public void doAction_removeMotionShouldNotAddDuplicateRecruitableCard() {
+        Game game = createTestGame();
+        Character character = Character.create(CharacterType.Archer, TeamColor.Black);
+        recruit(game, TeamColor.Black, CharacterType.Archer, POS_1);
+
+        game.getRecruitableCards().add(CharacterCard.Archer);
+
+        RecruitmentAction action = new RecruitmentAction(
+                List.of(createRemoveMotion(character, POS_1))
+        );
+
+        new RecruitmentActionHandler(game, action).doAction();
+
+        assertEquals(
+                List.of(CharacterCard.Archer),
+                game.getRecruitableCards()
+        );
+    }
+
+    @Test
+    public void doAction_shouldHandleSeveralRemoveMotionsInOneAction() {
+        Game game = createTestGame();
+
+        Character archer = Character.create(CharacterType.Archer, TeamColor.Black);
+        Character assassin = Character.create(CharacterType.Assassin, TeamColor.Black);
+
+        recruit(game, TeamColor.Black, CharacterType.Archer, POS_1);
+        recruit(game, TeamColor.Black, CharacterType.Assassin, POS_2);
+
+        RecruitmentAction action = new RecruitmentAction(List.of(
+                createRemoveMotion(archer, POS_1),
+                createRemoveMotion(assassin, POS_2)
+        ));
+
+        new RecruitmentActionHandler(game, action).doAction();
+
+        assertNull(game.getBoard().getCell(POS_1).getCharacter());
+        assertNull(game.getBoard().getCell(POS_2).getCharacter());
+
+        assertTrue(game.getRecruitedCards(TeamColor.Black).isEmpty());
+
+        assertEquals(2, game.getRecruitableCards().size());
+        assertTrue(game.getRecruitableCards().contains(CharacterCard.Archer));
+        assertTrue(game.getRecruitableCards().contains(CharacterCard.Assassin));
+    }
+
+    @Test
+    public void undoAction_shouldRevertSeveralRemoveMotionsInOneAction() {
+        Game game = createTestGame();
+
+        Character archer = Character.create(CharacterType.Archer, TeamColor.Black);
+        Character assassin = Character.create(CharacterType.Assassin, TeamColor.Black);
+
+        recruit(game, TeamColor.Black, CharacterType.Archer, POS_1);
+        recruit(game, TeamColor.Black, CharacterType.Assassin, POS_2);
+
+        RecruitmentAction action = new RecruitmentAction(List.of(
+                createRemoveMotion(archer, POS_1),
+                createRemoveMotion(assassin, POS_2)
+        ));
+
+        RecruitmentActionHandler handler = new RecruitmentActionHandler(game, action);
+
+        handler.doAction();
+        handler.undoAction();
+
+        assertSame(archer, game.getBoard().getCell(POS_1).getCharacter());
+        assertSame(assassin, game.getBoard().getCell(POS_2).getCharacter());
+
+        assertEquals(
+                1,
+                countCards(game, TeamColor.Black, CharacterCard.Archer)
+        );
+        assertEquals(
+                1,
+                countCards(game, TeamColor.Black, CharacterCard.Assassin)
+        );
+
+        assertTrue(game.getRecruitableCards().isEmpty());
+    }
+
+    @Test
     public void undoAction_shouldRemoveCharacterFromBoard() {
         Game game = createTestGame();
         RecruitmentActionHandler handler = recruit(game, TeamColor.Black, CharacterType.Archer, POS_1);
@@ -197,6 +334,185 @@ public class RecruitmentActionHandlerTest {
         assertEquals(2, game.getRecruitableCards().size());
         assertTrue(game.getRecruitableCards().contains(CharacterCard.Archer));
         assertTrue(game.getRecruitableCards().contains(CharacterCard.Assassin));
+    }
+
+    @Test
+    public void undoAction_removeMotionShouldRestoreCharacterOnBoard() {
+        Game game = createTestGame();
+        Character character = Character.create(CharacterType.Archer, TeamColor.Black);
+        recruit(game, TeamColor.Black, CharacterType.Archer, POS_1);
+
+        RecruitmentAction action = new RecruitmentAction(
+                List.of(createRemoveMotion(character, POS_1))
+        );
+
+        RecruitmentActionHandler handler = new RecruitmentActionHandler(game, action);
+
+        handler.doAction();
+        handler.undoAction();
+
+        assertSame(character, game.getBoard().getCell(POS_1).getCharacter());
+    }
+
+    @Test
+    public void undoAction_removeMotionShouldRestoreCardToRecruitedCards() {
+        Game game = createTestGame();
+        Character character = Character.create(CharacterType.Archer, TeamColor.Black);
+        recruit(game, TeamColor.Black, CharacterType.Archer, POS_1);
+
+        RecruitmentAction action = new RecruitmentAction(
+                List.of(createRemoveMotion(character, POS_1))
+        );
+
+        RecruitmentActionHandler handler = new RecruitmentActionHandler(game, action);
+
+        handler.doAction();
+        handler.undoAction();
+
+        assertEquals(
+                List.of(CharacterCard.Archer),
+                game.getRecruitedCards(TeamColor.Black)
+        );
+    }
+
+    @Test
+    public void undoAction_removeMotionShouldRemoveCardFromRecruitableCards() {
+        Game game = createTestGame();
+        Character character = Character.create(CharacterType.Archer, TeamColor.Black);
+        recruit(game, TeamColor.Black, CharacterType.Archer, POS_1);
+
+        RecruitmentAction action = new RecruitmentAction(
+                List.of(createRemoveMotion(character, POS_1))
+        );
+
+        RecruitmentActionHandler handler = new RecruitmentActionHandler(game, action);
+
+        handler.doAction();
+        handler.undoAction();
+
+        assertTrue(game.getRecruitableCards().isEmpty());
+    }
+
+    @Test
+    public void doActionThenUndoAction_withRemoveMotions_shouldRestoreGameState() {
+        Game game = createTestGame();
+
+        // Prepare initial game state.
+        Character archer = Character.create(CharacterType.Archer, TeamColor.Black);
+        Character assassin = Character.create(CharacterType.Assassin, TeamColor.Black);
+        Character hermit = Character.create(CharacterType.Hermit, TeamColor.Black);
+        Character cub = Character.create(CharacterType.Cub, TeamColor.Black);
+
+        List<Position> characterPositions = List.of(POS_1, POS_2, POS_3, POS_4);
+        List<CharacterType> characterTypes = List.of(
+                CharacterType.Archer,
+                CharacterType.Assassin,
+                CharacterType.Hermit,
+                CharacterType.Cub
+        );
+
+        for (int i = 0; i < characterPositions.size(); i++) {
+            recruit(game, TeamColor.Black, characterTypes.get(i), characterPositions.get(i));
+        }
+
+        // Prepare removal action.
+        RecruitmentAction action = new RecruitmentAction(List.of(
+                createRemoveMotion(archer, POS_1),
+                createRemoveMotion(assassin, POS_2),
+                createRemoveMotion(hermit, POS_3),
+                createRemoveMotion(cub, POS_4)
+        ));
+
+        RecruitmentActionHandler handler = new RecruitmentActionHandler(game, action);
+
+        // Save initial game state.
+        Board boardBefore = new Board(game.getBoard());
+        List<CharacterCard> recruitableCardsBefore = new ArrayList<>(game.getRecruitableCards());
+        List<CharacterCard> recruitedCardsBefore = new ArrayList<>(game.getRecruitedCards(TeamColor.Black));
+
+        // Execute and undo the action.
+        handler.doAction();
+        handler.undoAction();
+
+        // Verify that the board has been fully restored.
+        for (Position characterPos : characterPositions) {
+            assertEquals(
+                    boardBefore.getCell(characterPos).getCharacter().getCharacterType(),
+                    game.getBoard().getCell(characterPos).getCharacter().getCharacterType()
+            );
+        }
+
+        // Verify that recruitable cards have been fully restored.
+        assertEquals(recruitableCardsBefore, game.getRecruitableCards());
+
+        // Verify that recruited cards have been fully restored.
+        assertEquals(recruitedCardsBefore, game.getRecruitedCards(TeamColor.Black));
+    }
+
+    @Test
+    public void doAction_removeHermitShouldKeepHermitAndCubWhenCubRemains() {
+        Game game = createTestGame();
+
+        Character hermit = Character.create(CharacterType.Hermit, TeamColor.Black);
+
+        recruit(game, TeamColor.Black, CharacterType.Hermit, POS_1);
+        recruit(game, TeamColor.Black, CharacterType.Cub, POS_2);
+
+        RecruitmentAction action = new RecruitmentAction(
+                List.of(createRemoveMotion(hermit, POS_1))
+        );
+
+        new RecruitmentActionHandler(game, action).doAction();
+
+        assertEquals(
+                1,
+                countCards(game, TeamColor.Black, CharacterCard.HermitAndCub)
+        );
+    }
+
+    @Test
+    public void doAction_removeCubShouldKeepHermitAndCubWhenHermitRemains() {
+        Game game = createTestGame();
+
+        Character cub = Character.create(CharacterType.Cub, TeamColor.Black);
+
+        recruit(game, TeamColor.Black, CharacterType.Hermit, POS_1);
+        recruit(game, TeamColor.Black, CharacterType.Cub, POS_2);
+
+        RecruitmentAction action = new RecruitmentAction(
+                List.of(createRemoveMotion(cub, POS_2))
+        );
+
+        new RecruitmentActionHandler(game, action).doAction();
+
+        assertEquals(
+                1,
+                countCards(game, TeamColor.Black, CharacterCard.HermitAndCub)
+        );
+    }
+
+    @Test
+    public void doAction_removeHermitAndCubShouldRemoveHermitAndCubCard() {
+        Game game = createTestGame();
+
+        Character hermit = Character.create(CharacterType.Hermit, TeamColor.Black);
+        Character cub = Character.create(CharacterType.Cub, TeamColor.Black);
+
+        recruit(game, TeamColor.Black, CharacterType.Hermit, POS_1);
+        recruit(game, TeamColor.Black, CharacterType.Cub, POS_2);
+
+        RecruitmentAction action = new RecruitmentAction(List.of(
+                createRemoveMotion(hermit, POS_1),
+                createRemoveMotion(cub, POS_2)
+        ));
+
+        new RecruitmentActionHandler(game, action).doAction();
+
+        assertTrue(game.getRecruitedCards(TeamColor.Black).isEmpty());
+        assertEquals(
+                List.of(CharacterCard.HermitAndCub),
+                game.getRecruitableCards()
+        );
     }
 
     @Test

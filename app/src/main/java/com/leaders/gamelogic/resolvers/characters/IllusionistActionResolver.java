@@ -10,7 +10,6 @@ import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterMotionType;
-import com.leaders.gamelogic.enums.Direction;
 import com.leaders.gamelogic.interactions.CharacterActionBuilder;
 import com.leaders.gamelogic.interactions.InteractionContext;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
@@ -77,18 +76,16 @@ public final class IllusionistActionResolver extends CharacterActionResolver {
         }
 
         if (!isAbilityTargetResult(result)) {
-            throw new IllegalArgumentException(
-                    "Invalid Illusionist interaction type " + result.getResultType());
+            throw new IllegalArgumentException("Invalid Illusionist interaction type " + result.getResultType());
         }
 
         return buildSwapFeedback(result);
     }
 
     /**
-     * Returns all valid characters that can be targeted by the Illusionist's
-     * active ability.
+     * Returns all valid characters that can be targeted by the Illusionist's active ability.
      *
-     * <p>The target must be an enemy visible in a straight line and must not
+     * <p>The target must be a character visible in a straight line and must not
      * be adjacent to the Illusionist. Only the first character encountered
      * in each direction can be visible and targeted.</p>
      */
@@ -96,22 +93,19 @@ public final class IllusionistActionResolver extends CharacterActionResolver {
     private List<Position> getIllusionistTargetPositions(@NonNull CharacterActionBuilder builder) {
         List<Position> targets = new ArrayList<>();
 
-        for (Direction direction : Direction.values()) {
-            Cell adjacentCell = BoardQuery.findAdjacentCell(game.getBoard(), characterPos, direction);
-            if (adjacentCell != null && adjacentCell.getCharacter() == null) {
-                Cell targetCell = BoardQuery.findVisibleCharacterCell(game.getBoard(),
-                        adjacentCell.getPosition(), direction, null, null);
-                if (targetCell != null &&
-                        (targetCell.getCharacter().getTeamColor() == character.getTeamColor() ||
-                                CharacterAbilityQuery.canBeMovedByEnemyAbilities(game, targetCell.getCharacter()))) {
-                    Position targetPos = targetCell.getPosition();
+        for (Cell targetCell : BoardQuery.findVisibleCharacterCells(
+                game.getBoard(), characterPos, null, null, true)) {
+            if (targetCell.getCharacter().getTeamColor() == character.getTeamColor() ||
+                    CharacterAbilityQuery.canBeMovedByEnemyAbilities(game, targetCell.getCharacter())) {
+                Position targetPos = targetCell.getPosition();
 
-                    InteractionResult swapResult = ResolverUtils.createPositionResult(new InteractionContext(character),
-                            TargetCategory.ActiveAbilityTargetPosition, targetPos);
+                InteractionResult swapResult = ResolverUtils.createPositionResult(
+                        new InteractionContext(character),
+                        TargetCategory.ActiveAbilityTargetPosition, targetPos
+                );
 
-                    if (isValidWith(builder, swapResult, buildSwapFeedback(swapResult))) {
-                        targets.add(targetPos);
-                    }
+                if (isValidWith(builder, swapResult, buildSwapFeedback(swapResult))) {
+                    targets.add(targetPos);
                 }
             }
         }

@@ -183,10 +183,13 @@ public abstract class MoverActionResolver extends CharacterActionResolver {
         for (Cell destinationCell : BoardQuery.findEmptyCellsAround(game.getBoard(), targetPos, getTargetMovementMaxDistance())) {
             Position destination = destinationCell.getPosition();
 
-            InteractionResult destinationResult = ResolverUtils.createPositionResult(new InteractionContext(character, target),
-                    TargetCategory.ActiveAbilityDestination, destination);
+            InteractionResult destinationResult = ResolverUtils.createPositionResult(
+                    new InteractionContext(character, target),
+                    TargetCategory.ActiveAbilityDestination, destination
+            );
             InteractionFeedback destinationFeedback = ResolverUtils.createSingleMotionFeedback(
-                    CharacterMotionType.Move, target, targetPos, destination);
+                    CharacterMotionType.Move, target, targetPos, destination
+            );
 
             if (isValidWith(targetBuilder, destinationResult, destinationFeedback)) {
                 destinations.add(destination);

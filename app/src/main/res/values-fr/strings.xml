@@ -352,4 +352,11 @@
     <string name="card_name_elite_archer">archère d\'élite</string>
     <string name="card_formatted_name_elite_archer">ARcHÈRE D\'ÉLITE</string>
     <string name="card_description_elite_archer">Participe également à la capture du leader adverse à une distance de deux cases en ligne droite, même s\'il n\'est pas visible.</string>
+    <string name="card_name_shaman">chaman</string>
+    <string name="card_formatted_name_shaman">CHAMAn</string>
+    <string name="card_description_shaman">Transforme en grenouille un personnage non-leader visible en ligne droite jusqu’à la fin du tour adverse.</string>
+    <string name="card_name_frog">grenouille</string>
+    <string name="card_formatted_name_frog">grenouille</string>
+    <string name="card_description_frog">Se déplace jusqu\'à deux cases. Peut traverser une case occupée par un personnage. Ne participe pas à la capture du leader adverse.</string>
+    <string name="card_sort_name_elite_archer">archère d\'élite</string>
 </resources>

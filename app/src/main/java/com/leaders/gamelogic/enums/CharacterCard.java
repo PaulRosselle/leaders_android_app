@@ -22,6 +22,8 @@ public enum CharacterCard {
     Vizier,
     Wanderer,
     LeaderVermilion,
+    Shaman,
+    Frog,
     Sniper,
     Tactician,
     Wisp,
@@ -44,6 +46,7 @@ public enum CharacterCard {
             case Rider:
             case RoyalGuard:
             case Wanderer:
+            case Shaman:
             case Tactician:
                 return new AbilityType[] { AbilityType.Active };
             case Archer:
@@ -56,6 +59,7 @@ public enum CharacterCard {
                 return new AbilityType[] { AbilityType.Passive };
             case HermitAndCub:
             case Nemesis:
+            case Frog:
             case Wisp:
                 return new AbilityType[] { AbilityType.Special };
             case LeaderKing:
@@ -73,6 +77,6 @@ public enum CharacterCard {
 
     /** Indicates whether this character card can be recruited.*/
     public boolean canBeRecruited() {
-        return !isLeader();
+        return !isLeader() && this != Frog;
     }
 }
