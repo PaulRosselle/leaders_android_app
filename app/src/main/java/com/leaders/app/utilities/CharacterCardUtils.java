@@ -5,6 +5,7 @@ import android.content.res.Resources;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RawRes;
 import androidx.annotation.StringRes;
 
@@ -21,6 +22,23 @@ public final  class CharacterCardUtils {
     private CharacterCardUtils(){
         throw new AssertionError("Cannot instantiate utility class");
     }
+
+
+    //region ALTERNATIVE CHARACTERS
+
+    @Nullable
+    public static CharacterCard getBaseCharacter(@NonNull CharacterCard characterCard) {
+        if (characterCard == CharacterCard.EliteArcher) {
+            return CharacterCard.Archer;
+        }
+        return null;
+    }
+
+    public boolean isAlternativeCharacter(@NonNull CharacterCard characterCard) {
+        return getBaseCharacter(characterCard) != null;
+    }
+
+    //endregion
 
     //region NAME METHODS
 
