@@ -2,6 +2,7 @@ package com.leaders.app.utilities;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.leaders.R;
 import com.leaders.app.enums.CharacterSkinType;
@@ -60,6 +61,22 @@ public class CharacterTypeUtils {
             case EliteArcher: return R.drawable.character_piece_elite_archer;
             default: throw new IllegalArgumentException("No drawable found for character: " + characterType);
         }
+    }
+
+    //endregion
+
+    //region ALTERNATIVE CHARACTERS
+
+    @Nullable
+    public static CharacterType getBaseCharacter(@NonNull CharacterType characterType) {
+        if (characterType == CharacterType.EliteArcher) {
+            return CharacterType.Archer;
+        }
+        return null;
+    }
+
+    public boolean isAlternativeCharacter(@NonNull CharacterType characterType) {
+        return getBaseCharacter(characterType) != null;
     }
 
     //endregion
