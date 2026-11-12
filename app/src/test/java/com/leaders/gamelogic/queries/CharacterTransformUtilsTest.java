@@ -3,6 +3,7 @@ package com.leaders.gamelogic.queries;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
@@ -302,4 +303,145 @@ public class CharacterTransformUtilsTest {
                 exception.getMessage()
         );
     }
+
+
+    @Test
+    public void createTransformMotion_shouldCreateTransformMotion() {
+        Character originCharacter = createCharacter(CharacterType.Bruiser);
+
+        Character transformedCharacter = Character.transform(
+                originCharacter,
+                CharacterType.Cub,
+                TeamColor.Black
+        );
+
+        Position position = new Position(3, 3);
+
+        CharacterActionMotion motion = CharacterTransformUtils.createTransformMotion(
+                CharacterMotionType.Transform,
+                originCharacter,
+                transformedCharacter,
+                position
+        );
+
+        assertEquals(CharacterMotionType.Transform, motion.getMotionType());
+    }
+
+    @Test
+    public void createTransformMotion_shouldCreateUntransformMotion() {
+        Character transformedCharacter = createCharacter(CharacterType.Cub);
+
+        Character originCharacter = Character.transform(
+                transformedCharacter,
+                CharacterType.Bruiser,
+                TeamColor.Black
+        );
+
+        Position position = new Position(3, 3);
+
+        CharacterActionMotion motion = CharacterTransformUtils.createTransformMotion(
+                CharacterMotionType.Untransform,
+                transformedCharacter,
+                originCharacter,
+                position
+        );
+
+        assertEquals(CharacterMotionType.Untransform, motion.getMotionType());
+    }
+
+    @Test
+    public void createTransformMotion_shouldCreateExactlyTwoTargets() {
+        Character originCharacter = createCharacter(CharacterType.Bruiser);
+
+        Character transformedCharacter = Character.transform(
+                originCharacter,
+                CharacterType.Cub,
+                TeamColor.Black
+        );
+
+        CharacterActionMotion motion = CharacterTransformUtils.createTransformMotion(
+                CharacterMotionType.Transform,
+                originCharacter,
+                transformedCharacter,
+                new Position(3, 3)
+        );
+
+        assertEquals(2, motion.getTargets().size());
+    }
+
+    @Test
+    public void createTransformMotion_shouldSetCharactersInCorrectOrder() {
+        Character originCharacter = createCharacter(CharacterType.Bruiser);
+
+        Character transformedCharacter = Character.transform(
+                originCharacter,
+                CharacterType.Cub,
+                TeamColor.Black
+        );
+
+        CharacterActionMotion motion = CharacterTransformUtils.createTransformMotion(
+                CharacterMotionType.Transform,
+                originCharacter,
+                transformedCharacter,
+                new Position(3, 3)
+        );
+
+        assertSame(originCharacter, motion.getTargets().get(0).getCharacter());
+        assertSame(transformedCharacter, motion.getTargets().get(1).getCharacter());
+    }
+
+    @Test
+    public void createTransformMotion_shouldSetOriginAndDestinationPositionsCorrectly() {
+        Character originCharacter = createCharacter(CharacterType.Bruiser);
+
+        Character transformedCharacter = Character.transform(
+                originCharacter,
+                CharacterType.Cub,
+                TeamColor.Black
+        );
+
+        Position position = new Position(3, 3);
+
+        CharacterActionMotion motion = CharacterTransformUtils.createTransformMotion(
+                CharacterMotionType.Transform,
+                originCharacter,
+                transformedCharacter,
+                position
+        );
+
+        CharacterActionTarget originTarget = motion.getTargets().get(0);
+        CharacterActionTarget transformedTarget = motion.getTargets().get(1);
+
+        assertSame(position, originTarget.getOriginPos());
+        assertNull(originTarget.getDestPos());
+
+        assertNull(transformedTarget.getOriginPos());
+        assertSame(position, transformedTarget.getDestPos());
+    }
+
+    @Test
+    public void createTransformMotion_shouldUseSamePositionForBothTargets() {
+        Character originCharacter = createCharacter(CharacterType.Bruiser);
+
+        Character transformedCharacter = Character.transform(
+                originCharacter,
+                CharacterType.Cub,
+                TeamColor.Black
+        );
+
+        Position position = new Position(3, 3);
+
+        CharacterActionMotion motion = CharacterTransformUtils.createTransformMotion(
+                CharacterMotionType.Transform,
+                originCharacter,
+                transformedCharacter,
+                position
+        );
+
+        CharacterActionTarget originTarget = motion.getTargets().get(0);
+        CharacterActionTarget transformedTarget = motion.getTargets().get(1);
+
+        assertSame(originTarget.getOriginPos(), transformedTarget.getDestPos());
+    }
+
 }

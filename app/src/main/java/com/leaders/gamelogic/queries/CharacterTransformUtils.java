@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import com.leaders.gamelogic.actions.CharacterActionMotion;
 import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.entities.Character;
+import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.entities.TransformedState;
 import com.leaders.gamelogic.enums.CharacterMotionType;
 
@@ -80,5 +81,25 @@ public final class CharacterTransformUtils {
 
         List<CharacterActionTarget> targets = motion.getTargets();
         return new TransformedState(targets.get(0).getCharacter(), targets.get(1).getCharacter());
+    }
+
+    /**
+     * Creates a motion representing the transformation or untransformation of a character.
+     *
+     * @param motionType the type of motion
+     * @param originCharacter the character before the transformation
+     * @param transformedCharacter the character after the transformation
+     * @param characterPosition the position of the character
+     * @return the character action motion representing the transformation
+     */
+    @NonNull
+    public static CharacterActionMotion createTransformMotion(@NonNull CharacterMotionType motionType,
+                                                              @NonNull Character originCharacter,
+                                                              @NonNull Character transformedCharacter,
+                                                              @NonNull Position characterPosition) {
+        return new CharacterActionMotion(motionType, List.of(
+                new CharacterActionTarget(originCharacter, characterPosition, null),
+                new CharacterActionTarget(transformedCharacter, null, characterPosition)
+        ));
     }
 }

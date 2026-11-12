@@ -1,6 +1,7 @@
 package com.leaders.gamelogic.queries;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.actions.CharacterActionMotion;
@@ -16,13 +17,17 @@ import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.entities.TransformedState;
 import com.leaders.gamelogic.enums.AbilityType;
 import com.leaders.gamelogic.enums.CharacterCard;
+import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.GamePhaseType;
 import com.leaders.gamelogic.historyentries.IPhase;
 import com.leaders.gamelogic.historyentries.segments.ActionsPhase;
+import com.leaders.gamelogic.historyentries.segments.Turn;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Centralizes read-only queries related to character abilities whose scope goes
@@ -370,7 +375,58 @@ public final class CharacterAbilityQuery {
         ).isEmpty();
     }
 
-    // TODO - handle frog auto-detransformation (use AutoPlayQuery ?)
+    /**
+     * Gets the transformed state of the character currently transformed into a Frog.
+     *
+     * @param game the game to search
+     * @return the transformed Frog state, or {@code null} if no transformed Frog exists
+     * @throws NullPointerException if a transformed state cannot be found for a character ID
+     * @throws IllegalStateException if more than one transformed Frog exists
+     */
+    @Nullable
+    public static TransformedState getExistingTransformedFrogState(@NonNull Game game) {
+        TransformedState transformedFrogState = null;
+
+        for (UUID characterId : game.getTransformedCharacterIds()) {
+            TransformedState transformedState = Objects.requireNonNull(
+                    game.getTransformedState(characterId),
+                    "No transformed character found matching id: " + characterId
+            );
+
+            if (transformedState.getCharacterAfter().getCharacterType() == CharacterType.Frog) {
+                if (transformedFrogState != null) {
+                    throw new IllegalStateException("There can be only one transformed frog on the board");
+                }
+                transformedFrogState = transformedState;
+            }
+        }
+
+        return transformedFrogState;
+    }
+
+    /**
+     * Checks whether a Frog transformation has ended during the given turn.
+     *
+     * @param turn the turn to check
+     * @param state the transformed state to check
+     * @return {@code true} if the character was not transformed into a Frog during
+     *         this turn's actions phase, otherwise {@code false}
+     */
+    public static boolean isFrogTransformationOver(@NonNull Turn turn,
+                                                   @NonNull TransformedState state) {
+        // We search for the character transformation action during this turn actions phase
+        ActionsPhase actionsPhase = (ActionsPhase) turn.getSubPhase(GamePhaseType.Actions);
+        for (CharacterAction action : actionsPhase.getCharacterActions()) {
+            for (CharacterActionMotion motion : action.getMotions()) {
+                if (motion.getMotionType() == CharacterMotionType.Transform &&
+                    state.getCharacterId().equals(motion.getTargets().get(0).getCharacter().getId())) {
+                    return false;
+                }
+            }
+        }
+        // A character transformed before a turn action phase is untransformed at this turn's end
+        return true;
+    }
 
     /**
      * Returns the paths the specified character can take using its normal movement.

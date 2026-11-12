@@ -2,6 +2,8 @@ package com.leaders.gamelogic.queries;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
@@ -20,6 +22,7 @@ import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.entities.Position;
+import com.leaders.gamelogic.entities.TransformedState;
 import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.Direction;
@@ -101,6 +104,47 @@ public class CharacterAbilityQueryTest {
         );
 
         Objects.requireNonNull(GameHistoryQuery.findCurrentPhase(history)).getActions().add(action);
+    }
+
+    private Turn createTurn() {
+        return new Turn(TeamColor.Black);
+    }
+
+    private ActionsPhase getActionsPhase(@NonNull Turn turn) {
+        return (ActionsPhase) turn.getSubPhase(GamePhaseType.Actions);
+    }
+
+    private CharacterAction createTransformAction(@NonNull Character source,
+                                                  @NonNull Character before,
+                                                  @NonNull Character after,
+                                                  @NonNull Position position) {
+        return new CharacterAction(
+                source,
+                List.of(new CharacterActionMotion(
+                        CharacterMotionType.Transform,
+                        List.of(
+                                new CharacterActionTarget(before, position, null),
+                                new CharacterActionTarget(after, null, position)
+                        )
+                ))
+        );
+    }
+
+    private CharacterAction createMoveAction(@NonNull Character source,
+                                             @NonNull Character target,
+                                             @NonNull Position origin,
+                                             @NonNull Position destination) {
+        return new CharacterAction(
+                source,
+                List.of(new CharacterActionMotion(
+                        CharacterMotionType.Move,
+                        List.of(new CharacterActionTarget(target, origin, destination))
+                ))
+        );
+    }
+
+    private TransformedState getTransformedState(@NonNull Game game, @NonNull Character before) {
+        return Objects.requireNonNull(game.getTransformedState(before.getId()));
     }
 
     private ActionsPhase createActionsPhase() {
@@ -828,6 +872,162 @@ public class CharacterAbilityQueryTest {
         Game game = createTestGame(board);
 
         assertTrue(CharacterAbilityQuery.canBeMovedByEnemyAbilities(game, character));
+    }
+
+    @Test
+    public void getExistingTransformedFrogState_shouldReturnNullWhenNoCharacterIsTransformed() {
+        Game game = createTestGame(new Board());
+
+        assertNull(CharacterAbilityQuery.getExistingTransformedFrogState(game));
+    }
+
+    @Test
+    public void getExistingTransformedFrogState_shouldReturnFrogState() {
+        Character hermit = createCharacter(CharacterType.Hermit, TeamColor.White);
+        Character frog = frogifyCharacter(hermit, TeamColor.White);
+        Game game = createTestGameWithTransformedState(new Board(), hermit, frog);
+
+        TransformedState state = CharacterAbilityQuery.getExistingTransformedFrogState(game);
+
+        assertNotNull(state);
+        assertEquals(hermit.getId(), state.getCharacterId());
+        assertEquals(CharacterType.Frog, state.getCharacterAfter().getCharacterType());
+        assertEquals(CharacterType.Hermit, state.getCharacterBefore().getCharacterType());
+    }
+
+    @Test
+    public void getExistingTransformedFrogState_shouldReturnNullWhenOnlyNonFrogTransformationExists() {
+        Character bruiser = createCharacter(CharacterType.Bruiser, TeamColor.Black);
+        Character cub = Character.transform(bruiser, CharacterType.Cub, TeamColor.Black);
+        Game game = createTestGameWithTransformedState(new Board(), bruiser, cub);
+
+        assertNull(CharacterAbilityQuery.getExistingTransformedFrogState(game));
+    }
+
+    @Test
+    public void getExistingTransformedFrogState_shouldIgnoreNonFrogTransformationsWhenFrogExists() {
+        Character bruiser = createCharacter(CharacterType.Bruiser, TeamColor.Black);
+        Character cub = Character.transform(bruiser, CharacterType.Cub, TeamColor.Black);
+        Character hermit = createCharacter(CharacterType.Hermit, TeamColor.White);
+        Character frog = frogifyCharacter(hermit, TeamColor.White);
+
+        Game game = createTestGame(new Board());
+        game.addTransformedState(bruiser, cub);
+        game.addTransformedState(hermit, frog);
+
+        TransformedState state = CharacterAbilityQuery.getExistingTransformedFrogState(game);
+
+        assertNotNull(state);
+        assertEquals(hermit.getId(), state.getCharacterId());
+    }
+
+    @Test
+    public void getExistingTransformedFrogState_shouldThrowWhenMultipleFrogsExist() {
+        Character hermit = createCharacter(CharacterType.Hermit, TeamColor.White);
+        Character acrobat = createCharacter(CharacterType.Acrobat, TeamColor.White);
+
+        Game game = createTestGame(new Board());
+        game.addTransformedState(hermit, frogifyCharacter(hermit, TeamColor.White));
+        game.addTransformedState(acrobat, frogifyCharacter(acrobat, TeamColor.White));
+
+        assertThrows(IllegalStateException.class, () ->
+                CharacterAbilityQuery.getExistingTransformedFrogState(game));
+    }
+
+    @Test
+    public void isFrogTransformationOver_shouldReturnTrueWhenActionsPhaseIsEmpty() {
+        Character hermit = createCharacter(CharacterType.Hermit, TeamColor.White);
+        Character frog = frogifyCharacter(hermit, TeamColor.White);
+        Game game = createTestGameWithTransformedState(new Board(), hermit, frog);
+
+        Turn turn = createTurn();
+
+        assertTrue(CharacterAbilityQuery.isFrogTransformationOver(turn, getTransformedState(game, hermit)));
+    }
+
+    @Test
+    public void isFrogTransformationOver_shouldReturnFalseWhenCharacterWasTransformedDuringTurn() {
+        Character shaman = createCharacter(CharacterType.Shaman, TeamColor.Black);
+        Character hermit = createCharacter(CharacterType.Hermit, TeamColor.White);
+        Character frog = frogifyCharacter(hermit, TeamColor.White);
+        Game game = createTestGameWithTransformedState(new Board(), hermit, frog);
+
+        Turn turn = createTurn();
+        getActionsPhase(turn).getActions().add(
+                createTransformAction(shaman, hermit, frog, new Position(3, 5)));
+
+        assertFalse(CharacterAbilityQuery.isFrogTransformationOver(turn, getTransformedState(game, hermit)));
+    }
+
+    @Test
+    public void isFrogTransformationOver_shouldReturnTrueWhenAnotherCharacterWasTransformedDuringTurn() {
+        Character shaman = createCharacter(CharacterType.Shaman, TeamColor.Black);
+        Character hermit = createCharacter(CharacterType.Hermit, TeamColor.White);
+        Character frog = frogifyCharacter(hermit, TeamColor.White);
+        Character acrobat = createCharacter(CharacterType.Acrobat, TeamColor.White);
+        Character otherFrog = frogifyCharacter(acrobat, TeamColor.White);
+
+        Game game = createTestGameWithTransformedState(new Board(), hermit, frog);
+
+        // The Shaman transformed another character during this turn
+        Turn turn = createTurn();
+        getActionsPhase(turn).getActions().add(
+                createTransformAction(shaman, acrobat, otherFrog, new Position(3, 5)));
+
+        assertTrue(CharacterAbilityQuery.isFrogTransformationOver(turn, getTransformedState(game, hermit)));
+    }
+
+    @Test
+    public void isFrogTransformationOver_shouldReturnTrueWhenCharacterOnlyMovedDuringTurn() {
+        Character shaman = createCharacter(CharacterType.Shaman, TeamColor.Black);
+        Character hermit = createCharacter(CharacterType.Hermit, TeamColor.White);
+        Character frog = frogifyCharacter(hermit, TeamColor.White);
+        Game game = createTestGameWithTransformedState(new Board(), hermit, frog);
+
+        // The motion concerns the same character but is not a transformation
+        Turn turn = createTurn();
+        getActionsPhase(turn).getActions().add(
+                createMoveAction(shaman, frog, new Position(3, 5), new Position(3, 4)));
+
+        assertTrue(CharacterAbilityQuery.isFrogTransformationOver(turn, getTransformedState(game, hermit)));
+    }
+
+    @Test
+    public void isFrogTransformationOver_shouldReturnFalseWhenTransformationIsNotTheFirstAction() {
+        Character shaman = createCharacter(CharacterType.Shaman, TeamColor.Black);
+        Character acrobat = createCharacter(CharacterType.Acrobat, TeamColor.Black);
+        Character hermit = createCharacter(CharacterType.Hermit, TeamColor.White);
+        Character frog = frogifyCharacter(hermit, TeamColor.White);
+        Game game = createTestGameWithTransformedState(new Board(), hermit, frog);
+
+        Turn turn = createTurn();
+        ActionsPhase actionsPhase = getActionsPhase(turn);
+        actionsPhase.getActions().add(
+                createMoveAction(acrobat, acrobat, new Position(3, 3), new Position(3, 2)));
+        actionsPhase.getActions().add(
+                createTransformAction(shaman, hermit, frog, new Position(3, 5)));
+
+        assertFalse(CharacterAbilityQuery.isFrogTransformationOver(turn, getTransformedState(game, hermit)));
+    }
+
+    @Test
+    public void isFrogTransformationOver_shouldReturnTrueWhenTransformationWasDoneInPreviousTurn() {
+        Character hermit = createCharacter(CharacterType.Hermit, TeamColor.White);
+        Character frog = frogifyCharacter(hermit, TeamColor.White);
+        Game game = createTestGameWithTransformedState(new Board(), hermit, frog);
+
+        // The transformation was done in an earlier turn: the current turn has no matching action
+        Turn previousTurn = createTurn();
+        Turn currentTurn = createTurn();
+        getActionsPhase(previousTurn).getActions().add(
+                createTransformAction(
+                        createCharacter(CharacterType.Shaman, TeamColor.Black),
+                        hermit, frog, new Position(3, 5)));
+
+        TransformedState state = getTransformedState(game, hermit);
+
+        assertFalse(CharacterAbilityQuery.isFrogTransformationOver(previousTurn, state));
+        assertTrue(CharacterAbilityQuery.isFrogTransformationOver(currentTurn, state));
     }
 
     @Test

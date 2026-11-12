@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.leaders.gamelogic.actions.CharacterActionMotion;
-import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
@@ -22,13 +21,12 @@ import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.gamelogic.queries.CharacterAbilityQuery;
+import com.leaders.gamelogic.queries.CharacterTransformUtils;
 import com.leaders.gamelogic.resolvers.CharacterActionResolver;
 import com.leaders.gamelogic.resolvers.ResolverUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
 
 /**
  * Resolves the Shaman's active ability.
@@ -125,70 +123,27 @@ public class ShamanActionResolver extends CharacterActionResolver {
         List<CharacterActionMotion> motions = new ArrayList<>();
 
         // First we untransform any existing frog
-        for (TransformedState transformedFrogState : getExistingTransformedFrogStates()) {
-            motions.add(createTransformMotion(
+        TransformedState transformedFrogState = CharacterAbilityQuery.getExistingTransformedFrogState(game);
+        if (transformedFrogState != null) {
+            motions.add(CharacterTransformUtils.createTransformMotion(
                     CharacterMotionType.Untransform,
                     transformedFrogState.getCharacterAfter(),
                     transformedFrogState.getCharacterBefore(),
                     BoardQuery.getCellByCharacterId(
-                            game.getBoard(), transformedFrogState.getCharacterId()
-                    ).getPosition()
-            ));
+                            game.getBoard(), transformedFrogState.getCharacterId()).getPosition()
+                    )
+            );
         }
 
+        // Then we add the frog transformation motion
         Position targetPos = ResolverUtils.getChosenPosition(result);
         Character target = getCharacterAt(targetPos);
         Character transformedTarget = Character.transform(target, CharacterType.Frog, target.getTeamColor());
 
-        // Finally we add the frog transformation motion
-        motions.add(createTransformMotion(CharacterMotionType.Transform, target, transformedTarget, targetPos));
-
+        motions.add(CharacterTransformUtils.createTransformMotion(
+                CharacterMotionType.Transform, target, transformedTarget, targetPos
+        ));
 
         return InteractionFeedback.createForCharacterAction(motions);
-    }
-
-    /**
-     * Creates a motion representing the transformation or untransformation of a character.
-     *
-     * @param motionType the type of motion
-     * @param originCharacter the character before the transformation
-     * @param transformedCharacter the character after the transformation
-     * @param characterPosition the position of the character
-     * @return the character action motion representing the transformation
-     */
-    @NonNull
-    private CharacterActionMotion createTransformMotion(@NonNull CharacterMotionType motionType,
-                                                        @NonNull Character originCharacter,
-                                                        @NonNull Character transformedCharacter,
-                                                        @NonNull Position characterPosition) {
-        return new CharacterActionMotion(motionType,
-                List.of(new CharacterActionTarget(originCharacter, characterPosition, null),
-                        new CharacterActionTarget(transformedCharacter, null, characterPosition)
-                )
-        );
-    }
-
-    /**
-     * Gets the transformed states of characters currently transformed into Frogs.
-     *
-     * @return the list of transformed Frog states
-     * @throws NullPointerException if a transformed state cannot be found for a character ID
-     */
-    @NonNull
-    private List<TransformedState> getExistingTransformedFrogStates() {
-        List<TransformedState> transformedFrogStates = new ArrayList<>();
-
-        for (UUID characterId : game.getTransformedCharacterIds()) {
-            TransformedState transformedState = Objects.requireNonNull(
-                    game.getTransformedState(characterId),
-                    "No transformed character found matching id: " + characterId
-            );
-
-            if (transformedState.getCharacterAfter().getCharacterType() == CharacterType.Frog) {
-                transformedFrogStates.add(transformedState);
-            }
-        }
-
-        return transformedFrogStates;
     }
 }

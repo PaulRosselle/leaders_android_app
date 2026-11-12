@@ -408,8 +408,8 @@ public final  class CharacterCardUtils {
             case Vizier: return R.raw.character_demo_vizier;
             case Wanderer: return R.raw.character_demo_wanderer;
             case LeaderVermilion: return R.raw.character_demo_leader_vermilion;
-            case Shaman: return R.raw.character_demo_wisp; // TODO
-            case Frog: return R.raw.character_demo_wisp; // TODO
+            case Shaman: return R.raw.character_demo_shaman;
+            case Frog: return R.raw.character_demo_frog;
             case Sniper: return R.raw.character_demo_sniper;
             case Tactician: return R.raw.character_demo_tactician;
             case Wisp: return R.raw.character_demo_wisp;
