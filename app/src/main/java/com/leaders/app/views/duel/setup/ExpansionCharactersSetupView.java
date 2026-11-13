@@ -60,6 +60,7 @@ public class ExpansionCharactersSetupView extends ConstraintLayout {
         imvIcon = findViewById(R.id.imvIcon_vwExpansionCharactersSetup);
         txvTitle = findViewById(R.id.txvTitle_vwExpansionCharactersSetup);
         imvChecked = findViewById(R.id.imvChecked_vwExpansionCharactersSetup);
+        imvChecked.setOnClickListener(this::onCheckClick);
         llyPortraits = findViewById(R.id.llyPortraits_vwExpansionCharactersSetup);
     }
 
@@ -99,6 +100,7 @@ public class ExpansionCharactersSetupView extends ConstraintLayout {
                 .map(card -> getPortraitInfo(card, bannedCards.contains(card)))
                 .collect(Collectors.toList());
 
+        llyPortraits.removeAllViews();
         for (int start = 0; start < portraitInfos.size(); start += PORTRAITS_PER_GROUP) {
             int end = Math.min(start + PORTRAITS_PER_GROUP, portraitInfos.size());
 
@@ -107,10 +109,11 @@ public class ExpansionCharactersSetupView extends ConstraintLayout {
                 groupPortraitInfos.add(portraitInfos.get(groupIdx));
             }
 
-            llyPortraits.addView(
-                    new PortraitGroupView(getContext(), groupPortraitInfos, PORTRAITS_PER_GROUP),
-                    getPortraitGroupLayoutParams()
+            PortraitGroupView portraitGroupView = new PortraitGroupView(
+                    getContext(), groupPortraitInfos, PORTRAITS_PER_GROUP
             );
+            portraitGroupView.setPortraitsClickListener(this::onPortraitClick);
+            llyPortraits.addView(portraitGroupView, getPortraitGroupLayoutParams());
         }
     }
 

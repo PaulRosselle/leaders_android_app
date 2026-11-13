@@ -160,4 +160,29 @@
         app:strokeWidth="@dimen/default_stroke_width"
         tools:ignore="SpeakableTextPresentCheck" />
 
+    <View
+        android:id="@+id/vwDialogBg_actDuelSetup"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/transparent_black"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.leaders.app.views.duel.setup.CharactersSetupFormView
+        android:id="@+id/csfCharacters_actDuelSetup"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="@dimen/default_bottom_margin"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actDuelSetup" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

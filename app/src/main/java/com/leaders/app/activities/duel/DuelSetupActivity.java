@@ -6,6 +6,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
+import com.leaders.app.entities.CharactersSetup;
 import com.leaders.app.entities.LeadersApplication;
 import com.leaders.app.entities.PlayerSetup;
 import com.leaders.app.entities.Settings;
@@ -14,6 +15,7 @@ import com.leaders.app.enums.LeaderType;
 import com.leaders.app.utilities.DuelStartUtils;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.views.duel.PlayerSetupView;
+import com.leaders.app.views.duel.setup.CharactersSetupFormView;
 import com.leaders.app.views.duel.setup.FirstPlayerView;
 import com.leaders.app.views.duel.setup.GameModeView;
 import com.leaders.gamelogic.entities.GameHistory;
@@ -25,6 +27,7 @@ import org.json.JSONException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
@@ -139,7 +142,8 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
     }
 
     private void onStartGameClick(View v) {
-        Intent intent = ActivityType.DuelPlayer.getIntent(this);
+        showCharactersForm();
+        /*Intent intent = ActivityType.DuelPlayer.getIntent(this);
 
         List<PlayerSetup> playerSetups = new ArrayList<>();
         for (PlayerSetupView playerSetupView : List.of(psvFirst, psvSecond)) {
@@ -158,8 +162,17 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
             throw new RuntimeException(e);
         }
 
-        goToActivity(intent);
+        goToActivity(intent);*/
     }
 
     //endregion
+
+    // TODO - add region
+    private void showCharactersForm() {
+        // TODO - add transparent black background
+        findViewById(R.id.vwDialogBg_actDuelSetup).setVisibility(View.VISIBLE);
+        CharactersSetupFormView charactersForm = findViewById(R.id.csfCharacters_actDuelSetup);
+        charactersForm.setVisibility(View.VISIBLE);
+        charactersForm.applySetup(new CharactersSetup(new HashSet<>(), new HashSet<>()));
+    }
 }

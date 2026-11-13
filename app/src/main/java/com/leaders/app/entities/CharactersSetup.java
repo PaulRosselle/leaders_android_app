@@ -31,6 +31,10 @@ public class CharactersSetup {
         initAltSelections(existingAltSelections);
     }
 
+    public CharactersSetup(@NonNull CharactersSetup setup) {
+        this(Set.copyOf(setup.altCharacterSelections.values()), setup.bannedCharacters);
+    }
+
     private void initAltSelections(@NonNull Set<AltCharacterSelection> existingAltSelections) {
         for (AltCharacterSelection existingAltSelection : existingAltSelections) {
             this.altCharacterSelections.put(existingAltSelection.getCharacter(), existingAltSelection);
@@ -48,20 +52,26 @@ public class CharactersSetup {
         }
     }
 
-    public List<CharacterCard> getRemainingCharacters() {
-        List<CharacterCard> remainingCards = new ArrayList<>();
+    public List<CharacterCard> getRemainingCharacards() {
+        return getSelectedCharacters().stream()
+                .filter(card -> !bannedCharacters.contains(card))
+                .collect(Collectors.toList());
+    }
+
+    public List<CharacterCard> getSelectedCharacters() {
+        List<CharacterCard> selectedCards = new ArrayList<>();
 
         for (CharacterCard card : CharacterCard.values()) {
             if (canSetupCard(card)) {
-                remainingCards.add(getSelectedCard(card));
+                selectedCards.add(getSelectedCard(card));
             }
         }
 
-        return remainingCards;
+        return selectedCards;
     }
 
     public List<CharacterCard> getCharactersInExpansion(@NonNull CharacterExpansion expansion) {
-        return getRemainingCharacters().stream()
+        return getSelectedCharacters().stream()
                 .filter(card -> CharacterExpansion.getFromCard(card) == expansion)
                 .collect(Collectors.toList());
     }

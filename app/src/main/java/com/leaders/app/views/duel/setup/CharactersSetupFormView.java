@@ -3,6 +3,7 @@ package com.leaders.app.views.duel.setup;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,8 +20,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CharactersSetupFormView extends ConstraintLayout implements ExpansionCharactersSetupView.Listener {
-    private CharactersSetup setup;
+    private TextView txvSelected;
+    private TextView txvSave;
     private final List<ExpansionCharactersSetupView> expansionSetupViews = new ArrayList<>();
+
+    private CharactersSetup setup = null;
 
     public CharactersSetupFormView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -32,12 +36,14 @@ public class CharactersSetupFormView extends ConstraintLayout implements Expansi
     private void init(@NonNull Context context) {
         inflate(context, R.layout.view_characters_setup_form, this);
 
-        initExpansions(context);
+        txvSelected = findViewById(R.id.txvSelected_vwCharactersSetupForm);
+        txvSave = findViewById(R.id.txvSave_vwCharactersSetupForm);
+
+        LinearLayout llyCharacters = findViewById(R.id.llyCharacters_vwCharactersSetupForm);
+        initExpansions(context, llyCharacters);
     }
 
-    private void initExpansions(@NonNull Context context) {
-        LinearLayout llyExpansions = findViewById(R.id.llyExpansions_vwCharactersSetupForm);
-
+    private void initExpansions(@NonNull Context context, @NonNull LinearLayout llyExpansions) {
         for (CharacterExpansion expansion : CharacterExpansion.values()) {
             ExpansionCharactersSetupView expansionSetupView = new ExpansionCharactersSetupView(context);
 
@@ -45,19 +51,19 @@ public class CharactersSetupFormView extends ConstraintLayout implements Expansi
             expansionSetupView.setListener(this);
 
             expansionSetupViews.add(expansionSetupView);
-            llyExpansions.addView(expansionSetupView, getExpansionLayoutParams());
+            llyExpansions.addView(expansionSetupView, getCharactersLayoutParams());
         }
     }
 
     @NonNull
-    private LinearLayout.LayoutParams getExpansionLayoutParams() {
+    private LinearLayout.LayoutParams getCharactersLayoutParams() {
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                1
         );
 
-        layoutParams.topMargin = (int) (4 * getResources().getDisplayMetrics().density);
-        layoutParams.weight = 1;
+        layoutParams.bottomMargin = (int) (8 * getResources().getDisplayMetrics().density);
 
         return layoutParams;
     }
@@ -65,7 +71,55 @@ public class CharactersSetupFormView extends ConstraintLayout implements Expansi
     //endregion
 
     public void applySetup(@NonNull CharactersSetup setup) {
-        this.setup = setup;
+        this.setup = new CharactersSetup(setup);
+
+        updateExpansions();
+        // TODO - apply altSelection
+        updateSaveState();
+    }
+
+    public void updateSaveState() {
+        int remainingCharactersCount = setup.getRemainingCharacards().size();
+
+        boolean canSave = remainingCharactersCount >= CharactersSetup.CHARACTERS_START_COUNT;
+        int bansCount = remainingCharactersCount - CharactersSetup.CHARACTERS_START_COUNT;
+
+        Context context = getContext();
+        String textPrefix = String.format(
+                context.getString(R.string.x_selected_characters),
+                remainingCharactersCount
+        );
+        String selectedText;
+        switch (bansCount) {
+            case 1: {
+                selectedText = context.getString(R.string.one_auto_ban_required);
+            } break;
+            case 0: {
+                selectedText = "";
+            } break;
+            case -1: {
+                selectedText = context.getString(R.string.one_character_required);
+            } break;
+            default: {
+                selectedText = String.format(bansCount > 0 ?
+                                context.getString(R.string.x_auto_bans_required) :
+                                context.getString(R.string.x_characters_required),
+                        bansCount > 0 ? bansCount : -bansCount
+                );
+            } break;
+        }
+        txvSelected.setText(String.format("%s %s", textPrefix, selectedText).trim());
+
+        txvSave.setClickable(canSave);
+        txvSave.setTextColor(getContext().getColor(canSave ? R.color.app_golden : R.color.selected_golden));
+    }
+
+    //region EXPANSION METHODS
+
+    private void updateExpansions() {
+        if (setup == null) {
+            return;
+        }
 
         for (ExpansionCharactersSetupView expansionSetupView : expansionSetupViews) {
             expansionSetupView.update(
@@ -73,21 +127,27 @@ public class CharactersSetupFormView extends ConstraintLayout implements Expansi
                     setup.getBannedCharacters()
             );
         }
-
-        // TODO - apply altSelection
     }
-
-    //region EXPANSION METHODS
 
     @Override
     public void onPortraitClick(@NonNull CharacterCard card) {
-        if (setup.removeBannedCard(card)) {
+        if (setup == null) {
+            return;
+        }
+
+        if (!setup.removeBannedCard(card)) {
             setup.addBannedCard(card);
         }
+        updateExpansions();
+        updateSaveState();
     }
 
     @Override
     public void onExpansionClick(@NonNull CharacterExpansion expansion) {
+        if (setup == null) {
+            return;
+        }
+
         List<CharacterCard> expansionCards = setup.getCharactersInExpansion(expansion);
         Set<CharacterCard> bannedCards = setup.getBannedCharacters();
 
@@ -95,7 +155,7 @@ public class CharactersSetupFormView extends ConstraintLayout implements Expansi
                 .filter(bannedCards::contains)
                 .collect(Collectors.toList());
 
-        if (bannedExpansionCards.isEmpty()) {
+        if (bannedExpansionCards.size() < expansionCards.size()) {
             for (CharacterCard card : expansionCards) {
                 setup.addBannedCard(card);
             }
@@ -104,6 +164,8 @@ public class CharactersSetupFormView extends ConstraintLayout implements Expansi
                 setup.removeBannedCard(card);
             }
         }
+        updateExpansions();
+        updateSaveState();
     }
 
     //endregion

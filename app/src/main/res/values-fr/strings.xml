@@ -361,4 +361,9 @@
     <string name="card_sort_name_elite_archer">archère d\'élite</string>
     <string name="expansion_name_vermilion">Extension Vermillon</string>
     <string name="expansion_name_base_game">Jeu de base</string>
+    <string name="x_selected_characters">%d/16 personnages sélectionnés.</string>
+    <string name="one_auto_ban_required">Un ban automatique aura lieu en début de partie.</string>
+    <string name="one_character_required">Veuillez sélectionner un autre personnage.</string>
+    <string name="x_auto_bans_required">%d bans automatiques auront lieu en début de partie.</string>
+    <string name="x_characters_required">Veuillez sélectionner %d autres personnages.</string>
 </resources>
