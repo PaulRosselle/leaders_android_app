@@ -93,16 +93,16 @@ public class ShamanActionResolver extends CharacterActionResolver {
         List<Position> targets = new ArrayList<>();
 
         for (Cell targetCell : BoardQuery.findVisibleCharacterCells(
-                game.getBoard(), characterPos, null, null, true)) {
+                game.getBoard(), characterPos, null, null, false)) {
             if (!targetCell.getCharacter().getCharacterType().getCharacterCard().isLeader()) {
                 Position targetPos = targetCell.getPosition();
 
-                InteractionResult swapResult = ResolverUtils.createPositionResult(
+                InteractionResult transformResult = ResolverUtils.createPositionResult(
                         new InteractionContext(character),
                         TargetCategory.ActiveAbilityTargetPosition, targetPos
                 );
 
-                if (isValidWith(builder, swapResult, buildTransformFeedback(swapResult))) {
+                if (isValidWith(builder, transformResult, buildTransformFeedback(transformResult))) {
                     targets.add(targetPos);
                 }
             }
