@@ -164,7 +164,7 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
 
         GameHistory gameHistory = DuelStartUtils.getDefaultHistory(
                 playerSetups, fpvFirstPlayer.getTeam().getTeamColor(), gmvGameMode.getGameMode(),
-                DuelStartUtils.getDefaultRecruitableCards()
+                DuelStartUtils.getInitialCards(csvCharacters.getSetup(), random)
         );
 
         GameHistorySerializer serializer = new GameHistorySerializer();
@@ -178,8 +178,6 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
     }
 
     //endregion
-
-    // TODO - add region
 
     //region CHARACTERS SETUP
 
