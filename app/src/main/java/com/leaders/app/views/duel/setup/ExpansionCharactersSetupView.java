@@ -24,6 +24,7 @@ import com.leaders.gamelogic.enums.CharacterCard;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ExpansionCharactersSetupView extends ConstraintLayout {
@@ -66,9 +67,7 @@ public class ExpansionCharactersSetupView extends ConstraintLayout {
         return expansion;
     }
 
-    public void setExpansion(@NonNull CharacterExpansion expansion,
-                             @NonNull List<CharacterCard> expansionCards,
-                             @NonNull List<CharacterCard> bannedCards) {
+    public void setExpansion(@NonNull CharacterExpansion expansion) {
         this.expansion = expansion;
 
         // ICON
@@ -76,20 +75,25 @@ public class ExpansionCharactersSetupView extends ConstraintLayout {
         imvIcon.setImageTintList(ContextCompat.getColorStateList(getContext(), expansion.getColor()));
         // TITLE
         txvTitle.setText(expansion.getTitle());
-        // CHARACTERS
+    }
+
+    public void update(@NonNull List<CharacterCard> expansionCards,
+                       @NonNull Set<CharacterCard> bannedCards) {
         updatePortraits(expansionCards, bannedCards);
+        updateCheckedState(expansionCards, bannedCards);
     }
 
     private void updateCheckedState(@NonNull List<CharacterCard> expansionCards,
-                                    @NonNull List<CharacterCard> bannedCards) {
-        boolean hasSelectedCharacter = expansionCards.stream()
-                .anyMatch(card -> !bannedCards.contains(card));
+                                    @NonNull Set<CharacterCard> bannedCards) {
+        boolean hasSelectedCharacter = expansionCards.stream().anyMatch(
+                card -> !bannedCards.contains(card)
+        );
 
         imvChecked.setImageResource(hasSelectedCharacter ? R.drawable.checked_box : R.drawable.unchecked_box);
     }
 
     private void updatePortraits(@NonNull List<CharacterCard> expansionCards,
-                                 @NonNull List<CharacterCard> bannedCards) {
+                                 @NonNull Set<CharacterCard> bannedCards) {
         List<PortraitInfo> portraitInfos = expansionCards.stream()
                 .sorted(CharacterCardUtils.getByAbilityThenByNameComparator(getContext()))
                 .map(card -> getPortraitInfo(card, bannedCards.contains(card)))

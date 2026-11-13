@@ -98,12 +98,12 @@ public class CharactersSetup {
         getNonNullAltSelection(altCharacter).setSelectedAlternative(null);
     }
 
-    public void addBannedCard(@NonNull CharacterCard card) {
-        bannedCharacters.add(card);
+    public boolean addBannedCard(@NonNull CharacterCard card) {
+        return bannedCharacters.add(card);
     }
 
-    public void removeBannedCard(@NonNull CharacterCard card) {
-        bannedCharacters.remove(card);
+    public boolean removeBannedCard(@NonNull CharacterCard card) {
+        return bannedCharacters.remove(card);
     }
 
     @NonNull
