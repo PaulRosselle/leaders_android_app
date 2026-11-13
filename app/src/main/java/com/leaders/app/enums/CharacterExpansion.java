@@ -3,6 +3,7 @@ package com.leaders.app.enums;
 import androidx.annotation.ColorRes;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
 
 import com.leaders.R;
 import com.leaders.gamelogic.enums.CharacterCard;
@@ -26,6 +27,15 @@ public enum CharacterExpansion {
             case BASE_GAME: return R.drawable.icon_expansion_base_game;
             case VERMILION: return R.drawable.icon_expansion_vermilion;
             default: throw new IllegalStateException("No icon found matching expansion: " + this);
+        }
+    }
+
+    @StringRes
+    public int getTitle() {
+        switch (this) {
+            case BASE_GAME: return R.string.expansion_name_base_game;
+            case VERMILION: return R.string.expansion_name_vermilion;
+            default: throw new IllegalStateException("No title found matching expansion: " + this);
         }
     }
 

@@ -359,4 +359,6 @@
     <string name="card_formatted_name_frog">grenouille</string>
     <string name="card_description_frog">Se déplace jusqu\'à deux cases. Peut traverser une case occupée par un personnage. Ne participe pas à la capture du leader adverse.</string>
     <string name="card_sort_name_elite_archer">archère d\'élite</string>
+    <string name="expansion_name_vermilion">Extension Vermillon</string>
+    <string name="expansion_name_base_game">Jeu de base</string>
 </resources>

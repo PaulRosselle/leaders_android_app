@@ -13,14 +13,14 @@
         android:layout_height="0dp"
         android:cropToPadding="true"
         android:importantForAccessibility="no"
-        android:tint="@color/background"
         app:layout_constraintBottom_toBottomOf="@+id/imvIcon_vwExpansionCharactersSetup"
         app:layout_constraintEnd_toEndOf="@+id/imvIcon_vwExpansionCharactersSetup"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/imvIcon_vwExpansionCharactersSetup"
         app:layout_constraintTop_toTopOf="@+id/imvIcon_vwExpansionCharactersSetup"
         app:layout_constraintVertical_bias="0.0"
-        app:srcCompat="@drawable/round_rect" />
+        app:srcCompat="@drawable/round_rect"
+        app:tint="@color/background" />
 
     <ImageView
         android:id="@+id/imvIcon_vwExpansionCharactersSetup"
@@ -59,6 +59,21 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/imvIcon_vwExpansionCharactersSetup"
         app:layout_constraintTop_toTopOf="@+id/imvIcon_vwExpansionCharactersSetup" />
+
+    <ImageView
+        android:id="@+id/imvChecked_vwExpansionCharactersSetup"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginEnd="8dp"
+        android:contentDescription="@string/checkbox"
+        android:padding="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/imvIconBackground_vwExpansionCharactersSetup"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/imvIconBackground_vwExpansionCharactersSetup"
+        app:srcCompat="@drawable/unchecked_box"
+        app:tint="@color/white" />
 
     <LinearLayout
         android:id="@+id/llyPortraits_vwExpansionCharactersSetup"

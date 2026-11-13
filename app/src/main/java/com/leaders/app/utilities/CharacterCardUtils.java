@@ -476,11 +476,13 @@ public final class CharacterCardUtils {
     }
 
     public static void sort(@NonNull Context context, @NonNull List<CharacterCard> characterCards) {
+        characterCards.sort(getByAbilityThenByNameComparator(context));
+    }
+
+    public static Comparator<CharacterCard> getByAbilityThenByNameComparator(@NonNull Context context) {
         Resources res = context.getResources();
-        characterCards.sort(
-                Comparator.comparingInt(o -> getAbilitySortValue((CharacterCard) o))
-                        .thenComparing(o -> res.getString(getSortNameId((CharacterCard) o)))
-        );
+        return Comparator.comparingInt(CharacterCardUtils::getAbilitySortValue)
+                .thenComparing(card -> res.getString(getSortNameId(card)));
     }
 
     //endregion

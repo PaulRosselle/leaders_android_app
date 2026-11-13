@@ -9,18 +9,18 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.leaders.R;
 
-public class AlternativeCharactersSetupView  extends ConstraintLayout {
-    public AlternativeCharactersSetupView(@NonNull Context context) {
+public class AltCharacterSelectionView extends ConstraintLayout {
+    public AltCharacterSelectionView(@NonNull Context context) {
         super(context);
         init(context);
     }
 
-    public AlternativeCharactersSetupView(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public AltCharacterSelectionView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
 
     private void init(@NonNull Context context) {
-        inflate(context, R.layout.view_expansion_characters_setup, this);
+        inflate(context, R.layout.view_alt_character_selection, this);
     }
 }

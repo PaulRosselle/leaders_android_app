@@ -366,4 +366,7 @@
     <string name="card_formatted_name_frog">frog</string>
     <string name="card_description_frog">Moves up to two spaces. May pass through a space occupied by another character. Cannot help capture the opponent\'s leader.</string>
     <string name="card_sort_name_elite_archer">archer - elite</string>
+
+    <string name="expansion_name_vermilion">Vermilion expansion</string>
+    <string name="expansion_name_base_game">Base game</string>
 </resources>
