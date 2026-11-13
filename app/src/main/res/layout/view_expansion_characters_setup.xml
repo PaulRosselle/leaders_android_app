@@ -8,21 +8,6 @@
     tools:ignore="SpUsage">
 
     <ImageView
-        android:id="@+id/imvIconBackground_vwExpansionCharactersSetup"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:cropToPadding="true"
-        android:importantForAccessibility="no"
-        app:layout_constraintBottom_toBottomOf="@+id/imvIcon_vwExpansionCharactersSetup"
-        app:layout_constraintEnd_toEndOf="@+id/imvIcon_vwExpansionCharactersSetup"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/imvIcon_vwExpansionCharactersSetup"
-        app:layout_constraintTop_toTopOf="@+id/imvIcon_vwExpansionCharactersSetup"
-        app:layout_constraintVertical_bias="0.0"
-        app:srcCompat="@drawable/round_rect"
-        app:tint="@color/transparent_golden" />
-
-    <ImageView
         android:id="@+id/imvIcon_vwExpansionCharactersSetup"
         android:layout_width="wrap_content"
         android:layout_height="32dp"
@@ -67,11 +52,11 @@
         android:layout_marginEnd="8dp"
         android:contentDescription="@string/checkbox"
         android:padding="5dp"
-        app:layout_constraintBottom_toBottomOf="@+id/imvIconBackground_vwExpansionCharactersSetup"
+        app:layout_constraintBottom_toBottomOf="@+id/imvIcon_vwExpansionCharactersSetup"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/imvIconBackground_vwExpansionCharactersSetup"
+        app:layout_constraintTop_toTopOf="@+id/imvIcon_vwExpansionCharactersSetup"
         app:srcCompat="@drawable/unchecked_box"
         app:tint="@color/white" />
 

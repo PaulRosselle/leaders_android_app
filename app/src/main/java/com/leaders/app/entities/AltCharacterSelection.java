@@ -31,7 +31,7 @@ public class AltCharacterSelection {
 
     public void setSelectedAlternative(@Nullable CharacterCard selectedAlternative) {
         if (selectedAlternative != null &&
-                CharacterCardUtils.getBaseCharacter(selectedAlternative) != selectedAlternative) {
+                CharacterCardUtils.getBaseCharacter(selectedAlternative) != character) {
             throw new IllegalArgumentException(selectedAlternative + " is not a valid alternative for " + character);
         }
 

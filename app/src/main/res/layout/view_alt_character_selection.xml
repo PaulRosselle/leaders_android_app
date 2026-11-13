@@ -4,40 +4,38 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/round_rect"
-    android:backgroundTint="@color/ultra_dark_background">
+    android:background="@drawable/round_rect_stroke"
+    android:backgroundTint="@color/darker_font">
 
     <com.leaders.app.views.portrait.PortraitView
-        android:id="@+id/portraitView"
+        android:id="@+id/ptvBase_vwAltCharacterSelection"
         android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginBottom="1dp"
         app:displayMode="Hexagonal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/card_hex_portrait_archer" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.leaders.app.views.portrait.PortraitView
-        android:id="@+id/portraitView2"
+        android:id="@+id/ptvAlt_vwAltCharacterSelection"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="16dp"
         app:displayMode="Hexagonal"
-        app:layout_constraintBottom_toBottomOf="@+id/portraitView"
-        app:layout_constraintEnd_toStartOf="@+id/switch1"
+        app:layout_constraintBottom_toBottomOf="@+id/ptvBase_vwAltCharacterSelection"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/imageView"
-        app:layout_constraintTop_toTopOf="@+id/portraitView"
-        app:srcCompat="@drawable/card_hex_portrait_archer" />
+        app:layout_constraintStart_toEndOf="@+id/imvArrow_vwAltCharacterSelection"
+        app:layout_constraintTop_toTopOf="@+id/ptvBase_vwAltCharacterSelection" />
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/imvArrow_vwAltCharacterSelection"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
@@ -45,18 +43,18 @@
         android:layout_marginBottom="8dp"
         android:adjustViewBounds="true"
         android:rotation="180"
-        app:layout_constraintBottom_toBottomOf="@+id/portraitView"
-        app:layout_constraintEnd_toStartOf="@+id/switch1"
+        app:layout_constraintBottom_toBottomOf="@+id/ptvBase_vwAltCharacterSelection"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/portraitView"
-        app:layout_constraintTop_toTopOf="@+id/portraitView"
+        app:layout_constraintStart_toEndOf="@+id/ptvBase_vwAltCharacterSelection"
+        app:layout_constraintTop_toTopOf="@+id/ptvBase_vwAltCharacterSelection"
         app:srcCompat="@drawable/icon_back"
         app:tint="@color/font" />
 
     <Switch
-        android:id="@+id/switch1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/swtAlt_vwAltCharacterSelection"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:checked="true"
         android:padding="16dp"
         android:thumb="@drawable/seekbar_thumb"
@@ -66,5 +64,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="UseSwitchCompatOrMaterialXml" />
 </androidx.constraintlayout.widget.ConstraintLayout>

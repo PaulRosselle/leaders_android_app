@@ -23,6 +23,7 @@ public class CharactersSetupFormView extends ConstraintLayout implements Expansi
     private TextView txvSelected;
     private TextView txvSave;
     private final List<ExpansionCharactersSetupView> expansionSetupViews = new ArrayList<>();
+    private AltCharactersSetupView altCharactersSetupView;
 
     private CharactersSetup setup = null;
 
@@ -41,6 +42,7 @@ public class CharactersSetupFormView extends ConstraintLayout implements Expansi
 
         LinearLayout llyCharacters = findViewById(R.id.llyCharacters_vwCharactersSetupForm);
         initExpansions(context, llyCharacters);
+        initAltSelections(context, llyCharacters);
     }
 
     private void initExpansions(@NonNull Context context, @NonNull LinearLayout llyExpansions) {
@@ -51,19 +53,25 @@ public class CharactersSetupFormView extends ConstraintLayout implements Expansi
             expansionSetupView.setListener(this);
 
             expansionSetupViews.add(expansionSetupView);
-            llyExpansions.addView(expansionSetupView, getCharactersLayoutParams());
+            llyExpansions.addView(expansionSetupView, getCharactersLayoutParams(8));
         }
     }
 
+    private void initAltSelections(@NonNull Context context, @NonNull LinearLayout llyCharacters) {
+        altCharactersSetupView = new AltCharactersSetupView(context);
+        altCharactersSetupView.setSelectionListener(this::onCheckedChange);
+        llyCharacters.addView(altCharactersSetupView, getCharactersLayoutParams(0));
+    }
+
     @NonNull
-    private LinearLayout.LayoutParams getCharactersLayoutParams() {
+    private LinearLayout.LayoutParams getCharactersLayoutParams(int bottomMargin) {
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 1
         );
 
-        layoutParams.bottomMargin = (int) (8 * getResources().getDisplayMetrics().density);
+        layoutParams.bottomMargin = (int) (bottomMargin * getResources().getDisplayMetrics().density);
 
         return layoutParams;
     }
@@ -73,9 +81,8 @@ public class CharactersSetupFormView extends ConstraintLayout implements Expansi
     public void applySetup(@NonNull CharactersSetup setup) {
         this.setup = new CharactersSetup(setup);
 
+        updateAltSelections();
         updateExpansions();
-        // TODO - apply altSelection
-        updateSaveState();
     }
 
     public void updateSaveState() {
@@ -127,6 +134,8 @@ public class CharactersSetupFormView extends ConstraintLayout implements Expansi
                     setup.getBannedCharacters()
             );
         }
+
+        updateSaveState();
     }
 
     @Override
@@ -139,7 +148,6 @@ public class CharactersSetupFormView extends ConstraintLayout implements Expansi
             setup.addBannedCard(card);
         }
         updateExpansions();
-        updateSaveState();
     }
 
     @Override
@@ -165,8 +173,27 @@ public class CharactersSetupFormView extends ConstraintLayout implements Expansi
             }
         }
         updateExpansions();
-        updateSaveState();
     }
 
     //endregion
+
+    //region ALTERNATIVE CHARACTERS
+
+    private void updateAltSelections() {
+        altCharactersSetupView.applySetup(setup);
+    }
+
+    private void onCheckedChange(@NonNull CharacterCard altCard,
+                                 boolean useAltCard) {
+        if (useAltCard) {
+            setup.selectAlt(altCard);
+        } else {
+            setup.unselectAlt(altCard);
+        }
+        updateExpansions();
+    }
+
+    //endregion
+
+    // TODO - onPortraitLongClick
 }

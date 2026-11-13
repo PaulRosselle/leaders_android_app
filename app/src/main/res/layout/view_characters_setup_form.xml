@@ -12,7 +12,7 @@
         android:id="@+id/txvTitle_vwCharactersSetupForm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:fontFamily="@font/bourbon_regular"
         android:text="personnages pour cette partie"
         android:textColor="@color/app_golden"
@@ -28,7 +28,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:scrollbarSize="3dp"
@@ -42,10 +42,6 @@
             android:id="@+id/llyCharacters_vwCharactersSetupForm"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
             android:orientation="vertical">
 
         </LinearLayout>

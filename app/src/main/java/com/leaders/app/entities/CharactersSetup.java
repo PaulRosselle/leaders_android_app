@@ -93,7 +93,7 @@ public class CharactersSetup {
     }
 
     @NonNull
-    private AltCharacterSelection getNonNullAltSelection(@NonNull CharacterCard altCharacter) {
+    public AltCharacterSelection getNonNullAltSelection(@NonNull CharacterCard altCharacter) {
         return Objects.requireNonNull(
                 altCharacterSelections.get(CharacterCardUtils.getBaseCharacter(altCharacter)),
                 "No alternative character selection found for " + altCharacter

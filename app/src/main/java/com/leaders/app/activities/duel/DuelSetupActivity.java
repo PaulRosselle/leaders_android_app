@@ -104,7 +104,7 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
 
     @Override
     protected boolean overrideOnBackPressed() {
-        return false;
+        return true;
     }
 
     @Override
