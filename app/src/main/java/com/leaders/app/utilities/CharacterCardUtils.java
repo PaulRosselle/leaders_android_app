@@ -5,6 +5,7 @@ import android.content.res.Resources;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RawRes;
 import androidx.annotation.StringRes;
 
@@ -17,10 +18,41 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public final  class CharacterCardUtils {
+public final class CharacterCardUtils {
     private CharacterCardUtils(){
         throw new AssertionError("Cannot instantiate utility class");
     }
+
+
+    //region ALTERNATIVE CHARACTERS
+
+    @Nullable
+    public static CharacterCard getBaseCharacter(@NonNull CharacterCard characterCard) {
+        if (characterCard == CharacterCard.EliteArcher) {
+            return CharacterCard.Archer;
+        }
+        return null;
+    }
+
+    public static boolean isAlternativeCharacter(@NonNull CharacterCard characterCard) {
+        return getBaseCharacter(characterCard) != null;
+    }
+
+    @Nullable
+    public static CharacterCard getAlternativeCharacter(@NonNull CharacterCard characterCard) {
+        for (CharacterCard card : CharacterCard.values()) {
+            if (getBaseCharacter(card) == characterCard) {
+                return card;
+            }
+        }
+        return null;
+    }
+
+    public static boolean hasAlternativeCharacter(@NonNull CharacterCard characterCard) {
+        return getAlternativeCharacter(characterCard) != null;
+    }
+
+    //endregion
 
     //region NAME METHODS
 
@@ -444,11 +476,13 @@ public final  class CharacterCardUtils {
     }
 
     public static void sort(@NonNull Context context, @NonNull List<CharacterCard> characterCards) {
+        characterCards.sort(getByAbilityThenByNameComparator(context));
+    }
+
+    public static Comparator<CharacterCard> getByAbilityThenByNameComparator(@NonNull Context context) {
         Resources res = context.getResources();
-        characterCards.sort(
-                Comparator.comparingInt(o -> getAbilitySortValue((CharacterCard) o))
-                        .thenComparing(o -> res.getString(getSortNameId((CharacterCard) o)))
-        );
+        return Comparator.comparingInt(CharacterCardUtils::getAbilitySortValue)
+                .thenComparing(card -> res.getString(getSortNameId(card)));
     }
 
     //endregion

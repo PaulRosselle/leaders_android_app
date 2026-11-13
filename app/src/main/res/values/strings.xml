@@ -366,4 +366,14 @@
     <string name="card_formatted_name_frog">frog</string>
     <string name="card_description_frog">Moves up to two spaces. May pass through a space occupied by another character. Cannot help capture the opponent\'s leader.</string>
     <string name="card_sort_name_elite_archer">archer - elite</string>
+    <string name="expansion_name_vermilion">Vermilion expansion</string>
+    <string name="expansion_name_base_game">Base game</string>
+    <string name="x_selected_characters">%d/16 selected characters</string>
+    <string name="one_auto_ban_required">An automatic ban will occur at match start</string>
+    <string name="one_character_required">Please select one more character</string>
+    <string name="x_auto_bans_required">%d automatic bans will occur at match start</string>
+    <string name="x_characters_required">Please select %d more characters</string>
+    <string name="alternate_characters">Alternate characters</string>
+    <string name="current_game_characters">Current game characters</string>
+    <string name="characters_game_info">A game always starts with 16 characters</string>
 </resources>
