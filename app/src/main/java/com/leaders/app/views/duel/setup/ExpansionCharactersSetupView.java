@@ -125,11 +125,11 @@ public class ExpansionCharactersSetupView extends ConstraintLayout {
     private LinearLayout.LayoutParams getPortraitGroupLayoutParams() {
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                1
         );
 
         layoutParams.topMargin = (int) (4 * getResources().getDisplayMetrics().density);
-        layoutParams.weight = 1;
 
         return layoutParams;
     }

@@ -16,7 +16,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CharactersSetup {
-    public final static int CHARACTERS_START_COUNT = 16;
 
     @NonNull
     private final Map<CharacterCard, AltCharacterSelection> altCharacterSelections;
@@ -37,22 +36,24 @@ public class CharactersSetup {
 
     private void initAltSelections(@NonNull Set<AltCharacterSelection> existingAltSelections) {
         for (AltCharacterSelection existingAltSelection : existingAltSelections) {
-            this.altCharacterSelections.put(existingAltSelection.getCharacter(), existingAltSelection);
+            this.altCharacterSelections.put(
+                    existingAltSelection.getCharacter(),
+                    new AltCharacterSelection(
+                            existingAltSelection.getCharacter(),
+                            existingAltSelection.getSelectedAlternative()
+                    )
+            );
         }
 
         for (CharacterCard card : CharacterCard.values()) {
-            if (altCharacterSelections.containsKey(card)) {
-                continue;
-            }
-
             CharacterCard baseCard = CharacterCardUtils.getBaseCharacter(card);
-            if (baseCard != null) {
+            if (baseCard != null && !altCharacterSelections.containsKey(baseCard)) {
                 altCharacterSelections.put(baseCard, new AltCharacterSelection(baseCard, null));
             }
         }
     }
 
-    public List<CharacterCard> getRemainingCharacards() {
+    public List<CharacterCard> getRemainingCharacters() {
         return getSelectedCharacters().stream()
                 .filter(card -> !bannedCharacters.contains(card))
                 .collect(Collectors.toList());

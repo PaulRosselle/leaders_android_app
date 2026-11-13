@@ -1,7 +1,10 @@
 package com.leaders.app.utilities;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 
+import com.leaders.R;
 import com.leaders.app.entities.PlayerSetup;
 import com.leaders.gamelogic.actions.RecruitmentAction;
 import com.leaders.gamelogic.actions.RecruitmentActionMotion;
@@ -20,6 +23,8 @@ import java.util.Collections;
 import java.util.List;
 
 public final class DuelStartUtils {
+    public final static int CHARACTERS_START_COUNT = 16;
+
     private DuelStartUtils(){
         throw new AssertionError("Cannot instantiate utility class");
     }
@@ -80,5 +85,19 @@ public final class DuelStartUtils {
         }
 
         return characterCards;
+    }
+
+    @NonNull
+    public static String getCharactersInfo(@NonNull Context context, int bansCount) {
+        switch (bansCount) {
+            case 1: return context.getString(R.string.one_auto_ban_required);
+            case 0: return "";
+            case -1: return context.getString(R.string.one_character_required);
+            default: return String.format(bansCount > 0 ?
+                            context.getString(R.string.x_auto_bans_required) :
+                            context.getString(R.string.x_characters_required),
+                    bansCount > 0 ? bansCount : -bansCount
+            );
+        }
     }
 }

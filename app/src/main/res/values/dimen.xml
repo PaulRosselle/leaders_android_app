@@ -43,5 +43,8 @@
     <dimen name="puzzle_rules_text_font_size">18dp</dimen>
     <dimen name="image_span_default_size">20dp</dimen>
 
+    <dimen name="characters_edit_icon_size">24dp</dimen>
+    <dimen name="characters_edit_icon_margin">4dp</dimen>
+
     <dimen name="highlighted_token" format="float">0.87</dimen>
 </resources>

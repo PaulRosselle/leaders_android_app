@@ -61,6 +61,7 @@ public class AltCharacterSelectionView extends ConstraintLayout {
 
     public void setChecked(boolean checked) {
         swtAlt.setChecked(checked);
+        swtAlt.jumpDrawablesToCurrentState();
     }
 
     private void onCheckedChanged(@NonNull CompoundButton compoundButton, boolean checked) {

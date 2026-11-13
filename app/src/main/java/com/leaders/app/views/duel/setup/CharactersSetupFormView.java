@@ -2,6 +2,7 @@ package com.leaders.app.views.duel.setup;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -12,6 +13,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.leaders.R;
 import com.leaders.app.entities.CharactersSetup;
 import com.leaders.app.enums.CharacterExpansion;
+import com.leaders.app.utilities.DuelStartUtils;
 import com.leaders.gamelogic.enums.CharacterCard;
 
 import java.util.ArrayList;
@@ -20,12 +22,20 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CharactersSetupFormView extends ConstraintLayout implements ExpansionCharactersSetupView.Listener {
+    public interface Listener {
+        void onSaveCharactersSetup(@NonNull CharactersSetup setup);
+        void onCancelCharactersSetupChange();
+    }
+
+
     private TextView txvSelected;
     private TextView txvSave;
     private final List<ExpansionCharactersSetupView> expansionSetupViews = new ArrayList<>();
     private AltCharactersSetupView altCharactersSetupView;
 
     private CharactersSetup setup = null;
+
+    private Listener listener;
 
     public CharactersSetupFormView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -39,6 +49,9 @@ public class CharactersSetupFormView extends ConstraintLayout implements Expansi
 
         txvSelected = findViewById(R.id.txvSelected_vwCharactersSetupForm);
         txvSave = findViewById(R.id.txvSave_vwCharactersSetupForm);
+
+        findViewById(R.id.txvSave_vwCharactersSetupForm).setOnClickListener(this::onSaveClick);
+        findViewById(R.id.txvCancel_vwCharactersSetupForm).setOnClickListener(this::onCancelClick);
 
         LinearLayout llyCharacters = findViewById(R.id.llyCharacters_vwCharactersSetupForm);
         initExpansions(context, llyCharacters);
@@ -86,36 +99,22 @@ public class CharactersSetupFormView extends ConstraintLayout implements Expansi
     }
 
     public void updateSaveState() {
-        int remainingCharactersCount = setup.getRemainingCharacards().size();
+        int remainingCharactersCount = setup.getRemainingCharacters().size();
 
-        boolean canSave = remainingCharactersCount >= CharactersSetup.CHARACTERS_START_COUNT;
-        int bansCount = remainingCharactersCount - CharactersSetup.CHARACTERS_START_COUNT;
+        boolean canSave = remainingCharactersCount >= DuelStartUtils.CHARACTERS_START_COUNT;
+        int bansCount = remainingCharactersCount - DuelStartUtils.CHARACTERS_START_COUNT;
 
         Context context = getContext();
         String textPrefix = String.format(
                 context.getString(R.string.x_selected_characters),
                 remainingCharactersCount
         );
-        String selectedText;
-        switch (bansCount) {
-            case 1: {
-                selectedText = context.getString(R.string.one_auto_ban_required);
-            } break;
-            case 0: {
-                selectedText = "";
-            } break;
-            case -1: {
-                selectedText = context.getString(R.string.one_character_required);
-            } break;
-            default: {
-                selectedText = String.format(bansCount > 0 ?
-                                context.getString(R.string.x_auto_bans_required) :
-                                context.getString(R.string.x_characters_required),
-                        bansCount > 0 ? bansCount : -bansCount
-                );
-            } break;
-        }
-        txvSelected.setText(String.format("%s %s", textPrefix, selectedText).trim());
+        String selectedText = DuelStartUtils.getCharactersInfo(getContext(), bansCount);
+
+        txvSelected.setText(String.format(
+                selectedText.isEmpty() ? "%s." : "%s. %s.",
+                textPrefix, selectedText
+        ));
 
         txvSave.setClickable(canSave);
         txvSave.setTextColor(getContext().getColor(canSave ? R.color.app_golden : R.color.selected_golden));
@@ -194,6 +193,23 @@ public class CharactersSetupFormView extends ConstraintLayout implements Expansi
     }
 
     //endregion
+
+
+    public void setListener(Listener listener) {
+        this.listener = listener;
+    }
+
+    private void onSaveClick(View v) {
+        if (listener != null) {
+            listener.onSaveCharactersSetup(setup);
+        }
+    }
+
+    private void onCancelClick(View v) {
+        if (listener != null) {
+            listener.onCancelCharactersSetupChange();
+        }
+    }
 
     // TODO - onPortraitLongClick
 }

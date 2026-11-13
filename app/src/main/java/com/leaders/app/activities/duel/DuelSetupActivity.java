@@ -16,6 +16,7 @@ import com.leaders.app.utilities.DuelStartUtils;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.views.duel.PlayerSetupView;
 import com.leaders.app.views.duel.setup.CharactersSetupFormView;
+import com.leaders.app.views.duel.setup.CharactersSetupView;
 import com.leaders.app.views.duel.setup.FirstPlayerView;
 import com.leaders.app.views.duel.setup.GameModeView;
 import com.leaders.gamelogic.entities.GameHistory;
@@ -31,10 +32,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
-public final class DuelSetupActivity extends BaseActivity implements PlayerSetupView.PlayerSetupWatcher {
+public final class DuelSetupActivity extends BaseActivity implements PlayerSetupView.PlayerSetupWatcher, CharactersSetupFormView.Listener {
     private PlayerSetupView psvFirst, psvSecond;
     private GameModeView gmvGameMode;
     private FirstPlayerView fpvFirstPlayer;
+    private View vwDialogBg;
+    private CharactersSetupView csvCharacters;
+    private CharactersSetupFormView csfvCharacters;
 
     private final Random random = new Random();
 
@@ -49,6 +53,10 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
 
         fpvFirstPlayer = findViewById(R.id.fpvFirstPlayer_actDuelSetup);
         gmvGameMode = findViewById(R.id.gmvGameMode_actDuelSetup);
+
+        csvCharacters = findViewById(R.id.csvCharacters_actDuelSetup);
+        csfvCharacters = findViewById(R.id.csfvCharacters_actDuelSetup);
+        vwDialogBg = findViewById(R.id.vwDialogBg_actDuelSetup);
     }
 
     @Override
@@ -59,6 +67,8 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
         psvSecond.setPlayerSetupWatcher(this);
 
         (findViewById(R.id.btnStartGame_actDuelSetup)).setOnClickListener(this::onStartGameClick);
+        csvCharacters.setOpenFormListener(this::openCharactersForm);
+        csfvCharacters.setListener(this);
     }
 
     @Override
@@ -79,6 +89,9 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
         Collections.shuffle(leaderTypes);
         psvFirst.setLeaderType(leaderTypes.remove(0));
         psvSecond.setLeaderType(leaderTypes.remove(0));
+
+        // Characters
+        csvCharacters.applySetup(new CharactersSetup(new HashSet<>(), new HashSet<>()));
     }
 
     @Override
@@ -142,8 +155,7 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
     }
 
     private void onStartGameClick(View v) {
-        showCharactersForm();
-        /*Intent intent = ActivityType.DuelPlayer.getIntent(this);
+        Intent intent = ActivityType.DuelPlayer.getIntent(this);
 
         List<PlayerSetup> playerSetups = new ArrayList<>();
         for (PlayerSetupView playerSetupView : List.of(psvFirst, psvSecond)) {
@@ -162,17 +174,36 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
             throw new RuntimeException(e);
         }
 
-        goToActivity(intent);*/
+        goToActivity(intent);
     }
 
     //endregion
 
     // TODO - add region
-    private void showCharactersForm() {
-        // TODO - add transparent black background
-        findViewById(R.id.vwDialogBg_actDuelSetup).setVisibility(View.VISIBLE);
-        CharactersSetupFormView charactersForm = findViewById(R.id.csfCharacters_actDuelSetup);
-        charactersForm.setVisibility(View.VISIBLE);
-        charactersForm.applySetup(new CharactersSetup(new HashSet<>(), new HashSet<>()));
+
+    //region CHARACTERS SETUP
+
+    @Override
+    public void onSaveCharactersSetup(@NonNull CharactersSetup setup) {
+        csvCharacters.applySetup(setup);
+        closeCharactersForm();
     }
+
+    @Override
+    public void onCancelCharactersSetupChange() {
+        closeCharactersForm();
+    }
+
+    private void openCharactersForm(@NonNull CharactersSetup setup) {
+        vwDialogBg.setVisibility(View.VISIBLE);
+        csfvCharacters.setVisibility(View.VISIBLE);
+        csfvCharacters.applySetup(setup);
+    }
+
+    private void closeCharactersForm() {
+        vwDialogBg.setVisibility(View.GONE);
+        csfvCharacters.setVisibility(View.GONE);
+    }
+
+    //endregion
 }
