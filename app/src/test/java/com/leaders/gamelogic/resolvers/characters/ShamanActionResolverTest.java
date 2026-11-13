@@ -137,7 +137,7 @@ public class ShamanActionResolverTest {
     }
 
     @Test
-    public void getNextInteraction_shouldNotExposeAdjacentCharacterAsTarget() {
+    public void getNextInteraction_shouldAllowAdjacentCharacterAsTarget() {
         Position adjacentPosition = new Position(3, 4);
 
         game.getBoard().getCell(TARGET_POSITION).setCharacter(null);
@@ -146,7 +146,7 @@ public class ShamanActionResolverTest {
         InteractionRequest request = resolver.getNextInteraction(createBuilder());
 
         assertNotNull(request);
-        assertFalse(containsTarget(request, TargetCategory.ActiveAbilityTargetPosition, adjacentPosition));
+        assertTrue(containsTarget(request, TargetCategory.ActiveAbilityTargetPosition, adjacentPosition));
     }
 
     @Test
