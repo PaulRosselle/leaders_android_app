@@ -31,6 +31,7 @@ public class ExpansionCharactersSetupView extends ConstraintLayout {
     interface Listener {
         void onPortraitClick(@NonNull CharacterCard card);
         void onExpansionClick(@NonNull CharacterExpansion expansion);
+        boolean onPortraitLongClick(View v);
     }
 
     private static final int PORTRAITS_PER_GROUP = 6;
@@ -113,6 +114,9 @@ public class ExpansionCharactersSetupView extends ConstraintLayout {
                     getContext(), groupPortraitInfos, PORTRAITS_PER_GROUP
             );
             portraitGroupView.setPortraitsClickListener(this::onPortraitClick);
+            if (listener != null) {
+                portraitGroupView.setPortraitsLongClickListener(listener::onPortraitLongClick);
+            }
             llyPortraits.addView(portraitGroupView, getPortraitGroupLayoutParams());
         }
     }

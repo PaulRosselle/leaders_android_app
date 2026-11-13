@@ -36,6 +36,7 @@ public class CharactersSetupFormView extends ConstraintLayout implements Expansi
     private CharactersSetup setup = null;
 
     private Listener listener;
+    private OnLongClickListener onPortraitLongClick;
 
     public CharactersSetupFormView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -174,6 +175,11 @@ public class CharactersSetupFormView extends ConstraintLayout implements Expansi
         updateExpansions();
     }
 
+    @Override
+    public boolean onPortraitLongClick(View v) {
+        return onPortraitLongClick != null && onPortraitLongClick.onLongClick(v);
+    }
+
     //endregion
 
     //region ALTERNATIVE CHARACTERS
@@ -211,5 +217,8 @@ public class CharactersSetupFormView extends ConstraintLayout implements Expansi
         }
     }
 
-    // TODO - onPortraitLongClick
+    public void setOnPortraitLongClick(OnLongClickListener onPortraitLongClick) {
+        this.onPortraitLongClick = onPortraitLongClick;
+        altCharactersSetupView.setOnPortraitClickListener(onPortraitLongClick);
+    }
 }

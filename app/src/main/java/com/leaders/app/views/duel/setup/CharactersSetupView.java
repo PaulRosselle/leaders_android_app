@@ -40,6 +40,7 @@ public class CharactersSetupView extends ConstraintLayout {
     private CharactersSetup setup;
 
     private OpenFormListener openFormListener;
+    private OnLongClickListener onPortraitLongClick;
 
 
     public CharactersSetupView(@NonNull Context context, @Nullable AttributeSet attrs) {
@@ -95,6 +96,7 @@ public class CharactersSetupView extends ConstraintLayout {
                     getContext(), groupPortraitInfos, PORTRAITS_PER_GROUP
             );
             portraitGroupView.setPortraitsClickListener(this::openFormClick);
+            portraitGroupView.setPortraitsLongClickListener(onPortraitLongClick);
             llyPortraits.addView(portraitGroupView, getPortraitGroupLayoutParams());
         }
     }
@@ -142,5 +144,15 @@ public class CharactersSetupView extends ConstraintLayout {
 
     public void setOpenFormListener(OpenFormListener openFormListener) {
         this.openFormListener = openFormListener;
+    }
+
+    public void setOnPortraitLongClick(OnLongClickListener onPortraitLongClick) {
+        this.onPortraitLongClick = onPortraitLongClick;
+        for (int i = 0; i < llyPortraits.getChildCount(); i++) {
+            View child = llyPortraits.getChildAt(i);
+            if (child instanceof PortraitGroupView) {
+                ((PortraitGroupView) child).setPortraitsLongClickListener(onPortraitLongClick);
+            }
+        }
     }
 }

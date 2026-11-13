@@ -1726,11 +1726,11 @@ public class GameHandlerTest {
     }
 
     // ------------------------------------------------------------------
-// runTurnEndPhaseAsync
-// ------------------------------------------------------------------
+    // runTurnEndPhaseAsync
+    // ------------------------------------------------------------------
 
     @Test
-    public void runTurnEndPhaseAsync_shouldReturnCompletedWhenNothingToDo() {
+    public void runTurnEndPhaseAsync_shouldReturnCompletedWithNoAutoAction() {
         GameHistory history = createTurnEndGameHistory(false, 0);
         TestGameFlowListener listener = new TestGameFlowListener(history);
         GameHandler gameHandler = new GameHandler(history, listener);

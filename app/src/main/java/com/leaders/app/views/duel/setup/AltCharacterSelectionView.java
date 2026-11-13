@@ -3,6 +3,7 @@ package com.leaders.app.views.duel.setup;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
@@ -72,5 +73,14 @@ public class AltCharacterSelectionView extends ConstraintLayout {
 
     void setListener(Listener listener) {
         this.listener = listener;
+    }
+
+    public void setOnPortraitClickListener(@NonNull OnLongClickListener onPortraitLongClick) {
+        ptvBase.setOnLongClickListener(onPortraitLongClick);
+        ptvAlt.setOnLongClickListener(onPortraitLongClick);
+
+        View.OnClickListener toggle = v -> swtAlt.toggle();
+        ptvBase.setOnClickListener(toggle);
+        ptvAlt.setOnClickListener(toggle);
     }
 }

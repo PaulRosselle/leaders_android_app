@@ -7,6 +7,22 @@
     android:background="@drawable/round_rect_stroke"
     android:backgroundTint="@color/darker_font">
 
+    <Switch
+        android:id="@+id/swtAlt_vwAltCharacterSelection"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:checked="true"
+        android:padding="16dp"
+        android:thumb="@drawable/seekbar_thumb"
+        android:trackTint="@color/switch_track_tint"
+        android:trackTintMode="src_over"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="UseSwitchCompatOrMaterialXml" />
+
     <com.leaders.app.views.portrait.PortraitView
         android:id="@+id/ptvBase_vwAltCharacterSelection"
         android:layout_width="wrap_content"
@@ -14,6 +30,8 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="1dp"
         android:layout_marginBottom="1dp"
+        android:clickable="false"
+        android:longClickable="true"
         app:displayMode="Hexagonal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -27,6 +45,8 @@
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="16dp"
+        android:clickable="false"
+        android:longClickable="true"
         app:displayMode="Hexagonal"
         app:layout_constraintBottom_toBottomOf="@+id/ptvBase_vwAltCharacterSelection"
         app:layout_constraintEnd_toEndOf="parent"
@@ -50,20 +70,4 @@
         app:layout_constraintTop_toTopOf="@+id/ptvBase_vwAltCharacterSelection"
         app:srcCompat="@drawable/icon_back"
         app:tint="@color/font" />
-
-    <Switch
-        android:id="@+id/swtAlt_vwAltCharacterSelection"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:checked="true"
-        android:padding="16dp"
-        android:thumb="@drawable/seekbar_thumb"
-        android:trackTint="@color/switch_track_tint"
-        android:trackTintMode="src_over"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="UseSwitchCompatOrMaterialXml" />
 </androidx.constraintlayout.widget.ConstraintLayout>

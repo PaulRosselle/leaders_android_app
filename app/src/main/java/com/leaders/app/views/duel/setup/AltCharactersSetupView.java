@@ -76,4 +76,10 @@ public class AltCharactersSetupView extends ConstraintLayout {
             altSelectionView.setListener(selectionListener);
         }
     }
+
+    public void setOnPortraitClickListener(@NonNull OnLongClickListener onPortraitLongClick) {
+        for (AltCharacterSelectionView altSelectionView : altSelectionViews) {
+            altSelectionView.setOnPortraitClickListener(onPortraitLongClick);
+        }
+    }
 }
