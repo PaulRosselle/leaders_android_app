@@ -299,10 +299,16 @@ public abstract class PlayableActivity extends BaseActivity
     //region END GAME METHODS
 
     protected final LeaderType getLeaderType(@NonNull Board board, @NonNull TeamColor teamColor) {
-        Cell leaderCell = Objects.requireNonNull(
-                BoardQuery.findLeaderCell(board, teamColor),
-                "No leader found for team: " + teamColor
-        );
+        Cell leaderCell = BoardQuery.findLeaderCell(board, teamColor);
+
+        // If the targeted leader is not found, we try to find the other one
+        if (leaderCell == null) {
+            Cell opponentLeaderCell = Objects.requireNonNull(
+                    BoardQuery.findLeaderCell(board, teamColor.getOpposite()),
+                    "No leader found on the board"
+            );
+            return LeaderType.getFromCharacter(opponentLeaderCell.getCharacter()).getNext();
+        }
 
         return LeaderType.getFromCharacter(leaderCell.getCharacter());
     }

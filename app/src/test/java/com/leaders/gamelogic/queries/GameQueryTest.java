@@ -101,11 +101,11 @@ public class GameQueryTest {
         assertTrue(GameQuery.isLeaderCaptured(game, createTestPhase(), TeamColor.White));
     }
 
-    @Test(expected = NullPointerException.class)
-    public void isLeaderCaptured_shouldThrowWhenLeaderIsMissing() {
+    @Test
+    public void isLeaderCaptured_shouldReturnFalseWhenLeaderIsMissing() {
         Game game = createTestGame(new Board());
 
-        GameQuery.isLeaderCaptured(game, createTestPhase(), TeamColor.White);
+        assertFalse(GameQuery.isLeaderCaptured(game, createTestPhase(), TeamColor.White));
     }
 
     @Test
@@ -196,11 +196,11 @@ public class GameQueryTest {
         assertTrue(GameQuery.isLeaderSurrounded(game, TeamColor.White));
     }
 
-    @Test(expected = NullPointerException.class)
-    public void isLeaderSurrounded_shouldThrowWhenLeaderIsMissing() {
+    @Test
+    public void isLeaderSurrounded_shouldReturnFalseWhenLeaderIsMissing() {
         Game game = createTestGame(new Board());
 
-        GameQuery.isLeaderSurrounded(game, TeamColor.White);
+        assertFalse(GameQuery.isLeaderSurrounded(game, TeamColor.White));
     }
 
     @Test

@@ -55,6 +55,7 @@ public final class PuzzleEditionUtils {
         // 4. A leader is already captured or surrounded
         // 5. Multiple hermit or cubs are present on the player's team
 
+        // TODO - update to take into account news characters requirements
         StringBuilder builder = new StringBuilder();
         final String prefix = "\n• ";
 
@@ -89,7 +90,10 @@ public final class PuzzleEditionUtils {
 
         for (TeamColor teamColor : TeamColor.values()) {
             if (BoardQuery.findLeaderCell(game.getBoard(), teamColor) == null) {
-                builder.append(prefix).append(String.format(context.getString(R.string.puzzle_error_leader_missing), teamColor));
+                // A leader is not necessary for a puzzle to be valid in the player's team
+                if (teamColor != getPuzzlePlayerTeamColor()) {
+                    builder.append(prefix).append(String.format(context.getString(R.string.puzzle_error_leader_missing), teamColor));
+                }
                 continue;
             }
 

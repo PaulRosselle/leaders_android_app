@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 public final class GameQuery {
@@ -32,16 +31,16 @@ public final class GameQuery {
      * @param currentGamePhase current game phase
      * @param leaderTeamColor the team whose leader is checked
      * @return {@code true} if the leader has been captured; {@code false} otherwise
-     * @throws NullPointerException if the leader cannot be found on the board
      */
     public static boolean isLeaderCaptured(@NonNull Game game, @NonNull GamePhase currentGamePhase,
                                            @NonNull TeamColor leaderTeamColor) {
+        Cell leaderCell = BoardQuery.findLeaderCell(game.getBoard(), leaderTeamColor);
+        if (leaderCell == null) {
+            return false;
+        }
+
         // A leader is captured when its capture value reaches LEADER_CAPTURE_VALUE.
         int totalCaptureValue = 0;
-        Cell leaderCell = Objects.requireNonNull(
-                BoardQuery.findLeaderCell(game.getBoard(), leaderTeamColor),
-                "Leader not found for team " + leaderTeamColor
-        );
 
         for (Cell characterCell : BoardQuery.findCharacterCells(game.getBoard(), leaderTeamColor.getOpposite(), null)) {
             totalCaptureValue += CharacterAbilityQuery.getCaptureContribution(leaderCell, characterCell, currentGamePhase);
@@ -60,13 +59,13 @@ public final class GameQuery {
      * @param teamColor the team whose leader is checked
      * @return {@code true} if all adjacent cells around the leader are occupied;
      *         {@code false} otherwise
-     * @throws NullPointerException if the leader cannot be found on the board
      */
     public static boolean isLeaderSurrounded(@NonNull Game game, @NonNull TeamColor teamColor) {
-        Cell leaderCell = Objects.requireNonNull(
-                BoardQuery.findLeaderCell(game.getBoard(), teamColor),
-                "Leader not found for team " + teamColor
-        );
+        Cell leaderCell = BoardQuery.findLeaderCell(game.getBoard(), teamColor);
+        if (leaderCell == null) {
+            return false;
+        }
+
         for (Direction direction : Direction.values()) {
             Cell adjacentCell = BoardQuery.findAdjacentCell(game.getBoard(), leaderCell.getPosition(), direction);
             // If at least one cell around the leader is empty, we can exit
