@@ -24,6 +24,7 @@ import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
+import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.TeamColor;
@@ -528,6 +529,7 @@ public final class PuzzleSolverActivity extends BaseActivity {
         }
 
         bdvBoard.setBoard(displayGame.getBoard());
+        bdvBoard.updateTransformedDisplays(GameContext.getCurrentTransformedCharacters(displayGame));
     }
 
     private void onActionTimelineMarkerSelect(int markerIndex) {
