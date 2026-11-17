@@ -82,7 +82,7 @@ public class AltCharacterSelection {
     }
 
     @NonNull
-    public JSONObject getAsJson() throws JSONException {
+    public JSONObject toJson() throws JSONException {
         JSONObject joSelection = new JSONObject();
 
         joSelection.put("character", character.name());

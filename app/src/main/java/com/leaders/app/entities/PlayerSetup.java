@@ -42,7 +42,7 @@ public final class PlayerSetup {
     }
 
     @NonNull
-    public JSONObject getAsJson() throws JSONException {
+    public JSONObject toJson() throws JSONException {
         JSONObject joPlayerSetup = new JSONObject();
 
         joPlayerSetup.put("name", name);

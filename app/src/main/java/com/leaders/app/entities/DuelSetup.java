@@ -3,10 +3,18 @@ package com.leaders.app.entities;
 import androidx.annotation.NonNull;
 
 import com.leaders.app.enums.FirstPlayerTeam;
+import com.leaders.app.enums.LeaderType;
 import com.leaders.gamelogic.enums.GameMode;
+import com.leaders.gamelogic.enums.TeamColor;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 
 public class DuelSetup {
     @NonNull
@@ -19,6 +27,17 @@ public class DuelSetup {
     private FirstPlayerTeam firstPlayerTeam;
     @NonNull
     private CharactersSetup charactersSetup;
+
+    public DuelSetup() {
+        List<LeaderType> leaderTypes = new ArrayList<>(Arrays.asList(LeaderType.values()));
+        Collections.shuffle(leaderTypes);
+
+        playerSetup1 = new PlayerSetup("", TeamColor.Black, leaderTypes.remove(0));
+        playerSetup2 = new PlayerSetup("", TeamColor.White, leaderTypes.remove(0));
+        gameMode = GameMode.Discovery;
+        firstPlayerTeam = FirstPlayerTeam.Random;
+        charactersSetup = new CharactersSetup(new HashSet<>(), new HashSet<>());
+    }
 
     public DuelSetup(@NonNull PlayerSetup playerSetup1,
                      @NonNull PlayerSetup playerSetup2,
@@ -89,14 +108,14 @@ public class DuelSetup {
     }
 
     @NonNull
-    public JSONObject getAsJson() throws JSONException {
+    public JSONObject toJson() throws JSONException {
         JSONObject joDuelSetup = new JSONObject();
 
-        joDuelSetup.put("player_setup_1", playerSetup1.getAsJson());
-        joDuelSetup.put("player_setup_2", playerSetup2.getAsJson());
+        joDuelSetup.put("player_setup_1", playerSetup1.toJson());
+        joDuelSetup.put("player_setup_2", playerSetup2.toJson());
         joDuelSetup.put("game_mode", gameMode.name());
         joDuelSetup.put("first_player_team", firstPlayerTeam.name());
-        joDuelSetup.put("characters_setup", charactersSetup.getAsJson());
+        joDuelSetup.put("characters_setup", charactersSetup.toJson());
 
         return joDuelSetup;
     }

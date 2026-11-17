@@ -45,6 +45,7 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
     private CharacterNotificationView cnvCardInfo;
 
     private final Random random = new Random();
+    private Settings settings;
 
     //region BASE ACTIVITY OVERRIDEN METHODS
 
@@ -85,7 +86,7 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
     protected void initDatas() {
         super.initDatas();
 
-        Settings settings = ((LeadersApplication) getApplication()).getSettings();
+        settings = ((LeadersApplication) getApplication()).getSettings();
 
         // TODO - rework loading
         // First player setup is always loaded with the username

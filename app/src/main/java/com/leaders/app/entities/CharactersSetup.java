@@ -149,12 +149,12 @@ public class CharactersSetup {
     }
 
     @NonNull
-    public JSONObject getAsJson() throws JSONException {
+    public JSONObject toJson() throws JSONException {
         JSONObject joSetup = new JSONObject();
 
         JSONArray jaAltSelections = new JSONArray();
         for (AltCharacterSelection selection : altCharacterSelections.values()) {
-            jaAltSelections.put(selection.getAsJson());
+            jaAltSelections.put(selection.toJson());
         }
         joSetup.put("alt_character_selections", jaAltSelections);
 
