@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 
 import com.leaders.R;
+import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.actions.RecruitmentAction;
 import com.leaders.gamelogic.actions.RecruitmentActionMotion;
@@ -18,18 +19,24 @@ import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.Position;
+import com.leaders.gamelogic.entities.TransformedState;
+import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.RecruitmentMotionType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.factories.GameFactory;
+import com.leaders.gamelogic.queries.CharacterTransformQuery;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
 import com.leaders.puzzlelogic.utilities.PuzzleEditionUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -133,15 +140,37 @@ public final class PuzzleImportUtils {
      */
     public static GameHistory getFromLbeUrl(@Nullable Context context, @NonNull String lbeUrl) {
         List<IGameAction> initialActions = new ArrayList<>();
+
+        Map<UUID, Position> transformedPositions = new HashMap<>();
+        List<TransformedState> transformedStates = new ArrayList<>();
+
         for (TeamColor teamColor : TeamColor.values()) {
-            for (Cell characterCell : getTeamCharacterCells(context, lbeUrl, teamColor)) {
-                initialActions.add(new RecruitmentAction(List.of(
-                        new RecruitmentActionMotion(RecruitmentMotionType.Add,
-                                characterCell.getCharacter(),
-                                characterCell.getPosition())
-                        ))
-                );
+            List<Cell> characterCells = getTeamCharacterCells(context, lbeUrl, teamColor, transformedStates);
+
+            for (Cell characterCell : characterCells) {
+                initialActions.add(new RecruitmentAction(List.of(new RecruitmentActionMotion(
+                        RecruitmentMotionType.Add, characterCell.getCharacter(), characterCell.getPosition())
+                )));
+                transformedStates.stream()
+                        .filter(state -> state.getCharacterId() == characterCell.getCharacter().getId())
+                        .findFirst()
+                        .ifPresent(state -> transformedPositions.put(state.getCharacterId(), characterCell.getPosition()));
             }
+        }
+
+        for (TransformedState transformedState : transformedStates) {
+            initialActions.add(new CharacterAction(
+                    transformedState.getCharacterBefore(),
+                    List.of(CharacterTransformQuery.createTransformMotion(
+                            CharacterMotionType.Transform,
+                            transformedState.getCharacterBefore(),
+                            transformedState.getCharacterAfter(),
+                            Objects.requireNonNull(
+                                    transformedPositions.get(transformedState.getCharacterId()),
+                                    "No position found matching transform state: " + transformedState
+                            )
+                    ))
+            ));
         }
 
         return PuzzleEditionUtils.getDefaultHistory(initialActions);
@@ -155,9 +184,11 @@ public final class PuzzleImportUtils {
      * @param teamColor the team color to extract
      * @return the list of character cells for the team, or an empty list if its data is absent
      */
+    @NonNull
     private static List<Cell> getTeamCharacterCells(@Nullable Context context,
                                                     @NonNull String lbeUrl,
-                                                    @NonNull TeamColor teamColor) {
+                                                    @NonNull TeamColor teamColor,
+                                                    @NonNull List<TransformedState> transformedStates) {
         // First we get the header separator associated with the player color
         String colorHeader = teamColor == TeamColor.Black ? LbeUtils.HEADER_BLACK : LbeUtils.HEADER_WHITE;
 
@@ -187,14 +218,69 @@ public final class PuzzleImportUtils {
             }
             String[] characterDatas = cellData.split(LbeUtils.CHARACTER_DATA_SEPARATOR);
             Position position = LbeUtils.getPositionFromExportStr(context, characterDatas[0].toUpperCase(Locale.ROOT));
-            CharacterType characterType = LbeUtils.getCharacterTypeFromExportStr(context, characterDatas[1].toUpperCase(Locale.ROOT));
+
+            String characterTypeData = characterDatas[1];
+            // if the character type end with a frog tag, it is transformed into a frog
+            TransformedState transformedState = getCharacterTransformedState(
+                    context, characterTypeData, teamColor
+            );
+            Character character;
+            if (transformedState != null) {
+                character = transformedState.getCharacterAfter();
+                transformedStates.add(transformedState);
+            } else {
+                CharacterType characterType = LbeUtils.getCharacterTypeFromExportStr(
+                        context, removeTransformationTags(characterTypeData)
+                );
+                character = Character.create(characterType, teamColor);
+            }
 
             Cell characterCell = new Cell(position);
-            characterCell.setCharacter(Character.create(characterType, teamColor));
+            characterCell.setCharacter(character);
             characterCells.add(characterCell);
         }
 
         return characterCells;
+    }
+
+    /**
+     * Removes the frog transformation tag from the given reference data.
+     *
+     * @param refData the reference data to process
+     * @return the reference data without the frog transformation tag
+     */
+    @NonNull
+    private static String removeTransformationTags(@NonNull String refData) {
+        return refData.toUpperCase(Locale.ROOT).replace(
+                LbeUtils.FROG_TRANSFORMATION_TAG.toUpperCase(Locale.ROOT), ""
+        );
+    }
+
+    /**
+     * Returns the transformed state of a character if its type data contains the frog transformation tag.
+     *
+     * @param context the context used to resolve the character type
+     * @param characterTypeData the character type data to process
+     * @param teamColor the team color of the character
+     * @return the transformed state of the character, or {@code null} if the frog transformation tag is absent
+     */
+    @Nullable
+    private static TransformedState getCharacterTransformedState(@Nullable Context context,
+                                                                 @NonNull String characterTypeData,
+                                                                 @NonNull TeamColor teamColor) {
+        String formattedData = characterTypeData.toUpperCase(Locale.ROOT);
+        if (!formattedData.endsWith(LbeUtils.FROG_TRANSFORMATION_TAG.toUpperCase(Locale.ROOT))) {
+            return null;
+        }
+
+        Character originalCharacter = Character.create(
+                LbeUtils.getCharacterTypeFromExportStr(context, removeTransformationTags(formattedData)),
+                teamColor
+        );
+        return new TransformedState(
+                originalCharacter,
+                Character.transform(originalCharacter, CharacterType.Frog, teamColor)
+        );
     }
 
     /**

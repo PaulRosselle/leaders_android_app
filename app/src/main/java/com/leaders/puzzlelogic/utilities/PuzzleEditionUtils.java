@@ -272,11 +272,6 @@ public final class PuzzleEditionUtils {
     private static List<IGameAction> getTransformInitialActions(@NonNull Game game) {
         List<IGameAction> initialActions = new ArrayList<>();
 
-        List<Cell> whiteShamanCells = BoardQuery.findCharacterCells(
-                game.getBoard(), TeamColor.White, CharacterType.Shaman
-        );
-        Character whiteShaman = whiteShamanCells.stream().map(Cell::getCharacter).findFirst().orElse(null);
-
         for (UUID uuid : game.getTransformedCharacterIds()) {
             Position position = BoardQuery.getCellByCharacterId(game.getBoard(), uuid).getPosition();
             TransformedState state = Objects.requireNonNull(
@@ -285,7 +280,7 @@ public final class PuzzleEditionUtils {
             );
 
             initialActions.add(new CharacterAction(
-                    whiteShaman != null ? whiteShaman : state.getCharacterBefore(),
+                    state.getCharacterBefore(),
                     List.of(CharacterTransformQuery.createTransformMotion(
                             CharacterMotionType.Transform,
                             state.getCharacterBefore(),

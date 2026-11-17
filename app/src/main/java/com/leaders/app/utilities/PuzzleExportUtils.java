@@ -5,9 +5,9 @@ import android.content.Intent;
 
 import androidx.annotation.NonNull;
 
-import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Game;
+import com.leaders.gamelogic.entities.TransformedState;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.factories.GameFactory;
 import com.leaders.gamelogic.queries.BoardQuery;
@@ -21,13 +21,13 @@ public final class PuzzleExportUtils {
     }
 
     public static String getLbeUrl(@NonNull PuzzleSave puzzleSave) {
-        return getLbeUrl(GameFactory.create(puzzleSave.getPuzzleGameHistory()).getBoard());
+        return getLbeUrl(GameFactory.create(puzzleSave.getPuzzleGameHistory()));
     }
 
-    public static String getLbeUrl(@NonNull Board board) {
+    public static String getLbeUrl(@NonNull Game game) {
         // First we get character datas from the board
-        String whiteCharacters = getCharacters(board, TeamColor.White);
-        String blackCharacters = getCharacters(board, TeamColor.Black);
+        String whiteCharacters = getCharacters(game, TeamColor.White);
+        String blackCharacters = getCharacters(game, TeamColor.Black);
 
         // By default, the token datas string is empty
         String tokenDatas = "";
@@ -46,12 +46,8 @@ public final class PuzzleExportUtils {
         return String.format(LbeUtils.DEFAULT_URL + tokenDatas);
     }
 
-    public static String getLbeUrl(@NonNull Game game) {
-        return ""; // TODO
-    }
-
-    private static String getCharacters(@NonNull Board board, @NonNull TeamColor teamColor) {
-        List<Cell> characterCells = BoardQuery.findCharacterCells(board, teamColor, null);
+    private static String getCharacters(@NonNull Game game, @NonNull TeamColor teamColor) {
+        List<Cell> characterCells = BoardQuery.findCharacterCells(game.getBoard(), teamColor, null);
         if (characterCells.isEmpty()) {
             return "";
         }
@@ -61,7 +57,13 @@ public final class PuzzleExportUtils {
             builder.append(LbeUtils.CELL_DATA_SEPARATOR);
             builder.append(LbeUtils.getPositionExportStr(characterCell.getPosition()));
             builder.append(LbeUtils.CHARACTER_DATA_SEPARATOR);
-            builder.append(LbeUtils.getCharacterExportStr(characterCell.getCharacter()));
+            TransformedState transformedState = game.getTransformedState(characterCell.getCharacter().getId());
+            if (transformedState != null) {
+                builder.append(LbeUtils.getCharacterExportStr(transformedState.getCharacterBefore()));
+                builder.append(LbeUtils.FROG_TRANSFORMATION_TAG);
+            } else {
+                builder.append(LbeUtils.getCharacterExportStr(characterCell.getCharacter()));
+            }
         }
 
         // Since we're sure to have added at least one character, we can remove the first cell data separator

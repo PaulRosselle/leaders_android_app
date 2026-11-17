@@ -93,7 +93,7 @@ public class CharacterTypeUtils {
             case Archer: return 4;
             case LeaderVermilion: return 25;
             case Shaman: return 21;
-            case Frog: return 22; // TODO - handle the "frogified" tag
+            case Frog: return 22;
             case Sniper: return 23;
             case Tactician: return 24;
             case Wisp: return 20;
