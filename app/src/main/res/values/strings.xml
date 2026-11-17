@@ -119,7 +119,7 @@
     <string name="error_export_file_creation">Failed to create export file</string>
     <string name="export_successful">Export successful!</string>
     <string name="unsaved_puzzle_changes">You have unsaved changes</string>
-    <string name="invalid_puzzle">Invalid puzzle:</string>
+    <string name="invalid_puzzle">Invalid puzzle</string>
     <string name="puzzle_error_hermit_and_cub_limit">There can be only one hermit or cub in the player\'s team</string>
     <string name="puzzle_error_one_per_team_character">Character limited to one per team: %s</string>
     <string name="puzzle_error_one_leader_per_team">Each team can have only one Leader</string>
@@ -375,5 +375,6 @@
     <string name="x_characters_required">Please select %d more characters</string>
     <string name="alternate_characters">Alternate characters</string>
     <string name="current_game_characters">Current game characters</string>
-    <string name="characters_game_info">A game always starts with 16 characters</string>
+    <string name="characters_game_info">A game always starts with 16 characters.</string>
+    <string name="error_toast_transformed_frog_limited_to_one">There can be only one transformed frog on the board</string>
 </resources>

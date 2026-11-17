@@ -299,4 +299,14 @@ public final class Game {
     public Set<UUID> getTransformedCharacterIds() {
         return Collections.unmodifiableSet(charactersTransformedState.keySet());
     }
+
+    /**
+     * Returns the transformed states of all characters.
+     *
+     * @return an unmodifiable list of transformed character states
+     */
+    @NonNull
+    public List<TransformedState> getTransformedCharacterStates() {
+        return List.copyOf(charactersTransformedState.values());
+    }
 }
