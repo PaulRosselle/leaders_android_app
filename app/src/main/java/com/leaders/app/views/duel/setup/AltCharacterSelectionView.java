@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.leaders.R;
+import com.leaders.app.entities.CharacterSkins;
 import com.leaders.app.views.portrait.PortraitView;
 import com.leaders.gamelogic.enums.CharacterCard;
 
@@ -49,9 +50,14 @@ public class AltCharacterSelectionView extends ConstraintLayout {
 
     public void setAltSelection(@NonNull CharacterCard baseCard,
                                 @NonNull CharacterCard altCard,
+                                @NonNull CharacterSkins characterSkins,
                                 boolean useAltCard) {
         ptvBase.setPortraitCard(baseCard);
         ptvAlt.setPortraitCard(altCard);
+
+        ptvBase.setPortraitSkin(characterSkins.getCharacterSkin(baseCard));
+        ptvAlt.setPortraitSkin(characterSkins.getCharacterSkin(altCard));
+
         swtAlt.setChecked(useAltCard);
     }
 

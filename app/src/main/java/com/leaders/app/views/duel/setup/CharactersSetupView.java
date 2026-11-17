@@ -12,9 +12,9 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.leaders.R;
+import com.leaders.app.entities.CharacterSkins;
 import com.leaders.app.entities.CharactersSetup;
 import com.leaders.app.entities.PortraitInfo;
-import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.app.enums.PortraitDisplayMode;
 import com.leaders.app.utilities.CharacterCardUtils;
 import com.leaders.app.utilities.DuelStartUtils;
@@ -37,6 +37,7 @@ public class CharactersSetupView extends ConstraintLayout {
     private TextView txvInfo;
     private TextView txvCharactersCount;
 
+    private CharacterSkins characterSkins;
     private CharactersSetup setup;
 
     private OpenFormListener openFormListener;
@@ -80,7 +81,7 @@ public class CharactersSetupView extends ConstraintLayout {
         List<PortraitInfo> portraitInfos = characterCards.stream()
                 .sorted(CharacterCardUtils.getByAbilityThenByNameComparator(getContext()))
                 .map(card -> new PortraitInfo(
-                        card, CharacterSkinType.Default, false, PortraitDisplayMode.Hexagonal
+                        card, characterSkins.getCharacterSkin(card), false, PortraitDisplayMode.Hexagonal
                 )).collect(Collectors.toList());
 
         llyPortraits.removeAllViews();
@@ -140,6 +141,10 @@ public class CharactersSetupView extends ConstraintLayout {
         if (openFormListener != null) {
             openFormListener.onOpenFormClick(getSetup());
         }
+    }
+
+    public void setCharacterSkins(CharacterSkins characterSkins) {
+        this.characterSkins = characterSkins;
     }
 
     public void setOpenFormListener(OpenFormListener openFormListener) {

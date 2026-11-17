@@ -173,7 +173,12 @@ public final class CharacterCardUtils {
         switch (card) {
             case Acrobat: return R.drawable.card_portrait_acrobat;
             case Archer: return R.drawable.card_portrait_archer;
-            case Assassin: return R.drawable.card_portrait_assassin;
+            case Assassin: {
+                if (skinType == CharacterSkinType.ShadowOfTheOpalWood) {
+                    return R.drawable.card_portrait_assassin_sotow;
+                }
+                return R.drawable.card_portrait_assassin;
+            }
             case Brewmaster: return R.drawable.card_portrait_brewmaster;
             case Bruiser: return R.drawable.card_portrait_bruiser;
             case ClawLauncher: return R.drawable.card_portrait_claw_launcher;
@@ -203,13 +208,23 @@ public final class CharacterCardUtils {
                 }
                 return R.drawable.card_portrait_vizier;
             }
-            case Wanderer: return R.drawable.card_portrait_wanderer;
+            case Wanderer: {
+                if (skinType == CharacterSkinType.ShadowOfTheOpalWood) {
+                    return R.drawable.card_portrait_wanderer_sotow;
+                }
+                return R.drawable.card_portrait_wanderer;
+            }
             case LeaderVermilion: return R.drawable.card_portrait_leader_vermilion;
             case Shaman: return R.drawable.card_portrait_shaman;
             case Frog: return R.drawable.card_portrait_frog;
             case Sniper: return R.drawable.card_portrait_sniper;
             case Tactician: return R.drawable.card_portrait_tactician;
-            case Wisp: return R.drawable.card_portrait_wisp;
+            case Wisp: {
+                if (skinType == CharacterSkinType.ShadowOfTheOpalWood) {
+                    return R.drawable.card_portrait_wisp_sotow;
+                }
+                return R.drawable.card_portrait_wisp;
+            }
             case EliteArcher: return R.drawable.card_portrait_elite_archer;
             default: throw new IllegalArgumentException("No portrait drawable for card: " + card);
         }
@@ -221,7 +236,12 @@ public final class CharacterCardUtils {
         switch (card) {
             case Acrobat: return R.drawable.card_portrait_banned_acrobat;
             case Archer: return R.drawable.card_portrait_banned_archer;
-            case Assassin: return R.drawable.card_portrait_banned_assassin;
+            case Assassin: {
+                if (skinType == CharacterSkinType.ShadowOfTheOpalWood) {
+                    return R.drawable.card_portrait_banned_assassin_sotow;
+                }
+                return R.drawable.card_portrait_banned_assassin;
+            }
             case Brewmaster: return R.drawable.card_portrait_banned_brewmaster;
             case Bruiser: return R.drawable.card_portrait_banned_bruiser;
             case ClawLauncher: return R.drawable.card_portrait_banned_claw_launcher;
@@ -249,11 +269,21 @@ public final class CharacterCardUtils {
                 }
                 return R.drawable.card_portrait_banned_vizier;
             }
-            case Wanderer: return R.drawable.card_portrait_banned_wanderer;
+            case Wanderer: {
+                if (skinType == CharacterSkinType.ShadowOfTheOpalWood) {
+                    return R.drawable.card_portrait_banned_wanderer_sotow;
+                }
+                return R.drawable.card_portrait_banned_wanderer;
+            }
             case Shaman: return R.drawable.card_portrait_banned_shaman;
             case Sniper: return R.drawable.card_portrait_banned_sniper;
             case Tactician: return R.drawable.card_portrait_banned_tactician;
-            case Wisp: return R.drawable.card_portrait_banned_wisp;
+            case Wisp: {
+                if (skinType == CharacterSkinType.ShadowOfTheOpalWood) {
+                    return R.drawable.card_portrait_banned_wisp_sotow;
+                }
+                return R.drawable.card_portrait_banned_wisp;
+            }
             case EliteArcher: return R.drawable.card_portrait_banned_elite_archer;
             default: throw new IllegalArgumentException("No banned portrait drawable for card: " + card);
         }
@@ -265,7 +295,12 @@ public final class CharacterCardUtils {
         switch (card) {
             case Acrobat: return R.drawable.card_hex_portrait_acrobat;
             case Archer: return R.drawable.card_hex_portrait_archer;
-            case Assassin: return R.drawable.card_hex_portrait_assassin;
+            case Assassin: {
+                if (skinType == CharacterSkinType.ShadowOfTheOpalWood) {
+                    return R.drawable.card_hex_portrait_assassin_sotow;
+                }
+                return R.drawable.card_hex_portrait_assassin;
+            }
             case Brewmaster: return R.drawable.card_hex_portrait_brewmaster;
             case Bruiser: return R.drawable.card_hex_portrait_bruiser;
             case ClawLauncher: return R.drawable.card_hex_portrait_claw_launcher;
@@ -295,13 +330,23 @@ public final class CharacterCardUtils {
                 }
                 return R.drawable.card_hex_portrait_vizier;
             }
-            case Wanderer: return R.drawable.card_hex_portrait_wanderer;
+            case Wanderer: {
+                if (skinType == CharacterSkinType.ShadowOfTheOpalWood) {
+                    return R.drawable.card_hex_portrait_wanderer_sotow;
+                }
+                return R.drawable.card_hex_portrait_wanderer;
+            }
             case LeaderVermilion: return R.drawable.card_hex_portrait_leader_vermilion;
             case Shaman: return R.drawable.card_hex_portrait_shaman;
             case Frog: return R.drawable.card_hex_portrait_frog;
             case Sniper: return R.drawable.card_hex_portrait_sniper;
             case Tactician: return R.drawable.card_hex_portrait_tactician;
-            case Wisp: return R.drawable.card_hex_portrait_wisp;
+            case Wisp: {
+                if (skinType == CharacterSkinType.ShadowOfTheOpalWood) {
+                    return R.drawable.card_hex_portrait_wisp_sotow;
+                }
+                return R.drawable.card_hex_portrait_wisp;
+            }
             case EliteArcher: return R.drawable.card_hex_portrait_elite_archer;
             default: throw new IllegalArgumentException("No portrait hex drawable for card: " + card);
         }
@@ -313,7 +358,12 @@ public final class CharacterCardUtils {
         switch (card) {
             case Acrobat: return R.drawable.card_hex_portrait_banned_acrobat;
             case Archer: return R.drawable.card_hex_portrait_banned_archer;
-            case Assassin: return R.drawable.card_hex_portrait_banned_assassin;
+            case Assassin: {
+                if (skinType == CharacterSkinType.ShadowOfTheOpalWood) {
+                    return R.drawable.card_hex_portrait_banned_assassin_sotow;
+                }
+                return R.drawable.card_hex_portrait_banned_assassin;
+            }
             case Brewmaster: return R.drawable.card_hex_portrait_banned_brewmaster;
             case Bruiser: return R.drawable.card_hex_portrait_banned_bruiser;
             case ClawLauncher: return R.drawable.card_hex_portrait_banned_claw_launcher;
@@ -341,11 +391,21 @@ public final class CharacterCardUtils {
                 }
                 return R.drawable.card_hex_portrait_banned_vizier;
             }
-            case Wanderer: return R.drawable.card_hex_portrait_banned_wanderer;
+            case Wanderer: {
+                if (skinType == CharacterSkinType.ShadowOfTheOpalWood) {
+                    return R.drawable.card_hex_portrait_banned_wanderer_sotow;
+                }
+                return R.drawable.card_hex_portrait_banned_wanderer;
+            }
             case Shaman: return R.drawable.card_hex_portrait_banned_shaman;
             case Sniper: return R.drawable.card_hex_portrait_banned_sniper;
             case Tactician: return R.drawable.card_hex_portrait_banned_tactician;
-            case Wisp: return R.drawable.card_hex_portrait_banned_wisp;
+            case Wisp: {
+                if (skinType == CharacterSkinType.ShadowOfTheOpalWood) {
+                    return R.drawable.card_hex_portrait_banned_wisp_sotow;
+                }
+                return R.drawable.card_hex_portrait_banned_wisp;
+            }
             case EliteArcher: return R.drawable.card_hex_portrait_banned_elite_archer;
             default: throw new IllegalArgumentException("No banned portrait hex drawable for card: " + card);
         }
@@ -409,6 +469,10 @@ public final class CharacterCardUtils {
             case RoyalGuard:
             case Vizier:
                 return List.of(CharacterSkinType.Default, CharacterSkinType.LaughingMoonSage);
+            case Assassin:
+            case Wanderer:
+            case Wisp:
+                return List.of(CharacterSkinType.Default, CharacterSkinType.ShadowOfTheOpalWood);
             default:
                 return Collections.singletonList(CharacterSkinType.Default);
         }

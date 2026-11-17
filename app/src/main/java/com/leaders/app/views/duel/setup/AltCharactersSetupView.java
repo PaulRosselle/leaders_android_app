@@ -10,6 +10,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.leaders.R;
 import com.leaders.app.entities.AltCharacterSelection;
+import com.leaders.app.entities.CharacterSkins;
 import com.leaders.app.entities.CharactersSetup;
 import com.leaders.app.utilities.CharacterCardUtils;
 import com.leaders.gamelogic.enums.CharacterCard;
@@ -18,7 +19,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AltCharactersSetupView extends ConstraintLayout {
-    List<AltCharacterSelectionView> altSelectionViews = new ArrayList<>();
+    private CharacterSkins characterSkins;
+    private List<AltCharacterSelectionView> altSelectionViews = new ArrayList<>();
+
+    public AltCharactersSetupView(@NonNull Context context, @NonNull CharacterSkins characterSkins) {
+        super(context);
+        this.characterSkins = characterSkins;
+        init(context);
+    }
 
     public AltCharactersSetupView(@NonNull Context context) {
         super(context);
@@ -48,7 +56,7 @@ public class AltCharactersSetupView extends ConstraintLayout {
             }
 
             AltCharacterSelectionView altSelectionView = new AltCharacterSelectionView(context);
-            altSelectionView.setAltSelection(baseCard, card, false);
+            altSelectionView.setAltSelection(baseCard, card, characterSkins, false);
             altSelectionViews.add(altSelectionView);
             llyAltSelections.addView(altSelectionView, getSelectionLayoutParams());
         }

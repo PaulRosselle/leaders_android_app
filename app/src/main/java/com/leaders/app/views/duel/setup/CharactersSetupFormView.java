@@ -11,7 +11,9 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.leaders.R;
+import com.leaders.app.entities.CharacterSkins;
 import com.leaders.app.entities.CharactersSetup;
+import com.leaders.app.entities.LeadersApplication;
 import com.leaders.app.enums.CharacterExpansion;
 import com.leaders.app.utilities.DuelStartUtils;
 import com.leaders.gamelogic.enums.CharacterCard;
@@ -34,7 +36,6 @@ public class CharactersSetupFormView extends ConstraintLayout implements Expansi
     private AltCharactersSetupView altCharactersSetupView;
 
     private CharactersSetup setup = null;
-
     private Listener listener;
     private OnLongClickListener onPortraitLongClick;
 
@@ -54,14 +55,24 @@ public class CharactersSetupFormView extends ConstraintLayout implements Expansi
         findViewById(R.id.txvSave_vwCharactersSetupForm).setOnClickListener(this::onSaveClick);
         findViewById(R.id.txvCancel_vwCharactersSetupForm).setOnClickListener(this::onCancelClick);
 
+        CharacterSkins characterSkins;
+        if (!isInEditMode()) {
+            characterSkins = ((LeadersApplication) context.getApplicationContext()).getSettings().getCharacterSkins();
+        } else {
+            characterSkins = new CharacterSkins();
+        }
+
         LinearLayout llyCharacters = findViewById(R.id.llyCharacters_vwCharactersSetupForm);
-        initExpansions(context, llyCharacters);
-        initAltSelections(context, llyCharacters);
+        initExpansions(context, llyCharacters, characterSkins);
+        initAltSelections(context, llyCharacters, characterSkins);
     }
 
-    private void initExpansions(@NonNull Context context, @NonNull LinearLayout llyExpansions) {
+    private void initExpansions(@NonNull Context context,
+                                @NonNull LinearLayout llyExpansions,
+                                @NonNull CharacterSkins characterSkins) {
         for (CharacterExpansion expansion : CharacterExpansion.values()) {
             ExpansionCharactersSetupView expansionSetupView = new ExpansionCharactersSetupView(context);
+            expansionSetupView.setCharacterSkins(characterSkins);
 
             expansionSetupView.setExpansion(expansion);
             expansionSetupView.setListener(this);
@@ -71,8 +82,10 @@ public class CharactersSetupFormView extends ConstraintLayout implements Expansi
         }
     }
 
-    private void initAltSelections(@NonNull Context context, @NonNull LinearLayout llyCharacters) {
-        altCharactersSetupView = new AltCharactersSetupView(context);
+    private void initAltSelections(@NonNull Context context,
+                                   @NonNull LinearLayout llyCharacters,
+                                   @NonNull CharacterSkins characterSkins) {
+        altCharactersSetupView = new AltCharactersSetupView(context, characterSkins);
         altCharactersSetupView.setSelectionListener(this::onCheckedChange);
         llyCharacters.addView(altCharactersSetupView, getCharactersLayoutParams(0));
     }
