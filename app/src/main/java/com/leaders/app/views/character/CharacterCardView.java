@@ -78,6 +78,24 @@ public final class CharacterCardView extends ConstraintLayout {
                 }
                 return R.drawable.character_card_vizier;
             }
+            case Assassin: {
+                if (skinType == CharacterSkinType.ShadowOfTheOpalWood) {
+                    return R.drawable.character_card_assassin_sotow;
+                }
+                return R.drawable.character_card_assassin;
+            }
+            case Wanderer: {
+                if (skinType == CharacterSkinType.ShadowOfTheOpalWood) {
+                    return R.drawable.character_card_wanderer_sotow;
+                }
+                return R.drawable.character_card_wanderer;
+            }
+            case Wisp: {
+                if (skinType == CharacterSkinType.ShadowOfTheOpalWood) {
+                    return R.drawable.character_card_wisp_sotow;
+                }
+                return R.drawable.character_card_wisp;
+            }
             default: throw new IllegalStateException("No card resource found for card: " + card);
         }
     }

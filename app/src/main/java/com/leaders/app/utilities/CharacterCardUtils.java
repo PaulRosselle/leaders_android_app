@@ -409,6 +409,10 @@ public final class CharacterCardUtils {
             case RoyalGuard:
             case Vizier:
                 return List.of(CharacterSkinType.Default, CharacterSkinType.LaughingMoonSage);
+            case Assassin:
+            case Wanderer:
+            case Wisp:
+                return List.of(CharacterSkinType.Default, CharacterSkinType.ShadowOfTheOpalWood);
             default:
                 return Collections.singletonList(CharacterSkinType.Default);
         }
