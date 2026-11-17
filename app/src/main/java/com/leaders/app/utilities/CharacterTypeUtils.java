@@ -19,7 +19,12 @@ public class CharacterTypeUtils {
         switch (characterType) {
             case Acrobat: return R.drawable.character_piece_acrobat;
             case Archer: return R.drawable.character_piece_archer;
-            case Assassin: return R.drawable.character_piece_assassin;
+            case Assassin: {
+                if (skinType == CharacterSkinType.ShadowOfTheOpalWood) {
+                    return R.drawable.character_piece_assassin_sotow;
+                }
+                return R.drawable.character_piece_assassin;
+            }
             case Brewmaster: return R.drawable.character_piece_brewmaster;
             case Bruiser: return R.drawable.character_piece_bruiser;
             case ClawLauncher: return R.drawable.character_piece_claw_launcher;
@@ -50,13 +55,23 @@ public class CharacterTypeUtils {
                 }
                 return R.drawable.character_piece_vizier;
             }
-            case Wanderer: return R.drawable.character_piece_wanderer;
+            case Wanderer: {
+                if (skinType == CharacterSkinType.ShadowOfTheOpalWood) {
+                    return R.drawable.character_piece_wanderer_sotow;
+                }
+                return R.drawable.character_piece_wanderer;
+            }
             case LeaderVermilion: return R.drawable.character_piece_leader_vermilion;
             case Shaman: return R.drawable.character_piece_shaman;
             case Frog: return R.drawable.character_piece_frog;
             case Sniper: return R.drawable.character_piece_sniper;
             case Tactician: return R.drawable.character_piece_tactician;
-            case Wisp: return R.drawable.character_piece_wisp;
+            case Wisp: {
+                if (skinType == CharacterSkinType.ShadowOfTheOpalWood) {
+                    return R.drawable.character_piece_wisp_sotow;
+                }
+                return R.drawable.character_piece_wisp;
+            }
             case EliteArcher: return R.drawable.character_piece_elite_archer;
             default: throw new IllegalArgumentException("No drawable found for character: " + characterType);
         }

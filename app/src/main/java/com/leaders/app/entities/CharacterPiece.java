@@ -81,7 +81,8 @@ public class CharacterPiece {
         switch (skinType) {
             case Default: return -1;
             case LaughingMoonSage: return R.drawable.character_piece_outline_lms;
-            default: throw new IllegalStateException("Not outline found matching skin type: " + skinType);
+            case ShadowOfTheOpalWood: return R.drawable.character_piece_outline_sotow;
+            default: throw new IllegalStateException("No outline found matching skin type: " + skinType);
         }
     }
 
