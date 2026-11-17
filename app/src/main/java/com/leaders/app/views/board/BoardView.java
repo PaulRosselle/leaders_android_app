@@ -22,6 +22,7 @@ import com.leaders.app.views.character.OnCharacterDisplayClickListener;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Position;
+import com.leaders.gamelogic.entities.TransformedCharacter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -67,15 +68,23 @@ public abstract class BoardView extends ConstraintLayout {
         inflate(context, R.layout.view_board, this);
 
         imvBoard = findViewById(R.id.imvBoard_vwBoard);
+        ConstraintLayout flyCharacters = findViewById(R.id.flyCharacters_vwBoard);
+        ConstraintLayout flyEffects = findViewById(R.id.flyEffects_vwBoard);
         initCellViews();
-        characterDisplayPool = new CharacterDisplayPool(getContext(), this);
+        characterDisplayPool = new CharacterDisplayPool(getContext(), flyCharacters, flyEffects);
 
         setOrientation(BoardOrientation.Default);
         isCellPositionVisible = false;
         alwaysUseDefaultSkins = false;
 
         // Allow us to control better children animations using PropertyAnimators
-        LayoutTransition boardTransition = getLayoutTransition();
+        disableTransitions(this);
+        disableTransitions(flyCharacters);
+        disableTransitions(flyEffects);
+    }
+
+    private void disableTransitions(@NonNull ConstraintLayout constraintLayout) {
+        LayoutTransition boardTransition = constraintLayout.getLayoutTransition();
         if (boardTransition != null) {
             boardTransition.disableTransitionType(LayoutTransition.APPEARING);
             boardTransition.disableTransitionType(LayoutTransition.DISAPPEARING);
@@ -287,6 +296,29 @@ public abstract class BoardView extends ConstraintLayout {
 
     public final boolean isCellPositionVisible() {
         return isCellPositionVisible;
+    }
+
+    public final void updateTransformedDisplays(@Nullable List<TransformedCharacter> transformedCharacters) {
+        for (Map.Entry<Position, CharacterDisplay> entry : characterDisplayMap.entrySet()) {
+            entry.getValue().applyTransformedCharacter(
+                    findTransformedCharacterAt(transformedCharacters, entry.getKey()),
+                    settings.getCharacterSkins()
+            );
+        }
+    }
+
+    @Nullable
+    private TransformedCharacter findTransformedCharacterAt(@Nullable List<TransformedCharacter> transformedCharacters,
+                                                            @NonNull Position position) {
+        if (transformedCharacters != null) {
+            for (TransformedCharacter transformedCharacter : transformedCharacters) {
+                if (transformedCharacter.getPosition().equals(position)) {
+                    return transformedCharacter;
+                }
+            }
+        }
+
+        return null;
     }
 
     protected void setOnCellClickListener(OnClickListener onCellClickListener) {

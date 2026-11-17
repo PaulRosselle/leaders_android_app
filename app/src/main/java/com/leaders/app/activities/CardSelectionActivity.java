@@ -65,7 +65,7 @@ public abstract class CardSelectionActivity extends PlayableActivity implements
         super.initViews();
 
         ccsvCardSelector = findViewById(getCardSelectorViewId());
-        chdNewCharacter = new CharacterDisplay(this, ccsvCardSelector);
+        chdNewCharacter = new CharacterDisplay(this, ccsvCardSelector, ccsvCardSelector);
     }
 
     @Override

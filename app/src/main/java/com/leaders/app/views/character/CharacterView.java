@@ -111,7 +111,7 @@ public final class CharacterView extends AppCompatImageView {
     private float getScaleForHighlightValue() {
         // Android float dimensions must be gotten through a typed value
         TypedValue outValue = new TypedValue();
-        getResources().getValue(R.dimen.highlighted_token, outValue, true);
+        getResources().getValue(R.dimen.highlighted_piece, outValue, true);
         return outValue.getFloat();
     }
 

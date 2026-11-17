@@ -5,13 +5,19 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
+
+import com.leaders.app.entities.CharacterSkins;
+import com.leaders.gamelogic.entities.Character;
+import com.leaders.gamelogic.entities.TransformedCharacter;
 
 public final class CharacterDisplay {
     public enum ViewType {
         Character,
+        Shine,
         Highlight,
-        Shine
+        Transformed
     }
 
     @NonNull
@@ -20,29 +26,43 @@ public final class CharacterDisplay {
     private final HighlightView highlightView;
     @NonNull
     private final CharacterShineView shineView;
+    @NonNull
+    private final CharacterTransformedView transformedView;
 
     private boolean isHighlighted;
 
     private OnCharacterDisplayClickListener onClickListener;
 
-    public CharacterDisplay(@NonNull Context context, @NonNull ViewGroup parentView) {
+    public CharacterDisplay(@NonNull Context context,
+                            @NonNull ConstraintLayout charactersLayer,
+                            @NonNull ConstraintLayout effectsLayer) {
         characterView = new CharacterView(context);
         characterView.setOnClickListener(this::onCharacterClick);
-        parentView.addView(characterView, getDefaultLayoutParams());
+        charactersLayer.addView(characterView, getDefaultLayoutParams());
 
         shineView = new CharacterShineView(context);
-        parentView.addView(shineView, getDefaultLayoutParams());
+        charactersLayer.addView(shineView, getDefaultLayoutParams());
 
         highlightView = new HighlightView(context, null);
-        parentView.addView(highlightView, getDefaultLayoutParams());
+        effectsLayer.addView(highlightView, getDefaultLayoutParams());
+
+        transformedView = new CharacterTransformedView(context);
+        effectsLayer.addView(transformedView, getDefaultLayoutParams());
 
         reset();
     }
 
     public void setSize(int size) {
         for (ViewType viewType : ViewType.values()) {
-            setSize(getCharacterViewFromType(viewType), size);
+            setSize(getCharacterViewFromType(viewType), (int) (size * getSizeRatioFromType(viewType)));
         }
+    }
+
+    private float getSizeRatioFromType(@NonNull ViewType viewType) {
+        if (viewType == ViewType.Transformed) {
+            return 0.48f;
+        }
+        return 1f;
     }
 
     private void setSize(@NonNull View view, int size) {
@@ -58,6 +78,7 @@ public final class CharacterDisplay {
         return characterView;
     }
 
+    @NonNull
     private ConstraintLayout.LayoutParams getDefaultLayoutParams() {
         ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(
                 ConstraintLayout.LayoutParams.MATCH_CONSTRAINT,
@@ -83,6 +104,8 @@ public final class CharacterDisplay {
 
         shineView.stopShine();
         shineView.setVisibility(View.GONE);
+
+        transformedView.setVisibility(View.GONE);
     }
 
     public void setVisibility(int visibility) {
@@ -108,6 +131,7 @@ public final class CharacterDisplay {
             case Character: return characterView;
             case Highlight: return highlightView;
             case Shine: return shineView;
+            case Transformed: return transformedView;
             default: throw new IllegalArgumentException("No character view found for type: " + viewType);
         }
     }
@@ -126,12 +150,31 @@ public final class CharacterDisplay {
         characterView.setOnLongClickListener(onLongClickListener);
     }
 
+    public void applyTransformedCharacter(@Nullable TransformedCharacter transformedCharacter,
+                                          @NonNull CharacterSkins characterSkins) {
+        transformedView.setVisibility(transformedCharacter != null ? View.VISIBLE : View.GONE);
+
+        Character character = transformedCharacter != null ?
+                transformedCharacter.getTransformedState().getCharacterBefore() : null;
+
+        if (character != null) {
+            transformedView.setCharacter(character, characterSkins.getCharacterSkin(character));
+        } else {
+            transformedView.clearCharacter();
+        }
+    }
+
     public void setIsHighlighted(boolean isHighlighted, boolean animateCharacterScaling) {
         this.isHighlighted = isHighlighted;
 
         characterView.scaleForHighlight(isHighlighted, animateCharacterScaling);
         highlightView.setVisibility(isHighlighted ? View.VISIBLE : View.GONE);
+        // The character shine view visibility depends on the highlight visibility
         shineView.setVisibility(isHighlighted ? View.VISIBLE : View.GONE);
+    }
+
+    public void hide(ViewType viewType) {
+        getCharacterViewFromType(viewType).setVisibility(View.GONE);
     }
 
     public boolean isHighlighted() {
@@ -143,7 +186,6 @@ public final class CharacterDisplay {
             return;
         }
 
-        bringToFront();
         shineView.playShine();
     }
 
@@ -161,10 +203,9 @@ public final class CharacterDisplay {
         highlightView.stopAnimation();
     }
 
-    public void bringToFront() {
-        characterView.bringToFront();
-        shineView.bringToFront();
-        highlightView.bringToFront();
+    public void stopEffectsAnimation() {
+        stopHighlightAnimation();
+        stopShineAnimation();
     }
 
     public void clearTarget() {

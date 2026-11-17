@@ -46,5 +46,7 @@
     <dimen name="characters_edit_icon_size">24dp</dimen>
     <dimen name="characters_edit_icon_margin">4dp</dimen>
 
-    <dimen name="highlighted_token" format="float">0.87</dimen>
+    <dimen name="highlighted_piece" format="float">0.87</dimen>
+    <dimen name="transformed_piece_max_ratio" format="float">0.02</dimen>
+    <dimen name="transformed_piece_min_size">1dp</dimen>
 </resources>
