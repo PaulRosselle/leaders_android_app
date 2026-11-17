@@ -86,6 +86,8 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
         super.initDatas();
 
         Settings settings = ((LeadersApplication) getApplication()).getSettings();
+
+        // TODO - rework loading
         // First player setup is always loaded with the username
         psvFirst.setName(settings.getUserName());
 
@@ -165,6 +167,7 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
     }
 
     private void onStartGameClick(View v) {
+        // TODO - save settings on game start
         Intent intent = ActivityType.DuelPlayer.getIntent(this);
 
         List<PlayerSetup> playerSetups = new ArrayList<>();
