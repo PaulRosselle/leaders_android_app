@@ -171,8 +171,12 @@ public final class CharacterDisplay {
 
         characterView.scaleForHighlight(isHighlighted, animateCharacterScaling);
         highlightView.setVisibility(isHighlighted ? View.VISIBLE : View.GONE);
+        // The character shine view visibility depends on the highlight visibility
         shineView.setVisibility(isHighlighted ? View.VISIBLE : View.GONE);
-        // TODO - take into account transformedView
+    }
+
+    public void hide(ViewType viewType) {
+        getCharacterViewFromType(viewType).setVisibility(View.GONE);
     }
 
     public boolean isHighlighted() {

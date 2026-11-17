@@ -708,6 +708,7 @@ public final class CharacterActionAnimator extends ActionAnimator {
                                   float destX, float destY) {
         characterDisplay.stopEffectsAnimation();
         characterDisplay.setIsHighlighted(false, true);
+        characterDisplay.hide(CharacterDisplay.ViewType.Transformed);
         characterDisplay.getCharacterView().bringToFront();
 
         // Since we're animating the movement of the characterView alone,

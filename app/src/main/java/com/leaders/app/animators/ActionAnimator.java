@@ -32,6 +32,7 @@ public abstract class ActionAnimator {
                                   @Nullable Runnable onAnimationEnd) {
         characterDisplay.stopEffectsAnimation();
         characterDisplay.setIsHighlighted(false, false);
+        characterDisplay.hide(CharacterDisplay.ViewType.Transformed);
 
         characterDisplay.getCharacterView().animate().scaleX(0f).scaleY(0f).alpha(0f)
                 .setInterpolator(new AccelerateDecelerateInterpolator())
