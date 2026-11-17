@@ -48,10 +48,12 @@ public final class PuzzleEditionUtils {
         throw new AssertionError("Cannot instantiate utility class");
     }
 
+    @NonNull
     public static String getPuzzleValidityErrors(@NonNull Context context, @NonNull GameHistory gameHistory) {
         return getPuzzleValidityErrors(context, GameFactory.create(gameHistory));
     }
 
+    @NonNull
     public static String getPuzzleValidityErrors(@NonNull Context context, @NonNull Game game) {
         // A puzzle is invalid if :
         // 1. It is empty
