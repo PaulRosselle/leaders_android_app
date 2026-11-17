@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
+import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.factories.GameFactory;
 import com.leaders.gamelogic.queries.BoardQuery;
@@ -43,6 +44,10 @@ public final class PuzzleExportUtils {
         }
 
         return String.format(LbeUtils.DEFAULT_URL + tokenDatas);
+    }
+
+    public static String getLbeUrl(@NonNull Game game) {
+        return ""; // TODO
     }
 
     private static String getCharacters(@NonNull Board board, @NonNull TeamColor teamColor) {

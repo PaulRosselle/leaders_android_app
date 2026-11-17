@@ -66,6 +66,10 @@ public class CharacterTypeUtils {
 
     //region IMPORT / EXPORT METHODS
 
+    public static boolean canTransformInto(@NonNull CharacterType characterType) {
+        return characterType == CharacterType.Frog;
+    }
+
     public static int getCharacterExportId(@NonNull CharacterType characterType) {
         switch (characterType) {
             case Acrobat: return 3;

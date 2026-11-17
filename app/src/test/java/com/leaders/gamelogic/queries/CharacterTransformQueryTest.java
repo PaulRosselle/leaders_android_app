@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class CharacterTransformUtilsTest {
+public class CharacterTransformQueryTest {
 
     private Character createCharacter(CharacterType characterType) {
         return Character.create(characterType, TeamColor.Black);
@@ -62,7 +62,7 @@ public class CharacterTransformUtilsTest {
                 )
         );
 
-        assertTrue(CharacterTransformUtils.isTransformMotion(motion));
+        assertTrue(CharacterTransformQuery.isTransformMotion(motion));
     }
 
     @Test
@@ -85,7 +85,7 @@ public class CharacterTransformUtilsTest {
                 )
         );
 
-        assertTrue(CharacterTransformUtils.isTransformMotion(motion));
+        assertTrue(CharacterTransformQuery.isTransformMotion(motion));
     }
 
     @Test
@@ -101,7 +101,7 @@ public class CharacterTransformUtilsTest {
                 )
         );
 
-        assertFalse(CharacterTransformUtils.isTransformMotion(motion));
+        assertFalse(CharacterTransformQuery.isTransformMotion(motion));
     }
 
     @Test
@@ -121,7 +121,7 @@ public class CharacterTransformUtilsTest {
                     new ArrayList<>()
             );
 
-            assertFalse(CharacterTransformUtils.isTransformMotion(motion));
+            assertFalse(CharacterTransformQuery.isTransformMotion(motion));
         }
     }
 
@@ -146,7 +146,7 @@ public class CharacterTransformUtilsTest {
         );
 
         TransformedState state =
-                CharacterTransformUtils.getStateFromTranformMotion(motion);
+                CharacterTransformQuery.getStateFromTranformMotion(motion);
 
         assertSame(character, state.getCharacterBefore());
         assertSame(transformedCharacter, state.getCharacterAfter());
@@ -173,7 +173,7 @@ public class CharacterTransformUtilsTest {
         );
 
         TransformedState state =
-                CharacterTransformUtils.getStateFromTranformMotion(motion);
+                CharacterTransformQuery.getStateFromTranformMotion(motion);
 
         assertSame(transformedCharacter, state.getCharacterBefore());
         assertSame(character, state.getCharacterAfter());
@@ -195,7 +195,7 @@ public class CharacterTransformUtilsTest {
 
         IllegalStateException exception = assertThrows(
                 IllegalStateException.class,
-                () -> CharacterTransformUtils.getStateFromTranformMotion(motion)
+                () -> CharacterTransformQuery.getStateFromTranformMotion(motion)
         );
 
         assertTrue(Objects.requireNonNull(exception.getMessage()).contains("Invalid transform motion type"));
@@ -210,7 +210,7 @@ public class CharacterTransformUtilsTest {
 
         IllegalStateException exception = assertThrows(
                 IllegalStateException.class,
-                () -> CharacterTransformUtils.getStateFromTranformMotion(motion)
+                () -> CharacterTransformQuery.getStateFromTranformMotion(motion)
         );
 
         assertEquals(
@@ -234,7 +234,7 @@ public class CharacterTransformUtilsTest {
 
         IllegalStateException exception = assertThrows(
                 IllegalStateException.class,
-                () -> CharacterTransformUtils.getStateFromTranformMotion(motion)
+                () -> CharacterTransformQuery.getStateFromTranformMotion(motion)
         );
 
         assertEquals(
@@ -266,7 +266,7 @@ public class CharacterTransformUtilsTest {
 
         IllegalStateException exception = assertThrows(
                 IllegalStateException.class,
-                () -> CharacterTransformUtils.getStateFromTranformMotion(motion)
+                () -> CharacterTransformQuery.getStateFromTranformMotion(motion)
         );
 
         assertEquals(
@@ -295,7 +295,7 @@ public class CharacterTransformUtilsTest {
 
         IllegalStateException exception = assertThrows(
                 IllegalStateException.class,
-                () -> CharacterTransformUtils.getStateFromTranformMotion(motion)
+                () -> CharacterTransformQuery.getStateFromTranformMotion(motion)
         );
 
         assertEquals(
@@ -317,7 +317,7 @@ public class CharacterTransformUtilsTest {
 
         Position position = new Position(3, 3);
 
-        CharacterActionMotion motion = CharacterTransformUtils.createTransformMotion(
+        CharacterActionMotion motion = CharacterTransformQuery.createTransformMotion(
                 CharacterMotionType.Transform,
                 originCharacter,
                 transformedCharacter,
@@ -339,7 +339,7 @@ public class CharacterTransformUtilsTest {
 
         Position position = new Position(3, 3);
 
-        CharacterActionMotion motion = CharacterTransformUtils.createTransformMotion(
+        CharacterActionMotion motion = CharacterTransformQuery.createTransformMotion(
                 CharacterMotionType.Untransform,
                 transformedCharacter,
                 originCharacter,
@@ -359,7 +359,7 @@ public class CharacterTransformUtilsTest {
                 TeamColor.Black
         );
 
-        CharacterActionMotion motion = CharacterTransformUtils.createTransformMotion(
+        CharacterActionMotion motion = CharacterTransformQuery.createTransformMotion(
                 CharacterMotionType.Transform,
                 originCharacter,
                 transformedCharacter,
@@ -379,7 +379,7 @@ public class CharacterTransformUtilsTest {
                 TeamColor.Black
         );
 
-        CharacterActionMotion motion = CharacterTransformUtils.createTransformMotion(
+        CharacterActionMotion motion = CharacterTransformQuery.createTransformMotion(
                 CharacterMotionType.Transform,
                 originCharacter,
                 transformedCharacter,
@@ -402,7 +402,7 @@ public class CharacterTransformUtilsTest {
 
         Position position = new Position(3, 3);
 
-        CharacterActionMotion motion = CharacterTransformUtils.createTransformMotion(
+        CharacterActionMotion motion = CharacterTransformQuery.createTransformMotion(
                 CharacterMotionType.Transform,
                 originCharacter,
                 transformedCharacter,
@@ -431,7 +431,7 @@ public class CharacterTransformUtilsTest {
 
         Position position = new Position(3, 3);
 
-        CharacterActionMotion motion = CharacterTransformUtils.createTransformMotion(
+        CharacterActionMotion motion = CharacterTransformQuery.createTransformMotion(
                 CharacterMotionType.Transform,
                 originCharacter,
                 transformedCharacter,

@@ -154,7 +154,7 @@ public class AutoPlayQueryTest {
 
     private static CharacterAction createTransformAction(Character source, Character before,
                                                          Character frog, Position position) {
-        return new CharacterAction(source, List.of(CharacterTransformUtils.createTransformMotion(
+        return new CharacterAction(source, List.of(CharacterTransformQuery.createTransformMotion(
                 CharacterMotionType.Transform, before, frog, position)));
     }
 

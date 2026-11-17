@@ -221,7 +221,7 @@ public final class AutoPlayQuery {
         }
 
         Character frog = transformedFrogState.getCharacterAfter();
-        return new CharacterAction(frog, List.of(CharacterTransformUtils.createTransformMotion(
+        return new CharacterAction(frog, List.of(CharacterTransformQuery.createTransformMotion(
                 CharacterMotionType.Untransform,
                 frog,
                 transformedFrogState.getCharacterBefore(),
