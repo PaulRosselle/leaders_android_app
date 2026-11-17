@@ -13,9 +13,9 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 
 import com.leaders.R;
+import com.leaders.app.entities.CharacterSkins;
 import com.leaders.app.entities.PortraitInfo;
 import com.leaders.app.enums.CharacterExpansion;
-import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.app.enums.PortraitDisplayMode;
 import com.leaders.app.utilities.CharacterCardUtils;
 import com.leaders.app.views.portrait.PortraitGroupView;
@@ -42,8 +42,8 @@ public class ExpansionCharactersSetupView extends ConstraintLayout {
     private LinearLayout llyPortraits;
 
     private CharacterExpansion expansion;
+    private CharacterSkins characterSkins;
     private Listener listener;
-
 
     public ExpansionCharactersSetupView(@NonNull Context context) {
         super(context);
@@ -123,7 +123,7 @@ public class ExpansionCharactersSetupView extends ConstraintLayout {
 
     @NonNull
     private PortraitInfo getPortraitInfo(@NonNull CharacterCard card, boolean isBanned) {
-        return new PortraitInfo(card, CharacterSkinType.Default, isBanned, PortraitDisplayMode.Hexagonal);
+        return new PortraitInfo(card, characterSkins.getCharacterSkin(card), isBanned, PortraitDisplayMode.Hexagonal);
     }
 
     private LinearLayout.LayoutParams getPortraitGroupLayoutParams() {
@@ -136,6 +136,10 @@ public class ExpansionCharactersSetupView extends ConstraintLayout {
         layoutParams.topMargin = (int) (4 * getResources().getDisplayMetrics().density);
 
         return layoutParams;
+    }
+
+    public void setCharacterSkins(CharacterSkins characterSkins) {
+        this.characterSkins = characterSkins;
     }
 
     private void onPortraitClick(View v) {

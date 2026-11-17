@@ -96,7 +96,10 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
         initPlayerSetup(settings.getDuelSetup().getPlayerSetup2(), psvSecond);
         gmvGameMode.setGameMode(settings.getDuelSetup().getGameMode());
         fpvFirstPlayer.setTeam(settings.getDuelSetup().getFirstPlayerTeam());
+
+        csvCharacters.setCharacterSkins(settings.getCharacterSkins());
         csvCharacters.applySetup(settings.getDuelSetup().getCharactersSetup());
+        cnvCardInfo.setCharacterSkins(settings.getCharacterSkins());
     }
 
     private void initPlayerSetup(@NonNull PlayerSetup playerSetup,
