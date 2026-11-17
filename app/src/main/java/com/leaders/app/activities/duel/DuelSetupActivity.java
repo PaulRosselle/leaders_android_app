@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import com.leaders.R;
 import com.leaders.app.activities.BaseActivity;
 import com.leaders.app.entities.CharactersSetup;
+import com.leaders.app.entities.DuelSetup;
 import com.leaders.app.entities.LeadersApplication;
 import com.leaders.app.entities.PlayerSetup;
 import com.leaders.app.entities.Settings;
@@ -14,6 +15,7 @@ import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.LeaderType;
 import com.leaders.app.utilities.DuelStartUtils;
 import com.leaders.app.utilities.ExtraUtils;
+import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.views.character.CharacterNotificationView;
 import com.leaders.app.views.duel.PlayerSetupView;
 import com.leaders.app.views.duel.setup.CharactersSetupFormView;
@@ -21,7 +23,9 @@ import com.leaders.app.views.duel.setup.CharactersSetupView;
 import com.leaders.app.views.duel.setup.FirstPlayerView;
 import com.leaders.app.views.duel.setup.GameModeView;
 import com.leaders.app.views.portrait.PortraitView;
+import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.GameHistory;
+import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
@@ -29,9 +33,6 @@ import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
 import org.json.JSONException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
@@ -88,23 +89,24 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
 
         settings = ((LeadersApplication) getApplication()).getSettings();
 
-        // TODO - rework loading
-        // First player setup is always loaded with the username
-        psvFirst.setName(settings.getUserName());
+        initPlayerSetup(settings.getDuelSetup().getPlayerSetup1(), psvFirst);
+        if (!settings.getUserName().isEmpty()) {
+            psvFirst.setHint(settings.getUserName());
+        }
+        initPlayerSetup(settings.getDuelSetup().getPlayerSetup2(), psvSecond);
+        gmvGameMode.setGameMode(settings.getDuelSetup().getGameMode());
+        fpvFirstPlayer.setTeam(settings.getDuelSetup().getFirstPlayerTeam());
+        csvCharacters.applySetup(settings.getDuelSetup().getCharactersSetup());
+    }
 
-        // Player team color
-        TeamColor teamColor = random.nextBoolean() ? TeamColor.Black : TeamColor.White;
-        psvFirst.setTeamColor(teamColor);
-        psvSecond.setTeamColor(teamColor.getOpposite());
+    private void initPlayerSetup(@NonNull PlayerSetup playerSetup,
+                                 @NonNull PlayerSetupView playerSetupView) {
+        Player player = playerSetup.createPlayer();
+        Character leader = playerSetup.createLeader();
 
-        // Player leader
-        List<LeaderType> leaderTypes = new ArrayList<>(Arrays.asList(LeaderType.values()));
-        Collections.shuffle(leaderTypes);
-        psvFirst.setLeaderType(leaderTypes.remove(0));
-        psvSecond.setLeaderType(leaderTypes.remove(0));
-
-        // Characters
-        csvCharacters.applySetup(new CharactersSetup(new HashSet<>(), new HashSet<>()));
+        playerSetupView.setName(player.getName());
+        playerSetupView.setTeamColor(player.getTeamColor());
+        playerSetupView.setLeaderType(LeaderType.getFromCharacter(leader));
     }
 
     @Override
@@ -168,7 +170,6 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
     }
 
     private void onStartGameClick(View v) {
-        // TODO - save settings on game start
         Intent intent = ActivityType.DuelPlayer.getIntent(this);
 
         List<PlayerSetup> playerSetups = new ArrayList<>();
@@ -188,7 +189,19 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
             throw new RuntimeException(e);
         }
 
+        saveSettings();
         goToActivity(intent);
+    }
+
+    private void saveSettings() {
+        settings.setDuelSetup(new DuelSetup(
+                psvFirst.getPlayerSetup(),
+                psvSecond.getPlayerSetup(),
+                gmvGameMode.getGameMode(),
+                fpvFirstPlayer.getTeam(),
+                csvCharacters.getSetup()
+        ));
+        JsonUtils.saveSettings(this, settings);
     }
 
     //endregion

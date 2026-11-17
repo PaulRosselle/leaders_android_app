@@ -169,6 +169,10 @@ public final class Settings {
         this.isFirstLaunch = isFirstLaunch;
     }
 
+    public void setDuelSetup(@NonNull DuelSetup duelSetup) {
+        this.duelSetup = duelSetup;
+    }
+
     @NonNull
     public CharacterSkins getCharacterSkins() {
         return characterSkins;
@@ -191,5 +195,10 @@ public final class Settings {
 
     public void setCharacterSkin(@NonNull CharacterCard card, @NonNull CharacterSkinType skinType) {
         characterSkins.setCharacterSkin(card, skinType);
+    }
+
+    @NonNull
+    public DuelSetup getDuelSetup() {
+        return duelSetup;
     }
 }
