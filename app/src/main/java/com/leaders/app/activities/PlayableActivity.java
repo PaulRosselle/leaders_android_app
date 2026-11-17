@@ -244,7 +244,6 @@ public abstract class PlayableActivity extends BaseActivity
 
     protected void highlightPlayableCharacters(@NonNull GameContext gameContext,
                                                @NonNull InteractionRequest request) {
-
         bdvBoard.highlightPlayableCharacters(
                 gameContext.getPlayableCharacters(),
                 request.getContext().getTargetCharacter(),
@@ -262,6 +261,11 @@ public abstract class PlayableActivity extends BaseActivity
         }
     }
 
+    private void displayTransformedCharacters(@NonNull GameContext gameContext) {
+        // TODO
+        bdvBoard.updateTransformedDisplays(gameContext.getTransformedCharacters());
+    }
+
     protected void applyInteractionTargets(@NonNull GameContext gameContext,
                                            @NonNull InteractionRequest request) {
         bdvBoard.applyTargets(request.getLegalTargets(), request.getContext(), gameContext.getBoard());
@@ -270,6 +274,7 @@ public abstract class PlayableActivity extends BaseActivity
     protected void updateInteractionUI(@NonNull GameContext gameContext,
                                        @NonNull InteractionRequest request) {
         highlightPlayableCharacters(gameContext, request);
+        displayTransformedCharacters(gameContext);
 
         updateUndoButton();
     }

@@ -5,13 +5,21 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
+
+import com.leaders.app.entities.CharacterSkins;
+import com.leaders.app.enums.CharacterSkinType;
+import com.leaders.gamelogic.entities.Character;
+import com.leaders.gamelogic.entities.TransformedCharacter;
+import com.leaders.gamelogic.enums.TeamColor;
 
 public final class CharacterDisplay {
     public enum ViewType {
         Character,
+        Shine,
         Highlight,
-        Shine
+        Transformed
     }
 
     @NonNull
@@ -20,6 +28,8 @@ public final class CharacterDisplay {
     private final HighlightView highlightView;
     @NonNull
     private final CharacterShineView shineView;
+    @NonNull
+    private final CharacterView transformedView; // TODO - replace by a CharacterTransformedView
 
     private boolean isHighlighted;
 
@@ -38,13 +48,23 @@ public final class CharacterDisplay {
         highlightView = new HighlightView(context, null);
         effectsLayer.addView(highlightView, getDefaultLayoutParams());
 
+        transformedView = new CharacterView(context);
+        effectsLayer.addView(transformedView, getDefaultLayoutParams());
+
         reset();
     }
 
     public void setSize(int size) {
         for (ViewType viewType : ViewType.values()) {
-            setSize(getCharacterViewFromType(viewType), size);
+            setSize(getCharacterViewFromType(viewType), (int) (size * getSizeRatioFromType(viewType)));
         }
+    }
+
+    private float getSizeRatioFromType(@NonNull ViewType viewType) {
+        if (viewType == ViewType.Transformed) {
+            return 0.48f;
+        }
+        return 1f;
     }
 
     private void setSize(@NonNull View view, int size) {
@@ -86,6 +106,8 @@ public final class CharacterDisplay {
 
         shineView.stopShine();
         shineView.setVisibility(View.GONE);
+
+        transformedView.setVisibility(View.GONE);
     }
 
     public void setVisibility(int visibility) {
@@ -111,6 +133,7 @@ public final class CharacterDisplay {
             case Character: return characterView;
             case Highlight: return highlightView;
             case Shine: return shineView;
+            case Transformed: return transformedView;
             default: throw new IllegalArgumentException("No character view found for type: " + viewType);
         }
     }
@@ -129,12 +152,27 @@ public final class CharacterDisplay {
         characterView.setOnLongClickListener(onLongClickListener);
     }
 
+    public void applyTransformedCharacter(@Nullable TransformedCharacter transformedCharacter,
+                                          @NonNull CharacterSkins characterSkins) {
+        transformedView.setVisibility(transformedCharacter != null ? View.VISIBLE : View.GONE);
+
+        Character character = transformedCharacter != null ?
+                transformedCharacter.getTransformedState().getCharacterBefore() : null;
+
+        if (character != null) {
+            transformedView.setCharacter(character, characterSkins.getCharacterSkin(character));
+        } else {
+            transformedView.setCharacter(null, CharacterSkinType.Default, TeamColor.Black);
+        }
+    }
+
     public void setIsHighlighted(boolean isHighlighted, boolean animateCharacterScaling) {
         this.isHighlighted = isHighlighted;
 
         characterView.scaleForHighlight(isHighlighted, animateCharacterScaling);
         highlightView.setVisibility(isHighlighted ? View.VISIBLE : View.GONE);
         shineView.setVisibility(isHighlighted ? View.VISIBLE : View.GONE);
+        // TODO - take into account transformedView
     }
 
     public boolean isHighlighted() {

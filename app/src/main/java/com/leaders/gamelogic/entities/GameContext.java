@@ -148,7 +148,7 @@ public final class GameContext {
         return warningStates;
     }
 
-    @NonNull
+    @Nullable
     private static List<TransformedCharacter> getCurrentTransformedCharacters(@NonNull Game game) {
         List<TransformedCharacter> transformedCharacters = new ArrayList<>();
 
@@ -162,7 +162,7 @@ public final class GameContext {
             ));
         }
 
-        return transformedCharacters;
+        return transformedCharacters.isEmpty() ? null : transformedCharacters;
     }
 
     @NonNull
