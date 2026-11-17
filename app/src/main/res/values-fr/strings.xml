@@ -369,4 +369,5 @@
     <string name="alternate_characters">personnages alternatifs</string>
     <string name="current_game_characters">personnages pour cette partie</string>
     <string name="characters_game_info">Une partie démarre toujours avec 16 personnages.</string>
+    <string name="error_toast_transformed_frog_limited_to_one">Il ne peut y avoir qu\'un personnage transformé en grenouille sur le plateau</string>
 </resources>

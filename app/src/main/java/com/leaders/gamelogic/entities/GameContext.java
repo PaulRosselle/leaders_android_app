@@ -16,8 +16,6 @@ import com.leaders.gamelogic.queries.SelectableCardsQuery;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
 
 public final class GameContext {
     @NonNull
@@ -152,13 +150,12 @@ public final class GameContext {
     public static List<TransformedCharacter> getCurrentTransformedCharacters(@NonNull Game game) {
         List<TransformedCharacter> transformedCharacters = new ArrayList<>();
 
-        for (UUID uuid : game.getTransformedCharacterIds()) {
+        for (TransformedState transformedState : game.getTransformedCharacterStates()) {
             transformedCharacters.add(new TransformedCharacter(
-                    BoardQuery.getCellByCharacterId(game.getBoard(), uuid).getPosition(),
-                    Objects.requireNonNull(
-                            game.getTransformedState(uuid),
-                            "No transformed state found from id: " + uuid
-                    )
+                    BoardQuery.getCellByCharacterId(
+                            game.getBoard(), transformedState.getCharacterId()
+                    ).getPosition(),
+                    transformedState
             ));
         }
 

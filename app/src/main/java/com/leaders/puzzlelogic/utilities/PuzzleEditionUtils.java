@@ -42,7 +42,6 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 
 public final class PuzzleEditionUtils {
     private PuzzleEditionUtils(){
@@ -60,9 +59,8 @@ public final class PuzzleEditionUtils {
         // 3. "One per team character" constraint are not respected
         // 4. A leader is already captured or surrounded
         // 5. Multiple hermit or cubs are present on the player's team
-        // 6. No more than one frog per team
+        // 6. More than one character is transformed into a frog
 
-        // TODO - update to take into account news characters requirements
         StringBuilder builder = new StringBuilder();
         final String prefix = "\n• ";
 
@@ -72,7 +70,11 @@ public final class PuzzleEditionUtils {
             return builder.toString().trim();
         }
 
-        // TODO
+        if (game.getTransformedCharacterStates().stream()
+                .filter(state -> state.getCharacterAfter().getCharacterType() == CharacterType.Frog)
+                .count() > 1) {
+            builder.append(prefix).append(context.getString(R.string.error_toast_transformed_frog_limited_to_one));
+        }
 
         final TeamColor playerTeamColor = getPuzzlePlayerTeamColor();
 
@@ -275,19 +277,17 @@ public final class PuzzleEditionUtils {
     private static List<IGameAction> getTransformInitialActions(@NonNull Game game) {
         List<IGameAction> initialActions = new ArrayList<>();
 
-        for (UUID uuid : game.getTransformedCharacterIds()) {
-            Position position = BoardQuery.getCellByCharacterId(game.getBoard(), uuid).getPosition();
-            TransformedState state = Objects.requireNonNull(
-                    game.getTransformedState(uuid),
-                    "Transform state missing"
-            );
+        for (TransformedState transformedState : game.getTransformedCharacterStates()) {
+            Position position = BoardQuery.getCellByCharacterId(
+                    game.getBoard(), transformedState.getCharacterId()
+            ).getPosition();
 
             initialActions.add(new CharacterAction(
-                    state.getCharacterBefore(),
+                    transformedState.getCharacterBefore(),
                     List.of(CharacterTransformQuery.createTransformMotion(
                             CharacterMotionType.Transform,
-                            state.getCharacterBefore(),
-                            state.getCharacterAfter(),
+                            transformedState.getCharacterBefore(),
+                            transformedState.getCharacterAfter(),
                             position
                     ))
             ));

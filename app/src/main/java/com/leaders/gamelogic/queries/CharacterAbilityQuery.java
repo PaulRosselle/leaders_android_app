@@ -26,8 +26,6 @@ import com.leaders.gamelogic.historyentries.segments.Turn;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
 
 /**
  * Centralizes read-only queries related to character abilities whose scope goes
@@ -387,12 +385,7 @@ public final class CharacterAbilityQuery {
     public static TransformedState getExistingTransformedFrogState(@NonNull Game game) {
         TransformedState transformedFrogState = null;
 
-        for (UUID characterId : game.getTransformedCharacterIds()) {
-            TransformedState transformedState = Objects.requireNonNull(
-                    game.getTransformedState(characterId),
-                    "No transformed character found matching id: " + characterId
-            );
-
+        for (TransformedState transformedState : game.getTransformedCharacterStates()) {
             if (transformedState.getCharacterAfter().getCharacterType() == CharacterType.Frog) {
                 if (transformedFrogState != null) {
                     throw new IllegalStateException("There can be only one transformed frog on the board");
