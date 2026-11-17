@@ -122,6 +122,9 @@ public class ShamanActionResolver extends CharacterActionResolver {
     private InteractionFeedback buildTransformFeedback(@NonNull InteractionResult result) {
         List<CharacterActionMotion> motions = new ArrayList<>();
 
+        Position targetPos = ResolverUtils.getChosenPosition(result);
+        Character target = getCharacterAt(targetPos);
+
         // First we untransform any existing frog
         TransformedState transformedFrogState = CharacterAbilityQuery.getExistingTransformedFrogState(game);
         if (transformedFrogState != null) {
@@ -133,11 +136,14 @@ public class ShamanActionResolver extends CharacterActionResolver {
                             game.getBoard(), transformedFrogState.getCharacterId()).getPosition()
                     )
             );
+
+            // If the target was already transformed into a frog, we must use its original type
+            if (target.getId() == transformedFrogState.getCharacterId()) {
+                target = transformedFrogState.getCharacterBefore();
+            }
         }
 
         // Then we add the frog transformation motion
-        Position targetPos = ResolverUtils.getChosenPosition(result);
-        Character target = getCharacterAt(targetPos);
         Character transformedTarget = Character.transform(target, CharacterType.Frog, target.getTeamColor());
 
         motions.add(CharacterTransformQuery.createTransformMotion(
