@@ -6,6 +6,9 @@ import androidx.annotation.Nullable;
 import com.leaders.app.utilities.CharacterCardUtils;
 import com.leaders.gamelogic.enums.CharacterCard;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Objects;
 
 /**
@@ -67,5 +70,26 @@ public class AltCharacterSelection {
                 "character=" + character +
                 ", selectedAlternative=" + selectedAlternative +
                 '}';
+    }
+
+    @NonNull
+    public static AltCharacterSelection fromJson(@NonNull JSONObject jsonObject) throws JSONException {
+        Object selectedAlt = jsonObject.opt("selected_alternative");
+        return new AltCharacterSelection(
+                CharacterCard.valueOf(jsonObject.getString("character")),
+                selectedAlt instanceof String ? CharacterCard.valueOf((String) selectedAlt) : null
+        );
+    }
+
+    @NonNull
+    public JSONObject toJson() throws JSONException {
+        JSONObject joSelection = new JSONObject();
+
+        joSelection.put("character", character.name());
+        if (selectedAlternative != null) {
+            joSelection.put("selected_alternative", selectedAlternative.name());
+        }
+
+        return joSelection;
     }
 }

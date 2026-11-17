@@ -6,6 +6,10 @@ import com.leaders.app.enums.CharacterExpansion;
 import com.leaders.app.utilities.CharacterCardUtils;
 import com.leaders.gamelogic.enums.CharacterCard;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashSet;
@@ -120,5 +124,44 @@ public class CharactersSetup {
     @NonNull
     public Set<CharacterCard> getBannedCharacters() {
         return Set.copyOf(bannedCharacters);
+    }
+
+    @NonNull
+    public static CharactersSetup fromJson(@NonNull JSONObject jsonObject) throws JSONException {
+        Set<AltCharacterSelection> altSelections = new HashSet<>();
+        JSONArray jaAltSelections = jsonObject.optJSONArray("alt_character_selections");
+        if (jaAltSelections != null) {
+            for (int i = 0; i < jaAltSelections.length(); i++) {
+                altSelections.add(AltCharacterSelection.fromJson(jaAltSelections.getJSONObject(i)));
+            }
+        }
+
+        Set<CharacterCard> bannedCharacters = new HashSet<>();
+        JSONArray jaBanned = jsonObject.optJSONArray("banned_characters");
+        if (jaBanned != null) {
+            for (int i = 0; i < jaBanned.length(); i++) {
+                bannedCharacters.add(CharacterCard.valueOf(jaBanned.getString(i)));
+            }
+        }
+
+        // Missing alt selections are filled in by the constructor (initAltSelections)
+        return new CharactersSetup(altSelections, bannedCharacters);
+    }
+
+    @NonNull
+    public JSONObject toJson() throws JSONException {
+        JSONObject joSetup = new JSONObject();
+
+        JSONArray jaAltSelections = new JSONArray();
+        for (AltCharacterSelection selection : altCharacterSelections.values()) {
+            jaAltSelections.put(selection.toJson());
+        }
+        joSetup.put("alt_character_selections", jaAltSelections);
+
+        JSONArray jaBanned = new JSONArray();
+        bannedCharacters.stream().sorted().forEach(card -> jaBanned.put(card.name()));
+        joSetup.put("banned_characters", jaBanned);
+
+        return joSetup;
     }
 }
