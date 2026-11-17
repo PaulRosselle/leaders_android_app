@@ -3,6 +3,7 @@ package com.leaders.app.views.board;
 import android.animation.LayoutTransition;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
@@ -67,15 +68,23 @@ public abstract class BoardView extends ConstraintLayout {
         inflate(context, R.layout.view_board, this);
 
         imvBoard = findViewById(R.id.imvBoard_vwBoard);
+        ConstraintLayout flyCharacters = findViewById(R.id.flyCharacters_vwBoard);
+        ConstraintLayout flyEffects = findViewById(R.id.flyEffects_vwBoard);
         initCellViews();
-        characterDisplayPool = new CharacterDisplayPool(getContext(), this);
+        characterDisplayPool = new CharacterDisplayPool(getContext(), flyCharacters, flyEffects);
 
         setOrientation(BoardOrientation.Default);
         isCellPositionVisible = false;
         alwaysUseDefaultSkins = false;
 
         // Allow us to control better children animations using PropertyAnimators
-        LayoutTransition boardTransition = getLayoutTransition();
+        disableTransitions(this);
+        disableTransitions(flyCharacters);
+        disableTransitions(flyEffects);
+    }
+
+    private void disableTransitions(@NonNull ConstraintLayout constraintLayout) {
+        LayoutTransition boardTransition = constraintLayout.getLayoutTransition();
         if (boardTransition != null) {
             boardTransition.disableTransitionType(LayoutTransition.APPEARING);
             boardTransition.disableTransitionType(LayoutTransition.DISAPPEARING);

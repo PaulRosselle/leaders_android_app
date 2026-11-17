@@ -25,16 +25,18 @@ public final class CharacterDisplay {
 
     private OnCharacterDisplayClickListener onClickListener;
 
-    public CharacterDisplay(@NonNull Context context, @NonNull ViewGroup parentView) {
+    public CharacterDisplay(@NonNull Context context,
+                            @NonNull ConstraintLayout charactersLayer,
+                            @NonNull ConstraintLayout effectsLayer) {
         characterView = new CharacterView(context);
         characterView.setOnClickListener(this::onCharacterClick);
-        parentView.addView(characterView, getDefaultLayoutParams());
+        charactersLayer.addView(characterView, getDefaultLayoutParams());
 
         shineView = new CharacterShineView(context);
-        parentView.addView(shineView, getDefaultLayoutParams());
+        charactersLayer.addView(shineView, getDefaultLayoutParams());
 
         highlightView = new HighlightView(context, null);
-        parentView.addView(highlightView, getDefaultLayoutParams());
+        effectsLayer.addView(highlightView, getDefaultLayoutParams());
 
         reset();
     }
@@ -58,6 +60,7 @@ public final class CharacterDisplay {
         return characterView;
     }
 
+    @NonNull
     private ConstraintLayout.LayoutParams getDefaultLayoutParams() {
         ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(
                 ConstraintLayout.LayoutParams.MATCH_CONSTRAINT,
@@ -143,7 +146,6 @@ public final class CharacterDisplay {
             return;
         }
 
-        bringToFront();
         shineView.playShine();
     }
 
@@ -161,10 +163,9 @@ public final class CharacterDisplay {
         highlightView.stopAnimation();
     }
 
-    public void bringToFront() {
-        characterView.bringToFront();
-        shineView.bringToFront();
-        highlightView.bringToFront();
+    public void stopEffectsAnimation() {
+        stopHighlightAnimation();
+        stopShineAnimation();
     }
 
     public void clearTarget() {
