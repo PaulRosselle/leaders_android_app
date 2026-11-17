@@ -262,7 +262,6 @@ public abstract class PlayableActivity extends BaseActivity
     }
 
     private void displayTransformedCharacters(@NonNull GameContext gameContext) {
-        // TODO
         bdvBoard.updateTransformedDisplays(gameContext.getTransformedCharacters());
     }
 

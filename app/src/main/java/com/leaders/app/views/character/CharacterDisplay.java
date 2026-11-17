@@ -9,10 +9,8 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.leaders.app.entities.CharacterSkins;
-import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.TransformedCharacter;
-import com.leaders.gamelogic.enums.TeamColor;
 
 public final class CharacterDisplay {
     public enum ViewType {
@@ -29,7 +27,7 @@ public final class CharacterDisplay {
     @NonNull
     private final CharacterShineView shineView;
     @NonNull
-    private final CharacterView transformedView; // TODO - replace by a CharacterTransformedView
+    private final CharacterTransformedView transformedView;
 
     private boolean isHighlighted;
 
@@ -48,7 +46,7 @@ public final class CharacterDisplay {
         highlightView = new HighlightView(context, null);
         effectsLayer.addView(highlightView, getDefaultLayoutParams());
 
-        transformedView = new CharacterView(context);
+        transformedView = new CharacterTransformedView(context);
         effectsLayer.addView(transformedView, getDefaultLayoutParams());
 
         reset();
@@ -162,7 +160,7 @@ public final class CharacterDisplay {
         if (character != null) {
             transformedView.setCharacter(character, characterSkins.getCharacterSkin(character));
         } else {
-            transformedView.setCharacter(null, CharacterSkinType.Default, TeamColor.Black);
+            transformedView.clearCharacter();
         }
     }
 
