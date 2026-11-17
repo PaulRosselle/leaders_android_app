@@ -40,6 +40,8 @@ public final class CharacterCardView extends ConstraintLayout {
         imvHighlight = findViewById(R.id.imvCardHighlight_vwCharacterCard);
         txvCardName = findViewById(R.id.txvCardName_vwCharacterCard);
 
+        imvCard.setBackgroundResource(R.drawable.character_card_bg);
+
         card = CharacterCard.RoyalGuard;
         skinType = CharacterSkinType.Default;
     }
