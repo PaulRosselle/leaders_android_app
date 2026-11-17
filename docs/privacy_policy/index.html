@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-current="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -30,6 +31,53 @@
             color: var(--font);
             background: var(--background);
             -webkit-font-smoothing: antialiased;
+        }
+
+        /* Language handling */
+        [data-lang] {
+            display: none;
+        }
+
+        html[data-current="en"] [data-lang="en"],
+        html[data-current="fr"] [data-lang="fr"] {
+            display: block;
+        }
+
+        .lang-switch {
+            text-align: right;
+            font-size: 0.9rem;
+            margin: 0 0 8px;
+        }
+
+        .lang-switch span {
+            color: var(--muted);
+        }
+
+        .lang-switch button {
+            background: none;
+            border: 0;
+            padding: 0 2px;
+            cursor: default;
+            font: inherit;
+            color: var(--muted);
+            text-decoration: none;
+            text-decoration-color: #8D692D;
+            text-underline-offset: 3px;
+        }
+
+        .lang-switch button:hover {
+            color: var(--font);
+        }
+
+        .lang-switch button:focus-visible {
+            outline: 2px solid var(--golden);
+            outline-offset: 4px;
+        }
+
+        .lang-switch button[aria-pressed="true"] {
+            color: var(--golden);
+            text-decoration: underline;
+            cursor: pointer;
         }
 
         header {
@@ -75,7 +123,8 @@
             border-left: 3px solid var(--golden);
         }
 
-        p, li {
+        p,
+        li {
             font-size: 1rem;
         }
 
@@ -119,6 +168,7 @@
 
         footer p {
             font-size: 0.85rem;
+            margin: 0;
         }
 
         @media (max-width: 480px) {
@@ -146,205 +196,442 @@
 
 <body>
 
-<header>
-    <img
-        class="logo"
-        src="https://raw.githubusercontent.com/PaulRosselle/leaders_android_app/main/app/src/main/res/drawable-nodpi/logo_leaders.webp"
-        alt="Leaders game logo"
-    >
+    <nav class="lang-switch" aria-label="Language / Langue">
+        <button type="button" data-set="en" aria-pressed="true">English</button>
+        <span>·</span>
+        <button type="button" data-set="fr" aria-pressed="false">Français</button>
+    </nav>
 
-    <h1>Privacy Policy</h1>
-    <p class="date">Last updated: October 27, 2026</p>
-</header>
+    <header>
+        <img class="logo"
+            src="https://raw.githubusercontent.com/PaulRosselle/leaders_android_app/main/app/src/main/res/drawable-nodpi/logo_leaders.webp"
+            alt="Leaders game logo">
 
-<main>
-    <p class="intro">
-        This Privacy Policy explains how the <strong>Leaders</strong>
-        application handles information and files when you use
-        the application.
-    </p>
+        <div data-lang="en" lang="en">
+            <h1>Privacy Policy</h1>
+            <p class="date">Last updated: November 17, 2026</p>
+        </div>
 
-    <section>
-        <h2>1. Overview</h2>
+        <div data-lang="fr" lang="fr">
+            <h1>Politique de confidentialité</h1>
+            <p class="date">Dernière mise à jour : 17 novembre 2026</p>
+        </div>
+    </header>
 
-        <p>
-            Leaders is an offline Android application. The application
-            is designed to operate locally on your device and does not
-            require an account, registration, or an internet connection.
+    <!-- ===================== ENGLISH ===================== -->
+    <main data-lang="en" lang="en">
+        <p class="intro">
+            This Privacy Policy explains how the <strong>Leaders</strong>
+            application handles information and files when you use
+            the application.
         </p>
 
-        <p>
-            Leaders does not collect, transmit, sell, or share personal
-            information with the developer or with third parties.
+        <section>
+            <h2>1. Overview</h2>
+
+            <p>
+                Leaders is an offline Android application. The application
+                is designed to operate locally on your device and does not
+                require an account, registration, or an internet connection.
+            </p>
+
+            <p>
+                Leaders does not collect, transmit, sell, or share personal
+                information with the developer or with third parties.
+            </p>
+        </section>
+
+        <section>
+            <h2>2. Information We Collect</h2>
+
+            <p>
+                Leaders does not collect or transmit personal information
+                to the developer or to third parties.
+            </p>
+
+            <p>
+                The application does not require you to provide your name,
+                email address, phone number, location, account credentials,
+                or any other personal information.
+            </p>
+
+            <p>
+                Leaders does not use advertising SDKs, analytics services,
+                tracking technologies, or third-party services to collect
+                information about your use of the application.
+            </p>
+        </section>
+
+        <section>
+            <h2>3. Files and Storage Access</h2>
+
+            <p>
+                Leaders may allow you to import or export puzzles and
+                replay files in JSON format. Access to files is initiated
+                explicitly by you using the standard Android file selection
+                interface.
+            </p>
+
+            <p>
+                When you choose a file to import, Leaders accesses only
+                the file that you explicitly select.
+            </p>
+
+            <p>
+                When you choose a folder for export, Leaders creates the
+                exported file in the location that you explicitly select.
+            </p>
+
+            <p>
+                Leaders does not automatically scan your device, access
+                your files without your action, or request broad access
+                to your device storage.
+            </p>
+        </section>
+
+        <section>
+            <h2>4. How Files Are Used</h2>
+
+            <p>
+                Files selected by you are processed locally on your
+                Android device for the purpose of importing or exporting
+                puzzles or replays.
+            </p>
+
+            <p>
+                The contents of these files are not uploaded to a server
+                and are not transmitted to the developer or to any third
+                party by Leaders.
+            </p>
+        </section>
+
+        <section>
+            <h2>5. Data Sharing</h2>
+
+            <p>
+                Leaders does not share personal information or user files
+                with third parties.
+            </p>
+
+            <p>
+                Because Leaders operates offline and does not transmit
+                user data to external services, there is no third-party
+                data sharing performed by the application.
+            </p>
+        </section>
+
+        <section>
+            <h2>6. Data Security</h2>
+
+            <p>
+                Leaders does not maintain a remote database containing
+                user information. Data and files handled by the application
+                remain on your device unless you choose to copy, export,
+                or otherwise share them yourself using Android or another
+                application.
+            </p>
+        </section>
+
+        <section>
+            <h2>7. Data Retention and Deletion</h2>
+
+            <p>
+                Leaders does not retain personal information on external
+                servers.
+            </p>
+
+            <p>
+                Files exported by the application to a location selected
+                by the user remain in that location until the user deletes
+                or moves them.
+            </p>
+        </section>
+
+        <section>
+            <h2>8. Children's Privacy</h2>
+
+            <p>
+                Leaders does not knowingly collect personal information
+                from children or adults. The application does not require
+                users to create accounts or provide personal information.
+            </p>
+        </section>
+
+        <section>
+            <h2>9. Internet Access</h2>
+
+            <p>
+                Leaders is designed to function offline and does not
+                require an internet connection to use its core features.
+            </p>
+
+            <p>
+                The application does not send user data to remote servers.
+            </p>
+        </section>
+
+        <section>
+            <h2>10. Changes to This Privacy Policy</h2>
+
+            <p>
+                This Privacy Policy may be updated from time to time
+                to reflect changes to the application or applicable
+                requirements.
+            </p>
+
+            <p>
+                Any updated version will be published on this page
+                with a revised "Last updated" date.
+            </p>
+        </section>
+
+        <section>
+            <h2>11. Contact</h2>
+
+            <p>
+                If you have any questions about this Privacy Policy
+                or the privacy practices of Leaders, you can contact
+                the developer at:
+            </p>
+
+            <p>
+                <strong>Paul Rosselle</strong><br>
+                Email:
+                <a href="mailto:leaders.unofficial.app@gmail.com">
+                    leaders.unofficial.app@gmail.com
+                </a>
+            </p>
+        </section>
+    </main>
+
+    <!-- ===================== FRANÇAIS ===================== -->
+    <main data-lang="fr" lang="fr">
+        <p class="intro">
+            Cette politique de confidentialité explique comment l'application
+            <strong>Leaders</strong> traite les informations et les fichiers
+            lorsque vous l'utilisez.
         </p>
-    </section>
 
-    <section>
-        <h2>2. Information We Collect</h2>
+        <section>
+            <h2>1. Présentation</h2>
 
-        <p>
-            Leaders does not collect or transmit personal information
-            to the developer or to third parties.
-        </p>
+            <p>
+                Leaders est une application Android hors ligne. Elle est conçue
+                pour fonctionner localement sur votre appareil et ne nécessite
+                ni compte, ni inscription, ni connexion à Internet.
+            </p>
 
-        <p>
-            The application does not require you to provide your name,
-            email address, phone number, location, account credentials,
-            or any other personal information.
-        </p>
+            <p>
+                Leaders ne collecte, ne transmet, ne vend ni ne partage aucune
+                information personnelle avec le développeur ou avec des tiers.
+            </p>
+        </section>
 
-        <p>
-            Leaders does not use advertising SDKs, analytics services,
-            tracking technologies, or third-party services to collect
-            information about your use of the application.
-        </p>
-    </section>
+        <section>
+            <h2>2. Informations collectées</h2>
 
-    <section>
-        <h2>3. Files and Storage Access</h2>
+            <p>
+                Leaders ne collecte ni ne transmet d'informations personnelles
+                au développeur ou à des tiers.
+            </p>
 
-        <p>
-            Leaders may allow you to import or export puzzles and
-            replay files in JSON format. Access to files is initiated
-            explicitly by you using the standard Android file selection
-            interface.
-        </p>
+            <p>
+                L'application ne vous demande pas de fournir votre nom, votre
+                adresse e-mail, votre numéro de téléphone, votre position, des
+                identifiants de compte ou toute autre information personnelle.
+            </p>
 
-        <p>
-            When you choose a file to import, Leaders accesses only
-            the file that you explicitly select.
-        </p>
+            <p>
+                Leaders n'utilise aucun SDK publicitaire, service d'analyse,
+                technologie de suivi ou service tiers pour collecter des
+                informations sur votre utilisation de l'application.
+            </p>
+        </section>
 
-        <p>
-            When you choose a folder for export, Leaders creates the
-            exported file in the location that you explicitly select.
-        </p>
+        <section>
+            <h2>3. Fichiers et accès au stockage</h2>
 
-        <p>
-            Leaders does not automatically scan your device, access
-            your files without your action, or request broad access
-            to your device storage.
-        </p>
-    </section>
+            <p>
+                Leaders peut vous permettre d'importer ou d'exporter des puzzles
+                et des fichiers de replay au format JSON. L'accès aux fichiers
+                est toujours initié explicitement par vous, via l'interface
+                standard de sélection de fichiers d'Android.
+            </p>
 
-    <section>
-        <h2>4. How Files Are Used</h2>
+            <p>
+                Lorsque vous choisissez un fichier à importer, Leaders accède
+                uniquement au fichier que vous avez explicitement sélectionné.
+            </p>
 
-        <p>
-            Files selected by you are processed locally on your
-            Android device for the purpose of importing or exporting
-            puzzles or replays.
-        </p>
+            <p>
+                Lorsque vous choisissez un dossier pour l'export, Leaders crée
+                le fichier exporté à l'emplacement que vous avez explicitement
+                sélectionné.
+            </p>
 
-        <p>
-            The contents of these files are not uploaded to a server
-            and are not transmitted to the developer or to any third
-            party by Leaders.
-        </p>
-    </section>
+            <p>
+                Leaders n'analyse pas automatiquement votre appareil, n'accède
+                pas à vos fichiers sans action de votre part et ne demande pas
+                d'accès étendu au stockage de votre appareil.
+            </p>
+        </section>
 
-    <section>
-        <h2>5. Data Sharing</h2>
+        <section>
+            <h2>4. Utilisation des fichiers</h2>
 
-        <p>
-            Leaders does not share personal information or user files
-            with third parties.
-        </p>
+            <p>
+                Les fichiers que vous sélectionnez sont traités localement sur
+                votre appareil Android, dans le seul but d'importer ou d'exporter
+                des puzzles ou des replays.
+            </p>
 
-        <p>
-            Because Leaders operates offline and does not transmit
-            user data to external services, there is no third-party
-            data sharing performed by the application.
-        </p>
-    </section>
+            <p>
+                Le contenu de ces fichiers n'est pas envoyé vers un serveur et
+                n'est transmis ni au développeur ni à un tiers par Leaders.
+            </p>
+        </section>
 
-    <section>
-        <h2>6. Data Security</h2>
+        <section>
+            <h2>5. Partage des données</h2>
 
-        <p>
-            Leaders does not maintain a remote database containing
-            user information. Data and files handled by the application
-            remain on your device unless you choose to copy, export,
-            or otherwise share them yourself using Android or another
-            application.
-        </p>
-    </section>
+            <p>
+                Leaders ne partage aucune information personnelle ni aucun
+                fichier utilisateur avec des tiers.
+            </p>
 
-    <section>
-        <h2>7. Data Retention and Deletion</h2>
+            <p>
+                Comme Leaders fonctionne hors ligne et ne transmet aucune donnée
+                utilisateur à des services externes, l'application n'effectue
+                aucun partage de données avec des tiers.
+            </p>
+        </section>
 
-        <p>
-            Leaders does not retain personal information on external
-            servers.
-        </p>
+        <section>
+            <h2>6. Sécurité des données</h2>
 
-        <p>
-            Files exported by the application to a location selected
-            by the user remain in that location until the user deletes
-            or moves them.
-        </p>
-    </section>
+            <p>
+                Leaders ne maintient aucune base de données distante contenant
+                des informations sur les utilisateurs. Les données et fichiers
+                traités par l'application restent sur votre appareil, sauf si
+                vous choisissez de les copier, de les exporter ou de les
+                partager vous-même via Android ou une autre application.
+            </p>
+        </section>
 
-    <section>
-        <h2>8. Children's Privacy</h2>
+        <section>
+            <h2>7. Conservation et suppression des données</h2>
 
-        <p>
-            Leaders does not knowingly collect personal information
-            from children or adults. The application does not require
-            users to create accounts or provide personal information.
-        </p>
-    </section>
+            <p>
+                Leaders ne conserve aucune information personnelle sur des
+                serveurs externes.
+            </p>
 
-    <section>
-        <h2>9. Internet Access</h2>
+            <p>
+                Les fichiers exportés par l'application vers un emplacement
+                choisi par l'utilisateur y restent jusqu'à ce que celui-ci les
+                supprime ou les déplace.
+            </p>
+        </section>
 
-        <p>
-            Leaders is designed to function offline and does not
-            require an internet connection to use its core features.
-        </p>
+        <section>
+            <h2>8. Vie privée des enfants</h2>
 
-        <p>
-            The application does not send user data to remote servers.
-        </p>
-    </section>
+            <p>
+                Leaders ne collecte sciemment aucune information personnelle,
+                que ce soit auprès d'enfants ou d'adultes. L'application
+                n'oblige pas les utilisateurs à créer un compte ni à fournir
+                des informations personnelles.
+            </p>
+        </section>
 
-    <section>
-        <h2>10. Changes to This Privacy Policy</h2>
+        <section>
+            <h2>9. Accès à Internet</h2>
 
-        <p>
-            This Privacy Policy may be updated from time to time
-            to reflect changes to the application or applicable
-            requirements.
-        </p>
+            <p>
+                Leaders est conçue pour fonctionner hors ligne et ne nécessite
+                pas de connexion à Internet pour utiliser ses fonctionnalités
+                principales.
+            </p>
 
-        <p>
-            Any updated version will be published on this page
-            with a revised "Last updated" date.
-        </p>
-    </section>
+            <p>
+                L'application n'envoie aucune donnée utilisateur à des serveurs
+                distants.
+            </p>
+        </section>
 
-    <section>
-        <h2>11. Contact</h2>
+        <section>
+            <h2>10. Modifications de cette politique de confidentialité</h2>
 
-        <p>
-            If you have any questions about this Privacy Policy
-            or the privacy practices of Leaders, you can contact
-            the developer at:
-        </p>
+            <p>
+                Cette politique de confidentialité peut être mise à jour de
+                temps à autre afin de refléter les évolutions de l'application
+                ou des exigences applicables.
+            </p>
 
-        <p>
-            <strong>Paul Rosselle</strong><br>
-            Email:
-            <a href="mailto:leaders.unofficial.app@gmail.com">
-                leaders.unofficial.app@gmail.com
-            </a>
-        </p>
-    </section>
-</main>
+            <p>
+                Toute version mise à jour sera publiée sur cette page avec une
+                date de « Dernière mise à jour » révisée.
+            </p>
+        </section>
 
-<footer>
-    <p>Leaders · Privacy Policy</p>
-</footer>
+        <section>
+            <h2>11. Contact</h2>
+
+            <p>
+                Si vous avez des questions concernant cette politique de
+                confidentialité ou les pratiques de Leaders en matière de
+                vie privée, vous pouvez contacter le développeur :
+            </p>
+
+            <p>
+                <strong>Paul Rosselle</strong><br>
+                E-mail :
+                <a href="mailto:leaders.unofficial.app@gmail.com">
+                    leaders.unofficial.app@gmail.com
+                </a>
+            </p>
+        </section>
+    </main>
+
+    <footer>
+        <p data-lang="en" lang="en">Leaders · Privacy Policy</p>
+        <p data-lang="fr" lang="fr">Leaders · Politique de confidentialité</p>
+    </footer>
+
+    <script>
+        (function () {
+            var titles = {
+                en: "Privacy Policy - Leaders",
+                fr: "Politique de confidentialité - Leaders"
+            };
+
+            function apply(lang) {
+                document.documentElement.setAttribute("data-current", lang);
+                document.documentElement.lang = lang;
+                document.title = titles[lang];
+                document.querySelectorAll("[data-set]").forEach(function (b) {
+                    b.setAttribute("aria-pressed", String(b.dataset.set === lang));
+                });
+            }
+
+            var saved = null;
+            try { saved = localStorage.getItem("lang"); } catch (e) { }
+
+            var initial = saved;
+            if (initial !== "en" && initial !== "fr") {
+                initial = (navigator.language || "en").toLowerCase().indexOf("fr") === 0 ? "fr" : "en";
+            }
+            apply(initial);
+
+            document.querySelectorAll("[data-set]").forEach(function (b) {
+                b.addEventListener("click", function () {
+                    apply(b.dataset.set);
+                    try { localStorage.setItem("lang", b.dataset.set); } catch (e) { }
+                });
+            });
+        })();
+    </script>
 
 </body>
+
 </html>
