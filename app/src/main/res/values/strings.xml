@@ -375,6 +375,6 @@
     <string name="x_characters_required">Please select %d more characters</string>
     <string name="alternate_characters">Alternate characters</string>
     <string name="current_game_characters">Current game characters</string>
-    <string name="characters_game_info">A game always starts with 16 characters</string>
+    <string name="characters_game_info">A game always starts with 16 characters.</string>
     <string name="error_toast_transformed_frog_limited_to_one">There can be only one transformed frog on the board</string>
 </resources>
