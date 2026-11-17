@@ -212,7 +212,7 @@ public final class CharacterActionAnimator extends ActionAnimator {
                     for (Position destPos : destinationPositions) {
                         animateFadeIn(boardView.getCharacterDisplay(destPos), fadingDuration, onFadeInAnimationEnd);
                     }
-                }, respawnDelay);
+                }, getAnimationDuration(respawnDelay));
             }
         };
 
