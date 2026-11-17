@@ -40,6 +40,7 @@ import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.actions.RecruitmentAction;
 import com.leaders.gamelogic.actions.RecruitmentActionMotion;
 import com.leaders.gamelogic.entities.Game;
+import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
@@ -349,6 +350,14 @@ public final class ReplayViewerActivity extends BaseActivity implements ReplayCo
         );
     }
 
+    private void updateTransformedCharacters() {
+        updateTransformedCharacters(rcvControls.getReplayGame());
+    }
+
+    private void updateTransformedCharacters(@NonNull Game game) {
+        bdvBoard.updateTransformedDisplays(GameContext.getCurrentTransformedCharacters(game));
+    }
+
     private void setShowCards(boolean showCards) {
         this.showCards = showCards;
 
@@ -454,12 +463,14 @@ public final class ReplayViewerActivity extends BaseActivity implements ReplayCo
         bdvBoard.setBoard(game.getBoard());
         updateCards(game);
         updatePlayers(game);
+        updateTransformedCharacters(game);
     }
 
     @Override
     public void onStepPlayed(@Nullable IGameAction action, boolean playInReverse, @NonNull Runnable onActionEnd) {
         updateCards();
         updatePlayers();
+        updateTransformedCharacters();
 
         if (action != null && GameActionUtils.isAnimatable(action)) {
             playAction(action, playInReverse, onActionEnd);
@@ -479,7 +490,11 @@ public final class ReplayViewerActivity extends BaseActivity implements ReplayCo
                 actionToPlay = action;
             }
 
-            GameActionUtils.animate(bdvBoard, actionToPlay, onActionEnd, animationSpeed, new CharacterSkins());
+            Runnable endRunnable = () -> {
+                updateTransformedCharacters();
+                onActionEnd.run();
+            };
+            GameActionUtils.animate(bdvBoard, actionToPlay, endRunnable, animationSpeed, new CharacterSkins());
         }
     }
 

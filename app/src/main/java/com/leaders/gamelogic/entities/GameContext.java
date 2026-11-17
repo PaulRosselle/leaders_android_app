@@ -149,7 +149,7 @@ public final class GameContext {
     }
 
     @Nullable
-    private static List<TransformedCharacter> getCurrentTransformedCharacters(@NonNull Game game) {
+    public static List<TransformedCharacter> getCurrentTransformedCharacters(@NonNull Game game) {
         List<TransformedCharacter> transformedCharacters = new ArrayList<>();
 
         for (UUID uuid : game.getTransformedCharacterIds()) {
