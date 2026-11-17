@@ -12,8 +12,8 @@ import com.leaders.gamelogic.enums.CharacterMotionType;
 import java.util.List;
 import java.util.UUID;
 
-public final class CharacterTransformUtils {
-    private CharacterTransformUtils(){
+public final class CharacterTransformQuery {
+    private CharacterTransformQuery(){
         throw new AssertionError("Cannot instantiate utility class");
     }
 

@@ -48,7 +48,7 @@ import com.leaders.gamelogic.enums.GameActionType;
 import com.leaders.gamelogic.enums.RecruitmentMotionType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.enums.WarningType;
-import com.leaders.gamelogic.queries.ActionReversalUtils;
+import com.leaders.gamelogic.queries.ActionReversalQuery;
 
 import java.util.Collections;
 import java.util.List;
@@ -484,8 +484,8 @@ public final class ReplayViewerActivity extends BaseActivity implements ReplayCo
             animateBanishment((BanishmentAction) action, playInReverse, onActionEnd);
         } else {
             IGameAction actionToPlay;
-            if (playInReverse && ActionReversalUtils.isReversible(action)) {
-                actionToPlay = ActionReversalUtils.reverse(action);
+            if (playInReverse && ActionReversalQuery.isReversible(action)) {
+                actionToPlay = ActionReversalQuery.reverse(action);
             } else {
                 actionToPlay = action;
             }

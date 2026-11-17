@@ -44,7 +44,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 
-public class ActionReversalUtilsTest {
+public class ActionReversalQueryTest {
 
     private static final Position POS_A = new Position(3, 3);
     private static final Position POS_B = new Position(3, 4);
@@ -98,17 +98,17 @@ public class ActionReversalUtilsTest {
 
     @NonNull
     private CharacterAction reverseCharacter(@NonNull CharacterAction action) {
-        return (CharacterAction) ActionReversalUtils.reverse(action);
+        return (CharacterAction) ActionReversalQuery.reverse(action);
     }
 
     @NonNull
     private RecruitmentAction reverseRecruitment(@NonNull RecruitmentAction action) {
-        return (RecruitmentAction) ActionReversalUtils.reverse(action);
+        return (RecruitmentAction) ActionReversalQuery.reverse(action);
     }
 
     @NonNull
     private WarningAction reverseWarning(@NonNull WarningAction action) {
-        return (WarningAction) ActionReversalUtils.reverse(action);
+        return (WarningAction) ActionReversalQuery.reverse(action);
     }
 
     private void assertMotionTypeReversal(@NonNull CharacterMotionType expected,
@@ -143,7 +143,7 @@ public class ActionReversalUtilsTest {
         IGameAction action = characterAction(character,
                 motion(CharacterMotionType.Move, target(character, POS_A, POS_B)));
 
-        assertTrue(ActionReversalUtils.isReversible(action));
+        assertTrue(ActionReversalQuery.isReversible(action));
     }
 
     @Test
@@ -152,24 +152,24 @@ public class ActionReversalUtilsTest {
         IGameAction action = new RecruitmentAction(
                 List.of(recruitmentMotion(RecruitmentMotionType.Add, character, POS_A)));
 
-        assertTrue(ActionReversalUtils.isReversible(action));
+        assertTrue(ActionReversalQuery.isReversible(action));
     }
 
     @Test
     public void isReversible_shouldReturnTrueForWarningAction() {
         IGameAction action = new WarningAction(WarningType.Barrage, TeamColor.Black, 1);
 
-        assertTrue(ActionReversalUtils.isReversible(action));
+        assertTrue(ActionReversalQuery.isReversible(action));
     }
 
     @Test
     public void isReversible_shouldReturnFalseForBanishmentAction() {
-        assertFalse(ActionReversalUtils.isReversible(createBanishmentAction()));
+        assertFalse(ActionReversalQuery.isReversible(createBanishmentAction()));
     }
 
     @Test
     public void isReversible_shouldReturnFalseForTransitionAction() {
-        assertFalse(ActionReversalUtils.isReversible(createTransitionAction()));
+        assertFalse(ActionReversalQuery.isReversible(createTransitionAction()));
     }
 
     //endregion
@@ -179,13 +179,13 @@ public class ActionReversalUtilsTest {
     @Test
     public void reverse_shouldThrowForBanishmentAction() {
         assertThrows(IllegalArgumentException.class,
-                () -> ActionReversalUtils.reverse(createBanishmentAction()));
+                () -> ActionReversalQuery.reverse(createBanishmentAction()));
     }
 
     @Test
     public void reverse_shouldThrowForTransitionAction() {
         assertThrows(IllegalArgumentException.class,
-                () -> ActionReversalUtils.reverse(createTransitionAction()));
+                () -> ActionReversalQuery.reverse(createTransitionAction()));
     }
 
     //endregion

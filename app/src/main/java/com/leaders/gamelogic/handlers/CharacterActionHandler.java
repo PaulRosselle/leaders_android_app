@@ -9,7 +9,7 @@ import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.TransformedState;
 import com.leaders.gamelogic.enums.CharacterMotionType;
-import com.leaders.gamelogic.queries.CharacterTransformUtils;
+import com.leaders.gamelogic.queries.CharacterTransformQuery;
 
 /**
  * Four target cases are handled:
@@ -83,11 +83,11 @@ public final class CharacterActionHandler extends GameActionHandler {
      * @param undoAction whether the action is being undone
      */
     private void updateTransformedState(@NonNull CharacterActionMotion motion, boolean undoAction) {
-        if (!CharacterTransformUtils.isTransformMotion(motion)) {
+        if (!CharacterTransformQuery.isTransformMotion(motion)) {
             return;
         }
 
-        TransformedState newState = CharacterTransformUtils.getStateFromTranformMotion(motion);
+        TransformedState newState = CharacterTransformQuery.getStateFromTranformMotion(motion);
 
         if (motion.getMotionType() == CharacterMotionType.Transform) {
             applyTransformState(newState, undoAction);

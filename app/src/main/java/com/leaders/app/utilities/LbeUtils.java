@@ -18,6 +18,7 @@ public final class LbeUtils {
     public static final String COLOR_DATA_SEPARATOR = "&";
     public static final String CHARACTER_DATA_SEPARATOR = ":";
     public static final String CELL_DATA_SEPARATOR = ",";
+    public static final String FROG_TRANSFORMATION_TAG = "f";
 
     private final static String POSITION_X_REF_STR = "ABCDEFG";
 

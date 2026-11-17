@@ -66,6 +66,10 @@ public class CharacterTypeUtils {
 
     //region IMPORT / EXPORT METHODS
 
+    public static boolean canTransformInto(@NonNull CharacterType characterType) {
+        return characterType == CharacterType.Frog;
+    }
+
     public static int getCharacterExportId(@NonNull CharacterType characterType) {
         switch (characterType) {
             case Acrobat: return 3;
@@ -89,7 +93,7 @@ public class CharacterTypeUtils {
             case Archer: return 4;
             case LeaderVermilion: return 25;
             case Shaman: return 21;
-            case Frog: return 22; // TODO - handle the "frogified" tag
+            case Frog: return 22;
             case Sniper: return 23;
             case Tactician: return 24;
             case Wisp: return 20;

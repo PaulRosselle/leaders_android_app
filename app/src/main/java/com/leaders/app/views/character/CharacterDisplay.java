@@ -60,7 +60,7 @@ public final class CharacterDisplay {
 
     private float getSizeRatioFromType(@NonNull ViewType viewType) {
         if (viewType == ViewType.Transformed) {
-            return 0.48f;
+            return 0.46f;
         }
         return 1f;
     }

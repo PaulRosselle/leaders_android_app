@@ -21,7 +21,7 @@ import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.gamelogic.queries.CharacterAbilityQuery;
-import com.leaders.gamelogic.queries.CharacterTransformUtils;
+import com.leaders.gamelogic.queries.CharacterTransformQuery;
 import com.leaders.gamelogic.resolvers.CharacterActionResolver;
 import com.leaders.gamelogic.resolvers.ResolverUtils;
 
@@ -125,7 +125,7 @@ public class ShamanActionResolver extends CharacterActionResolver {
         // First we untransform any existing frog
         TransformedState transformedFrogState = CharacterAbilityQuery.getExistingTransformedFrogState(game);
         if (transformedFrogState != null) {
-            motions.add(CharacterTransformUtils.createTransformMotion(
+            motions.add(CharacterTransformQuery.createTransformMotion(
                     CharacterMotionType.Untransform,
                     transformedFrogState.getCharacterAfter(),
                     transformedFrogState.getCharacterBefore(),
@@ -140,7 +140,7 @@ public class ShamanActionResolver extends CharacterActionResolver {
         Character target = getCharacterAt(targetPos);
         Character transformedTarget = Character.transform(target, CharacterType.Frog, target.getTeamColor());
 
-        motions.add(CharacterTransformUtils.createTransformMotion(
+        motions.add(CharacterTransformQuery.createTransformMotion(
                 CharacterMotionType.Transform, target, transformedTarget, targetPos
         ));
 

@@ -23,7 +23,7 @@ import java.util.List;
  * applied to the game, {@link #reverse(IGameAction)} produces the action that, once applied
  * in turn, cancels out its effect.
  */
-public class ActionReversalUtils {
+public class ActionReversalQuery {
     /**
      * Checks whether the given action can be undone using a reversed action.
      *

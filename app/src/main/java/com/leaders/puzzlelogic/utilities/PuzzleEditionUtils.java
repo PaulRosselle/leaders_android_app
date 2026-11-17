@@ -5,6 +5,7 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 
 import com.leaders.R;
+import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.actions.RecruitmentAction;
 import com.leaders.gamelogic.actions.RecruitmentActionMotion;
@@ -16,7 +17,10 @@ import com.leaders.gamelogic.entities.GameConfig;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.Player;
+import com.leaders.gamelogic.entities.Position;
+import com.leaders.gamelogic.entities.TransformedState;
 import com.leaders.gamelogic.enums.CharacterCard;
+import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.GamePhaseType;
@@ -28,6 +32,7 @@ import com.leaders.gamelogic.historyentries.segments.Turn;
 import com.leaders.gamelogic.historyentries.segments.TurnPhase;
 import com.leaders.gamelogic.queries.AutoPlayQuery;
 import com.leaders.gamelogic.queries.BoardQuery;
+import com.leaders.gamelogic.queries.CharacterTransformQuery;
 import com.leaders.gamelogic.queries.GameQuery;
 
 import java.util.ArrayList;
@@ -37,6 +42,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 public final class PuzzleEditionUtils {
     private PuzzleEditionUtils(){
@@ -238,8 +244,19 @@ public final class PuzzleEditionUtils {
     }
 
     @NonNull
-    public static GameHistory getDefaultHistory(@NonNull Board board) {
+    public static GameHistory getDefaultHistory(@NonNull Game game) {
         List<IGameAction> initialActions = new ArrayList<>();
+
+        initialActions.addAll(getBoardInitialActions(game.getBoard()));
+        initialActions.addAll(getTransformInitialActions(game));
+
+        return getDefaultHistory(initialActions);
+    }
+
+    @NonNull
+    private static List<IGameAction> getBoardInitialActions(@NonNull Board board) {
+        List<IGameAction> initialActions = new ArrayList<>();
+
         for (Cell characterCell : BoardQuery.findCharacterCells(board, null, null)) {
             initialActions.add(new RecruitmentAction(List.of(
                     new RecruitmentActionMotion(RecruitmentMotionType.Add,
@@ -248,6 +265,31 @@ public final class PuzzleEditionUtils {
                     ))
             );
         }
-        return getDefaultHistory(initialActions);
+        return initialActions;
+    }
+
+    @NonNull
+    private static List<IGameAction> getTransformInitialActions(@NonNull Game game) {
+        List<IGameAction> initialActions = new ArrayList<>();
+
+        for (UUID uuid : game.getTransformedCharacterIds()) {
+            Position position = BoardQuery.getCellByCharacterId(game.getBoard(), uuid).getPosition();
+            TransformedState state = Objects.requireNonNull(
+                    game.getTransformedState(uuid),
+                    "Transform state missing"
+            );
+
+            initialActions.add(new CharacterAction(
+                    state.getCharacterBefore(),
+                    List.of(CharacterTransformQuery.createTransformMotion(
+                            CharacterMotionType.Transform,
+                            state.getCharacterBefore(),
+                            state.getCharacterAfter(),
+                            position
+                    ))
+            ));
+        }
+
+        return initialActions;
     }
 }
