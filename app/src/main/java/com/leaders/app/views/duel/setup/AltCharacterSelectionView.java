@@ -52,9 +52,12 @@ public class AltCharacterSelectionView extends ConstraintLayout {
                                 @NonNull CharacterCard altCard,
                                 @NonNull CharacterSkins characterSkins,
                                 boolean useAltCard) {
-        // TODO - handle skin type
         ptvBase.setPortraitCard(baseCard);
         ptvAlt.setPortraitCard(altCard);
+
+        ptvBase.setPortraitSkin(characterSkins.getCharacterSkin(baseCard));
+        ptvAlt.setPortraitSkin(characterSkins.getCharacterSkin(altCard));
+
         swtAlt.setChecked(useAltCard);
     }
 
