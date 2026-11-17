@@ -572,4 +572,95 @@ public class GameTest {
 
         assertTrue(ids.contains(id));
     }
+
+    @Test
+    public void getTransformedCharacterStates_initially_isEmpty() {
+        assertTrue(createTestGame().getTransformedCharacterStates().isEmpty());
+    }
+
+    @Test
+    public void getTransformedCharacterStates_containsAllTransformedStates() {
+        Game game = createTestGame();
+        UUID first = addTransformedCharacter(game);
+        UUID second = addTransformedCharacter(game);
+
+        List<TransformedState> states = game.getTransformedCharacterStates();
+
+        assertEquals(2, states.size());
+        assertTrue(states.contains(game.getTransformedState(first)));
+        assertTrue(states.contains(game.getTransformedState(second)));
+    }
+
+    @Test
+    public void getTransformedCharacterStates_returnsStoredStateInstances() {
+        Game game = createTestGame();
+        Character before = createCharacter(null);
+        Character after = createCharacter(before);
+        game.addTransformedState(before, after);
+
+        List<TransformedState> states = game.getTransformedCharacterStates();
+
+        assertEquals(1, states.size());
+        assertSame(game.getTransformedState(before.getId()), states.get(0));
+        assertSame(before, states.get(0).getCharacterBefore());
+        assertSame(after, states.get(0).getCharacterAfter());
+    }
+
+    @Test
+    public void getTransformedCharacterStates_isUnmodifiable() {
+        Game game = createTestGame();
+        UUID id = addTransformedCharacter(game);
+        TransformedState state = game.getTransformedState(id);
+
+        List<TransformedState> states = game.getTransformedCharacterStates();
+
+        assertThrows(UnsupportedOperationException.class, () -> states.add(state));
+        assertThrows(UnsupportedOperationException.class, () -> states.remove(state));
+        assertThrows(UnsupportedOperationException.class, states::clear);
+        assertEquals(1, game.getTransformedCharacterStates().size());
+    }
+
+    @Test
+    public void getTransformedCharacterStates_afterRemove_excludesRemovedState() {
+        Game game = createTestGame();
+        UUID firstId = addTransformedCharacter(game);
+        UUID secondId = addTransformedCharacter(game);
+        TransformedState second = game.getTransformedState(secondId);
+
+        game.removeTransformedState(firstId);
+
+        List<TransformedState> states = game.getTransformedCharacterStates();
+        assertEquals(1, states.size());
+        assertSame(second, states.get(0));
+    }
+
+    @Test
+    public void getTransformedCharacterStates_doesNotReflectLaterChanges() {
+        // Documents that the returned list is a snapshot, not a live view
+        // (unlike getTransformedCharacterIds)
+        Game game = createTestGame();
+        UUID existingId = addTransformedCharacter(game);
+        List<TransformedState> states = game.getTransformedCharacterStates();
+
+        addTransformedCharacter(game);
+        game.removeTransformedState(existingId);
+
+        assertEquals(1, states.size());
+        assertEquals(1, game.getTransformedCharacterStates().size());
+        assertNotSame(states.get(0), game.getTransformedCharacterStates().get(0));
+    }
+
+    @Test
+    public void getTransformedCharacterStates_matchesTransformedCharacterIds() {
+        Game game = createTestGame();
+        addTransformedCharacter(game);
+        addTransformedCharacter(game);
+
+        assertEquals(game.getTransformedCharacterIds().size(),
+                game.getTransformedCharacterStates().size());
+        for (UUID id : game.getTransformedCharacterIds()) {
+            assertTrue(game.getTransformedCharacterStates()
+                    .contains(game.getTransformedState(id)));
+        }
+    }
 }

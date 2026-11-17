@@ -60,6 +60,7 @@ public final class PuzzleEditionUtils {
         // 3. "One per team character" constraint are not respected
         // 4. A leader is already captured or surrounded
         // 5. Multiple hermit or cubs are present on the player's team
+        // 6. No more than one frog per team
 
         // TODO - update to take into account news characters requirements
         StringBuilder builder = new StringBuilder();
@@ -70,6 +71,8 @@ public final class PuzzleEditionUtils {
             builder.append(prefix).append(context.getString(R.string.puzzle_error_empty_board));
             return builder.toString().trim();
         }
+
+        // TODO
 
         final TeamColor playerTeamColor = getPuzzlePlayerTeamColor();
 
