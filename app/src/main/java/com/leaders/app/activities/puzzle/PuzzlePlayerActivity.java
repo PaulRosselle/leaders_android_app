@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.material.button.MaterialButton;
@@ -131,9 +132,13 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     private View vwDialogBg;
 
     private MaterialButton btnReset;
+
     private MaterialButton btnNextPuzzle;
     private HighlightView hlvNextPuzzle;
     private TextView txvNextPuzzle;
+
+    private MaterialButton btnEndTurn;
+    private TextView txvEndTurn;
 
     private TextView txvPuzzleName;
     private TextView txvAuthorName;
@@ -178,6 +183,9 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
         hlvNextPuzzle = findViewById(R.id.hlvNextPuzzle_actPuzzlePlayer);
         txvNextPuzzle = findViewById(R.id.txvNextPuzzle_actPuzzlePlayer);
 
+        btnEndTurn = findViewById(R.id.btnEndTurn_actPuzzlePlayer);
+        txvEndTurn = findViewById(R.id.txvEndTurn_actPuzzlePlayer);
+
         txvPuzzleName = findViewById(R.id.txvPuzzleName_actPuzzlePlayer);
         txvAuthorName = findViewById(R.id.txvAuthorName_actPuzzlePlayer);
         imvSolved = findViewById(R.id.imvSolved_actPuzzlePlayer);
@@ -201,6 +209,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
 
         btnReset.setOnClickListener(this::onResetClick);
         btnNextPuzzle.setOnClickListener(this::onNextPuzzleClick);
+        btnEndTurn.setOnClickListener(this::onEndTurnClick);
 
         nbvBlocker.setOnInterruptClickListener(this::onBlockerInterruptClick);
     }
@@ -452,6 +461,10 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
         btnNextPuzzle.setVisibility(visible ? View.VISIBLE : View.GONE);
         hlvNextPuzzle.setVisibility(visible ? View.VISIBLE : View.GONE);
         btnUndoLastAction.setVisibility(visible ? View.GONE : View.VISIBLE);
+        // TODO
+        boolean canEndTurn = canEndTurn();
+        btnEndTurn.setVisibility(!visible && canEndTurn ? View.VISIBLE : View.GONE);
+        txvEndTurn.setVisibility(!visible && canEndTurn ? View.VISIBLE : View.GONE);
         if (visible) {
             hlvNextPuzzle.startAnimation();
         } else {
@@ -641,6 +654,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
         } else {
             hidePuzzleInfos();
         }
+        updateEndTurnState();
     }
 
     private void loadPuzzleInfos() {
@@ -702,6 +716,47 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     private void hidePuzzleActions() {
         amvPuzzleActions.setVisibility(View.GONE);
         vwDialogBg.setVisibility(View.GONE);
+    }
+
+    //endregion
+
+    //region END TURN METHODS
+
+    private boolean canEndTurn() {
+        // End turn is currently only handled for the introduction puzzle of the sniper
+        return puzzleSave instanceof OfficialPuzzleSave &&
+                ((OfficialPuzzleSave) puzzleSave).getId() == 40;
+    }
+
+    private void updateEndTurnState() {
+        // TODO - update rules
+
+        boolean canEndTurn = canEndTurn();
+        btnEndTurn.setVisibility(canEndTurn ? View.VISIBLE : View.GONE);
+        txvEndTurn.setVisibility(canEndTurn ? View.VISIBLE : View.GONE);
+        // TODO
+        realignButtons();
+    }
+
+    private void realignButtons() {
+        boolean canEndTurn = canEndTurn();
+        alignButton(btnReset, canEndTurn ? 0.166f : 0.25f);
+        alignButton(btnUndoLastAction, canEndTurn ? 0.5f : 0.75f);
+        alignButton(btnNextPuzzle, canEndTurn ? 0.833f : 0.75f);
+    }
+
+    private void alignButton(@NonNull MaterialButton button, float horizontalBias) {
+        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) button.getLayoutParams();
+        params.horizontalBias = horizontalBias;
+        button.setLayoutParams(params);
+    }
+
+    private void onEndTurnClick(View v) {
+        GameContext gameContext = controller.getCurrentContext();
+        clearInteractionUI(gameContext);
+        // TODO - simuler les mouvements adverses
+        // TODO - rechercher une solution
+        onGameEnded(gameContext.getCurrentPlayer(), gameContext);
     }
 
     //endregion
