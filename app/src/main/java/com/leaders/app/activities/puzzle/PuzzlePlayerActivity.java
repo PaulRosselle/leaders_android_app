@@ -33,14 +33,18 @@ import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.character.HighlightView;
 import com.leaders.app.views.puzzle.NemesisBlockerView;
 import com.leaders.app.views.puzzle.PuzzleDifficultyView;
+import com.leaders.app.views.puzzle.PuzzleRulesView;
 import com.leaders.app.views.settings.AnimationSpeedView;
+import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.enums.TeamColor;
+import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionTarget;
+import com.leaders.gamelogic.queries.GameHistoryQuery;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
 import com.leaders.puzzlelogic.entities.OfficialPuzzleSave;
 import com.leaders.puzzlelogic.entities.PuzzleSave;
@@ -52,6 +56,7 @@ import com.leaders.puzzlelogic.search.PuzzleSortMode;
 import com.leaders.puzzlelogic.serializers.SerializationContext;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
 import com.leaders.puzzlelogic.utilities.PuzzleEditionUtils;
+import com.leaders.puzzlelogic.utilities.SniperEvasionUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -131,6 +136,8 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     private AnimationSpeedView asvAnimationSpeed;
     private View vwDialogBg;
 
+    private PuzzleRulesView prvRules;
+
     private MaterialButton btnReset;
 
     private MaterialButton btnNextPuzzle;
@@ -176,6 +183,8 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
                     action.ordinal(), action.getOnClickListener(this));
         }
         asvAnimationSpeed = findViewById(R.id.asvAnimationSpeed_actPuzzlePlayer);
+
+        prvRules = findViewById(R.id.prvRules_actPuzzlePlayer);
 
         btnReset = findViewById(R.id.btnReset_actPuzzlePlayer);
 
@@ -461,10 +470,11 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
         btnNextPuzzle.setVisibility(visible ? View.VISIBLE : View.GONE);
         hlvNextPuzzle.setVisibility(visible ? View.VISIBLE : View.GONE);
         btnUndoLastAction.setVisibility(visible ? View.GONE : View.VISIBLE);
-        // TODO
-        boolean canEndTurn = canEndTurn();
-        btnEndTurn.setVisibility(!visible && canEndTurn ? View.VISIBLE : View.GONE);
-        txvEndTurn.setVisibility(!visible && canEndTurn ? View.VISIBLE : View.GONE);
+
+        boolean showEndTurn = !visible && canEndTurn();
+        btnEndTurn.setVisibility(showEndTurn ? View.VISIBLE : View.GONE);
+        txvEndTurn.setVisibility(showEndTurn ? View.VISIBLE : View.GONE);
+        realignButtons(showEndTurn);
         if (visible) {
             hlvNextPuzzle.startAnimation();
         } else {
@@ -592,6 +602,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     private void restartPuzzle() {
         controller.restartGame(puzzleSave.getPuzzleGameHistory());
         setNextPuzzleVisible(false);
+        setEndTurnEnabled(canEndTurn());
     }
 
     private void loadPuzzle(@NonNull PuzzleSave puzzleSave) {
@@ -667,7 +678,6 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
         imvSolved.setVisibility(isInEditor ? View.GONE : View.VISIBLE);
         txvSolved.setVisibility(isInEditor ? View.GONE : View.VISIBLE);
 
-
         txvPuzzleName.setText(puzzleSave.getName());
         txvAuthorName.setText(String.format(getString(R.string.by_author), authorName));
         pdvDifficulty.setDifficulty(puzzleSave.getDifficulty());
@@ -729,20 +739,25 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     }
 
     private void updateEndTurnState() {
-        // TODO - update rules
-
         boolean canEndTurn = canEndTurn();
+
+        prvRules.setText(canEndTurn ? R.string.formatted_puzzle_rules_turn_start : R.string.formatted_puzzle_rules);
+
         btnEndTurn.setVisibility(canEndTurn ? View.VISIBLE : View.GONE);
         txvEndTurn.setVisibility(canEndTurn ? View.VISIBLE : View.GONE);
-        // TODO
-        realignButtons();
+
+        realignButtons(canEndTurn);
     }
 
-    private void realignButtons() {
-        boolean canEndTurn = canEndTurn();
-        alignButton(btnReset, canEndTurn ? 0.166f : 0.25f);
-        alignButton(btnUndoLastAction, canEndTurn ? 0.5f : 0.75f);
-        alignButton(btnNextPuzzle, canEndTurn ? 0.833f : 0.75f);
+    private void setEndTurnEnabled(boolean enabled) {
+        btnEndTurn.setAlpha(enabled ? 1f : 0.5f);
+        btnEndTurn.setClickable(enabled);
+        txvEndTurn.setAlpha(enabled ? 1f : 0.5f);
+    }
+
+    private void realignButtons(boolean expand) {
+        alignButton(btnReset, expand ? 0.166f : 0.25f);
+        alignButton(btnUndoLastAction, expand ? 0.5f : 0.75f);
     }
 
     private void alignButton(@NonNull MaterialButton button, float horizontalBias) {
@@ -752,11 +767,30 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     }
 
     private void onEndTurnClick(View v) {
+        setEndTurnEnabled(false);
+
         GameContext gameContext = controller.getCurrentContext();
         clearInteractionUI(gameContext);
-        // TODO - simuler les mouvements adverses
-        // TODO - rechercher une solution
-        onGameEnded(gameContext.getCurrentPlayer(), gameContext);
+
+        GameHistory history = controller.getHistory();
+        TeamColor opponentTeam = PuzzleEditionUtils.getPuzzlePlayerTeamColor().getOpposite();
+
+        // If the sniper is not in range at the end of the player's turn, the player loses the game
+        if (!SniperEvasionUtils.isLeaderInSniperRange(gameContext.getBoard(), opponentTeam)) {
+            onGameEnded(GameHistoryQuery.getPlayerFromTeam(history, opponentTeam), gameContext);
+            return;
+        }
+
+        // If an escape is possible for the opponent leader, the player loses the game
+        CharacterAction escapeAction = SniperEvasionUtils.findEscapeAction(history, opponentTeam);
+        if (escapeAction != null) {
+            InteractionFeedback escapeFeedback = InteractionFeedback.createForCharacterAction(escapeAction.getMotions());
+            bdvBoard.animateFeedback(escapeFeedback, animationSpeed, getCharacterSkins(), () ->
+                    onGameEnded(GameHistoryQuery.getPlayerFromTeam(history, opponentTeam), gameContext)
+            );
+        } else {
+            onGameEnded(gameContext.getCurrentPlayer(), gameContext);
+        }
     }
 
     //endregion
