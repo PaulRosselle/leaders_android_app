@@ -2,8 +2,8 @@ package com.leaders.app.views.character;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.View;
 import android.view.ViewOutlineProvider;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,8 +13,6 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.leaders.R;
 import com.leaders.app.entities.CharacterSkins;
-import com.leaders.app.utilities.CharacterCardUtils;
-import com.leaders.app.views.portrait.PortraitView;
 import com.leaders.gamelogic.enums.CharacterCard;
 
 public final class CharacterNotificationView extends ConstraintLayout {
@@ -23,10 +21,10 @@ public final class CharacterNotificationView extends ConstraintLayout {
 
     private final Runnable hideRunnable;
 
-    private final PortraitView ptvPortrait;
-    private final TextView txvTitle, txvInfo;
-    @Nullable
-    private CharacterCard characterCard;
+    private final CardDescriptionView cdvMain;
+    private final CardDescriptionView cdvAdditional;
+    private final View vwSeparator;
+
     private int statusBarOffset;
     @NonNull
     private CharacterSkins characterSkins;
@@ -39,11 +37,10 @@ public final class CharacterNotificationView extends ConstraintLayout {
 
         inflate(context, R.layout.view_character_notification, this);
 
-        ptvPortrait = findViewById(R.id.ptvPortrait_vwCharacterNotification);
-        txvTitle = findViewById(R.id.txvCardTitle_vwCharacterNotification);
-        txvInfo = findViewById(R.id.txvCardInfo_vwCharacterNotification);
+        cdvMain = findViewById(R.id.cdvMain_vwCharacterNotification);
+        vwSeparator = findViewById(R.id.vwSeparator_vwCharacterNotification);
+        cdvAdditional = findViewById(R.id.cdvAdditional_vwCharacterNotification);
 
-        characterCard = null;
         statusBarOffset = 0;
         characterSkins = new CharacterSkins();
 
@@ -60,21 +57,13 @@ public final class CharacterNotificationView extends ConstraintLayout {
     }
 
     private void setCharacterCard(@Nullable CharacterCard characterCard) {
-        this.characterCard = characterCard;
-        // When no card is displayed, child views aren't updated
-        if (characterCard == null) {
-            return;
-        }
-
-        ptvPortrait.setPortraitCard(characterCard);
-        ptvPortrait.setPortraitSkin(characterSkins.getCharacterSkin(characterCard));
-        txvTitle.setText(CharacterCardUtils.getFormattedNameId(characterCard));
-        txvInfo.setText(CharacterCardUtils.getDescriptionId(characterCard));
+        // TODO - change
     }
 
     @Nullable
     public CharacterCard getCharacterCard() {
-        return characterCard;
+        // TODO - change
+        return CharacterCard.Sniper;
     }
 
     public void setCharacterSkins(@NonNull CharacterSkins characterSkins) {
@@ -86,6 +75,7 @@ public final class CharacterNotificationView extends ConstraintLayout {
     }
 
     public void show(@Nullable CharacterCard characterCard) {
+        // TODO - change
         setCharacterCard(characterCard);
 
         if (getVisibility() != VISIBLE) {
