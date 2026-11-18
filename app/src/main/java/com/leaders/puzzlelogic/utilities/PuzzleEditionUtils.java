@@ -42,6 +42,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public final class PuzzleEditionUtils {
     private PuzzleEditionUtils(){
@@ -72,10 +73,20 @@ public final class PuzzleEditionUtils {
             return builder.toString().trim();
         }
 
-        if (game.getTransformedCharacterStates().stream()
+        List<TransformedState> frogTransformedStates = game.getTransformedCharacterStates().stream()
                 .filter(state -> state.getCharacterAfter().getCharacterType() == CharacterType.Frog)
-                .count() > 1) {
-            builder.append(prefix).append(context.getString(R.string.error_toast_transformed_frog_limited_to_one));
+                .collect(Collectors.toList());
+        if (!frogTransformedStates.isEmpty()) {
+            if (frogTransformedStates.size() > 1) {
+                builder.append(prefix).append(context.getString(R.string.error_toast_transformed_frog_limited_to_one));
+            }
+            TransformedState state = frogTransformedStates.get(0);
+            if (state.getCharacterBefore().getCharacterType().getCharacterCard().isLeader()) {
+                builder.append(prefix).append(context.getString(R.string.error_toast_leader_cannot_be_transformed_into_a_frog));
+            }
+            if (state.getCharacterBefore().getTeamColor() != state.getCharacterAfter().getTeamColor()) {
+                builder.append(prefix).append(context.getString(R.string.error_toast_invalid_transformed_frog_team));
+            }
         }
 
         final TeamColor playerTeamColor = getPuzzlePlayerTeamColor();

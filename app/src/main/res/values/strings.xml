@@ -380,4 +380,6 @@
     <string name="shadow_of_the_opal_forest">ShadOw Of thE OPal wooD</string>
     <string name="end_turn">End turn</string>
     <string name="formatted_puzzle_rules_turn_start">You control black characters, find a way to win at the start of your next turn.</string>
+    <string name="error_toast_leader_cannot_be_transformed_into_a_frog">A leader cannot be transformed into a frog</string>
+    <string name="error_toast_invalid_transformed_frog_team">A character cannot be transformed into a frog of a different team</string>
 </resources>

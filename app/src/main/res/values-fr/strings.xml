@@ -373,4 +373,6 @@
     <string name="shadow_of_the_opal_forest">OmBRE DU BOiS d\'OPalE</string>
     <string name="end_turn">Fin du tour</string>
     <string name="formatted_puzzle_rules_turn_start">Vous contrÔlez les pions noirs, trouvez comment gagner au début de votre prochain tour.</string>
+    <string name="error_toast_leader_cannot_be_transformed_into_a_frog">Un leader ne peut pas être transformé en grenouille</string>
+    <string name="error_toast_invalid_transformed_frog_team">L\'équipe d\'un personnage ne doit pas changer suite à une transformation en grenouille</string>
 </resources>
