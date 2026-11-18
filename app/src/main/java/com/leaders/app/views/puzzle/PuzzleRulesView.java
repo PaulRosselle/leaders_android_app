@@ -23,11 +23,9 @@ public final class PuzzleRulesView extends androidx.appcompat.widget.AppCompatTe
         setIncludeFontPadding(false);
         setGravity(Gravity.CENTER);
 
-
         float densityRatio = getResources().getDisplayMetrics().density;
-        int verticalPadding = (int) (4 * densityRatio);
         int horizontalPadding = (int) (36 * densityRatio);
-        setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding);
+        setPadding(horizontalPadding, (int) (4 * densityRatio), horizontalPadding, (int) (6 * densityRatio));
 
         setClickable(false);
 
