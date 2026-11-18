@@ -401,15 +401,6 @@ public final class PuzzleEditorActivity extends BaseActivity {
         applyDefaultEditorState();
     }
 
-    private void showCardDescriptionNotification(@NonNull CharacterCard characterCard) {
-        // TODO - change
-        if (cnvCardInfo.getCharacterCard() == characterCard) {
-            cnvCardInfo.hide();
-        } else {
-            cnvCardInfo.show(characterCard);
-        }
-    }
-
     //region INTERACTION METHODS
 
     private void applyDefaultEditorState() {
@@ -742,7 +733,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
     }
 
     private boolean onCardPortraitLongClick(View v) {
-        showCardDescriptionNotification(((PortraitView) v).getPortraitCard());
+        cnvCardInfo.toggle(((PortraitView) v).getPortraitCard(), null);
         return true;
     }
 
@@ -751,18 +742,12 @@ public final class PuzzleEditorActivity extends BaseActivity {
     }
 
     private boolean onNewCharacterLongClick(View v) {
-        // TODO - change
-        CharacterType characterType = Objects.requireNonNull(((CharacterView) v).getCharacterType(),
-                "An empty character piece is not authorized in the puzzle editor");
-        showCardDescriptionNotification(characterType.getCharacterCard());
+        cnvCardInfo.toggle(((CharacterView) v).getCharacterType(), null);
         return true;
     }
 
     private boolean onCharacterLongClick(@NonNull CharacterDisplay characterDisplay) {
-        // TODO - change
-        CharacterType characterType = Objects.requireNonNull(characterDisplay.getCharacterView().getCharacterType(),
-                "An empty character piece is not authorized in the puzzle editor");
-        showCardDescriptionNotification(characterType.getCharacterCard());
+        cnvCardInfo.toggle(characterDisplay.getCharacterType(), characterDisplay.getTransformedCharacterType());
         return true;
     }
 

@@ -42,8 +42,6 @@ import com.leaders.gamelogic.actions.RecruitmentActionMotion;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.Player;
-import com.leaders.gamelogic.enums.CharacterCard;
-import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.GameActionType;
 import com.leaders.gamelogic.enums.RecruitmentMotionType;
 import com.leaders.gamelogic.enums.TeamColor;
@@ -52,7 +50,6 @@ import com.leaders.gamelogic.queries.ActionReversalQuery;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 public final class ReplayViewerActivity extends BaseActivity implements ReplayControlsView.ReplayControlsListener {
     private enum ReplayViewerAction {
@@ -313,15 +310,6 @@ public final class ReplayViewerActivity extends BaseActivity implements ReplayCo
         pbvBottomPlayer.setPlayer(bottomPlayer, getPlayerLeaderType(bottomPlayer.getTeamColor()));
     }
 
-    private void showCardDescriptionNotification(@NonNull CharacterCard characterCard) {
-        // TODO - change
-        if (cnvCardInfo.getCharacterCard() == characterCard) {
-            cnvCardInfo.hide();
-        } else {
-            cnvCardInfo.show(characterCard);
-        }
-    }
-
     private void updateCards() {
         updateCards(rcvControls.getReplayGame());
     }
@@ -376,19 +364,12 @@ public final class ReplayViewerActivity extends BaseActivity implements ReplayCo
     //region VIEWS LISTENER METHODS
 
     private boolean onCharacterLongClick(@NonNull CharacterDisplay characterDisplay) {
-        // TODO - change
-        CharacterType characterType = Objects.requireNonNull(
-                characterDisplay.getCharacterView().getCharacterType(),
-                "An empty character piece is not authorized in the puzzle editor"
-        );
-        showCardDescriptionNotification(characterType.getCharacterCard());
-
+        cnvCardInfo.toggle(characterDisplay.getCharacterType(), characterDisplay.getTransformedCharacterType());
         return true;
     }
 
     private boolean onPortraitLongClick(View v) {
-        showCardDescriptionNotification(((PortraitView) v).getPortraitCard());
-
+        cnvCardInfo.toggle(((PortraitView) v).getPortraitCard(), null);
         return true;
     }
 

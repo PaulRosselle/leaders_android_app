@@ -25,8 +25,6 @@ import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.GameHistory;
-import com.leaders.gamelogic.enums.CharacterCard;
-import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
@@ -223,14 +221,7 @@ public abstract class PlayableActivity extends BaseActivity
     }
 
     protected boolean onBoardCharacterLongClick(@NonNull CharacterDisplay characterDisplay) {
-
-        // TODO - change
-        CharacterType characterType = Objects.requireNonNull(
-                characterDisplay.getCharacterView().getCharacterType(),
-                "An empty character piece is not authorized"
-        );
-        showCardDescriptionNotification(characterType.getCharacterCard());
-
+        cnvCardInfo.toggle(characterDisplay.getCharacterType(), characterDisplay.getTransformedCharacterType());
         return true;
     }
 
@@ -285,19 +276,6 @@ public abstract class PlayableActivity extends BaseActivity
 
     protected boolean canUndoLastAction() {
         return controller.canUndoLastAction();
-    }
-
-    //endregion
-
-    //region CHARACTER INFORMATION METHODS
-
-    protected final void showCardDescriptionNotification(@NonNull CharacterCard characterCard) {
-        // TODO - change
-        if (cnvCardInfo.getCharacterCard() == characterCard) {
-            cnvCardInfo.hide();
-        } else {
-            cnvCardInfo.show(characterCard);
-        }
     }
 
     //endregion

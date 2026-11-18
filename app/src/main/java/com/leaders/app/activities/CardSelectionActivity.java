@@ -85,7 +85,7 @@ public abstract class CardSelectionActivity extends PlayableActivity implements
     //region VIEW LISTENER METHODS
 
     protected boolean onPortraitLongClick(View v) {
-        showCardDescriptionNotification(((PortraitView) v).getPortraitCard());
+        cnvCardInfo.toggle(((PortraitView) v).getPortraitCard(), null);
         return true;
     }
 

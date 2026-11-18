@@ -18,6 +18,8 @@ public class CardDescriptionView extends ConstraintLayout {
     private PortraitView ptvPortrait;
     private TextView txvTitle, txvInfo;
 
+    private CharacterCard card;
+
     public CardDescriptionView(@NonNull Context context) {
         super(context);
         init(context);
@@ -39,16 +41,24 @@ public class CardDescriptionView extends ConstraintLayout {
         ptvPortrait = findViewById(R.id.ptvPortrait_vwCardDescription);
         txvTitle = findViewById(R.id.txvTitle_vwCardDescription);
         txvInfo = findViewById(R.id.txvInfo_vwCardDescription);
+
+        card = null;
     }
 
-    public void setCard(@NonNull CharacterCard card, @NonNull CharacterSkins characterSkins) {
+    public void setCard(@Nullable CharacterCard card, @NonNull CharacterSkins characterSkins) {
+        this.card = card;
+        if (card == null) {
+            return;
+        }
+
         ptvPortrait.setPortraitCard(card);
         ptvPortrait.setPortraitSkin(characterSkins.getCharacterSkin(card));
         txvTitle.setText(CharacterCardUtils.getFormattedNameId(card));
         txvInfo.setText(CharacterCardUtils.getDescriptionId(card));
     }
 
+    @Nullable
     public CharacterCard getCard() {
-        return ptvPortrait.getPortraitCard();
+        return card;
     }
 }
