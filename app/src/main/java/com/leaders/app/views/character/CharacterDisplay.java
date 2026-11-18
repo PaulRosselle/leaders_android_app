@@ -11,6 +11,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.leaders.app.entities.CharacterSkins;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.TransformedCharacter;
+import com.leaders.gamelogic.enums.CharacterType;
 
 public final class CharacterDisplay {
     public enum ViewType {
@@ -31,13 +32,18 @@ public final class CharacterDisplay {
 
     private boolean isHighlighted;
 
+    @Nullable
     private OnCharacterDisplayClickListener onClickListener;
+    @Nullable
+    private OnCharacterDisplayLongClickListener onLongClickListener;
+
 
     public CharacterDisplay(@NonNull Context context,
                             @NonNull ConstraintLayout charactersLayer,
                             @NonNull ConstraintLayout effectsLayer) {
         characterView = new CharacterView(context);
         characterView.setOnClickListener(this::onCharacterClick);
+        characterView.setOnLongClickListener(this::onCharacterLongClick);
         charactersLayer.addView(characterView, getDefaultLayoutParams());
 
         shineView = new CharacterShineView(context);
@@ -76,6 +82,16 @@ public final class CharacterDisplay {
     @NonNull
     public CharacterView getCharacterView() {
         return characterView;
+    }
+
+    @Nullable
+    public CharacterType getCharacterType() {
+        return characterView.getCharacterType();
+    }
+
+    @Nullable
+    public CharacterType getTransformedCharacterType() {
+        return transformedView.getCharacterType();
     }
 
     @NonNull
@@ -142,12 +158,16 @@ public final class CharacterDisplay {
         }
     }
 
-    public void setOnClickListener(OnCharacterDisplayClickListener onClickListener) {
+    private boolean onCharacterLongClick(View v) {
+        return onLongClickListener != null && onLongClickListener.onCharacterDisplayLongClick(this);
+    }
+
+    public void setOnClickListener(@Nullable OnCharacterDisplayClickListener onClickListener) {
         this.onClickListener = onClickListener;
     }
 
-    public void setOnCharacterLongClickListener(View.OnLongClickListener onLongClickListener) {
-        characterView.setOnLongClickListener(onLongClickListener);
+    public void setOnCharacterLongClickListener(@Nullable OnCharacterDisplayLongClickListener onLongClickListener) {
+        this.onLongClickListener = onLongClickListener;
     }
 
     public void applyTransformedCharacter(@Nullable TransformedCharacter transformedCharacter,

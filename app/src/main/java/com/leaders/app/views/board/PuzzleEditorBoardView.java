@@ -36,10 +36,6 @@ public final class PuzzleEditorBoardView extends BoardView {
         super.setOnCharacterDisplayClickListener(onCharacterDisplayClickListener);
     }
 
-    public void setOnCharacterLongClickListener(OnLongClickListener onCharacterLongClickListener) {
-        super.setOnCharacterLongClickListener(onCharacterLongClickListener);
-    }
-
     public void selectCharacterAt(@NonNull Position position) {
         CharacterDisplay characterDisplay = Objects.requireNonNull(characterDisplayMap.get(position),
                 "Character to unselected not found at position:" + position);

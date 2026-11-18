@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 import com.leaders.R;
 import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.gamelogic.entities.Character;
+import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.TeamColor;
 
 public class CharacterTransformedView extends FrameLayout {
@@ -90,5 +91,10 @@ public class CharacterTransformedView extends FrameLayout {
                 CharacterSkinType.Default,
                 TeamColor.Black
         );
+    }
+
+    @Nullable
+    public CharacterType getCharacterType() {
+        return characterView.getCharacterType();
     }
 }

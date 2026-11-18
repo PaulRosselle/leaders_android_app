@@ -25,10 +25,10 @@ import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.utilities.TeamColorUtils;
 import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.board.ReadOnlyBoardView;
+import com.leaders.app.views.character.CharacterDisplay;
 import com.leaders.app.views.duel.PlayerHaloView;
 import com.leaders.app.views.portrait.PortraitView;
 import com.leaders.app.views.character.CharacterNotificationView;
-import com.leaders.app.views.character.CharacterView;
 import com.leaders.app.views.duel.PlayerBottomView;
 import com.leaders.app.views.duel.PlayerTopView;
 import com.leaders.app.views.duel.PlayerView;
@@ -42,8 +42,6 @@ import com.leaders.gamelogic.actions.RecruitmentActionMotion;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.Player;
-import com.leaders.gamelogic.enums.CharacterCard;
-import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.GameActionType;
 import com.leaders.gamelogic.enums.RecruitmentMotionType;
 import com.leaders.gamelogic.enums.TeamColor;
@@ -52,7 +50,6 @@ import com.leaders.gamelogic.queries.ActionReversalQuery;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 public final class ReplayViewerActivity extends BaseActivity implements ReplayControlsView.ReplayControlsListener {
     private enum ReplayViewerAction {
@@ -313,14 +310,6 @@ public final class ReplayViewerActivity extends BaseActivity implements ReplayCo
         pbvBottomPlayer.setPlayer(bottomPlayer, getPlayerLeaderType(bottomPlayer.getTeamColor()));
     }
 
-    private void showCardDescriptionNotification(@NonNull CharacterCard characterCard) {
-        if (cnvCardInfo.getCharacterCard() == characterCard) {
-            cnvCardInfo.hide();
-        } else {
-            cnvCardInfo.show(characterCard);
-        }
-    }
-
     private void updateCards() {
         updateCards(rcvControls.getReplayGame());
     }
@@ -374,17 +363,13 @@ public final class ReplayViewerActivity extends BaseActivity implements ReplayCo
 
     //region VIEWS LISTENER METHODS
 
-    private boolean onCharacterLongClick(View v) {
-        CharacterType characterType = Objects.requireNonNull(((CharacterView) v).getCharacterType(),
-                "An empty character piece is not authorized in the puzzle editor");
-        showCardDescriptionNotification(characterType.getCharacterCard());
-
+    private boolean onCharacterLongClick(@NonNull CharacterDisplay characterDisplay) {
+        cnvCardInfo.toggle(characterDisplay.getCharacterType(), characterDisplay.getTransformedCharacterType());
         return true;
     }
 
     private boolean onPortraitLongClick(View v) {
-        showCardDescriptionNotification(((PortraitView) v).getPortraitCard());
-
+        cnvCardInfo.toggle(((PortraitView) v).getPortraitCard(), null);
         return true;
     }
 

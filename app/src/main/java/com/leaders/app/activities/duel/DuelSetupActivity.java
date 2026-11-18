@@ -26,7 +26,6 @@ import com.leaders.app.views.portrait.PortraitView;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.Player;
-import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
 
@@ -234,13 +233,7 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
     }
 
     private boolean onPortraitLongClick(View v) {
-        CharacterCard portraitCard = ((PortraitView) v).getPortraitCard();
-        if (cnvCardInfo.getCharacterCard() == portraitCard) {
-            cnvCardInfo.hide();
-        } else {
-            cnvCardInfo.show(portraitCard);
-        }
-
+        cnvCardInfo.toggle(((PortraitView) v).getPortraitCard(), null);
         return true;
     }
 
