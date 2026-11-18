@@ -378,4 +378,6 @@
     <string name="characters_game_info">A game always starts with 16 characters.</string>
     <string name="error_toast_transformed_frog_limited_to_one">There can be only one transformed frog on the board</string>
     <string name="shadow_of_the_opal_forest">ShadOw Of thE OPal wooD</string>
+    <string name="end_turn">End turn</string>
+    <string name="formatted_puzzle_rules_turn_start">You control black characters, find a way to win at the start of your next turn.</string>
 </resources>

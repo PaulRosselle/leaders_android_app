@@ -370,5 +370,7 @@
     <string name="current_game_characters">personnages pour cette partie</string>
     <string name="characters_game_info">Une partie démarre toujours avec 16 personnages.</string>
     <string name="error_toast_transformed_frog_limited_to_one">Il ne peut y avoir qu\'un personnage transformé en grenouille sur le plateau</string>
-    <string name="shadow_of_the_opal_forest">OmBRE DU BOiS d\'OPpalE</string>
+    <string name="shadow_of_the_opal_forest">OmBRE DU BOiS d\'OPalE</string>
+    <string name="end_turn">Fin du tour</string>
+    <string name="formatted_puzzle_rules_turn_start">Vous contrÔlez les pions noirs, trouvez comment gagner au début de votre prochain tour.</string>
 </resources>

@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.material.button.MaterialButton;
@@ -32,14 +33,18 @@ import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.character.HighlightView;
 import com.leaders.app.views.puzzle.NemesisBlockerView;
 import com.leaders.app.views.puzzle.PuzzleDifficultyView;
+import com.leaders.app.views.puzzle.PuzzleRulesView;
 import com.leaders.app.views.settings.AnimationSpeedView;
+import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.enums.TeamColor;
+import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionTarget;
+import com.leaders.gamelogic.queries.GameHistoryQuery;
 import com.leaders.puzzlelogic.entities.CustomPuzzleSave;
 import com.leaders.puzzlelogic.entities.OfficialPuzzleSave;
 import com.leaders.puzzlelogic.entities.PuzzleSave;
@@ -51,6 +56,7 @@ import com.leaders.puzzlelogic.search.PuzzleSortMode;
 import com.leaders.puzzlelogic.serializers.SerializationContext;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
 import com.leaders.puzzlelogic.utilities.PuzzleEditionUtils;
+import com.leaders.puzzlelogic.utilities.SniperEvasionUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -130,10 +136,16 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     private AnimationSpeedView asvAnimationSpeed;
     private View vwDialogBg;
 
+    private PuzzleRulesView prvRules;
+
     private MaterialButton btnReset;
+
     private MaterialButton btnNextPuzzle;
     private HighlightView hlvNextPuzzle;
     private TextView txvNextPuzzle;
+
+    private MaterialButton btnEndTurn;
+    private TextView txvEndTurn;
 
     private TextView txvPuzzleName;
     private TextView txvAuthorName;
@@ -172,11 +184,16 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
         }
         asvAnimationSpeed = findViewById(R.id.asvAnimationSpeed_actPuzzlePlayer);
 
+        prvRules = findViewById(R.id.prvRules_actPuzzlePlayer);
+
         btnReset = findViewById(R.id.btnReset_actPuzzlePlayer);
 
         btnNextPuzzle = findViewById(R.id.btnNextPuzzle_actPuzzlePlayer);
         hlvNextPuzzle = findViewById(R.id.hlvNextPuzzle_actPuzzlePlayer);
         txvNextPuzzle = findViewById(R.id.txvNextPuzzle_actPuzzlePlayer);
+
+        btnEndTurn = findViewById(R.id.btnEndTurn_actPuzzlePlayer);
+        txvEndTurn = findViewById(R.id.txvEndTurn_actPuzzlePlayer);
 
         txvPuzzleName = findViewById(R.id.txvPuzzleName_actPuzzlePlayer);
         txvAuthorName = findViewById(R.id.txvAuthorName_actPuzzlePlayer);
@@ -201,6 +218,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
 
         btnReset.setOnClickListener(this::onResetClick);
         btnNextPuzzle.setOnClickListener(this::onNextPuzzleClick);
+        btnEndTurn.setOnClickListener(this::onEndTurnClick);
 
         nbvBlocker.setOnInterruptClickListener(this::onBlockerInterruptClick);
     }
@@ -452,6 +470,11 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
         btnNextPuzzle.setVisibility(visible ? View.VISIBLE : View.GONE);
         hlvNextPuzzle.setVisibility(visible ? View.VISIBLE : View.GONE);
         btnUndoLastAction.setVisibility(visible ? View.GONE : View.VISIBLE);
+
+        boolean showEndTurn = !visible && canEndTurn();
+        btnEndTurn.setVisibility(showEndTurn ? View.VISIBLE : View.GONE);
+        txvEndTurn.setVisibility(showEndTurn ? View.VISIBLE : View.GONE);
+        realignButtons(showEndTurn);
         if (visible) {
             hlvNextPuzzle.startAnimation();
         } else {
@@ -579,6 +602,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     private void restartPuzzle() {
         controller.restartGame(puzzleSave.getPuzzleGameHistory());
         setNextPuzzleVisible(false);
+        setEndTurnEnabled(canEndTurn());
     }
 
     private void loadPuzzle(@NonNull PuzzleSave puzzleSave) {
@@ -641,6 +665,7 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
         } else {
             hidePuzzleInfos();
         }
+        updateEndTurnState();
     }
 
     private void loadPuzzleInfos() {
@@ -652,7 +677,6 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
         pdvDifficulty.setVisibility(View.VISIBLE);
         imvSolved.setVisibility(isInEditor ? View.GONE : View.VISIBLE);
         txvSolved.setVisibility(isInEditor ? View.GONE : View.VISIBLE);
-
 
         txvPuzzleName.setText(puzzleSave.getName());
         txvAuthorName.setText(String.format(getString(R.string.by_author), authorName));
@@ -702,6 +726,71 @@ public final class PuzzlePlayerActivity extends PlayableActivity implements Neme
     private void hidePuzzleActions() {
         amvPuzzleActions.setVisibility(View.GONE);
         vwDialogBg.setVisibility(View.GONE);
+    }
+
+    //endregion
+
+    //region END TURN METHODS
+
+    private boolean canEndTurn() {
+        // End turn is currently only handled for the introduction puzzle of the sniper
+        return puzzleSave instanceof OfficialPuzzleSave &&
+                ((OfficialPuzzleSave) puzzleSave).getId() == 40;
+    }
+
+    private void updateEndTurnState() {
+        boolean canEndTurn = canEndTurn();
+
+        prvRules.setText(canEndTurn ? R.string.formatted_puzzle_rules_turn_start : R.string.formatted_puzzle_rules);
+
+        btnEndTurn.setVisibility(canEndTurn ? View.VISIBLE : View.GONE);
+        txvEndTurn.setVisibility(canEndTurn ? View.VISIBLE : View.GONE);
+
+        realignButtons(canEndTurn);
+    }
+
+    private void setEndTurnEnabled(boolean enabled) {
+        btnEndTurn.setAlpha(enabled ? 1f : 0.5f);
+        btnEndTurn.setClickable(enabled);
+        txvEndTurn.setAlpha(enabled ? 1f : 0.5f);
+    }
+
+    private void realignButtons(boolean expand) {
+        alignButton(btnReset, expand ? 0.166f : 0.25f);
+        alignButton(btnUndoLastAction, expand ? 0.5f : 0.75f);
+    }
+
+    private void alignButton(@NonNull MaterialButton button, float horizontalBias) {
+        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) button.getLayoutParams();
+        params.horizontalBias = horizontalBias;
+        button.setLayoutParams(params);
+    }
+
+    private void onEndTurnClick(View v) {
+        setEndTurnEnabled(false);
+
+        GameContext gameContext = controller.getCurrentContext();
+        clearInteractionUI(gameContext);
+
+        GameHistory history = controller.getHistory();
+        TeamColor opponentTeam = PuzzleEditionUtils.getPuzzlePlayerTeamColor().getOpposite();
+
+        // If the sniper is not in range at the end of the player's turn, the player loses the game
+        if (!SniperEvasionUtils.isLeaderInSniperRange(gameContext.getBoard(), opponentTeam)) {
+            onGameEnded(GameHistoryQuery.getPlayerFromTeam(history, opponentTeam), gameContext);
+            return;
+        }
+
+        // If an escape is possible for the opponent leader, the player loses the game
+        CharacterAction escapeAction = SniperEvasionUtils.findEscapeAction(history, opponentTeam);
+        if (escapeAction != null) {
+            InteractionFeedback escapeFeedback = InteractionFeedback.createForCharacterAction(escapeAction.getMotions());
+            bdvBoard.animateFeedback(escapeFeedback, animationSpeed, getCharacterSkins(), () ->
+                    onGameEnded(GameHistoryQuery.getPlayerFromTeam(history, opponentTeam), gameContext)
+            );
+        } else {
+            onGameEnded(gameContext.getCurrentPlayer(), gameContext);
+        }
     }
 
     //endregion
