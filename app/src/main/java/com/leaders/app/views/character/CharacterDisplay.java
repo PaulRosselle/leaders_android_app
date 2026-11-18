@@ -31,13 +31,18 @@ public final class CharacterDisplay {
 
     private boolean isHighlighted;
 
+    @Nullable
     private OnCharacterDisplayClickListener onClickListener;
+    @Nullable
+    private OnCharacterDisplayLongClickListener onLongClickListener;
+
 
     public CharacterDisplay(@NonNull Context context,
                             @NonNull ConstraintLayout charactersLayer,
                             @NonNull ConstraintLayout effectsLayer) {
         characterView = new CharacterView(context);
         characterView.setOnClickListener(this::onCharacterClick);
+        characterView.setOnLongClickListener(this::onCharacterLongClick);
         charactersLayer.addView(characterView, getDefaultLayoutParams());
 
         shineView = new CharacterShineView(context);
@@ -142,12 +147,16 @@ public final class CharacterDisplay {
         }
     }
 
-    public void setOnClickListener(OnCharacterDisplayClickListener onClickListener) {
+    private boolean onCharacterLongClick(View v) {
+        return onLongClickListener != null && onLongClickListener.onCharacterDisplayLongClick(this);
+    }
+
+    public void setOnClickListener(@Nullable OnCharacterDisplayClickListener onClickListener) {
         this.onClickListener = onClickListener;
     }
 
-    public void setOnCharacterLongClickListener(View.OnLongClickListener onLongClickListener) {
-        characterView.setOnLongClickListener(onLongClickListener);
+    public void setOnCharacterLongClickListener(@Nullable OnCharacterDisplayLongClickListener onLongClickListener) {
+        this.onLongClickListener = onLongClickListener;
     }
 
     public void applyTransformedCharacter(@Nullable TransformedCharacter transformedCharacter,

@@ -383,10 +383,6 @@ public final class PlayableBoardView extends BoardView {
 
     //region LISTENER SETTERS
 
-    public void setOnCharacterLongClickListener(OnLongClickListener onCharacterLongClickListener) {
-        super.setOnCharacterLongClickListener(onCharacterLongClickListener);
-    }
-
     public void setOnTargetClickListener(OnTargetClickListener onTargetClickListener) {
         this.onTargetClickListener = onTargetClickListener;
     }

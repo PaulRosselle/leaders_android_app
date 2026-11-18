@@ -234,6 +234,7 @@ public final class DuelSetupActivity extends BaseActivity implements PlayerSetup
     }
 
     private boolean onPortraitLongClick(View v) {
+        // TODO - change
         CharacterCard portraitCard = ((PortraitView) v).getPortraitCard();
         if (cnvCardInfo.getCharacterCard() == portraitCard) {
             cnvCardInfo.hide();

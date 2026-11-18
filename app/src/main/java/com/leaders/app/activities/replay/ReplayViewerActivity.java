@@ -25,10 +25,10 @@ import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.utilities.TeamColorUtils;
 import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.board.ReadOnlyBoardView;
+import com.leaders.app.views.character.CharacterDisplay;
 import com.leaders.app.views.duel.PlayerHaloView;
 import com.leaders.app.views.portrait.PortraitView;
 import com.leaders.app.views.character.CharacterNotificationView;
-import com.leaders.app.views.character.CharacterView;
 import com.leaders.app.views.duel.PlayerBottomView;
 import com.leaders.app.views.duel.PlayerTopView;
 import com.leaders.app.views.duel.PlayerView;
@@ -314,6 +314,7 @@ public final class ReplayViewerActivity extends BaseActivity implements ReplayCo
     }
 
     private void showCardDescriptionNotification(@NonNull CharacterCard characterCard) {
+        // TODO - change
         if (cnvCardInfo.getCharacterCard() == characterCard) {
             cnvCardInfo.hide();
         } else {
@@ -374,9 +375,12 @@ public final class ReplayViewerActivity extends BaseActivity implements ReplayCo
 
     //region VIEWS LISTENER METHODS
 
-    private boolean onCharacterLongClick(View v) {
-        CharacterType characterType = Objects.requireNonNull(((CharacterView) v).getCharacterType(),
-                "An empty character piece is not authorized in the puzzle editor");
+    private boolean onCharacterLongClick(@NonNull CharacterDisplay characterDisplay) {
+        // TODO - change
+        CharacterType characterType = Objects.requireNonNull(
+                characterDisplay.getCharacterView().getCharacterType(),
+                "An empty character piece is not authorized in the puzzle editor"
+        );
         showCardDescriptionNotification(characterType.getCharacterCard());
 
         return true;

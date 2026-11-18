@@ -402,6 +402,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
     }
 
     private void showCardDescriptionNotification(@NonNull CharacterCard characterCard) {
+        // TODO - change
         if (cnvCardInfo.getCharacterCard() == characterCard) {
             cnvCardInfo.hide();
         } else {
@@ -733,7 +734,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
                 addableCharacters,
                 bdvBoard.getCharacterDisplaySize(),
                 this::onNewCharacterClick,
-                this::onCharacterLongClick
+                this::onNewCharacterLongClick
         );
 
         bdvBoard.applyCellTargets();
@@ -749,8 +750,17 @@ public final class PuzzleEditorActivity extends BaseActivity {
         cevCharacterEditor.selectNewCharacter((CharacterView) v);
     }
 
-    private boolean onCharacterLongClick(View v) {
+    private boolean onNewCharacterLongClick(View v) {
+        // TODO - change
         CharacterType characterType = Objects.requireNonNull(((CharacterView) v).getCharacterType(),
+                "An empty character piece is not authorized in the puzzle editor");
+        showCardDescriptionNotification(characterType.getCharacterCard());
+        return true;
+    }
+
+    private boolean onCharacterLongClick(@NonNull CharacterDisplay characterDisplay) {
+        // TODO - change
+        CharacterType characterType = Objects.requireNonNull(characterDisplay.getCharacterView().getCharacterType(),
                 "An empty character piece is not authorized in the puzzle editor");
         showCardDescriptionNotification(characterType.getCharacterCard());
         return true;

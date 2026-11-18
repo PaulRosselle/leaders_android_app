@@ -8,7 +8,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.leaders.R;
-import com.leaders.app.enums.BoardOrientation;
 
 public final class ReadOnlyBoardView extends BoardView {
 
@@ -20,10 +19,5 @@ public final class ReadOnlyBoardView extends BoardView {
                     customAttrs.getBoolean(R.styleable.ReadOnlyBoardView_position_visible, true)
             );
         }
-    }
-
-    public void setOnCharacterLongClickListener(OnLongClickListener onCharacterLongClickListener) {
-        // LongClickListener setter is visible to allow for character description display
-        super.setOnCharacterLongClickListener(onCharacterLongClickListener);
     }
 }

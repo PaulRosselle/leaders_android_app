@@ -19,6 +19,7 @@ import com.leaders.app.views.character.CharacterDisplay;
 import com.leaders.app.views.character.CharacterDisplayPool;
 import com.leaders.app.views.character.CharacterView;
 import com.leaders.app.views.character.OnCharacterDisplayClickListener;
+import com.leaders.app.views.character.OnCharacterDisplayLongClickListener;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Position;
@@ -48,7 +49,7 @@ public abstract class BoardView extends ConstraintLayout {
     protected boolean alwaysUseDefaultSkins;
 
     private OnCharacterDisplayClickListener onCharacterDisplayClickListener;
-    private OnLongClickListener onCharacterLongClickListener;
+    private OnCharacterDisplayLongClickListener onCharacterLongClickListener;
 
     private final Settings settings;
 
@@ -335,7 +336,7 @@ public abstract class BoardView extends ConstraintLayout {
         }
     }
 
-    protected void setOnCharacterLongClickListener(OnLongClickListener onCharacterLongClickListener) {
+    public void setOnCharacterLongClickListener(OnCharacterDisplayLongClickListener onCharacterLongClickListener) {
         this.onCharacterLongClickListener = onCharacterLongClickListener;
 
         for (CharacterDisplay characterDisplay : characterDisplayMap.values()) {

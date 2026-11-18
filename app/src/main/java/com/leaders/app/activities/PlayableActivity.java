@@ -19,8 +19,8 @@ import com.leaders.app.enums.LeaderType;
 import com.leaders.app.utilities.ButtonUtils;
 import com.leaders.app.views.EndGameView;
 import com.leaders.app.views.board.PlayableBoardView;
+import com.leaders.app.views.character.CharacterDisplay;
 import com.leaders.app.views.character.CharacterNotificationView;
-import com.leaders.app.views.character.CharacterView;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.GameContext;
@@ -222,12 +222,13 @@ public abstract class PlayableActivity extends BaseActivity
         controller.cancelAction();
     }
 
-    protected boolean onBoardCharacterLongClick(View v) {
+    protected boolean onBoardCharacterLongClick(@NonNull CharacterDisplay characterDisplay) {
+
+        // TODO - change
         CharacterType characterType = Objects.requireNonNull(
-                ((CharacterView) v).getCharacterType(),
+                characterDisplay.getCharacterView().getCharacterType(),
                 "An empty character piece is not authorized"
         );
-
         showCardDescriptionNotification(characterType.getCharacterCard());
 
         return true;
@@ -291,6 +292,7 @@ public abstract class PlayableActivity extends BaseActivity
     //region CHARACTER INFORMATION METHODS
 
     protected final void showCardDescriptionNotification(@NonNull CharacterCard characterCard) {
+        // TODO - change
         if (cnvCardInfo.getCharacterCard() == characterCard) {
             cnvCardInfo.hide();
         } else {
