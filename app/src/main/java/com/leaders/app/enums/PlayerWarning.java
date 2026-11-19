@@ -36,7 +36,7 @@ public enum PlayerWarning {
             case BARRAGE: return R.string.barrage_warning_message;
             case SNIPER: return R.string.sniper_warning_message;
             case SNIPER_AND_BARRAGE: return R.string.barrage_and_sniper_warning_message;
-            default: throw new IllegalStateException("No title found for player warning: " + this);
+            default: throw new IllegalStateException("No message found for player warning: " + this);
         }
     }
 }
