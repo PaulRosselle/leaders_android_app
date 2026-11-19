@@ -418,10 +418,19 @@ public final class PuzzleEditorActivity extends BaseActivity {
         editorState = EditorState.Default;
     }
 
-    private void clearTransformStates() {
-        for (UUID uuid : game.getTransformedCharacterIds()) {
-            game.removeTransformedState(uuid);
+    private void untransformExistingCharacter() {
+        List<TransformedState> states = game.getTransformedCharacterStates();
+        if (states.size() > 1) {
+            throw new IllegalStateException("Cannot untransform character: single transformed character expected");
         }
+        if (states.isEmpty()) {
+            return;
+        }
+
+        TransformedState state = states.get(0);
+        BoardQuery.getCellByCharacterId(game.getBoard(), state.getCharacterId())
+                .setCharacter(state.getCharacterBefore());
+        game.removeTransformedState(state.getCharacterId());
     }
 
     private void updateTransformStates() {
@@ -550,8 +559,8 @@ public final class PuzzleEditorActivity extends BaseActivity {
 
         Character transformedCharacter = null;
         if (CharacterTypeUtils.canTransformInto(newCharacter.getCharacterType())) {
-            // There can only be one transformed character per board at the moment
-            clearTransformStates();
+            // There can only be one transformed character per board
+            untransformExistingCharacter();
 
             transformedCharacter = Character.transform(
                     destCharacter, newCharacter.getCharacterType(), newCharacter.getTeamColor()
@@ -826,42 +835,52 @@ public final class PuzzleEditorActivity extends BaseActivity {
 
     //region PUZZLE ACTIONS LISTENER METHODS
 
-    private void btnSaveClick(View v) {
-        amvPuzzleActions.setVisibility(View.GONE);
-        openSavePuzzleDialog();
-    }
-
-    private void btnPlayClick(View v) {
+    private boolean checkPuzzleValidity() {
         String validityErrors = PuzzleEditionUtils.getPuzzleValidityErrors(this, game);
 
-        if (validityErrors.isEmpty()) {
-            Intent intent = ActivityType.PuzzlePlayer.getIntent(this);
-
-            intent.putExtra(ExtraUtils.EXTRA_PUZZLE_SOURCE, PuzzleSource.Editor.name());
-            intent.putExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, puzzleSaves.indexOf(puzzleSave));
-
-            GameHistorySerializer serializer = new GameHistorySerializer();
-            try {
-                GameHistory gameHistory = PuzzleEditionUtils.getDefaultHistory(game);
-                intent.putExtra(ExtraUtils.EXTRA_PUZZLE_DATAS, serializer.getAsJson(gameHistory).toString());
-            } catch (JSONException e) {
-                throw new RuntimeException(e);
-            }
-
-            goToActivity(intent);
-
-        } else {
+        boolean isValid = validityErrors.isEmpty();
+        if (!isValid) {
             new AlertDialog.Builder(this, R.style.alert_dialog_theme)
                     .setTitle(R.string.invalid_puzzle)
                     .setMessage(validityErrors)
                     .setPositiveButton(R.string.ok, null)
                     .show();
+            setActionsMenuVisible(false);
+        }
+        return isValid;
+    }
+
+    private void btnSaveClick(View v) {
+        if (checkPuzzleValidity()) {
+            amvPuzzleActions.setVisibility(View.GONE);
+            applyDefaultEditorState();
+            openSavePuzzleDialog();
+        }
+    }
+
+    private void btnPlayClick(View v) {
+        if (!checkPuzzleValidity()) {
+            return;
         }
 
-        setActionsMenuVisible(false);
+        Intent intent = ActivityType.PuzzlePlayer.getIntent(this);
+
+        intent.putExtra(ExtraUtils.EXTRA_PUZZLE_SOURCE, PuzzleSource.Editor.name());
+        intent.putExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, puzzleSaves.indexOf(puzzleSave));
+
+        GameHistorySerializer serializer = new GameHistorySerializer();
+        try {
+            GameHistory gameHistory = PuzzleEditionUtils.getDefaultHistory(game);
+            intent.putExtra(ExtraUtils.EXTRA_PUZZLE_DATAS, serializer.getAsJson(gameHistory).toString());
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+
+        goToActivity(intent);
     }
 
     private void btnSearchForSolutionsClick(View v) {
+        // TODO - check
         List<Cell> playerCharacterCells = BoardQuery.findCharacterCells(game.getBoard(),
                 PuzzleEditionUtils.getPuzzlePlayerTeamColor(), null);
         if (playerCharacterCells.size() >= PuzzleSolverUtils.MAX_PLAYER_CHARACTER_COUNT) {
@@ -880,26 +899,20 @@ public final class PuzzleEditorActivity extends BaseActivity {
     }
 
     private void searchForSolution() {
-        String validityErrors = PuzzleEditionUtils.getPuzzleValidityErrors(this, game);
-
-        if (validityErrors.isEmpty()) {
-            Intent intent = ActivityType.PuzzleSolver.getIntent(this);
-            intent.putExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, puzzleSaves.indexOf(puzzleSave));
-            GameHistorySerializer serializer = new GameHistorySerializer();
-            GameHistory gameHistory = PuzzleEditionUtils.getDefaultHistory(game);
-            try {
-                intent.putExtra(ExtraUtils.EXTRA_PUZZLE_DATAS, serializer.getAsJson(gameHistory).toString());
-            } catch (JSONException e) {
-                throw new RuntimeException(e);
-            }
-            goToActivity(intent);
-        } else {
-            new AlertDialog.Builder(this, R.style.alert_dialog_theme)
-                    .setTitle(R.string.invalid_puzzle)
-                    .setMessage(validityErrors)
-                    .setPositiveButton(R.string.ok, null)
-                    .show();
+        if (!checkPuzzleValidity()) {
+            return;
         }
+
+        Intent intent = ActivityType.PuzzleSolver.getIntent(this);
+        intent.putExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, puzzleSaves.indexOf(puzzleSave));
+        GameHistorySerializer serializer = new GameHistorySerializer();
+        GameHistory gameHistory = PuzzleEditionUtils.getDefaultHistory(game);
+        try {
+            intent.putExtra(ExtraUtils.EXTRA_PUZZLE_DATAS, serializer.getAsJson(gameHistory).toString());
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        goToActivity(intent);
     }
 
     private void btnImportClick(View v) {
@@ -917,18 +930,12 @@ public final class PuzzleEditorActivity extends BaseActivity {
     }
 
     private void btnExportClick(View v) {
-        String validityErrors = PuzzleEditionUtils.getPuzzleValidityErrors(this, game);
-
-        if (validityErrors.isEmpty()) {
-            PuzzleExportUtils.exportAsTextIntent(this, PuzzleExportUtils.getLbeUrl(game));
-            applyDefaultEditorState();
-        } else {
-            new AlertDialog.Builder(this, R.style.alert_dialog_theme)
-                    .setTitle(R.string.invalid_puzzle)
-                    .setMessage(validityErrors)
-                    .setPositiveButton(R.string.ok, null)
-                    .show();
+        if (!checkPuzzleValidity()) {
+            return;
         }
+
+        PuzzleExportUtils.exportAsTextIntent(this, PuzzleExportUtils.getLbeUrl(game));
+        applyDefaultEditorState();
 
         setActionsMenuVisible(false);
     }
