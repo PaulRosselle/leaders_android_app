@@ -119,4 +119,16 @@ public class SniperEvasionUtils {
         return sniperCell.getPosition().isAligned(targetCell.getPosition()) &&
                 sniperCell.getPosition().distanceTo(targetCell.getPosition()) >= 3;
     }
+
+    // TODO - javadoc
+    /**
+     * Checks whether the specified team has at least one sniper on the board.
+     *
+     * @param board the board to check
+     * @param teamColor the color of the team
+     * @return {@code true} if the team has at least one sniper, {@code false} otherwise
+     */
+    public static boolean hasSniper(@NonNull Board board, @NonNull TeamColor teamColor) {
+        return !BoardQuery.findCharacterCells(board, teamColor, CharacterType.Sniper).isEmpty();
+    }
 }

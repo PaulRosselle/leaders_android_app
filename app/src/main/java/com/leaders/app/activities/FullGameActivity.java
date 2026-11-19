@@ -4,11 +4,9 @@ import android.view.View;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.google.android.material.button.MaterialButton;
 import com.leaders.app.enums.LeaderType;
-import com.leaders.app.enums.PlayerWarning;
 import com.leaders.app.utilities.AlignmentUtils;
 import com.leaders.app.utilities.ButtonUtils;
 import com.leaders.app.views.character.HighlightView;
@@ -177,22 +175,16 @@ public abstract class FullGameActivity extends CardSelectionActivity {
         return LeaderType.getFromCharacter(leaderCell.getCharacter());
     }
 
-    protected boolean playerHasWarning(@NonNull Player player,
-                                       @NonNull List<PlayerWarningState> warningStates) {
-        return getPlayerWarning(player, warningStates) != null;
-    }
-
-    @Nullable
-    protected PlayerWarning getPlayerWarning(@NonNull Player player,
-                                             @NonNull List<PlayerWarningState> warningStates) {
+    protected boolean hasBarrageWarning(@NonNull Player player,
+                                        @NonNull List<PlayerWarningState> warningStates) {
         for (PlayerWarningState warningState : warningStates) {
             if (warningState.getPlayerTeamColor() == player.getTeamColor() &&
                     warningState.getWarningCount() > 0) {
-                return PlayerWarning.BARRAGE;
+                return true;
             }
         }
 
-        return null;
+        return false;
     }
 
     //endregion

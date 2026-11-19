@@ -25,6 +25,7 @@ import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.AnimationSpeed;
 import com.leaders.app.enums.BoardOrientation;
 import com.leaders.app.enums.EndGameType;
+import com.leaders.app.enums.PlayerWarning;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.HelpUtils;
 import com.leaders.app.utilities.JsonUtils;
@@ -42,6 +43,7 @@ import com.leaders.gamelogic.entities.PlayerWarningState;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.puzzlelogic.serializers.SerializationContext;
 import com.leaders.puzzlelogic.serializers.entities.GameHistorySerializer;
+import com.leaders.puzzlelogic.utilities.SniperEvasionUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -525,13 +527,40 @@ public final class DuelPlayerActivity extends FullGameActivity {
 
         Board board = gameContext.getBoard();
         pbvBottomPlayer.setPlayer(currentPlayer, getPlayerLeaderType(currentPlayer, board));
-        // TODO
-        pbvBottomPlayer.setWarningVisible(playerHasWarning(currentPlayer, warningStates));
+        pbvBottomPlayer.applyWarning(getPlayerWarning(gameContext, currentPlayer, warningStates));
 
         Player opposingPlayer = gameContext.getOpposingPlayer();
 
         ptvOpposingPlayer.setPlayer(opposingPlayer, getPlayerLeaderType(opposingPlayer, board));
-        ptvOpposingPlayer.setWarningVisible(playerHasWarning(opposingPlayer, warningStates));
+        ptvOpposingPlayer.setWarningVisible(hasBarrageWarning(opposingPlayer, warningStates));
+    }
+
+    @Nullable
+    private PlayerWarning getPlayerWarning(@NonNull GameContext gameContext,
+                                           @NonNull Player player,
+                                           @NonNull List<PlayerWarningState> warningStates) {
+        boolean hasBarrageWarning = hasBarrageWarning(player, warningStates);
+        boolean hasSniperWarning = hasSniperWarning(gameContext, player.getTeamColor());
+
+        if (hasBarrageWarning && hasSniperWarning) {
+            return PlayerWarning.SNIPER_AND_BARRAGE;
+        }
+
+        if (hasBarrageWarning) {
+            return PlayerWarning.BARRAGE;
+        }
+
+        if (hasSniperWarning) {
+            return PlayerWarning.SNIPER;
+        }
+
+        return null;
+    }
+
+    private boolean hasSniperWarning(@NonNull GameContext gameContext, @NonNull TeamColor teamColor) {
+        // TODO - handle disabled Sniper warning
+        return SniperEvasionUtils.hasSniper(gameContext.getBoard(), teamColor.getOpposite()) &&
+                SniperEvasionUtils.isLeaderInSniperRange(gameContext.getBoard(), teamColor);
     }
 
     private boolean isScreenRotated() {

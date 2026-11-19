@@ -19,4 +19,6 @@ public enum PlayerWarning {
                 throw new IllegalStateException("Unexpected value: " + this);
         }
     }
+
+    // TODO - add warning description
 }
