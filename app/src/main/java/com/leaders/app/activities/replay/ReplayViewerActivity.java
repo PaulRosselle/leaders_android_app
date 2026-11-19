@@ -342,7 +342,6 @@ public final class ReplayViewerActivity extends BaseActivity implements ReplayCo
     @Nullable
     private PlayerWarning getPlayerWarning(@NonNull Game game, @NonNull TeamColor teamColor) {
         boolean hasBarrageWarning = game.getPlayerWarningCount(teamColor, WarningType.Barrage) > 0;
-        // TODO - handle disabled Sniper warning
         boolean hasSniperWarning = SniperEvasionUtils.isLeaderThreatened(game.getBoard(), teamColor);
 
         if (hasBarrageWarning && hasSniperWarning) {

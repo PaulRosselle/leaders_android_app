@@ -108,6 +108,7 @@ public final class DuelPlayerActivity extends FullGameActivity {
     private Guideline gdlBottom;
     private int statusBarHeight;
     private boolean autoRotateEnabled;
+    private boolean showSniperWarning;
 
     private PlayerTopView ptvOpposingPlayer;
     private TextView txvPlayerTurn;
@@ -217,6 +218,7 @@ public final class DuelPlayerActivity extends FullGameActivity {
         cnvCardInfo.setCharacterSkins(characterSkins);
         ccsvCardSelector.setCharacterSkins(characterSkins);
         autoRotateEnabled = settings.duelScreenAutoRotation();
+        showSniperWarning = settings.showSniperWarning();
 
         // The options changed during the previous session take priority over the settings
         Bundle savedState = getSavedState();
@@ -558,8 +560,7 @@ public final class DuelPlayerActivity extends FullGameActivity {
     }
 
     private boolean hasSniperWarning(@NonNull GameContext gameContext, @NonNull TeamColor teamColor) {
-        // TODO - handle disabled Sniper warning
-        return SniperEvasionUtils.isLeaderThreatened(gameContext.getBoard(), teamColor);
+        return showSniperWarning && SniperEvasionUtils.isLeaderThreatened(gameContext.getBoard(), teamColor);
     }
 
     private boolean isScreenRotated() {
