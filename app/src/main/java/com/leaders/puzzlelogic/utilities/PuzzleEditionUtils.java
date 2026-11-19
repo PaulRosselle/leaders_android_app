@@ -141,7 +141,7 @@ public final class PuzzleEditionUtils {
                         firstCharacter.getTeamColor() == secondCharacter.getTeamColor() &&
                         firstCharacter.getCharacterType() == secondCharacter.getCharacterType()) {
                     duplicatesErrors.put(firstCharacter.getCharacterType(),
-                            String.format(context.getString(R.string.puzzle_error_one_per_team_character) + firstCharacter.getCharacterType()));
+                            String.format(context.getString(R.string.puzzle_error_one_per_team_character), firstCharacter.getCharacterType()));
                 }
             }
         }
