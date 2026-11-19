@@ -22,12 +22,17 @@ public final class PlayerBottomView extends PlayerView {
     private final ImageView imvWarning;
     private final ImageView imvInfoBg;
 
+    @Nullable
+    private PlayerWarning playerWarning;
+
     public PlayerBottomView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
         txvInfo = findViewById(R.id.txvInfo_vwPlayerBottom);
         imvWarning = findViewById(R.id.imvWarning_actPlayerBottom);
         imvInfoBg = findViewById(R.id.imvInfo_vwPlayerBottom);
+
+        playerWarning = null;
     }
 
     @Override
@@ -79,6 +84,22 @@ public final class PlayerBottomView extends PlayerView {
         return new WarningDimension(277f, 175f, 463f, 286f, 218f, 287f);
     }
 
+    @Override
+    protected int getWarningTitle() {
+        if (playerWarning == null) {
+            throw new IllegalStateException("Warning title should not be requested without a valid warning");
+        }
+        return playerWarning.getTitleResId();
+    }
+
+    @Override
+    protected int getWarningMessage() {
+        if (playerWarning == null) {
+            throw new IllegalStateException("Warning message should not be requested without a valid warning");
+        }
+        return playerWarning.getMessageResId();
+    }
+
     public void setInfo(@NonNull GamePhaseType gamePhaseType) {
         setInfo(getInfoResId(gamePhaseType),
                 gamePhaseType == GamePhaseType.Banishment ?
@@ -99,6 +120,8 @@ public final class PlayerBottomView extends PlayerView {
     }
 
     public void applyWarning(@Nullable PlayerWarning playerWarning) {
+        this.playerWarning = playerWarning;
+
         boolean warningVisible = playerWarning != null;
         if (warningVisible) {
             imvWarning.setImageResource(playerWarning.getBottomResId());

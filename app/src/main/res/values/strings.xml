@@ -382,4 +382,9 @@
     <string name="formatted_puzzle_rules_turn_start">You control black characters, find a way to win at the start of your next turn.</string>
     <string name="error_toast_leader_cannot_be_transformed_into_a_frog">A leader cannot be transformed into a frog</string>
     <string name="error_toast_invalid_transformed_frog_team">A character cannot be transformed into a frog of a different team</string>
+    <string name="sniper_warning_title">Warning: Sniper threat</string>
+    <string name="sniper_warning_message">Your leader is threatened by an enemy sniper! An enemy Sniper can capture it from 3 or more spaces away in a straight line, even without line of sight.\n\nMove your Leader out of the Sniper\'s firing line before your opponent\'s next turn, or you will lose the game.</string>
+    <string name="barrage_and_sniper_warning_title">Warnings: barrage and sniper</string>
+    <string name="barrage_and_sniper_warning_message">You have received warnings for both Barrage and Sniper!\n•Barrage: A barrage is a chain of 4 allied characters splitting the board in two. If you receive a Barrage warning 2 turns in a row, you immediately lose the game.\n• Sniper: An enemy Sniper can capture your Leader from 3 or more spaces away in a straight line, even without line of sight. Move your Leader out of the Sniper\'s firing line before your opponent\'s next turn, or you will lose the game.\n\nTake action to avoid losing the game!</string>
+
 </resources>
