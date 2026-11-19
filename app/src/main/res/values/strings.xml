@@ -386,5 +386,7 @@
     <string name="sniper_warning_message">Your leader is threatened by an enemy sniper! An enemy Sniper can capture it from 3 or more spaces away in a straight line, even without line of sight.\n\nMove your Leader out of the Sniper\'s firing line before your opponent\'s next turn, or you will lose the game.</string>
     <string name="barrage_and_sniper_warning_title">Warnings: barrage and sniper</string>
     <string name="barrage_and_sniper_warning_message">You have received warnings for both Barrage and Sniper!\n•Barrage: A barrage is a chain of 4 allied characters splitting the board in two. If you receive a Barrage warning 2 turns in a row, you immediately lose the game.\n• Sniper: An enemy Sniper can capture your Leader from 3 or more spaces away in a straight line, even without line of sight. Move your Leader out of the Sniper\'s firing line before your opponent\'s next turn, or you will lose the game.\n\nTake action to avoid losing the game!</string>
+    <string name="show_sniper_warning_title">Sniper threat warning</string>
+    <string name="show_sniper_warning_message">Display a warning when your Leader is threatened by an enemy Sniper.</string>
 
 </resources>
