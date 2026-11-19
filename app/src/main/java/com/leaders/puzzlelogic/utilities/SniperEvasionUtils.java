@@ -120,7 +120,6 @@ public class SniperEvasionUtils {
                 sniperCell.getPosition().distanceTo(targetCell.getPosition()) >= 3;
     }
 
-    // TODO - javadoc
     /**
      * Checks whether the specified team has at least one sniper on the board.
      *
@@ -128,7 +127,20 @@ public class SniperEvasionUtils {
      * @param teamColor the color of the team
      * @return {@code true} if the team has at least one sniper, {@code false} otherwise
      */
-    public static boolean hasSniper(@NonNull Board board, @NonNull TeamColor teamColor) {
+    private static boolean hasSniper(@NonNull Board board, @NonNull TeamColor teamColor) {
         return !BoardQuery.findCharacterCells(board, teamColor, CharacterType.Sniper).isEmpty();
+    }
+
+    /**
+     * Checks whether the specified team's leader is threatened by an opposing sniper.
+     *
+     * @param board the board to check
+     * @param teamColor the color of the leader's team
+     * @return {@code true} if the opposing team has a sniper within range of the leader,
+     *         {@code false} otherwise
+     * @throws IllegalStateException if the leader or the opposing sniper is missing
+     */
+    public static boolean isLeaderThreatened(@NonNull Board board, @NonNull TeamColor teamColor) {
+        return hasSniper(board, teamColor.getOpposite()) && isLeaderInSniperRange(board, teamColor);
     }
 }

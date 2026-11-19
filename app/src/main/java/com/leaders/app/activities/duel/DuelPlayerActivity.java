@@ -559,8 +559,7 @@ public final class DuelPlayerActivity extends FullGameActivity {
 
     private boolean hasSniperWarning(@NonNull GameContext gameContext, @NonNull TeamColor teamColor) {
         // TODO - handle disabled Sniper warning
-        return SniperEvasionUtils.hasSniper(gameContext.getBoard(), teamColor.getOpposite()) &&
-                SniperEvasionUtils.isLeaderInSniperRange(gameContext.getBoard(), teamColor);
+        return SniperEvasionUtils.isLeaderThreatened(gameContext.getBoard(), teamColor);
     }
 
     private boolean isScreenRotated() {
