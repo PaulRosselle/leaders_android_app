@@ -13,17 +13,20 @@ import androidx.annotation.StringRes;
 import com.leaders.R;
 import com.leaders.app.entities.WarningDimension;
 import com.leaders.app.enums.LeaderType;
+import com.leaders.app.enums.PlayerWarning;
 import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.enums.GamePhaseType;
 
 public final class PlayerBottomView extends PlayerView {
     private final TextView txvInfo;
+    private final ImageView imvWarning;
     private final ImageView imvInfoBg;
 
     public PlayerBottomView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
         txvInfo = findViewById(R.id.txvInfo_vwPlayerBottom);
+        imvWarning = findViewById(R.id.imvWarning_actPlayerBottom);
         imvInfoBg = findViewById(R.id.imvInfo_vwPlayerBottom);
     }
 
@@ -93,6 +96,14 @@ public final class PlayerBottomView extends PlayerView {
     public void setInfoVisible(boolean infoVisible) {
         txvInfo.setVisibility(infoVisible ? VISIBLE : INVISIBLE);
         imvInfoBg.setVisibility(infoVisible ? VISIBLE : INVISIBLE);
+    }
+
+    public void applyWarning(@Nullable PlayerWarning playerWarning) {
+        boolean warningVisible = playerWarning != null;
+        if (warningVisible) {
+            imvWarning.setImageResource(playerWarning.getBottomResId());
+        }
+        setWarningVisible(warningVisible);
     }
 
     private int getInfoResId(@NonNull GamePhaseType gamePhaseType) {
