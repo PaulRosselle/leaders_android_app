@@ -28,6 +28,7 @@ public class SettingsActivity extends BaseActivity {
     private AnimationSpeedView asvAnimationSpeed;
     private SettingsSwitch swtAnimatePlayableItems;
     private SettingsSwitch swtAutoRotation;
+    private SettingsSwitch swtShowSniperWarning;
     private HighlightColorView hcvHighlightColor;
     private ContactView ctvContact;
     private View vwDialogBg;
@@ -48,6 +49,7 @@ public class SettingsActivity extends BaseActivity {
         asvAnimationSpeed = findViewById(R.id.asvAnimationSpeed_actSettings);
         swtAnimatePlayableItems = findViewById(R.id.swtAnimatePlayableItems_actSettings);
         swtAutoRotation = findViewById(R.id.swtAutoRotation_actSettings);
+        swtShowSniperWarning = findViewById(R.id.swtShowSniperWarning_actSettings);
         hcvHighlightColor = findViewById(R.id.hcvHighlightColor_actSettings);
 
         ctvContact = findViewById(R.id.ctvContact_actSettings);
@@ -66,6 +68,7 @@ public class SettingsActivity extends BaseActivity {
         asvAnimationSpeed.setChangeListener(this::onAnimationSpeedChange);
         swtAnimatePlayableItems.setOnCheckedChangeListener(this::onAnimatePlayableItemsChanged);
         swtAutoRotation.setOnCheckedChangeListener(this::onAutoRotationChanged);
+        swtShowSniperWarning.setOnCheckedChangeListener(this::onShowSniperWarningChanged);
         hcvHighlightColor.setChangeListener(this::onColorChange);
 
         ctvContact.setOnOpenFormClickListener(this::onOpenContactFormClick);
@@ -84,6 +87,7 @@ public class SettingsActivity extends BaseActivity {
         hcvHighlightColor.setColor(settings.getHighlightColor());
         swtAnimatePlayableItems.setChecked(settings.animatePlayableItems());
         swtAutoRotation.setChecked(settings.duelScreenAutoRotation());
+        swtShowSniperWarning.setChecked(settings.showSniperWarning());
     }
 
     @Override
@@ -143,10 +147,15 @@ public class SettingsActivity extends BaseActivity {
         JsonUtils.saveSettings(this, settings);
     }
 
-
     public void onAutoRotationChanged(@NonNull CompoundButton compoundButton,
                                       boolean duelScreenAutoRotation) {
         settings.setDuelScreenAutoRotation(duelScreenAutoRotation);
+        JsonUtils.saveSettings(this, settings);
+    }
+
+    public void onShowSniperWarningChanged(@NonNull CompoundButton compoundButton,
+                                           boolean showSniperWarning) {
+        settings.setShowSniperWarning(showSniperWarning);
         JsonUtils.saveSettings(this, settings);
     }
 

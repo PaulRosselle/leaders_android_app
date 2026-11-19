@@ -175,7 +175,7 @@ public abstract class FullGameActivity extends CardSelectionActivity {
         return LeaderType.getFromCharacter(leaderCell.getCharacter());
     }
 
-    protected boolean playerHasWarnings(@NonNull Player player,
+    protected boolean hasBarrageWarning(@NonNull Player player,
                                         @NonNull List<PlayerWarningState> warningStates) {
         for (PlayerWarningState warningState : warningStates) {
             if (warningState.getPlayerTeamColor() == player.getTeamColor() &&
