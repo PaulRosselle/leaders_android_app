@@ -525,12 +525,13 @@ public final class DuelPlayerActivity extends FullGameActivity {
 
         Board board = gameContext.getBoard();
         pbvBottomPlayer.setPlayer(currentPlayer, getPlayerLeaderType(currentPlayer, board));
-        pbvBottomPlayer.setWarningVisible(playerHasWarnings(currentPlayer, warningStates));
+        // TODO
+        pbvBottomPlayer.setWarningVisible(playerHasWarning(currentPlayer, warningStates));
 
         Player opposingPlayer = gameContext.getOpposingPlayer();
 
         ptvOpposingPlayer.setPlayer(opposingPlayer, getPlayerLeaderType(opposingPlayer, board));
-        ptvOpposingPlayer.setWarningVisible(playerHasWarnings(opposingPlayer, warningStates));
+        ptvOpposingPlayer.setWarningVisible(playerHasWarning(opposingPlayer, warningStates));
     }
 
     private boolean isScreenRotated() {

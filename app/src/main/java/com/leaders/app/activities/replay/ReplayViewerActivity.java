@@ -334,6 +334,7 @@ public final class ReplayViewerActivity extends BaseActivity implements ReplayCo
         ptvTopPlayer.setWarningVisible(
                 game.getPlayerWarningCount(playerPerspective.getOpposite(), WarningType.Barrage) > 0
         );
+        // TODO
         pbvBottomPlayer.setWarningVisible(
                 game.getPlayerWarningCount(playerPerspective, WarningType.Barrage) > 0
         );
