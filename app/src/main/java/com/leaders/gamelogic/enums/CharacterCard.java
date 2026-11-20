@@ -20,7 +20,14 @@ public enum CharacterCard {
     Rider,
     RoyalGuard,
     Vizier,
-    Wanderer;
+    Wanderer,
+    LeaderVermilion,
+    Shaman,
+    Frog,
+    Sniper,
+    Tactician,
+    Wisp,
+    EliteArcher;
 
     /**
      * Returns the ability types associated with this character card.
@@ -39,18 +46,25 @@ public enum CharacterCard {
             case Rider:
             case RoyalGuard:
             case Wanderer:
+            case Shaman:
+            case Tactician:
                 return new AbilityType[] { AbilityType.Active };
             case Archer:
             case Assassin:
             case Jailer:
             case Protector:
             case Vizier:
+            case Sniper:
+            case EliteArcher:
                 return new AbilityType[] { AbilityType.Passive };
             case HermitAndCub:
             case Nemesis:
+            case Frog:
+            case Wisp:
                 return new AbilityType[] { AbilityType.Special };
             case LeaderKing:
             case LeaderQueen:
+            case LeaderVermilion:
                 return new AbilityType[0];
             default: throw new NoSuchElementException(String.format("No ability type found matching %s", this));
         }
@@ -58,11 +72,11 @@ public enum CharacterCard {
 
     /** Indicates whether this character card is a leader.*/
     public boolean isLeader() {
-        return this == LeaderKing || this == LeaderQueen;
+        return this == LeaderKing || this == LeaderQueen || this == LeaderVermilion;
     }
 
     /** Indicates whether this character card can be recruited.*/
     public boolean canBeRecruited() {
-        return !isLeader();
+        return !isLeader() && this != Frog;
     }
 }

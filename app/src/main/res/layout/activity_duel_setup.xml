@@ -75,58 +75,54 @@
         app:layout_constraintTop_toTopOf="@+id/gdlRoot_actDuelSetup"
         app:layout_constraintVertical_bias="0.0" />
 
-    <com.leaders.app.views.duel.PlayerSetupView
-        android:id="@+id/psvFirst_actDuelSetup"
+    <ScrollView
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnBack_actDuelSetup"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <com.leaders.app.views.duel.PlayerSetupView
-        android:id="@+id/psvSecond_actDuelSetup"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/btnStartGame_actDuelSetup"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/psvFirst_actDuelSetup"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toBottomOf="@+id/btnBack_actDuelSetup">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-    <com.leaders.app.views.duel.setup.GameModeView
-        android:id="@+id/gmvGameMode_actDuelSetup"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/fpvFirstPlayer_actDuelSetup"
-        app:layout_constraintVertical_bias="0.0" />
+            <com.leaders.app.views.duel.PlayerSetupView
+                android:id="@+id/psvFirst_actDuelSetup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
-    <com.leaders.app.views.duel.setup.FirstPlayerView
-        android:id="@+id/fpvFirstPlayer_actDuelSetup"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/psvSecond_actDuelSetup"
-        app:layout_constraintVertical_bias="0.0" />
+            <com.leaders.app.views.duel.PlayerSetupView
+                android:id="@+id/psvSecond_actDuelSetup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp" />
+
+            <com.leaders.app.views.duel.setup.GameModeView
+                android:id="@+id/gmvGameMode_actDuelSetup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <com.leaders.app.views.duel.setup.FirstPlayerView
+                android:id="@+id/fpvFirstPlayer_actDuelSetup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <com.leaders.app.views.duel.setup.CharactersSetupView
+                android:id="@+id/csvCharacters_actDuelSetup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+        </LinearLayout>
+    </ScrollView>
+
 
     <Button
         android:id="@+id/btnStartGame_actDuelSetup"
@@ -159,5 +155,43 @@
         app:strokeColor="@color/font"
         app:strokeWidth="@dimen/default_stroke_width"
         tools:ignore="SpeakableTextPresentCheck" />
+
+    <View
+        android:id="@+id/vwDialogBg_actDuelSetup"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/transparent_black"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.leaders.app.views.duel.setup.CharactersSetupFormView
+        android:id="@+id/csfvCharacters_actDuelSetup"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="@dimen/default_bottom_margin"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actDuelSetup" />
+
+    <com.leaders.app.views.character.CharacterNotificationView
+        android:id="@+id/cnvCardInfo_actDuelSetup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/gdlRoot_actDuelSetup"
+        app:layout_constraintVertical_bias="0.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

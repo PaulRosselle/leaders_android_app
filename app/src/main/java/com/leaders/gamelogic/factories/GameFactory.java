@@ -14,6 +14,7 @@ import com.leaders.gamelogic.historyentries.segments.TurnPhase;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 
 public final class GameFactory {
@@ -29,7 +30,8 @@ public final class GameFactory {
                 new ArrayList<>(gameHistory.getConfig().getInitialRecruitableCards()),
                 new EnumMap<>(TeamColor.class), // playerRecruitedCharacters
                 new EnumMap<>(TeamColor.class), // playerBanishedCards
-                new EnumMap<>(TeamColor.class) // playerWarnings
+                new EnumMap<>(TeamColor.class), // playerWarnings
+                new HashMap<>() // charactersTransformedState
         );
 
         // The config contains every action made before the game started.

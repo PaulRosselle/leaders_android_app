@@ -46,6 +46,7 @@ public final class PlayerTopView extends PlayerView {
         switch (leaderType) {
             case King: return R.drawable.player_top_king;
             case Queen: return R.drawable.player_top_queen;
+            case Vermilion: return R.drawable.player_top_vermilion;
             default: throw new IllegalStateException("No leader res id found for leader: " + leaderType);
         }
     }

@@ -44,7 +44,7 @@ public final class GameStateHashUtils {
         return String.format("%s%s%s%s%s",
                 createBoardHash(characterCells),
                 GLOBAL_SEPARATOR,
-                createTurnHash(gameHistory, characterCells),
+                createTurnHash(game, gameHistory, characterCells),
                 GLOBAL_SEPARATOR,
                 createPlayabilityHash(game, gameHistory)
         );
@@ -70,13 +70,17 @@ public final class GameStateHashUtils {
     /**
      * Creates a hash string representing the characters that can still act during the current turn.
      *
+     * @param game the current game projection
      * @param gameHistory the game history containing the current phase
      * @param characterCells the cells containing the characters to evaluate
      * @return a string encoding the cells of characters that can still act during the current turn
      * @throws IllegalArgumentException if the current phase is not an {@link ActionsPhase}
      * @throws NullPointerException if {@code gameHistory} or {@code characterCells} is {@code null}
      */
-    private static String createTurnHash(@NonNull GameHistory gameHistory, @NonNull List<Cell> characterCells) {
+    @NonNull
+    private static String createTurnHash(@NonNull Game game,
+                                         @NonNull GameHistory gameHistory,
+                                         @NonNull List<Cell> characterCells) {
         IPhase currentPhase = GameHistoryQuery.findCurrentPhase(gameHistory);
         if (!(currentPhase instanceof ActionsPhase)) {
             throw new IllegalArgumentException("In progress actions phase required");
@@ -85,7 +89,7 @@ public final class GameStateHashUtils {
 
         // Here we're trying to get a list of the character that can still play during the turn.
         List<Cell> turnCharacterCells = characterCells.stream()
-                .filter(cell -> CharacterAbilityQuery.canAct(currentActionsPhase, cell.getCharacter()))
+                .filter(cell -> CharacterAbilityQuery.canAct(game, currentActionsPhase, cell.getCharacter()))
                 .collect(Collectors.toList());
 
         StringBuilder builder = new StringBuilder();

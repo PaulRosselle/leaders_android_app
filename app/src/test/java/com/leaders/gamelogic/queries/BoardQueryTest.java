@@ -5,6 +5,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
@@ -103,6 +105,209 @@ public class BoardQueryTest {
         assertNull(BoardQuery.findVisibleCharacterCell(board, origin, Direction.Top, TeamColor.Black, CharacterType.Archer));
     }
 
+
+    @Test
+    public void findVisibleCharacterCells_shouldReturnAllVisibleCharactersInAllDirections() {
+        Board board = new Board();
+        Position origin = new Position(3, 3);
+
+        Character top = Character.create(CharacterType.Archer, TeamColor.Black);
+        Character bottom = Character.create(CharacterType.Bruiser, TeamColor.White);
+        Character left = Character.create(CharacterType.LeaderKing, TeamColor.Black);
+        Character right = Character.create(CharacterType.LeaderQueen, TeamColor.White);
+
+        board.getCell(new Position(3, 1)).setCharacter(top);
+        board.getCell(new Position(3, 5)).setCharacter(bottom);
+        board.getCell(new Position(1, 3)).setCharacter(left);
+        board.getCell(new Position(5, 3)).setCharacter(right);
+
+        List<Cell> cells = BoardQuery.findVisibleCharacterCells(
+                board, origin, null, null, false
+        );
+
+        assertEquals(4, cells.size());
+        assertTrue(cells.contains(board.getCell(new Position(3, 1))));
+        assertTrue(cells.contains(board.getCell(new Position(3, 5))));
+        assertTrue(cells.contains(board.getCell(new Position(1, 3))));
+        assertTrue(cells.contains(board.getCell(new Position(5, 3))));
+    }
+
+    @Test
+    public void findVisibleCharacterCells_shouldReturnEmptyListWhenNoCharacterIsVisible() {
+        Board board = new Board();
+        Position origin = new Position(3, 3);
+
+        List<Cell> cells = BoardQuery.findVisibleCharacterCells(
+                board, origin, null, null, false
+        );
+
+        assertTrue(cells.isEmpty());
+    }
+
+    @Test
+    public void findVisibleCharacterCells_shouldFilterByTeamColor() {
+        Board board = new Board();
+        Position origin = new Position(3, 3);
+
+        Character blackArcher = Character.create(CharacterType.Archer, TeamColor.Black);
+        Character whiteArcher = Character.create(CharacterType.Archer, TeamColor.White);
+
+        board.getCell(new Position(3, 1)).setCharacter(blackArcher);
+        board.getCell(new Position(3, 5)).setCharacter(whiteArcher);
+
+        List<Cell> cells = BoardQuery.findVisibleCharacterCells(
+                board, origin, TeamColor.Black, null, false
+        );
+
+        assertEquals(1, cells.size());
+        assertSame(board.getCell(new Position(3, 1)), cells.get(0));
+    }
+
+    @Test
+    public void findVisibleCharacterCells_shouldFilterByCharacterType() {
+        Board board = new Board();
+        Position origin = new Position(3, 3);
+
+        Character blackArcher = Character.create(CharacterType.Archer, TeamColor.Black);
+        Character blackBruiser = Character.create(CharacterType.Bruiser, TeamColor.Black);
+
+        board.getCell(new Position(3, 1)).setCharacter(blackArcher);
+        board.getCell(new Position(3, 5)).setCharacter(blackBruiser);
+
+        List<Cell> cells = BoardQuery.findVisibleCharacterCells(
+                board, origin, null, CharacterType.Archer, false
+        );
+
+        assertEquals(1, cells.size());
+        assertSame(board.getCell(new Position(3, 1)), cells.get(0));
+    }
+
+    @Test
+    public void findVisibleCharacterCells_shouldAllowNullAsWildcard() {
+        Board board = new Board();
+        Position origin = new Position(3, 3);
+
+        Character blackArcher = Character.create(CharacterType.Archer, TeamColor.Black);
+        Character whiteBruiser = Character.create(CharacterType.Bruiser, TeamColor.White);
+
+        board.getCell(new Position(3, 1)).setCharacter(blackArcher);
+        board.getCell(new Position(3, 5)).setCharacter(whiteBruiser);
+
+        List<Cell> cells = BoardQuery.findVisibleCharacterCells(
+                board, origin, null, null, false
+        );
+
+        assertEquals(2, cells.size());
+    }
+
+    @Test
+    public void findVisibleCharacterCells_shouldIgnoreAdjacentCellsWhenRequested() {
+        Board board = new Board();
+        Position origin = new Position(3, 3);
+
+        Character adjacent = Character.create(CharacterType.Archer, TeamColor.Black);
+        Character distant = Character.create(CharacterType.Bruiser, TeamColor.White);
+
+        board.getCell(new Position(3, 2)).setCharacter(adjacent);
+        board.getCell(new Position(3, 1)).setCharacter(distant);
+
+        List<Cell> cells = BoardQuery.findVisibleCharacterCells(
+                board, origin, null, null, true
+        );
+
+        assertTrue(cells.isEmpty());
+    }
+
+    @Test
+    public void findVisibleCharacterCells_shouldIncludeAdjacentCellsWhenNotIgnored() {
+        Board board = new Board();
+        Position origin = new Position(3, 3);
+
+        Character adjacent = Character.create(CharacterType.Archer, TeamColor.Black);
+
+        board.getCell(new Position(3, 2)).setCharacter(adjacent);
+
+        List<Cell> cells = BoardQuery.findVisibleCharacterCells(
+                board, origin, null, null, false
+        );
+
+        assertEquals(1, cells.size());
+        assertSame(board.getCell(new Position(3, 2)), cells.get(0));
+    }
+
+    @Test
+    public void findVisibleCharacterCells_shouldSearchBeyondEmptyAdjacentCellsWhenIgnoringThem() {
+        Board board = new Board();
+        Position origin = new Position(3, 3);
+
+        Character distant = Character.create(CharacterType.Archer, TeamColor.Black);
+        board.getCell(new Position(3, 1)).setCharacter(distant);
+
+        List<Cell> cells = BoardQuery.findVisibleCharacterCells(
+                board, origin, null, null, true
+        );
+
+        assertEquals(1, cells.size());
+        assertSame(board.getCell(new Position(3, 1)), cells.get(0));
+    }
+
+    @Test
+    public void findVisibleCharacterCells_shouldNotSearchInDirectionWhenAdjacentCellIsOccupiedAndIgnored() {
+        Board board = new Board();
+        Position origin = new Position(3, 3);
+
+        Character adjacent = Character.create(CharacterType.Bruiser, TeamColor.White);
+        Character distant = Character.create(CharacterType.Archer, TeamColor.Black);
+
+        board.getCell(new Position(3, 2)).setCharacter(adjacent);
+        board.getCell(new Position(3, 1)).setCharacter(distant);
+
+        List<Cell> cells = BoardQuery.findVisibleCharacterCells(
+                board, origin, TeamColor.Black, CharacterType.Archer, true
+        );
+
+        assertTrue(cells.isEmpty());
+    }
+
+    @Test
+    public void findVisibleCharacterCells_shouldNotReturnCharactersBehindAnotherCharacter() {
+        Board board = new Board();
+        Position origin = new Position(3, 3);
+
+        Character first = Character.create(CharacterType.Bruiser, TeamColor.White);
+        Character second = Character.create(CharacterType.Archer, TeamColor.Black);
+
+        board.getCell(new Position(3, 2)).setCharacter(first);
+        board.getCell(new Position(3, 1)).setCharacter(second);
+
+        List<Cell> cells = BoardQuery.findVisibleCharacterCells(
+                board, origin, TeamColor.Black, CharacterType.Archer, false
+        );
+
+        assertTrue(cells.isEmpty());
+    }
+
+    @Test
+    public void findVisibleCharacterCells_shouldReturnVisibleCharactersAtBoardEdges() {
+        Board board = new Board();
+        Position origin = new Position(0, 0);
+
+        Character right = Character.create(CharacterType.Archer, TeamColor.Black);
+        Character bottom = Character.create(CharacterType.Bruiser, TeamColor.White);
+
+        board.getCell(new Position(0, 2)).setCharacter(right);
+        board.getCell(new Position(2, 0)).setCharacter(bottom);
+
+        List<Cell> cells = BoardQuery.findVisibleCharacterCells(
+                board, origin, null, null, false
+        );
+
+        assertEquals(2, cells.size());
+        assertTrue(cells.contains(board.getCell(new Position(0, 2))));
+        assertTrue(cells.contains(board.getCell(new Position(2, 0))));
+    }
+
+
     @Test
     public void findLeaderCell_shouldReturnLeaderOfSpecifiedTeam() {
         Board board = new Board();
@@ -175,6 +380,102 @@ public class BoardQueryTest {
         board.getCell(new Position(2, 2)).setCharacter(Character.create(CharacterType.Archer, TeamColor.Black));
         List<Cell> cells = BoardQuery.findEmptyCellsAround(board, center, 2);
         assertEquals(Direction.values().length * 3L - 5, cells.size());
+    }
+
+    @Test
+    public void getNonNullCharacterAt_shouldReturnCharacterAtPosition() {
+        Board board = new Board();
+        Position position = new Position(3, 3);
+        Character character = Character.create(CharacterType.Archer, TeamColor.Black);
+
+        board.getCell(position).setCharacter(character);
+
+        assertSame(character, BoardQuery.getNonNullCharacterAt(board, position));
+    }
+
+    @Test
+    public void getNonNullCharacterAt_shouldThrowWhenCellIsEmpty() {
+        Board board = new Board();
+        Position position = new Position(3, 3);
+
+        assertThrows(NullPointerException.class, () -> BoardQuery.getNonNullCharacterAt(board, position));
+    }
+
+    @Test
+    public void getAdjacentCells_shouldReturnAllAdjacentCellsWhenPredicateMatchesAll() {
+        Board board = new Board();
+        Position position = new Position(3, 3);
+
+        List<Cell> cells = BoardQuery.getAdjacentCells(board, position, cell -> true);
+
+        assertEquals(Direction.values().length, cells.size());
+
+        for (Cell cell : cells) {
+            assertSame(board.getCell(cell.getPosition()), cell);
+        }
+    }
+
+    @Test
+    public void getAdjacentCells_shouldReturnNoCellsWhenPredicateMatchesNone() {
+        Board board = new Board();
+        Position position = new Position(3, 3);
+
+        List<Cell> cells = BoardQuery.getAdjacentCells(board, position, cell -> false);
+
+        assertTrue(cells.isEmpty());
+    }
+
+    @Test
+    public void getAdjacentCells_shouldFilterCellsUsingPredicate() {
+        Board board = new Board();
+        Position position = new Position(3, 3);
+
+        Character blackArcher = Character.create(CharacterType.Archer, TeamColor.Black);
+        Character whiteArcher = Character.create(CharacterType.Archer, TeamColor.White);
+
+        board.getCell(new Position(3, 2)).setCharacter(blackArcher);
+        board.getCell(new Position(3, 4)).setCharacter(whiteArcher);
+
+        List<Cell> cells = BoardQuery.getAdjacentCells(
+                board,
+                position,
+                cell -> cell.getCharacter() != null
+                        && cell.getCharacter().getTeamColor() == TeamColor.Black
+        );
+
+        assertEquals(1, cells.size());
+        assertSame(board.getCell(new Position(3, 2)), cells.get(0));
+    }
+
+    @Test
+    public void getAdjacentCells_shouldReturnOnlyExistingAdjacentCellsAtBoardEdge() {
+        Board board = new Board();
+        Position position = new Position(0, 0);
+
+        List<Cell> cells = BoardQuery.getAdjacentCells(board, position, cell -> true);
+
+        assertEquals(Direction.values().length / 2, cells.size());
+
+        for (Cell cell : cells) {
+            assertSame(board.getCell(cell.getPosition()), cell);
+        }
+    }
+
+    @Test
+    public void getAdjacentCells_shouldReturnOnlyAdjacentCells() {
+        Board board = new Board();
+        Position position = new Position(3, 3);
+
+        Character character = Character.create(CharacterType.Archer, TeamColor.Black);
+        board.getCell(new Position(3, 1)).setCharacter(character);
+
+        List<Cell> cells = BoardQuery.getAdjacentCells(
+                board,
+                position,
+                cell -> cell.getCharacter() != null
+        );
+
+        assertTrue(cells.isEmpty());
     }
 
     @Test

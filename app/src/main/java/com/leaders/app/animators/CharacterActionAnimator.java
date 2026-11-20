@@ -87,7 +87,9 @@ public final class CharacterActionAnimator extends ActionAnimator {
             case Jump: animateJumpCharacter(boardView, targets, onAnimationEnd); break;
             case Fly: animateFlyCharacter(boardView, targets, onAnimationEnd); break;
             case Remove: animateRemoveCharacter(boardView, targets, onAnimationEnd); break;
-            case Transform: animateTransformCharacter(boardView, targets, onAnimationEnd); break;
+            case Transform:
+            case Untransform:
+                animateTransformCharacter(boardView, targets, onAnimationEnd); break;
             default: throw new IllegalArgumentException("Character motion animation not handled: " + motion.getMotionType());
         }
     }
@@ -210,7 +212,7 @@ public final class CharacterActionAnimator extends ActionAnimator {
                     for (Position destPos : destinationPositions) {
                         animateFadeIn(boardView.getCharacterDisplay(destPos), fadingDuration, onFadeInAnimationEnd);
                     }
-                }, respawnDelay);
+                }, getAnimationDuration(respawnDelay));
             }
         };
 
@@ -704,9 +706,10 @@ public final class CharacterActionAnimator extends ActionAnimator {
 
     private void setupForMovement(@NonNull CharacterDisplay characterDisplay,
                                   float destX, float destY) {
-        characterDisplay.stopHighlightAnimation();
+        characterDisplay.stopEffectsAnimation();
         characterDisplay.setIsHighlighted(false, true);
-        characterDisplay.bringToFront();
+        characterDisplay.hide(CharacterDisplay.ViewType.Transformed);
+        characterDisplay.getCharacterView().bringToFront();
 
         // Since we're animating the movement of the characterView alone,
         // we place all other views directly at the destination

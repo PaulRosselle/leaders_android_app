@@ -65,7 +65,7 @@ public abstract class CardSelectionActivity extends PlayableActivity implements
         super.initViews();
 
         ccsvCardSelector = findViewById(getCardSelectorViewId());
-        chdNewCharacter = new CharacterDisplay(this, ccsvCardSelector);
+        chdNewCharacter = new CharacterDisplay(this, ccsvCardSelector, ccsvCardSelector);
     }
 
     @Override
@@ -85,7 +85,7 @@ public abstract class CardSelectionActivity extends PlayableActivity implements
     //region VIEW LISTENER METHODS
 
     protected boolean onPortraitLongClick(View v) {
-        showCardDescriptionNotification(((PortraitView) v).getPortraitCard());
+        cnvCardInfo.toggle(((PortraitView) v).getPortraitCard(), null);
         return true;
     }
 

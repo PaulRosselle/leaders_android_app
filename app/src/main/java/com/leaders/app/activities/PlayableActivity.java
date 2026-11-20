@@ -19,14 +19,12 @@ import com.leaders.app.enums.LeaderType;
 import com.leaders.app.utilities.ButtonUtils;
 import com.leaders.app.views.EndGameView;
 import com.leaders.app.views.board.PlayableBoardView;
+import com.leaders.app.views.character.CharacterDisplay;
 import com.leaders.app.views.character.CharacterNotificationView;
-import com.leaders.app.views.character.CharacterView;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.GameHistory;
-import com.leaders.gamelogic.enums.CharacterCard;
-import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
@@ -222,14 +220,8 @@ public abstract class PlayableActivity extends BaseActivity
         controller.cancelAction();
     }
 
-    protected boolean onBoardCharacterLongClick(View v) {
-        CharacterType characterType = Objects.requireNonNull(
-                ((CharacterView) v).getCharacterType(),
-                "An empty character piece is not authorized"
-        );
-
-        showCardDescriptionNotification(characterType.getCharacterCard());
-
+    protected boolean onBoardCharacterLongClick(@NonNull CharacterDisplay characterDisplay) {
+        cnvCardInfo.toggle(characterDisplay.getCharacterType(), characterDisplay.getTransformedCharacterType());
         return true;
     }
 
@@ -244,7 +236,6 @@ public abstract class PlayableActivity extends BaseActivity
 
     protected void highlightPlayableCharacters(@NonNull GameContext gameContext,
                                                @NonNull InteractionRequest request) {
-
         bdvBoard.highlightPlayableCharacters(
                 gameContext.getPlayableCharacters(),
                 request.getContext().getTargetCharacter(),
@@ -262,6 +253,10 @@ public abstract class PlayableActivity extends BaseActivity
         }
     }
 
+    private void displayTransformedCharacters(@NonNull GameContext gameContext) {
+        bdvBoard.updateTransformedDisplays(gameContext.getTransformedCharacters());
+    }
+
     protected void applyInteractionTargets(@NonNull GameContext gameContext,
                                            @NonNull InteractionRequest request) {
         bdvBoard.applyTargets(request.getLegalTargets(), request.getContext(), gameContext.getBoard());
@@ -270,6 +265,7 @@ public abstract class PlayableActivity extends BaseActivity
     protected void updateInteractionUI(@NonNull GameContext gameContext,
                                        @NonNull InteractionRequest request) {
         highlightPlayableCharacters(gameContext, request);
+        displayTransformedCharacters(gameContext);
 
         updateUndoButton();
     }
@@ -284,25 +280,19 @@ public abstract class PlayableActivity extends BaseActivity
 
     //endregion
 
-    //region CHARACTER INFORMATION METHODS
-
-    protected final void showCardDescriptionNotification(@NonNull CharacterCard characterCard) {
-        if (cnvCardInfo.getCharacterCard() == characterCard) {
-            cnvCardInfo.hide();
-        } else {
-            cnvCardInfo.show(characterCard);
-        }
-    }
-
-    //endregion
-
     //region END GAME METHODS
 
     protected final LeaderType getLeaderType(@NonNull Board board, @NonNull TeamColor teamColor) {
-        Cell leaderCell = Objects.requireNonNull(
-                BoardQuery.findLeaderCell(board, teamColor),
-                "No leader found for team: " + teamColor
-        );
+        Cell leaderCell = BoardQuery.findLeaderCell(board, teamColor);
+
+        // If the targeted leader is not found, we try to find the other one
+        if (leaderCell == null) {
+            Cell opponentLeaderCell = Objects.requireNonNull(
+                    BoardQuery.findLeaderCell(board, teamColor.getOpposite()),
+                    "No leader found on the board"
+            );
+            return LeaderType.getFromCharacter(opponentLeaderCell.getCharacter()).getNext();
+        }
 
         return LeaderType.getFromCharacter(leaderCell.getCharacter());
     }

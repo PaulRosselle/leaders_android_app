@@ -1,11 +1,12 @@
 package com.leaders.app.animators;
 
+import android.view.animation.AccelerateDecelerateInterpolator;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.leaders.app.enums.AnimationSpeed;
 import com.leaders.app.views.character.CharacterDisplay;
-import com.leaders.app.views.character.CharacterView;
 
 public abstract class ActionAnimator {
     AnimationSpeed speed;
@@ -21,6 +22,7 @@ public abstract class ActionAnimator {
     protected void animateFadeIn(@NonNull CharacterDisplay characterDisplay, int duration,
                                  @Nullable Runnable onAnimationEnd) {
         characterDisplay.getCharacterView().animate().scaleX(1f).scaleY(1f).alpha(1f)
+                .setInterpolator(new AccelerateDecelerateInterpolator())
                 .setDuration(getAnimationDuration(duration))
                 .withEndAction(onAnimationEnd)
                 .start();
@@ -28,11 +30,12 @@ public abstract class ActionAnimator {
 
     protected void animateFadeOut(@NonNull CharacterDisplay characterDisplay, int duration,
                                   @Nullable Runnable onAnimationEnd) {
-        CharacterView characterView = characterDisplay.getCharacterView();
+        characterDisplay.stopEffectsAnimation();
         characterDisplay.setIsHighlighted(false, false);
-        characterDisplay.stopHighlightAnimation();
+        characterDisplay.hide(CharacterDisplay.ViewType.Transformed);
 
-        characterView.animate().scaleX(0f).scaleY(0f).alpha(0f)
+        characterDisplay.getCharacterView().animate().scaleX(0f).scaleY(0f).alpha(0f)
+                .setInterpolator(new AccelerateDecelerateInterpolator())
                 .setDuration(getAnimationDuration(duration))
                 .withEndAction(onAnimationEnd)
                 .start();

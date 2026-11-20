@@ -101,15 +101,15 @@ public final class PlayerSetupView extends ConstraintLayout {
 
     public void setTeamColor(TeamColor teamColor) {
         this.teamColor = teamColor;
-        chvCharacterColor.setCharacter(
-                null,
-                CharacterSkinType.Default,
-                teamColor
-        );
+        chvCharacterColor.setCharacter(null, CharacterSkinType.Default, teamColor);
     }
 
     public void setName(@NonNull String name) {
         edtName.setText(name);
+    }
+
+    public void setHint(@NonNull String hint) {
+        edtName.setHint(hint);
     }
 
     public void setPlayerSetupWatcher(PlayerSetupWatcher watcher) {

@@ -8,6 +8,8 @@ import com.leaders.gamelogic.actions.RecruitmentActionMotion;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
+import com.leaders.gamelogic.entities.GameHistory;
+import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
@@ -25,6 +27,7 @@ import com.leaders.gamelogic.interactions.InteractionType;
 import com.leaders.gamelogic.interactions.RecruitmentActionBuilder;
 import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
+import com.leaders.gamelogic.queries.GameHistoryQuery;
 import com.leaders.gamelogic.queries.GameQuery;
 
 import java.util.ArrayList;
@@ -36,6 +39,8 @@ public final class RecruitmentActionResolver {
     @NonNull
     private final Game game;
 
+    @NonNull
+    private final GamePhase currentPhase;
 
     @NonNull
     private final CharacterCard recruitedCard;
@@ -44,11 +49,16 @@ public final class RecruitmentActionResolver {
     private final TeamColor teamColor;
 
     public RecruitmentActionResolver(@NonNull Game game,
+                                     @NonNull GameHistory gameHistory,
                                      @NonNull CharacterCard recruitedCard,
                                      @NonNull TeamColor teamColor) {
         this.game = game;
         this.recruitedCard = recruitedCard;
         this.teamColor = teamColor;
+        this.currentPhase = GameHistoryQuery.getGamePhase(gameHistory,
+                Objects.requireNonNull(GameHistoryQuery.findCurrentPhase(gameHistory),
+                        "No current phase during resolver initialization")
+        );
     }
 
     /**
@@ -271,7 +281,7 @@ public final class RecruitmentActionResolver {
             // The action is applied temporarily to evaluate its consequences.
             // Validation is performed against the resulting game state.
             actionHandler.doAction();
-            return !GameQuery.isLeaderCaptured(game, teamColor)
+            return !GameQuery.isLeaderCaptured(game, currentPhase, teamColor)
                     && !GameQuery.isLeaderSurrounded(game, teamColor);
         } finally {
             // The temporary state modification must always be reverted in order

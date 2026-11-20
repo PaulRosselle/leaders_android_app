@@ -18,6 +18,7 @@ import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.AnimationSpeed;
 import com.leaders.app.enums.LeaderType;
+import com.leaders.app.enums.PlayerWarning;
 import com.leaders.app.utilities.AlignmentUtils;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.GameActionUtils;
@@ -25,10 +26,10 @@ import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.utilities.TeamColorUtils;
 import com.leaders.app.views.ActionsMenuView;
 import com.leaders.app.views.board.ReadOnlyBoardView;
+import com.leaders.app.views.character.CharacterDisplay;
 import com.leaders.app.views.duel.PlayerHaloView;
 import com.leaders.app.views.portrait.PortraitView;
 import com.leaders.app.views.character.CharacterNotificationView;
-import com.leaders.app.views.character.CharacterView;
 import com.leaders.app.views.duel.PlayerBottomView;
 import com.leaders.app.views.duel.PlayerTopView;
 import com.leaders.app.views.duel.PlayerView;
@@ -40,17 +41,17 @@ import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.actions.RecruitmentAction;
 import com.leaders.gamelogic.actions.RecruitmentActionMotion;
 import com.leaders.gamelogic.entities.Game;
+import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.Player;
-import com.leaders.gamelogic.enums.CharacterCard;
-import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.GameActionType;
 import com.leaders.gamelogic.enums.RecruitmentMotionType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.enums.WarningType;
+import com.leaders.gamelogic.queries.ActionReversalQuery;
+import com.leaders.puzzlelogic.utilities.SniperEvasionUtils;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 public final class ReplayViewerActivity extends BaseActivity implements ReplayControlsView.ReplayControlsListener {
     private enum ReplayViewerAction {
@@ -311,14 +312,6 @@ public final class ReplayViewerActivity extends BaseActivity implements ReplayCo
         pbvBottomPlayer.setPlayer(bottomPlayer, getPlayerLeaderType(bottomPlayer.getTeamColor()));
     }
 
-    private void showCardDescriptionNotification(@NonNull CharacterCard characterCard) {
-        if (cnvCardInfo.getCharacterCard() == characterCard) {
-            cnvCardInfo.hide();
-        } else {
-            cnvCardInfo.show(characterCard);
-        }
-    }
-
     private void updateCards() {
         updateCards(rcvControls.getReplayGame());
     }
@@ -341,11 +334,37 @@ public final class ReplayViewerActivity extends BaseActivity implements ReplayCo
         phvBottomPlayer.setVisibility(isCurrentPlayerPerspective ? View.VISIBLE : View.INVISIBLE);
 
         ptvTopPlayer.setWarningVisible(
-                game.getPlayerWarningCount(playerPerspective.getOpposite(), WarningType.Barrage) > 0
+                getPlayerWarning(game, playerPerspective.getOpposite()) == PlayerWarning.BARRAGE
         );
-        pbvBottomPlayer.setWarningVisible(
-                game.getPlayerWarningCount(playerPerspective, WarningType.Barrage) > 0
-        );
+        pbvBottomPlayer.applyWarning(getPlayerWarning(game, playerPerspective));
+    }
+
+    @Nullable
+    private PlayerWarning getPlayerWarning(@NonNull Game game, @NonNull TeamColor teamColor) {
+        boolean hasBarrageWarning = game.getPlayerWarningCount(teamColor, WarningType.Barrage) > 0;
+        boolean hasSniperWarning = SniperEvasionUtils.isLeaderThreatened(game.getBoard(), teamColor);
+
+        if (hasBarrageWarning && hasSniperWarning) {
+            return PlayerWarning.SNIPER_AND_BARRAGE;
+        }
+
+        if (hasBarrageWarning) {
+            return PlayerWarning.BARRAGE;
+        }
+
+        if (hasSniperWarning) {
+            return PlayerWarning.SNIPER;
+        }
+
+        return null;
+    }
+
+    private void updateTransformedCharacters() {
+        updateTransformedCharacters(rcvControls.getReplayGame());
+    }
+
+    private void updateTransformedCharacters(@NonNull Game game) {
+        bdvBoard.updateTransformedDisplays(GameContext.getCurrentTransformedCharacters(game));
     }
 
     private void setShowCards(boolean showCards) {
@@ -364,17 +383,13 @@ public final class ReplayViewerActivity extends BaseActivity implements ReplayCo
 
     //region VIEWS LISTENER METHODS
 
-    private boolean onCharacterLongClick(View v) {
-        CharacterType characterType = Objects.requireNonNull(((CharacterView) v).getCharacterType(),
-                "An empty character piece is not authorized in the puzzle editor");
-        showCardDescriptionNotification(characterType.getCharacterCard());
-
+    private boolean onCharacterLongClick(@NonNull CharacterDisplay characterDisplay) {
+        cnvCardInfo.toggle(characterDisplay.getCharacterType(), characterDisplay.getTransformedCharacterType());
         return true;
     }
 
     private boolean onPortraitLongClick(View v) {
-        showCardDescriptionNotification(((PortraitView) v).getPortraitCard());
-
+        cnvCardInfo.toggle(((PortraitView) v).getPortraitCard(), null);
         return true;
     }
 
@@ -453,12 +468,14 @@ public final class ReplayViewerActivity extends BaseActivity implements ReplayCo
         bdvBoard.setBoard(game.getBoard());
         updateCards(game);
         updatePlayers(game);
+        updateTransformedCharacters(game);
     }
 
     @Override
     public void onStepPlayed(@Nullable IGameAction action, boolean playInReverse, @NonNull Runnable onActionEnd) {
         updateCards();
         updatePlayers();
+        updateTransformedCharacters();
 
         if (action != null && GameActionUtils.isAnimatable(action)) {
             playAction(action, playInReverse, onActionEnd);
@@ -472,13 +489,17 @@ public final class ReplayViewerActivity extends BaseActivity implements ReplayCo
             animateBanishment((BanishmentAction) action, playInReverse, onActionEnd);
         } else {
             IGameAction actionToPlay;
-            if (playInReverse && GameActionUtils.isReversible(action)) {
-                actionToPlay = GameActionUtils.reverse(action);
+            if (playInReverse && ActionReversalQuery.isReversible(action)) {
+                actionToPlay = ActionReversalQuery.reverse(action);
             } else {
                 actionToPlay = action;
             }
 
-            GameActionUtils.animate(bdvBoard, actionToPlay, onActionEnd, animationSpeed, new CharacterSkins());
+            Runnable endRunnable = () -> {
+                updateTransformedCharacters();
+                onActionEnd.run();
+            };
+            GameActionUtils.animate(bdvBoard, actionToPlay, endRunnable, animationSpeed, new CharacterSkins());
         }
     }
 

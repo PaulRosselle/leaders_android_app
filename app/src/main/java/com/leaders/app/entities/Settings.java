@@ -21,7 +21,11 @@ public final class Settings {
     private HighlightColor highlightColor;
     private boolean animatePlayableItems;
     private boolean duelScreenAutoRotation;
+    private boolean showSniperWarning;
+    @NonNull
     private CharacterSkins characterSkins;
+    @NonNull
+    private DuelSetup duelSetup;
     private boolean isFirstLaunch;
 
     public Settings(){
@@ -30,8 +34,10 @@ public final class Settings {
         highlightColor = HighlightColor.Default;
         animatePlayableItems = true;
         duelScreenAutoRotation = true;
+        showSniperWarning = true;
         isFirstLaunch = true;
         characterSkins = new CharacterSkins();
+        duelSetup = new DuelSetup();
     }
 
     @NonNull
@@ -43,6 +49,7 @@ public final class Settings {
         settings.highlightColor = readEnum(joSettings, "highlight_color", HighlightColor.class, settings.highlightColor);
         settings.animatePlayableItems = readBoolean(joSettings, "animate_playable_items", settings.animatePlayableItems);
         settings.duelScreenAutoRotation = readBoolean(joSettings, "duel_screen_auto_rotation", settings.duelScreenAutoRotation);
+        settings.showSniperWarning = readBoolean(joSettings, "show_sniper_warning", settings.showSniperWarning);
         settings.isFirstLaunch = readBoolean(joSettings, "is_first_launch", settings.isFirstLaunch);
 
         Object skins = joSettings.opt("character_skins");
@@ -51,6 +58,15 @@ public final class Settings {
                 settings.characterSkins = CharacterSkins.fromJson((JSONObject) skins);
             } catch (Exception e) {
                 // If the json is invalid, we use the skins default value
+            }
+        }
+
+        Object duelSetup = joSettings.opt("duel_setup");
+        if (duelSetup instanceof JSONObject) {
+            try {
+                settings.duelSetup = DuelSetup.fromJson((JSONObject) duelSetup);
+            } catch (Exception e) {
+                // If the json is invalid, we use the default duel setup
             }
         }
 
@@ -98,8 +114,10 @@ public final class Settings {
         joSettings.put("highlight_color", getHighlightColor().name());
         joSettings.put("animate_playable_items", animatePlayableItems());
         joSettings.put("duel_screen_auto_rotation", duelScreenAutoRotation());
+        joSettings.put("show_sniper_warning", showSniperWarning());
         joSettings.put("is_first_launch", isFirstLaunch());
         joSettings.put("character_skins", characterSkins.toJson());
+        joSettings.put("duel_setup", duelSetup.toJson());
 
         return joSettings;
     }
@@ -143,8 +161,16 @@ public final class Settings {
         return duelScreenAutoRotation;
     }
 
+    public boolean showSniperWarning() {
+        return showSniperWarning;
+    }
+
     public void setDuelScreenAutoRotation(boolean duelScreenAutoRotation) {
         this.duelScreenAutoRotation = duelScreenAutoRotation;
+    }
+
+    public void setShowSniperWarning(boolean showSniperWarning) {
+        this.showSniperWarning = showSniperWarning;
     }
 
     public boolean isFirstLaunch() {
@@ -153,6 +179,10 @@ public final class Settings {
 
     public void setIsFirstLaunch(boolean isFirstLaunch) {
         this.isFirstLaunch = isFirstLaunch;
+    }
+
+    public void setDuelSetup(@NonNull DuelSetup duelSetup) {
+        this.duelSetup = duelSetup;
     }
 
     @NonNull
@@ -177,5 +207,10 @@ public final class Settings {
 
     public void setCharacterSkin(@NonNull CharacterCard card, @NonNull CharacterSkinType skinType) {
         characterSkins.setCharacterSkin(card, skinType);
+    }
+
+    @NonNull
+    public DuelSetup getDuelSetup() {
+        return duelSetup;
     }
 }

@@ -7,6 +7,9 @@ import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.enums.TeamColor;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public final class PlayerSetup {
     @NonNull
     private final String name;
@@ -27,5 +30,25 @@ public final class PlayerSetup {
 
     public Character createLeader() {
         return Character.create(leaderType.getCharacterType(), teamColor);
+    }
+
+    @NonNull
+    public static PlayerSetup fromJson(@NonNull JSONObject jsonObject) throws JSONException {
+        return new PlayerSetup(
+                jsonObject.getString("name"),
+                TeamColor.valueOf(jsonObject.getString("team_color")),
+                LeaderType.valueOf(jsonObject.getString("leader_type"))
+        );
+    }
+
+    @NonNull
+    public JSONObject toJson() throws JSONException {
+        JSONObject joPlayerSetup = new JSONObject();
+
+        joPlayerSetup.put("name", name);
+        joPlayerSetup.put("team_color", teamColor.name());
+        joPlayerSetup.put("leader_type", leaderType.name());
+
+        return joPlayerSetup;
     }
 }

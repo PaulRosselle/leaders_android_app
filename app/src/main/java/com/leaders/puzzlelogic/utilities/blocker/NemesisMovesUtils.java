@@ -6,7 +6,9 @@ import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
+import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.PlayableCharacter;
+import com.leaders.gamelogic.enums.GamePhaseType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.factories.GameActionHandlerFactory;
 import com.leaders.gamelogic.handlers.GameActionHandler;
@@ -152,7 +154,7 @@ public final class NemesisMovesUtils {
         }
 
         // Nothing to explore once the game is decided.
-        if (GameQuery.getWinnerTeam(searchContext.game, searchContext.actionsPhase.getTurnTeamColor()) != null) {
+        if (GameQuery.getWinnerTeam(searchContext.game, getActionsPhase(searchContext)) != null) {
             return;
         }
 
@@ -369,10 +371,9 @@ public final class NemesisMovesUtils {
     private static boolean bruteForcePlayerCanWin(@NonNull SearchContext searchContext) throws InterruptedException {
         checkCancellation(searchContext.shouldCancel);
 
-        TeamColor playerTeam = searchContext.actionsPhase.getTurnTeamColor();
-        TeamColor winner = GameQuery.getWinnerTeam(searchContext.game, playerTeam);
+        TeamColor winner = GameQuery.getWinnerTeam(searchContext.game, getActionsPhase(searchContext));
         if (winner != null) {
-            return winner == playerTeam;
+            return winner == searchContext.actionsPhase.getTurnTeamColor();
         }
 
         List<PlayableCharacter> playable = PlayabilityQuery.getPlayableCharacters(searchContext.game, searchContext.history);
@@ -425,6 +426,16 @@ public final class NemesisMovesUtils {
                 remainingCharacters.stream()
                         .map(character -> character.getId().toString())
                         .collect(Collectors.joining(","));
+    }
+
+    @NonNull
+    private static GamePhase getActionsPhase(@NonNull SearchContext searchContext) {
+        return new GamePhase(GamePhaseType.Actions,
+                GameHistoryQuery.getPlayerFromTeam(
+                        searchContext.history,
+                        searchContext.actionsPhase.getTurnTeamColor()
+                )
+        );
     }
 
     /**

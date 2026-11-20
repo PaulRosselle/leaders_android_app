@@ -224,7 +224,7 @@ public final class NemesisBlocker {
 
         for (Cell characterCell : BoardQuery.findCharacterCells(game.getBoard(), null, null)) {
             Character character = characterCell.getCharacter();
-            if (CharacterAbilityQuery.canAct(currentActionsPhase, character)) {
+            if (CharacterAbilityQuery.canAct(game, currentActionsPhase, character)) {
                 characters.add(character);
             }
         }

@@ -23,7 +23,14 @@ public enum CharacterType {
     Rider,
     RoyalGuard,
     Vizier,
-    Wanderer;
+    Wanderer,
+    LeaderVermilion,
+    Shaman,
+    Frog,
+    Sniper,
+    Tactician,
+    Wisp,
+    EliteArcher;
 
     /**
      * Returns the {@link CharacterCard} corresponding to this character type.
@@ -53,6 +60,13 @@ public enum CharacterType {
             case RoyalGuard: return CharacterCard.RoyalGuard;
             case Vizier: return CharacterCard.Vizier;
             case Wanderer: return CharacterCard.Wanderer;
+            case LeaderVermilion: return CharacterCard.LeaderVermilion;
+            case Shaman: return CharacterCard.Shaman;
+            case Frog: return CharacterCard.Frog;
+            case Sniper: return CharacterCard.Sniper;
+            case Tactician: return CharacterCard.Tactician;
+            case Wisp: return CharacterCard.Wisp;
+            case EliteArcher: return CharacterCard.EliteArcher;
             default: throw new NoSuchElementException(String.format("No character card found matching %s", this));
         }
     }
@@ -71,5 +85,14 @@ public enum CharacterType {
             }
         }
         return matchingTypes;
+    }
+
+    /**
+     * Checks whether this character type can capture.
+     *
+     * @return {@code true} if this type can capture, otherwise {@code false}
+     */
+    public boolean canCapture() {
+        return this != Cub && this != Wisp && this != Frog;
     }
 }

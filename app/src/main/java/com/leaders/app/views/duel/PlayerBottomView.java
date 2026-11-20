@@ -13,18 +13,26 @@ import androidx.annotation.StringRes;
 import com.leaders.R;
 import com.leaders.app.entities.WarningDimension;
 import com.leaders.app.enums.LeaderType;
+import com.leaders.app.enums.PlayerWarning;
 import com.leaders.gamelogic.entities.Player;
 import com.leaders.gamelogic.enums.GamePhaseType;
 
 public final class PlayerBottomView extends PlayerView {
     private final TextView txvInfo;
+    private final ImageView imvWarning;
     private final ImageView imvInfoBg;
+
+    @Nullable
+    private PlayerWarning playerWarning;
 
     public PlayerBottomView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
         txvInfo = findViewById(R.id.txvInfo_vwPlayerBottom);
+        imvWarning = findViewById(R.id.imvWarning_actPlayerBottom);
         imvInfoBg = findViewById(R.id.imvInfo_vwPlayerBottom);
+
+        playerWarning = null;
     }
 
     @Override
@@ -57,6 +65,7 @@ public final class PlayerBottomView extends PlayerView {
         switch (leaderType) {
             case King: return R.drawable.player_bottom_king;
             case Queen: return R.drawable.player_bottom_queen;
+            case Vermilion: return R.drawable.player_bottom_vermilion;
             default: throw new IllegalStateException("No leader res id found for leader: " + leaderType);
         }
     }
@@ -73,6 +82,22 @@ public final class PlayerBottomView extends PlayerView {
     @Override
     protected WarningDimension getWarningDimensions() {
         return new WarningDimension(277f, 175f, 463f, 286f, 218f, 287f);
+    }
+
+    @Override
+    protected int getWarningTitle() {
+        if (playerWarning == null) {
+            throw new IllegalStateException("Warning title should not be requested without a valid warning");
+        }
+        return playerWarning.getTitleResId();
+    }
+
+    @Override
+    protected int getWarningMessage() {
+        if (playerWarning == null) {
+            throw new IllegalStateException("Warning message should not be requested without a valid warning");
+        }
+        return playerWarning.getMessageResId();
     }
 
     public void setInfo(@NonNull GamePhaseType gamePhaseType) {
@@ -92,6 +117,16 @@ public final class PlayerBottomView extends PlayerView {
     public void setInfoVisible(boolean infoVisible) {
         txvInfo.setVisibility(infoVisible ? VISIBLE : INVISIBLE);
         imvInfoBg.setVisibility(infoVisible ? VISIBLE : INVISIBLE);
+    }
+
+    public void applyWarning(@Nullable PlayerWarning playerWarning) {
+        this.playerWarning = playerWarning;
+
+        boolean warningVisible = playerWarning != null;
+        if (warningVisible) {
+            imvWarning.setImageResource(playerWarning.getBottomResId());
+        }
+        setWarningVisible(warningVisible);
     }
 
     private int getInfoResId(@NonNull GamePhaseType gamePhaseType) {

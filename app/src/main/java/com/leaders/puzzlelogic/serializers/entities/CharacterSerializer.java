@@ -18,15 +18,16 @@ public final class CharacterSerializer implements IJsonSerializer<Character> {
     public Character getFromJson(@NonNull JSONObject jsonObject,
                                  @NonNull SerializationContext srlContext) throws JSONException {
         UUID uuid = UUID.fromString(jsonObject.getString("uuid"));
+        CharacterType characterType = CharacterType.valueOf(jsonObject.getString("character_type"));
+        TeamColor teamColor = TeamColor.valueOf(jsonObject.getString("team_color"));
+
         Character mappedCharacter = srlContext.getCharactersMap().get(uuid);
         if (mappedCharacter != null) {
-            return mappedCharacter;
+            // Characters who share the same UUID in the json must also share it at runtine
+            return Character.transform(mappedCharacter, characterType, teamColor);
         }
 
-        Character newCharacter = Character.create(
-                CharacterType.valueOf(jsonObject.getString("character_type")),
-                TeamColor.valueOf(jsonObject.getString("team_color"))
-        );
+        Character newCharacter = Character.create(characterType, teamColor);
         srlContext.getCharactersMap().put(uuid, newCharacter);
         return newCharacter;
     }

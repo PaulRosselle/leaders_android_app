@@ -119,7 +119,7 @@
     <string name="error_export_file_creation">Failed to create export file</string>
     <string name="export_successful">Export successful!</string>
     <string name="unsaved_puzzle_changes">You have unsaved changes</string>
-    <string name="invalid_puzzle">Invalid puzzle:</string>
+    <string name="invalid_puzzle">Invalid puzzle</string>
     <string name="puzzle_error_hermit_and_cub_limit">There can be only one hermit or cub in the player\'s team</string>
     <string name="puzzle_error_one_per_team_character">Character limited to one per team: %s</string>
     <string name="puzzle_error_one_leader_per_team">Each team can have only one Leader</string>
@@ -311,7 +311,7 @@
     <string name="reset_all">Reset all</string>
     <string name="progress_reset">Progress reset!</string>
     <string name="customize_your_characters">Customize your characters with the available skins.</string>
-    <string name="app_version" translatable="false">v1.0.0</string>
+    <string name="app_version" translatable="false">v1.1.0-beta.1</string>
     <string name="app_name" translatable="false">Leaders</string>
     <string name="leaders_board_editor" translatable="false">Leaders Board Editor</string>
     <string name="rules_chapter_number_capture_leader" translatable="false">I.</string>
@@ -345,4 +345,48 @@
     <string name="unreadable_puzzle_data">Unreadable puzzle data</string>
     <string name="puzzle_details_too_long">Puzzle details too long (size > %d)</string>
     <string name="puzzle_import_file_too_large">Puzzle import file too large</string>
+    <string name="card_name_wisp">wisp</string>
+    <string name="card_formatted_name_wisp">WiSP</string>
+    <string name="card_description_wisp">Move to any empty space on the board. Cannot help capture the opponent\'s Leader.</string>
+    <string name="card_name_sniper">sniper</string>
+    <string name="card_formatted_name_sniper">SNiPER</string>
+    <string name="card_description_sniper">At the start of your turn, the Sniper captures alone the opponent\'s Leader from three or more spaces away in a straight line, even if the Leader is not visible.</string>
+    <string name="demo_defeat_subtitle">Opponent leader not captured</string>
+    <string name="card_name_leader_vermilion">vermilion emperor</string>
+    <string name="card_name_tactician">tactician</string>
+    <string name="card_formatted_name_tactician">TACtiCAn</string>
+    <string name="card_description_tactician">If an ally (Tactician included) is adjacent to the opponent\'s Leader, the Tactician moves a non-Leader ally by one space. The relocated ally can no longer use their active ability this turn.</string>
+    <string name="card_name_elite_archer">elite archer</string>
+    <string name="card_formatted_name_elite_archer">ELiTE ARcHER</string>
+    <string name="card_description_elite_archer">Also helps capture the oppponent\'s leader from two spaces away in a straight line, even if they are not visible.</string>
+    <string name="card_name_shaman">shaman</string>
+    <string name="card_formatted_name_shaman">SHAMAn</string>
+    <string name="card_description_shaman">Transforms a non-leader character, visible in a straight line, into a frog until the end of the opponent\'s turn.</string>
+    <string name="card_name_frog">frog</string>
+    <string name="card_formatted_name_frog">frog</string>
+    <string name="card_description_frog">Moves up to two spaces. May pass through a space occupied by another character. Cannot help capture the opponent\'s leader.</string>
+    <string name="card_sort_name_elite_archer">archer - elite</string>
+    <string name="expansion_name_vermilion">Vermilion expansion</string>
+    <string name="expansion_name_base_game">Base game</string>
+    <string name="x_selected_characters">%d/16 selected characters</string>
+    <string name="one_auto_ban_required">An automatic ban will occur at match start</string>
+    <string name="one_character_required">Please select one more character</string>
+    <string name="x_auto_bans_required">%d automatic bans will occur at match start</string>
+    <string name="x_characters_required">Please select %d more characters</string>
+    <string name="alternate_characters">Alternate characters</string>
+    <string name="current_game_characters">Current game characters</string>
+    <string name="characters_game_info">A game always starts with 16 characters.</string>
+    <string name="error_toast_transformed_frog_limited_to_one">There can be only one transformed frog on the board</string>
+    <string name="shadow_of_the_opal_forest">ShadOw Of thE OPal wooD</string>
+    <string name="end_turn">End turn</string>
+    <string name="formatted_puzzle_rules_turn_start">You control black characters, find a way to win at the start of your next turn.</string>
+    <string name="error_toast_leader_cannot_be_transformed_into_a_frog">A leader cannot be transformed into a frog</string>
+    <string name="error_toast_invalid_transformed_frog_team">A character cannot be transformed into a frog of a different team</string>
+    <string name="sniper_warning_title">Warning: Sniper threat</string>
+    <string name="sniper_warning_message">Your leader is threatened by an enemy sniper! An enemy Sniper can capture it from 3 or more spaces away in a straight line, even without line of sight.\n\nMove your Leader out of the Sniper\'s firing line before your opponent\'s next turn, or you will lose the game.</string>
+    <string name="barrage_and_sniper_warning_title">Warnings: barrage and sniper</string>
+    <string name="barrage_and_sniper_warning_message">You have received warnings for both Barrage and Sniper!\n•Barrage: A barrage is a chain of 4 allied characters splitting the board in two. If you receive a Barrage warning 2 turns in a row, you immediately lose the game.\n• Sniper: An enemy Sniper can capture your Leader from 3 or more spaces away in a straight line, even without line of sight. Move your Leader out of the Sniper\'s firing line before your opponent\'s next turn, or you will lose the game.\n\nTake action to avoid losing the game!</string>
+    <string name="show_sniper_warning_title">Sniper threat warning</string>
+    <string name="show_sniper_warning_message">Display a warning when your Leader is threatened by an enemy Sniper.</string>
+
 </resources>

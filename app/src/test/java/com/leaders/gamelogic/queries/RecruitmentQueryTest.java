@@ -33,9 +33,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
-
 public class RecruitmentQueryTest {
 
     private GameHistory createTestGameHistory() {
@@ -62,7 +61,8 @@ public class RecruitmentQueryTest {
                 new ArrayList<>(), // recruitableCards
                 new EnumMap<>(TeamColor.class), // playerRecruitedCharacters
                 new EnumMap<>(TeamColor.class), // playerBanishedCards
-                new EnumMap<>(TeamColor.class) // playerWarnings
+                new EnumMap<>(TeamColor.class), // playerWarnings
+                new HashMap<>() // charactersTransformedState
         );
     }
 

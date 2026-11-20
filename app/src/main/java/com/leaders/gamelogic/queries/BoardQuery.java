@@ -18,8 +18,10 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 public final class BoardQuery {
     private BoardQuery(){
@@ -96,6 +98,44 @@ public final class BoardQuery {
             currentPos = currentPos.adjacent(direction);
         }
         return null;
+    }
+
+    /**
+     * Finds visible characters in each direction from the given position.
+     *
+     * @param board the board to search
+     * @param position the reference position
+     * @param characterColor the team color to match, or {@code null} to match any color
+     * @param characterType the character type to match, or {@code null} to match any type
+     * @param ignoreAdjacentCells whether to exclude adjacent cells from the search
+     * @return the list of visible character cells matching the given filters
+     */
+    @NonNull
+    public static List<Cell> findVisibleCharacterCells(@NonNull Board board,
+                                                       @NonNull Position position,
+                                                       @Nullable TeamColor characterColor,
+                                                       @Nullable CharacterType characterType,
+                                                       boolean ignoreAdjacentCells) {
+        List<Cell> visibleCharacterCells = new ArrayList<>();
+
+        for (Direction direction : Direction.values()) {
+            Position startPos = position;
+            if (ignoreAdjacentCells) {
+                Cell adjacentCell = BoardQuery.findAdjacentCell(board, position, direction);
+                if (adjacentCell == null || adjacentCell.getCharacter() != null) {
+                    continue;
+                }
+                startPos = adjacentCell.getPosition();
+            }
+            Cell visibleCharacterCell = BoardQuery.findVisibleCharacterCell(
+                    board, startPos, direction, characterColor, characterType
+            );
+            if (visibleCharacterCell != null) {
+                visibleCharacterCells.add(visibleCharacterCell);
+            }
+        }
+
+        return visibleCharacterCells;
     }
 
     /**
@@ -251,6 +291,44 @@ public final class BoardQuery {
             }
         }
         throw new NoSuchElementException("Character not found on the board");
+    }
+
+    /**
+     * Gets the character at the given position.
+     *
+     * @param board the board to search
+     * @param characterPos the position to check
+     * @return the character at the given position
+     * @throws NullPointerException if no character is present at the given position
+     */
+    @NonNull
+    public static Character getNonNullCharacterAt(@NonNull Board board, @NonNull Position characterPos) {
+        return Objects.requireNonNull(board.getCell(characterPos).getCharacter(),
+                "No character found at position: " + characterPos
+        );
+    }
+
+    /**
+     * Gets the adjacent cells that match the given predicate.
+     *
+     * @param board the board to search
+     * @param position the position of the reference cell
+     * @param predicate the predicate used to filter adjacent cells
+     * @return the list of matching adjacent cells
+     */
+    @NonNull
+    public static List<Cell> getAdjacentCells(@NonNull Board board, @NonNull Position position,
+                                              @NonNull Predicate<Cell> predicate) {
+        List<Cell> matchingAdjacentCells = new ArrayList<>();
+
+        for (Direction direction : Direction.values()) {
+            Cell adjacentCell = BoardQuery.findAdjacentCell(board, position, direction);
+            if (adjacentCell != null && predicate.test(adjacentCell)) {
+                matchingAdjacentCells.add(adjacentCell);
+            }
+        }
+
+        return matchingAdjacentCells;
     }
 
     /**

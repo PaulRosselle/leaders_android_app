@@ -6,6 +6,7 @@ import androidx.annotation.Nullable;
 import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Game;
+import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.enums.Direction;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.enums.WarningType;
@@ -14,7 +15,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 public final class GameQuery {
@@ -28,20 +28,22 @@ public final class GameQuery {
      * Checks whether the specified team's leader has been captured.
      *
      * @param game the game to evaluate
-     * @param teamColor the team whose leader is checked
+     * @param currentGamePhase current game phase
+     * @param leaderTeamColor the team whose leader is checked
      * @return {@code true} if the leader has been captured; {@code false} otherwise
-     * @throws NullPointerException if the leader cannot be found on the board
      */
-    public static boolean isLeaderCaptured(@NonNull Game game, @NonNull TeamColor teamColor) {
+    public static boolean isLeaderCaptured(@NonNull Game game, @NonNull GamePhase currentGamePhase,
+                                           @NonNull TeamColor leaderTeamColor) {
+        Cell leaderCell = BoardQuery.findLeaderCell(game.getBoard(), leaderTeamColor);
+        if (leaderCell == null) {
+            return false;
+        }
+
         // A leader is captured when its capture value reaches LEADER_CAPTURE_VALUE.
         int totalCaptureValue = 0;
-        Cell leaderCell = Objects.requireNonNull(
-                BoardQuery.findLeaderCell(game.getBoard(), teamColor),
-                "Leader not found for team " + teamColor
-        );
 
-        for (Cell characterCell : BoardQuery.findCharacterCells(game.getBoard(), teamColor.getOpposite(), null)) {
-            totalCaptureValue += CharacterAbilityQuery.getCaptureContribution(leaderCell, characterCell);
+        for (Cell characterCell : BoardQuery.findCharacterCells(game.getBoard(), leaderTeamColor.getOpposite(), null)) {
+            totalCaptureValue += CharacterAbilityQuery.getCaptureContribution(leaderCell, characterCell, currentGamePhase);
             if (totalCaptureValue >= CharacterAbilityQuery.LEADER_CAPTURE_VALUE) {
                 return true;
             }
@@ -57,13 +59,13 @@ public final class GameQuery {
      * @param teamColor the team whose leader is checked
      * @return {@code true} if all adjacent cells around the leader are occupied;
      *         {@code false} otherwise
-     * @throws NullPointerException if the leader cannot be found on the board
      */
     public static boolean isLeaderSurrounded(@NonNull Game game, @NonNull TeamColor teamColor) {
-        Cell leaderCell = Objects.requireNonNull(
-                BoardQuery.findLeaderCell(game.getBoard(), teamColor),
-                "Leader not found for team " + teamColor
-        );
+        Cell leaderCell = BoardQuery.findLeaderCell(game.getBoard(), teamColor);
+        if (leaderCell == null) {
+            return false;
+        }
+
         for (Direction direction : Direction.values()) {
             Cell adjacentCell = BoardQuery.findAdjacentCell(game.getBoard(), leaderCell.getPosition(), direction);
             // If at least one cell around the leader is empty, we can exit
@@ -288,13 +290,13 @@ public final class GameQuery {
     /**
      * Returns the winning team, if the game has ended.
      *
-     * @param game the game to evaluate
-     * @param currentPhaseTeam the team whose turn is currently being resolved
+     * @param currentPhase current game phase
      * @return the winning team, or {@code null} if the game has no winner yet
      */
     @Nullable
-    public static TeamColor getWinnerTeam(@NonNull Game game, @NonNull TeamColor currentPhaseTeam) {
+    public static TeamColor getWinnerTeam(@NonNull Game game, @NonNull GamePhase currentPhase) {
         // First, we get the team for both players
+        TeamColor currentPhaseTeam = currentPhase.getPhasePlayer().getTeamColor();
         TeamColor opponentTeam = currentPhaseTeam.getOpposite();
         TeamColor winnerTeam = null;
 
@@ -306,9 +308,9 @@ public final class GameQuery {
 
         // We check if the current leader is captured/surrounded first to stay consistent with
         // the "don't capture your own leader" rule
-        if (isLeaderCaptured(game, currentPhaseTeam) || isLeaderSurrounded(game, currentPhaseTeam)) {
+        if (isLeaderCaptured(game, currentPhase, currentPhaseTeam) || isLeaderSurrounded(game, currentPhaseTeam)) {
             winnerTeam = opponentTeam;
-        } else if (isLeaderCaptured(game, opponentTeam) || isLeaderSurrounded(game, opponentTeam)) {
+        } else if (isLeaderCaptured(game, currentPhase, opponentTeam) || isLeaderSurrounded(game, opponentTeam)) {
             winnerTeam = currentPhaseTeam;
         }
 

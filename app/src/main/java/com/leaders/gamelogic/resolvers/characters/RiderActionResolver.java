@@ -3,8 +3,6 @@ package com.leaders.gamelogic.resolvers.characters;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.leaders.gamelogic.actions.CharacterActionMotion;
-import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
@@ -17,17 +15,15 @@ import com.leaders.gamelogic.interactions.InteractionContext;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
-import com.leaders.gamelogic.interactions.InteractionResultType;
 import com.leaders.gamelogic.interactions.InteractionTarget;
-import com.leaders.gamelogic.interactions.InteractionType;
 import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.gamelogic.queries.CharacterAbilityQuery;
 import com.leaders.gamelogic.resolvers.CharacterActionResolver;
+import com.leaders.gamelogic.resolvers.ResolverUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Resolves the Rider's active ability.
@@ -44,8 +40,6 @@ public final class RiderActionResolver extends CharacterActionResolver {
     @Override
     @Nullable
     public InteractionRequest getNextInteraction(@NonNull CharacterActionBuilder builder) {
-        // Rider actions require a single interaction.
-        // If an interaction has already been selected, no further interaction can be added to this action.
         if (!builder.getResults().isEmpty()) {
             return null;
         }
@@ -55,30 +49,19 @@ public final class RiderActionResolver extends CharacterActionResolver {
         // Normal movement and Rider dash destinations cannot overlap:
         // a normal move requires an adjacent cell, while a dash destination is at exactly two cells away.
         // For this reason, we can add both destinations without further treatment to avoid duplicates
-        for (Position destination : getNormalMovementValidDestinations(builder)) {
-            legalTargets.add(new InteractionTarget(TargetCategory.MovementDestination, destination));
+        ResolverUtils.addTargets(legalTargets, TargetCategory.MovementDestination, getNormalMovementValidDestinations(builder));
+
+        if (CharacterAbilityQuery.canUseActiveAbility(game, gameHistory, character)) {
+            ResolverUtils.addTargets(legalTargets, TargetCategory.ActiveAbilityDestination, getRiderDashDestinations(builder));
         }
 
-        if (CharacterAbilityQuery.canUseActiveAbility(game, character)) {
-            for (Position destination : getRiderDashDestinations(builder)) {
-                legalTargets.add(new InteractionTarget(TargetCategory.ActiveAbilityDestination, destination));
-            }
-        }
-
-        return new InteractionRequest(
-                InteractionType.PositionExpected,
-                new InteractionContext(character),
-                legalTargets,
-                List.of(InteractionResultType.PositionChosen, InteractionResultType.CancelAction)
-        );
+        return ResolverUtils.createPositionRequest(new InteractionContext(character), legalTargets);
     }
 
     @Override
     @Nullable
     public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
-        if (builder.getResults().isEmpty() ||
-                !builder.getFeedbacks().isEmpty() ||
-                builder.isBuildCancelled()) {
+        if (!ResolverUtils.isFeedbackExpected(builder)) {
             return null;
         }
 
@@ -87,7 +70,7 @@ public final class RiderActionResolver extends CharacterActionResolver {
         InteractionFeedback feedback;
         if (isNormalMovementResult(result)) {
             feedback = super.getNextFeedback(builder);
-        } else if (isRiderDestinationResult(result)){
+        } else if (isAbilityDestinationResult(result)){
             feedback = buildRiderDashFeedback(result);
         } else {
             throw new IllegalArgumentException("Invalid Rider interaction type " + result.getResultType());
@@ -112,21 +95,10 @@ public final class RiderActionResolver extends CharacterActionResolver {
                 if (destCell != null && destCell.getCharacter() == null) {
                     Position destPos = destCell.getPosition();
 
-                    CharacterActionBuilder destBuilder = new CharacterActionBuilder(builder);
-                    destBuilder.addResult(new InteractionResult(
-                            InteractionResultType.PositionChosen,
-                            new InteractionContext(character),
-                            new InteractionTarget(TargetCategory.ActiveAbilityDestination, destPos)
-                    ));
+                    InteractionResult dashResult = ResolverUtils.createPositionResult(new InteractionContext(character),
+                            TargetCategory.ActiveAbilityDestination, destPos);
 
-                    destBuilder.addFeedback(InteractionFeedback.createForCharacterAction(
-                            List.of(new CharacterActionMotion(
-                                    CharacterMotionType.Move,
-                                    List.of(new CharacterActionTarget(character, characterPos, destPos))
-                            ))
-                    ));
-
-                    if (isActionValid(buildAction(destBuilder))) {
+                    if (isValidWith(builder, dashResult, buildRiderDashFeedback(dashResult))) {
                         destinations.add(destPos);
                     }
                 }
@@ -137,21 +109,8 @@ public final class RiderActionResolver extends CharacterActionResolver {
     }
 
     private InteractionFeedback buildRiderDashFeedback(@NonNull InteractionResult result) {
-        Position destination = Objects.requireNonNull(
-                Objects.requireNonNull(result.getChosenTarget(),
-                                "Rider destination interaction result invalid: no data")
-                        .getChosenPosition(),
-                "Rider destination interaction result invalid: no destination position");
+        Position destination = ResolverUtils.getChosenPosition(result);
 
-        return InteractionFeedback.createForCharacterAction(List.of(new CharacterActionMotion(
-                CharacterMotionType.Move,
-                List.of(new CharacterActionTarget(character, characterPos, destination))
-        )));
-    }
-
-    private boolean isRiderDestinationResult(@NonNull InteractionResult result) {
-        return result.getResultType() == InteractionResultType.PositionChosen &&
-                result.getChosenTarget() != null &&
-                result.getChosenTarget().getCategory() == TargetCategory.ActiveAbilityDestination;
+        return ResolverUtils.createSingleMotionFeedback(CharacterMotionType.Move, character, characterPos, destination);
     }
 }

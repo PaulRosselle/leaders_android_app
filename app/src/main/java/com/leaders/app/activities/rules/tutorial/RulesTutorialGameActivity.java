@@ -283,8 +283,8 @@ public class RulesTutorialGameActivity extends FullGameActivity implements
     protected void applyPlayerChange(@NonNull GameContext gameContext) {
         List<PlayerWarningState> warningStates = gameContext.getPlayerWarningStates();
 
-        pbvBottomPlayer.setWarningVisible(playerHasWarnings(getPlayer(gameContext), warningStates));
-        ptvBot.setWarningVisible(playerHasWarnings(getBot(gameContext), warningStates));
+        pbvBottomPlayer.setWarningVisible(hasBarrageWarning(getPlayer(gameContext), warningStates));
+        ptvBot.setWarningVisible(hasBarrageWarning(getBot(gameContext), warningStates));
 
         updateCurrentPlayer(isBotPlaying(gameContext));
     }

@@ -96,6 +96,13 @@ public final class EndGameView extends ConstraintLayout {
                     default: throw new RuntimeException("Updating end game leader : Invalid end game type");
                 }
             } break;
+            case Vermilion: {
+                switch (endType) {
+                    case Victory: leaderDrawableId = R.drawable.end_game_victory_vermilion; break;
+                    case Defeat: leaderDrawableId = R.drawable.end_game_defeat_vermilion; break;
+                    default: throw new RuntimeException("Updating end game leader : Invalid end game type");
+                }
+            } break;
             default: throw new RuntimeException("Updating end game leader : Invalid leader type");
         }
 
@@ -107,12 +114,14 @@ public final class EndGameView extends ConstraintLayout {
         switch (endType) {
             case Victory: {
                 endColorId = R.color.app_golden;
+                imvLeader.setBackgroundResource(R.drawable.end_game_victory_bg);
                 txvSubTitle.setBackgroundResource(R.drawable.end_game_victory_subtitle_bg);
                 imvSideLeft.setImageResource(R.drawable.end_game_victory_side);
                 imvSideRight.setImageResource(R.drawable.end_game_victory_side);
             } break;
             case Defeat: {
                 endColorId = R.color.app_red;
+                imvLeader.setBackgroundResource(R.drawable.end_game_defeat_bg);
                 txvSubTitle.setBackgroundResource(R.drawable.end_game_defeat_subtitle_bg);
                 imvSideLeft.setImageResource(R.drawable.end_game_defeat_side);
                 imvSideRight.setImageResource(R.drawable.end_game_defeat_side);

@@ -5,7 +5,9 @@ import androidx.annotation.NonNull;
 import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameHistory;
+import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.PlayableCharacter;
+import com.leaders.gamelogic.enums.GamePhaseType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.factories.GameActionHandlerFactory;
 import com.leaders.gamelogic.handlers.GameActionHandler;
@@ -85,7 +87,8 @@ public final class NemesisBlockerUtils {
         checkCancellation(shouldCancel);
 
         TeamColor team = phase.getTurnTeamColor();
-        TeamColor winner = GameQuery.getWinnerTeam(game, team);
+        TeamColor winner = GameQuery.getWinnerTeam(game,
+                new GamePhase(GamePhaseType.Actions, GameHistoryQuery.getPlayerFromTeam(history, team)));
         if (winner != null) {
             return winner == team; // Ends the search, no need to hash
         }

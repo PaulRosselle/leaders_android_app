@@ -8,6 +8,7 @@ import com.leaders.gamelogic.enums.GamePhaseType;
 import com.leaders.gamelogic.enums.TeamColor;
 import com.leaders.gamelogic.enums.WarningType;
 import com.leaders.gamelogic.historyentries.IPhase;
+import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.gamelogic.queries.GameHistoryQuery;
 import com.leaders.gamelogic.queries.PhaseTransitionQuery;
 import com.leaders.gamelogic.queries.PlayabilityQuery;
@@ -36,12 +37,15 @@ public final class GameContext {
 
     @Nullable
     private final List<PlayableCharacter> playableCharacters;
+    @Nullable
+    private final List<TransformedCharacter> transformedCharacters;
 
     public GameContext(@NonNull GamePhase gamePhase,
                        @NonNull Player currentPlayer, @NonNull Player opposingPlayer,
                        @NonNull GameMode gameMode, @NonNull Board board, @NonNull List<PlayerWarningState> playerWarningStates,
                        @NonNull List<SelectableCharacterCard> availableCharacterCards,
-                       @Nullable List<PlayableCharacter> playableCharacters) {
+                       @Nullable List<PlayableCharacter> playableCharacters,
+                       @Nullable List<TransformedCharacter> transformedCharacters) {
         this.gamePhase = gamePhase;
         this.currentPlayer = new Player(currentPlayer);
         this.opposingPlayer = new Player(opposingPlayer);
@@ -50,6 +54,7 @@ public final class GameContext {
         this.playerWarningStates = playerWarningStates; // Immutable object
         this.availableCharacterCards = List.copyOf(availableCharacterCards);
         this.playableCharacters = playableCharacters != null ? List.copyOf(playableCharacters) : null;
+        this.transformedCharacters = transformedCharacters != null ? List.copyOf(transformedCharacters) : null;
     }
 
     @NonNull
@@ -90,6 +95,11 @@ public final class GameContext {
     @NonNull
     public List<PlayerWarningState> getPlayerWarningStates() {
         return playerWarningStates;
+    }
+
+    @Nullable
+    public List<TransformedCharacter> getTransformedCharacters() {
+        return transformedCharacters;
     }
 
     private static GamePhase getCurrentContextPhase(@NonNull Game game, @NonNull GameHistory gameHistory) {
@@ -136,6 +146,22 @@ public final class GameContext {
         return warningStates;
     }
 
+    @Nullable
+    public static List<TransformedCharacter> getCurrentTransformedCharacters(@NonNull Game game) {
+        List<TransformedCharacter> transformedCharacters = new ArrayList<>();
+
+        for (TransformedState transformedState : game.getTransformedCharacterStates()) {
+            transformedCharacters.add(new TransformedCharacter(
+                    BoardQuery.getCellByCharacterId(
+                            game.getBoard(), transformedState.getCharacterId()
+                    ).getPosition(),
+                    transformedState
+            ));
+        }
+
+        return transformedCharacters.isEmpty() ? null : transformedCharacters;
+    }
+
     @NonNull
     public static GameContext createCurrent(@NonNull Game game, @NonNull GameHistory gameHistory) {
         GamePhase currentGamePhase = getCurrentContextPhase(game, gameHistory);
@@ -162,6 +188,7 @@ public final class GameContext {
                 new Board(game.getBoard()),
                 getCurrentPlayerWarningState(game),
                 SelectableCardsQuery.getSelectableCards(game, gameHistory),
-                playableCharacters);
+                playableCharacters,
+                getCurrentTransformedCharacters(game));
     }
 }

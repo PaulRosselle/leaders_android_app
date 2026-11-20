@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
@@ -69,6 +70,16 @@ public abstract class PlayerView extends ConstraintLayout {
 
     protected abstract WarningDimension getWarningDimensions();
 
+    @StringRes
+    protected int getWarningTitle() {
+        return R.string.barrage_warning_title;
+    }
+
+    @StringRes
+    protected int getWarningMessage() {
+        return R.string.barrage_warning_message;
+    }
+
     public void setPlayer(@NonNull Player player, @NonNull LeaderType leaderType) {
         txvName.setText(player.getName());
         imvLeader.setImageResource(getLeaderResId(leaderType));
@@ -78,8 +89,8 @@ public abstract class PlayerView extends ConstraintLayout {
     public void onWarningClick() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.alert_dialog_theme);
 
-        builder.setTitle(R.string.barrage_warning_title);
-        builder.setMessage(R.string.barrage_warning_message);
+        builder.setTitle(getWarningTitle());
+        builder.setMessage(getWarningMessage());
         builder.setPositiveButton(R.string.ok, null);
 
         builder.show();

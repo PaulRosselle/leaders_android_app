@@ -19,7 +19,9 @@ import com.leaders.gamelogic.entities.Position;
 import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.GameMode;
+import com.leaders.gamelogic.enums.GamePhaseType;
 import com.leaders.gamelogic.enums.TeamColor;
+import com.leaders.gamelogic.historyentries.segments.Turn;
 import com.leaders.gamelogic.interactions.CharacterActionBuilder;
 import com.leaders.gamelogic.interactions.InteractionContext;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
@@ -35,6 +37,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 
 public class CharacterActionResolverTest {
@@ -48,7 +51,8 @@ public class CharacterActionResolverTest {
                 new ArrayList<>(), // recruitableCards
                 new EnumMap<>(TeamColor.class), // playerRecruitedCharacters
                 new EnumMap<>(TeamColor.class), // playerBanishedCards
-                new EnumMap<>(TeamColor.class) // playerWarnings
+                new EnumMap<>(TeamColor.class), // playerWarnings
+                new HashMap<>() // charactersTransformedState
         );
     }
 
@@ -58,13 +62,22 @@ public class CharacterActionResolverTest {
         ArrayList<Player> players = new ArrayList<>();
         players.add(new Player(TeamColor.Black, "Paul"));
         players.add(new Player(TeamColor.White, "Elise"));
-        return new GameHistory(new GameConfig(
+        GameHistory history = new GameHistory(new GameConfig(
                 players,
                 players.get(1), // firstPlayer
                 GameMode.Discovery,
                 new ArrayList<>(), // initialRecruitableCards
                 new ArrayList<>() // initialPlacements
         ), new ArrayList<>());
+
+        Turn turn = new Turn(TeamColor.White);
+        history.getEntries().add(turn);
+
+        turn.getSubPhase(GamePhaseType.TurnStart).start();
+        turn.getSubPhase(GamePhaseType.TurnStart).end();
+        turn.getSubPhase(GamePhaseType.Actions).start();
+
+        return history;
     }
 
     private CharacterActionBuilder createBuilder() {

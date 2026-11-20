@@ -10,7 +10,7 @@ public enum ContributorAvatar {
     Jailer,
     LeaderKing,
     LeaderQueen,
-    LeaderVermillion,
+    LeaderVermilion,
     Nemesis,
     Protector,
     Rider,

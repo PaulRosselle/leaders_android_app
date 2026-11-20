@@ -24,6 +24,7 @@ import com.leaders.app.enums.ActivityTransitionType;
 import com.leaders.app.enums.ActivityType;
 import com.leaders.app.enums.AnimationSpeed;
 import com.leaders.app.enums.PuzzleSource;
+import com.leaders.app.utilities.CharacterTypeUtils;
 import com.leaders.app.utilities.ExtraUtils;
 import com.leaders.app.utilities.JsonUtils;
 import com.leaders.app.utilities.PuzzleExportUtils;
@@ -36,9 +37,12 @@ import com.leaders.app.views.puzzle.PuzzleDetailsView;
 import com.leaders.gamelogic.actions.CharacterActionMotion;
 import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.entities.Cell;
+import com.leaders.gamelogic.entities.Game;
+import com.leaders.gamelogic.entities.GameContext;
 import com.leaders.gamelogic.entities.GameHistory;
 import com.leaders.gamelogic.entities.PlayableCharacter;
 import com.leaders.gamelogic.entities.Position;
+import com.leaders.gamelogic.entities.TransformedState;
 import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.interactions.InteractionTarget;
 import com.leaders.gamelogic.queries.BoardQuery;
@@ -53,7 +57,6 @@ import com.leaders.app.views.puzzle.CharacterEditorView;
 import com.leaders.app.views.character.CharacterNotificationView;
 import com.leaders.app.views.character.CharacterView;
 import com.leaders.app.views.board.PuzzleEditorBoardView;
-import com.leaders.gamelogic.entities.Board;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.enums.CharacterCard;
 import com.leaders.gamelogic.enums.CharacterType;
@@ -66,7 +69,10 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class PuzzleEditorActivity extends BaseActivity {
@@ -142,8 +148,10 @@ public final class PuzzleEditorActivity extends BaseActivity {
     private CharacterEditorView cevCharacterEditor;
 
     private Settings settings;
-    private Board initialBoard;
-    private Board board;
+
+    private Game initialGame;
+    private Game game;
+
     private EditorState editorState;
     private List<CustomPuzzleSave> puzzleSaves;
     private CustomPuzzleSave puzzleSave;
@@ -270,15 +278,15 @@ public final class PuzzleEditorActivity extends BaseActivity {
     @Override
     protected JSONObject createSnapshot() throws JSONException {
         // Nothing to save until a puzzle has been loaded on the board
-        if (initialBoard == null || board == null) {
+        if (initialGame == null || game == null) {
             return null;
         }
 
-        // Both boards are needed: the initial one is the reference of "hasPuzzleBeenEdited"
+        // Both games are needed: the initial one is the reference of "hasPuzzleBeenEdited"
         GameHistorySerializer serializer = new GameHistorySerializer();
         JSONObject joSnapshot = new JSONObject();
-        joSnapshot.put(SNAPSHOT_INITIAL, serializer.getAsJson(PuzzleEditionUtils.getDefaultHistory(initialBoard)));
-        joSnapshot.put(SNAPSHOT_CURRENT, serializer.getAsJson(PuzzleEditionUtils.getDefaultHistory(board)));
+        joSnapshot.put(SNAPSHOT_INITIAL, serializer.getAsJson(PuzzleEditionUtils.getDefaultHistory(initialGame)));
+        joSnapshot.put(SNAPSHOT_CURRENT, serializer.getAsJson(PuzzleEditionUtils.getDefaultHistory(game)));
         return joSnapshot;
     }
 
@@ -351,7 +359,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
     }
 
     private boolean hasPuzzleBeenEdited() {
-        return !PuzzleExportUtils.getLbeUrl(initialBoard).equals(PuzzleExportUtils.getLbeUrl(board));
+        return !PuzzleExportUtils.getLbeUrl(initialGame).equals(PuzzleExportUtils.getLbeUrl(game));
     }
 
     /**
@@ -387,19 +395,10 @@ public final class PuzzleEditorActivity extends BaseActivity {
 
     private void loadPuzzleFromHistories(@NonNull GameHistory initialHistory,
                                          @NonNull GameHistory currentHistory) {
-        initialBoard = GameFactory.create(initialHistory).getBoard();
-        board = (currentHistory == initialHistory) ?
-                new Board(initialBoard) : GameFactory.create(currentHistory).getBoard();
-        bdvBoard.setBoard(board);
+        initialGame = GameFactory.create(initialHistory);
+        game = (currentHistory == initialHistory) ? new Game(initialGame) : GameFactory.create(currentHistory);
+        bdvBoard.setBoard(game.getBoard());
         applyDefaultEditorState();
-    }
-
-    private void showCardDescriptionNotification(@NonNull CharacterCard characterCard) {
-        if (cnvCardInfo.getCharacterCard() == characterCard) {
-            cnvCardInfo.hide();
-        } else {
-            cnvCardInfo.show(characterCard);
-        }
     }
 
     //region INTERACTION METHODS
@@ -408,12 +407,76 @@ public final class PuzzleEditorActivity extends BaseActivity {
         selectedBoardCharacter = null;
         bdvBoard.clearCharacterSelection();
 
+        updateTransformStates();
+
         bdvBoard.clearTargets();
-        bdvBoard.applyCharacterTargets(board);
+        bdvBoard.applyCharacterTargets(game.getBoard());
+        bdvBoard.updateTransformedDisplays(GameContext.getCurrentTransformedCharacters(game));
 
         cevCharacterEditor.startSelectCardMode();
 
         editorState = EditorState.Default;
+    }
+
+    private void untransformExistingCharacter() {
+        List<TransformedState> states = game.getTransformedCharacterStates();
+        if (states.size() > 1) {
+            throw new IllegalStateException("Cannot untransform character: single transformed character expected");
+        }
+        if (states.isEmpty()) {
+            return;
+        }
+
+        TransformedState state = states.get(0);
+        BoardQuery.getCellByCharacterId(game.getBoard(), state.getCharacterId())
+                .setCharacter(state.getCharacterBefore());
+        game.removeTransformedState(state.getCharacterId());
+    }
+
+    private void updateTransformStates() {
+        Set<UUID> transformedCharacterIds = game.getTransformedCharacterIds();
+        if (transformedCharacterIds.size() > 1) {
+            throw new IllegalStateException("Only one transformation per board is authorized");
+        }
+
+        for (UUID characterId : transformedCharacterIds) {
+            Character currentCharacter;
+            try {
+                currentCharacter = getNonNullTransformedCharacter(characterId);
+            } catch (NoSuchElementException e) {
+                game.removeTransformedState(characterId);
+                continue;
+            }
+
+            TransformedState state = getNonNullTransformedState(characterId);
+            Character transformedCharacter = state.getCharacterAfter();
+            if (currentCharacter.getCharacterType() != transformedCharacter.getCharacterType()) {
+                game.removeTransformedState(characterId);
+                continue;
+            }
+
+            if (currentCharacter.getTeamColor() != transformedCharacter.getTeamColor()) {
+                game.removeTransformedState(characterId);
+
+                game.addTransformedState(state.getCharacterBefore(), currentCharacter);
+            }
+        }
+    }
+
+    @NonNull
+    private Character getNonNullTransformedCharacter(@NonNull UUID characterId) {
+        return Objects.requireNonNull(
+                BoardQuery.getCellByCharacterId(game.getBoard(), characterId).getCharacter(),
+                "Character not found by id"
+        );
+    }
+
+    @NonNull
+    private TransformedState getNonNullTransformedState(@NonNull UUID characterId) {
+        return Objects.requireNonNull(
+                game.getTransformedState(characterId),
+                "Transform state not found by id"
+        );
     }
 
     private void addNewCharacter(@NonNull Position position) {
@@ -431,7 +494,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
 
         new CharacterActionAnimator(AnimationSpeed.Normal, settings.getCharacterSkins())
                 .animate(bdvBoard, actionMotion, () -> {
-                    board.getCell(position).setCharacter(character);
+                    game.getBoard().getCell(position).setCharacter(character);
 
                     // If there are still characters to add, we continue in AddingCharacter mode
                     cevCharacterEditor.removeNewCharactersMatching(
@@ -440,7 +503,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
                     );
                     if (cevCharacterEditor.hasCharactersToAdd()) {
                         bdvBoard.applyCellTargets();
-                        bdvBoard.applyCharacterTargets(board);
+                        bdvBoard.applyCharacterTargets(game.getBoard());
                         editorState = EditorState.AddingCharacter;
                     } else {
                         applyDefaultEditorState();
@@ -456,16 +519,59 @@ public final class PuzzleEditorActivity extends BaseActivity {
             throw new IllegalStateException("A new character must be selected to be added to the board");
         }
 
-        CharacterActionMotion motion = new CharacterActionMotion(CharacterMotionType.Transform, List.of(
+        List<CharacterActionMotion> motions = new ArrayList<>();
+
+        if (CharacterTypeUtils.canTransformInto(character.getCharacterType())) {
+            CharacterActionMotion untransformMotion = getUntransformMotion(character.getId());
+            if (untransformMotion != null) {
+                motions.add(untransformMotion);
+            }
+        }
+
+        motions.add(new CharacterActionMotion(CharacterMotionType.Transform, List.of(
                 new CharacterActionTarget(destCharacter.getCharacter(), destCharacter.getPosition(), null),
                 new CharacterActionTarget(character, null, destCharacter.getPosition())
-        ));
+        )));
 
         new CharacterActionAnimator(AnimationSpeed.Normal, settings.getCharacterSkins())
-                .animate(bdvBoard, motion, () -> {
-                    board.getCell(destCharacter.getPosition()).setCharacter(character);
-                    applyDefaultEditorState();
-                });
+                .animate(bdvBoard, motions, () -> doOnCharacterReplaced(character, destCharacter));
+    }
+
+    @Nullable
+    private CharacterActionMotion getUntransformMotion(@NonNull UUID newCharacterId) {
+        UUID transformedCharacterId = game.getTransformedCharacterIds().stream().findFirst().orElse(null);
+        if (transformedCharacterId == null || newCharacterId.equals(transformedCharacterId)) {
+            return null;
+        }
+
+        Position characterPos = BoardQuery.getCellByCharacterId(game.getBoard(), transformedCharacterId).getPosition();
+        TransformedState state = getNonNullTransformedState(transformedCharacterId);
+
+        return new CharacterActionMotion(CharacterMotionType.Untransform, List.of(
+                new CharacterActionTarget(state.getCharacterAfter(), characterPos, null),
+                new CharacterActionTarget(state.getCharacterBefore(), null, characterPos)
+        ));
+    }
+
+    private void doOnCharacterReplaced(@NonNull Character newCharacter,
+                                       @NonNull PlayableCharacter targetedPlayableCharacter) {
+        Character destCharacter = targetedPlayableCharacter.getCharacter();
+
+        Character transformedCharacter = null;
+        if (CharacterTypeUtils.canTransformInto(newCharacter.getCharacterType())) {
+            // There can only be one transformed character per board
+            untransformExistingCharacter();
+
+            transformedCharacter = Character.transform(
+                    destCharacter, newCharacter.getCharacterType(), newCharacter.getTeamColor()
+            );
+            game.addTransformedState(destCharacter, transformedCharacter);
+        }
+
+        game.getBoard().getCell(targetedPlayableCharacter.getPosition()).setCharacter(
+                transformedCharacter == null ? newCharacter : transformedCharacter
+        );
+        applyDefaultEditorState();
     }
 
     private void moveCharacter(@NonNull Position position) {
@@ -482,8 +588,8 @@ public final class PuzzleEditorActivity extends BaseActivity {
 
         new CharacterActionAnimator(AnimationSpeed.Normal, settings.getCharacterSkins())
                 .animate(bdvBoard, actionMotion, () -> {
-                    board.getCell(selectedBoardCharacter.getPosition()).setCharacter(null);
-                    board.getCell(position).setCharacter(selectedBoardCharacter.getCharacter());
+                    game.getBoard().getCell(selectedBoardCharacter.getPosition()).setCharacter(null);
+                    game.getBoard().getCell(position).setCharacter(selectedBoardCharacter.getCharacter());
                     applyDefaultEditorState();
                 });
     }
@@ -504,8 +610,8 @@ public final class PuzzleEditorActivity extends BaseActivity {
 
         new CharacterActionAnimator(AnimationSpeed.Normal, settings.getCharacterSkins())
                 .animate(bdvBoard, actionMotion, () -> {
-                    board.getCell(selectedBoardCharacter.getPosition()).setCharacter(destCharacter.getCharacter());
-                    board.getCell(destCharacter.getPosition()).setCharacter(selectedBoardCharacter.getCharacter());
+                    game.getBoard().getCell(selectedBoardCharacter.getPosition()).setCharacter(destCharacter.getCharacter());
+                    game.getBoard().getCell(destCharacter.getPosition()).setCharacter(selectedBoardCharacter.getCharacter());
                     applyDefaultEditorState();
                 });
     }
@@ -523,13 +629,13 @@ public final class PuzzleEditorActivity extends BaseActivity {
         // When the user switches the color of one of them, we must switch the color of the other
         Cell otherCharacterCell = null;
         if (characterCard.isLeader()) {
-            Cell leaderCell = BoardQuery.findLeaderCell(board, teamColor);
+            Cell leaderCell = BoardQuery.findLeaderCell(game.getBoard(), teamColor);
             if (leaderCell != null) {
                 otherCharacterCell = leaderCell;
             }
         }
         if (PuzzleEditionUtils.isCardRestrictedToOnePerTeam(characterCard)) {
-            List<Cell> otherCharacterCells = BoardQuery.findCharacterCells(board, teamColor, characterType);
+            List<Cell> otherCharacterCells = BoardQuery.findCharacterCells(game.getBoard(), teamColor, characterType);
             if (!otherCharacterCells.isEmpty()) {
                 otherCharacterCell = otherCharacterCells.get(0);
             }
@@ -568,7 +674,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
                 settings.getCharacterSkin(characterType),
                 newTeamColor,
                 duration, () -> {
-                    board.getCell(position).setCharacter(Character.transform(character, characterType, newTeamColor));
+                    game.getBoard().getCell(position).setCharacter(Character.transform(character, characterType, newTeamColor));
                     onAnimationEnd.run();
                 });
     }
@@ -586,7 +692,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
 
         new CharacterActionAnimator(AnimationSpeed.Normal, settings.getCharacterSkins())
                 .animate(bdvBoard, actionMotion, () -> {
-                    board.getCell(position).setCharacter(null);
+                    game.getBoard().getCell(position).setCharacter(null);
                     applyDefaultEditorState();
                 });
     }
@@ -606,7 +712,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
         // Some characters addition are restricted must be prevented here
         CharacterCard portraitCard = ((PortraitView) v).getPortraitCard();
         List<TeamColor> addableColors = new ArrayList<>();
-        String errors = PuzzleEditionUtils.getCardAdditionErrors(this, board, portraitCard, addableColors);
+        String errors = PuzzleEditionUtils.getCardAdditionErrors(this, game.getBoard(), portraitCard, addableColors);
         if (!errors.isEmpty()) {
             Toast.makeText(this, errors, Toast.LENGTH_SHORT).show();
             return;
@@ -628,15 +734,15 @@ public final class PuzzleEditorActivity extends BaseActivity {
                 addableCharacters,
                 bdvBoard.getCharacterDisplaySize(),
                 this::onNewCharacterClick,
-                this::onCharacterLongClick
+                this::onNewCharacterLongClick
         );
 
         bdvBoard.applyCellTargets();
-        bdvBoard.applyCharacterTargets(board);
+        bdvBoard.applyCharacterTargets(game.getBoard());
     }
 
     private boolean onCardPortraitLongClick(View v) {
-        showCardDescriptionNotification(((PortraitView) v).getPortraitCard());
+        cnvCardInfo.toggle(((PortraitView) v).getPortraitCard(), null);
         return true;
     }
 
@@ -644,10 +750,13 @@ public final class PuzzleEditorActivity extends BaseActivity {
         cevCharacterEditor.selectNewCharacter((CharacterView) v);
     }
 
-    private boolean onCharacterLongClick(View v) {
-        CharacterType characterType = Objects.requireNonNull(((CharacterView) v).getCharacterType(),
-                "An empty character piece is not authorized in the puzzle editor");
-        showCardDescriptionNotification(characterType.getCharacterCard());
+    private boolean onNewCharacterLongClick(View v) {
+        cnvCardInfo.toggle(((CharacterView) v).getCharacterType(), null);
+        return true;
+    }
+
+    private boolean onCharacterLongClick(@NonNull CharacterDisplay characterDisplay) {
+        cnvCardInfo.toggle(characterDisplay.getCharacterType(), characterDisplay.getTransformedCharacterType());
         return true;
     }
 
@@ -711,7 +820,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
 
             cevCharacterEditor.startEditCharacterMode(selectedBoardCharacter.getCharacter());
             bdvBoard.applyCellTargets();
-            bdvBoard.applyCharacterTargets(board);
+            bdvBoard.applyCharacterTargets(game.getBoard());
         }
     }
 
@@ -726,44 +835,53 @@ public final class PuzzleEditorActivity extends BaseActivity {
 
     //region PUZZLE ACTIONS LISTENER METHODS
 
-    private void btnSaveClick(View v) {
-        amvPuzzleActions.setVisibility(View.GONE);
-        openSavePuzzleDialog();
-    }
+    private boolean checkPuzzleValidity() {
+        String validityErrors = PuzzleEditionUtils.getPuzzleValidityErrors(this, game);
 
-    private void btnPlayClick(View v) {
-        String validityErrors = PuzzleEditionUtils.getPuzzleValidityErrors(this,
-                GameFactory.create(PuzzleEditionUtils.getDefaultHistory(board)));
-
-        if (validityErrors.isEmpty()) {
-            Intent intent = ActivityType.PuzzlePlayer.getIntent(this);
-
-            intent.putExtra(ExtraUtils.EXTRA_PUZZLE_SOURCE, PuzzleSource.Editor.name());
-            intent.putExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, puzzleSaves.indexOf(puzzleSave));
-
-            GameHistorySerializer serializer = new GameHistorySerializer();
-            try {
-                GameHistory gameHistory = PuzzleEditionUtils.getDefaultHistory(board);
-                intent.putExtra(ExtraUtils.EXTRA_PUZZLE_DATAS, serializer.getAsJson(gameHistory).toString());
-            } catch (JSONException e) {
-                throw new RuntimeException(e);
-            }
-
-            goToActivity(intent);
-
-        } else {
+        boolean isValid = validityErrors.isEmpty();
+        if (!isValid) {
             new AlertDialog.Builder(this, R.style.alert_dialog_theme)
                     .setTitle(R.string.invalid_puzzle)
                     .setMessage(validityErrors)
                     .setPositiveButton(R.string.ok, null)
                     .show();
+            setActionsMenuVisible(false);
+        }
+        return isValid;
+    }
+
+    private void btnSaveClick(View v) {
+        if (checkPuzzleValidity()) {
+            amvPuzzleActions.setVisibility(View.GONE);
+            applyDefaultEditorState();
+            openSavePuzzleDialog();
+        }
+    }
+
+    private void btnPlayClick(View v) {
+        if (!checkPuzzleValidity()) {
+            return;
         }
 
-        setActionsMenuVisible(false);
+        Intent intent = ActivityType.PuzzlePlayer.getIntent(this);
+
+        intent.putExtra(ExtraUtils.EXTRA_PUZZLE_SOURCE, PuzzleSource.Editor.name());
+        intent.putExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, puzzleSaves.indexOf(puzzleSave));
+
+        GameHistorySerializer serializer = new GameHistorySerializer();
+        try {
+            GameHistory gameHistory = PuzzleEditionUtils.getDefaultHistory(game);
+            intent.putExtra(ExtraUtils.EXTRA_PUZZLE_DATAS, serializer.getAsJson(gameHistory).toString());
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+
+        goToActivity(intent);
     }
 
     private void btnSearchForSolutionsClick(View v) {
-        List<Cell> playerCharacterCells = BoardQuery.findCharacterCells(board,
+        // TODO - check
+        List<Cell> playerCharacterCells = BoardQuery.findCharacterCells(game.getBoard(),
                 PuzzleEditionUtils.getPuzzlePlayerTeamColor(), null);
         if (playerCharacterCells.size() >= PuzzleSolverUtils.MAX_PLAYER_CHARACTER_COUNT) {
             new AlertDialog.Builder(this, R.style.alert_dialog_theme)
@@ -781,27 +899,20 @@ public final class PuzzleEditorActivity extends BaseActivity {
     }
 
     private void searchForSolution() {
-        String validityErrors = PuzzleEditionUtils.getPuzzleValidityErrors(this,
-                GameFactory.create(PuzzleEditionUtils.getDefaultHistory(board)));
-
-        if (validityErrors.isEmpty()) {
-            Intent intent = ActivityType.PuzzleSolver.getIntent(this);
-            intent.putExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, puzzleSaves.indexOf(puzzleSave));
-            GameHistorySerializer serializer = new GameHistorySerializer();
-            GameHistory gameHistory = PuzzleEditionUtils.getDefaultHistory(board);
-            try {
-                intent.putExtra(ExtraUtils.EXTRA_PUZZLE_DATAS, serializer.getAsJson(gameHistory).toString());
-            } catch (JSONException e) {
-                throw new RuntimeException(e);
-            }
-            goToActivity(intent);
-        } else {
-            new AlertDialog.Builder(this, R.style.alert_dialog_theme)
-                    .setTitle(R.string.invalid_puzzle)
-                    .setMessage(validityErrors)
-                    .setPositiveButton(R.string.ok, null)
-                    .show();
+        if (!checkPuzzleValidity()) {
+            return;
         }
+
+        Intent intent = ActivityType.PuzzleSolver.getIntent(this);
+        intent.putExtra(ExtraUtils.EXTRA_PUZZLE_INDEX, puzzleSaves.indexOf(puzzleSave));
+        GameHistorySerializer serializer = new GameHistorySerializer();
+        GameHistory gameHistory = PuzzleEditionUtils.getDefaultHistory(game);
+        try {
+            intent.putExtra(ExtraUtils.EXTRA_PUZZLE_DATAS, serializer.getAsJson(gameHistory).toString());
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        goToActivity(intent);
     }
 
     private void btnImportClick(View v) {
@@ -819,19 +930,12 @@ public final class PuzzleEditorActivity extends BaseActivity {
     }
 
     private void btnExportClick(View v) {
-        String validityErrors = PuzzleEditionUtils.getPuzzleValidityErrors(this,
-                GameFactory.create(PuzzleEditionUtils.getDefaultHistory(board)));
-
-        if (validityErrors.isEmpty()) {
-            PuzzleExportUtils.exportAsTextIntent(this, PuzzleExportUtils.getLbeUrl(board));
-            applyDefaultEditorState();
-        } else {
-            new AlertDialog.Builder(this, R.style.alert_dialog_theme)
-                    .setTitle(R.string.invalid_puzzle)
-                    .setMessage(validityErrors)
-                    .setPositiveButton(R.string.ok, null)
-                    .show();
+        if (!checkPuzzleValidity()) {
+            return;
         }
+
+        PuzzleExportUtils.exportAsTextIntent(this, PuzzleExportUtils.getLbeUrl(game));
+        applyDefaultEditorState();
 
         setActionsMenuVisible(false);
     }
@@ -890,7 +994,7 @@ public final class PuzzleEditorActivity extends BaseActivity {
             return;
         }
 
-        GameHistory gameHistory = PuzzleEditionUtils.getDefaultHistory(board);
+        GameHistory gameHistory = PuzzleEditionUtils.getDefaultHistory(game);
         if (puzzleSave == null) {
             puzzleSave = CustomPuzzleSave.getDefault(gameHistory);
             puzzleSaves.add(puzzleSave);

@@ -3,8 +3,6 @@ package com.leaders.gamelogic.resolvers.characters;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.leaders.gamelogic.actions.CharacterActionMotion;
-import com.leaders.gamelogic.actions.CharacterActionTarget;
 import com.leaders.gamelogic.entities.Cell;
 import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
@@ -17,17 +15,16 @@ import com.leaders.gamelogic.interactions.InteractionContext;
 import com.leaders.gamelogic.interactions.InteractionFeedback;
 import com.leaders.gamelogic.interactions.InteractionRequest;
 import com.leaders.gamelogic.interactions.InteractionResult;
-import com.leaders.gamelogic.interactions.InteractionResultType;
 import com.leaders.gamelogic.interactions.InteractionTarget;
-import com.leaders.gamelogic.interactions.InteractionType;
 import com.leaders.gamelogic.interactions.TargetCategory;
 import com.leaders.gamelogic.queries.BoardQuery;
 import com.leaders.gamelogic.queries.CharacterAbilityQuery;
 import com.leaders.gamelogic.resolvers.CharacterActionResolver;
+import com.leaders.gamelogic.resolvers.ResolverUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Resolves the Claw Launcher's active ability.
@@ -49,7 +46,6 @@ public final class ClawLauncherActionResolver extends CharacterActionResolver {
     @Override
     @Nullable
     public InteractionRequest getNextInteraction(@NonNull CharacterActionBuilder builder) {
-        // The Claw Launcher only requires a single interaction.
         if (!builder.getResults().isEmpty()) {
             return null;
         }
@@ -58,13 +54,10 @@ public final class ClawLauncherActionResolver extends CharacterActionResolver {
 
         // Normal movement has priority over the Claw Launcher's active ability effect.
         List<Position> movementDestinations = getNormalMovementValidDestinations(builder);
-        for (Position destination : movementDestinations) {
-            legalTargets.add(new InteractionTarget(TargetCategory.MovementDestination, destination));
-        }
+        ResolverUtils.addTargets(legalTargets, TargetCategory.MovementDestination, movementDestinations);
 
-
-        if (CharacterAbilityQuery.canUseActiveAbility(game, character)) {
-            for (Position targetPos : getClawLauncherValidTargetPositions(builder)) {
+        if (CharacterAbilityQuery.canUseActiveAbility(game, gameHistory, character)) {
+            for (Position targetPos : getClawLauncherValidTargetPositions()) {
                 // The claw launcher can pull itself to any valid target
                 Position clawLauncherDestPos = getAbilityPullDestination(targetPos, characterPos);
                 if (!movementDestinations.contains(clawLauncherDestPos) &&
@@ -82,20 +75,13 @@ public final class ClawLauncherActionResolver extends CharacterActionResolver {
             }
         }
 
-        return new InteractionRequest(
-                InteractionType.PositionExpected,
-                new InteractionContext(character),
-                legalTargets,
-                List.of(InteractionResultType.PositionChosen, InteractionResultType.CancelAction)
-        );
+        return ResolverUtils.createPositionRequest(new InteractionContext(character), legalTargets);
     }
 
     @Override
     @Nullable
     public InteractionFeedback getNextFeedback(@NonNull CharacterActionBuilder builder) {
-        if (builder.getResults().isEmpty() ||
-                !builder.getFeedbacks().isEmpty() ||
-                builder.isBuildCancelled()) {
+        if (!ResolverUtils.isFeedbackExpected(builder)) {
             return null;
         }
 
@@ -105,8 +91,8 @@ public final class ClawLauncherActionResolver extends CharacterActionResolver {
             return super.getNextFeedback(builder);
         }
 
-        if (isClawLauncherTargetResult(result) ||
-                isClawLauncherDestinationResult(result)) {
+        if (isAbilityTargetResult(result) ||
+                isAbilityDestinationResult(result)) {
             return buildClawLauncherFeedback(result);
         }
 
@@ -121,87 +107,38 @@ public final class ClawLauncherActionResolver extends CharacterActionResolver {
      * and can therefore be targeted.</p>
      */
     @NonNull
-    private List<Position> getClawLauncherValidTargetPositions(@NonNull CharacterActionBuilder builder) {
-        List<Position> targets = new ArrayList<>();
-
-        for (Direction direction : Direction.values()) {
-            Cell adjacentCell = BoardQuery.findAdjacentCell(game.getBoard(), characterPos, direction);
-            if (adjacentCell != null && adjacentCell.getCharacter() == null) {
-                Cell targetCell = BoardQuery.findVisibleCharacterCell(game.getBoard(), adjacentCell.getPosition(),
-                        direction, null, null);
-
-                if (targetCell != null) {
-                    targets.add(targetCell.getPosition());
-                }
-            }
-        }
-
-        return targets;
+    private List<Position> getClawLauncherValidTargetPositions() {
+        return BoardQuery.findVisibleCharacterCells(
+                game.getBoard(), characterPos, null, null, true
+        ).stream().map(Cell::getPosition).collect(Collectors.toList());
     }
 
     private boolean isValidPull(@NonNull CharacterActionBuilder builder,
                                 @NonNull TargetCategory targetCategory,
                                 @NonNull Position targetPos) {
-        CharacterActionBuilder pullBuilder = new CharacterActionBuilder(builder);
-        InteractionResult pullResult = new InteractionResult(
-                InteractionResultType.PositionChosen,
-                new InteractionContext(character),
-                new InteractionTarget(targetCategory, targetPos)
-        );
+        InteractionResult pullResult = ResolverUtils.createPositionResult(
+                new InteractionContext(character), targetCategory, targetPos);
 
-        pullBuilder.addResult(pullResult);
-        pullBuilder.addFeedback(buildClawLauncherFeedback(pullResult));
-
-        return isActionValid(buildAction(pullBuilder));
+        return isValidWith(builder, pullResult, buildClawLauncherFeedback(pullResult));
     }
 
     @NonNull
     private InteractionFeedback buildClawLauncherFeedback(@NonNull InteractionResult result) {
         // This can be either a target pos or the claw launcher pull destination
-        Position targetPos = Objects.requireNonNull(
-                Objects.requireNonNull(
-                        result.getChosenTarget(),
-                        "Claw Launcher interaction result invalid: no data"
-                ).getChosenPosition(),
-                "Claw Launcher interaction result invalid: no target position"
-        );
+        Position targetPos = ResolverUtils.getChosenPosition(result);
 
-        if (isClawLauncherTargetResult(result)) {
-            Character target = Objects.requireNonNull(
-                    game.getBoard().getCell(targetPos).getCharacter(),
-                    "Claw Launcher target position should contain a character"
-            );
+        if (isAbilityTargetResult(result)) {
+            Character target = getCharacterAt(targetPos);
 
-            return InteractionFeedback.createForCharacterAction(List.of(new CharacterActionMotion(
-                    CharacterMotionType.Move,
-                    List.of(new CharacterActionTarget(
-                            target, targetPos, getAbilityPullDestination(characterPos, targetPos)))
-            )));
+            return ResolverUtils.createSingleMotionFeedback(CharacterMotionType.Move,
+                    target, targetPos, getAbilityPullDestination(characterPos, targetPos));
         }
 
-        if (isClawLauncherDestinationResult(result)) {
-            return InteractionFeedback.createForCharacterAction(List.of(new CharacterActionMotion(
-                    CharacterMotionType.Move,
-                    List.of(new CharacterActionTarget(
-                            character, characterPos, targetPos))
-            )));
+        if (isAbilityDestinationResult(result)) {
+            return ResolverUtils.createSingleMotionFeedback(CharacterMotionType.Move, character, characterPos, targetPos);
         }
 
         throw new IllegalArgumentException("Invalid target category for a Claw Launcher ability");
-    }
-
-    private boolean isClawLauncherTargetResult(@NonNull InteractionResult result) {
-        return result.getResultType() == InteractionResultType.PositionChosen &&
-                result.getChosenTarget() != null &&
-                result.getChosenTarget().getCategory() ==
-                        TargetCategory.ActiveAbilityTargetPosition;
-    }
-
-    private boolean isClawLauncherDestinationResult(@NonNull InteractionResult result) {
-        return result.getResultType() == InteractionResultType.PositionChosen &&
-                result.getChosenTarget() != null &&
-                result.getChosenTarget().getCategory() ==
-                        TargetCategory.ActiveAbilityDestination;
     }
 
     private int getNormalizedPullVector(int startCoordinate, int endCoordinate) {

@@ -9,5 +9,6 @@ public enum CharacterMotionType {
     Fly,
     Add,
     Remove,
-    Transform
+    Transform,
+    Untransform
 }

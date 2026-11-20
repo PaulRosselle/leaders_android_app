@@ -5,6 +5,7 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 
 import com.leaders.R;
+import com.leaders.gamelogic.actions.CharacterAction;
 import com.leaders.gamelogic.actions.IGameAction;
 import com.leaders.gamelogic.actions.RecruitmentAction;
 import com.leaders.gamelogic.actions.RecruitmentActionMotion;
@@ -14,8 +15,12 @@ import com.leaders.gamelogic.entities.Character;
 import com.leaders.gamelogic.entities.Game;
 import com.leaders.gamelogic.entities.GameConfig;
 import com.leaders.gamelogic.entities.GameHistory;
+import com.leaders.gamelogic.entities.GamePhase;
 import com.leaders.gamelogic.entities.Player;
+import com.leaders.gamelogic.entities.Position;
+import com.leaders.gamelogic.entities.TransformedState;
 import com.leaders.gamelogic.enums.CharacterCard;
+import com.leaders.gamelogic.enums.CharacterMotionType;
 import com.leaders.gamelogic.enums.CharacterType;
 import com.leaders.gamelogic.enums.GameMode;
 import com.leaders.gamelogic.enums.GamePhaseType;
@@ -27,6 +32,7 @@ import com.leaders.gamelogic.historyentries.segments.Turn;
 import com.leaders.gamelogic.historyentries.segments.TurnPhase;
 import com.leaders.gamelogic.queries.AutoPlayQuery;
 import com.leaders.gamelogic.queries.BoardQuery;
+import com.leaders.gamelogic.queries.CharacterTransformQuery;
 import com.leaders.gamelogic.queries.GameQuery;
 
 import java.util.ArrayList;
@@ -36,16 +42,19 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public final class PuzzleEditionUtils {
     private PuzzleEditionUtils(){
         throw new AssertionError("Cannot instantiate utility class");
     }
 
+    @NonNull
     public static String getPuzzleValidityErrors(@NonNull Context context, @NonNull GameHistory gameHistory) {
         return getPuzzleValidityErrors(context, GameFactory.create(gameHistory));
     }
 
+    @NonNull
     public static String getPuzzleValidityErrors(@NonNull Context context, @NonNull Game game) {
         // A puzzle is invalid if :
         // 1. It is empty
@@ -53,6 +62,7 @@ public final class PuzzleEditionUtils {
         // 3. "One per team character" constraint are not respected
         // 4. A leader is already captured or surrounded
         // 5. Multiple hermit or cubs are present on the player's team
+        // 6. More than one character is transformed into a frog
 
         StringBuilder builder = new StringBuilder();
         final String prefix = "\n• ";
@@ -61,6 +71,22 @@ public final class PuzzleEditionUtils {
         if (characterCells.isEmpty()) {
             builder.append(prefix).append(context.getString(R.string.puzzle_error_empty_board));
             return builder.toString().trim();
+        }
+
+        List<TransformedState> frogTransformedStates = game.getTransformedCharacterStates().stream()
+                .filter(state -> state.getCharacterAfter().getCharacterType() == CharacterType.Frog)
+                .collect(Collectors.toList());
+        if (!frogTransformedStates.isEmpty()) {
+            if (frogTransformedStates.size() > 1) {
+                builder.append(prefix).append(context.getString(R.string.error_toast_transformed_frog_limited_to_one));
+            }
+            TransformedState state = frogTransformedStates.get(0);
+            if (state.getCharacterBefore().getCharacterType().getCharacterCard().isLeader()) {
+                builder.append(prefix).append(context.getString(R.string.error_toast_leader_cannot_be_transformed_into_a_frog));
+            }
+            if (state.getCharacterBefore().getTeamColor() != state.getCharacterAfter().getTeamColor()) {
+                builder.append(prefix).append(context.getString(R.string.error_toast_invalid_transformed_frog_team));
+            }
         }
 
         final TeamColor playerTeamColor = getPuzzlePlayerTeamColor();
@@ -88,11 +114,14 @@ public final class PuzzleEditionUtils {
 
         for (TeamColor teamColor : TeamColor.values()) {
             if (BoardQuery.findLeaderCell(game.getBoard(), teamColor) == null) {
-                builder.append(prefix).append(String.format(context.getString(R.string.puzzle_error_leader_missing), teamColor));
+                // A leader is not necessary for a puzzle to be valid in the player's team
+                if (teamColor != getPuzzlePlayerTeamColor()) {
+                    builder.append(prefix).append(String.format(context.getString(R.string.puzzle_error_leader_missing), teamColor));
+                }
                 continue;
             }
 
-            if (GameQuery.isLeaderCaptured(game, teamColor)) {
+            if (GameQuery.isLeaderCaptured(game, new GamePhase(GamePhaseType.Actions, getDefaultPlayer()), teamColor)) {
                 builder.append(prefix).append(String.format(context.getString(R.string.puzzle_error_leader_captured), teamColor));
             }
             if (GameQuery.isLeaderSurrounded(game, teamColor)) {
@@ -112,7 +141,7 @@ public final class PuzzleEditionUtils {
                         firstCharacter.getTeamColor() == secondCharacter.getTeamColor() &&
                         firstCharacter.getCharacterType() == secondCharacter.getCharacterType()) {
                     duplicatesErrors.put(firstCharacter.getCharacterType(),
-                            String.format(context.getString(R.string.puzzle_error_one_per_team_character) + firstCharacter.getCharacterType()));
+                            String.format(context.getString(R.string.puzzle_error_one_per_team_character), firstCharacter.getCharacterType()));
                 }
             }
         }
@@ -182,22 +211,26 @@ public final class PuzzleEditionUtils {
         return characterCard == CharacterCard.Nemesis;
     }
 
+    private static Player getDefaultPlayer() {
+        return new Player(AutoPlayQuery.getAutoPlayableTeam().getOpposite(), "Player");
+    }
+
     @NonNull
     public static GameHistory getDefaultHistory(@NonNull List<IGameAction> initialActions) {
         // The black player represents the human player (official puzzles convention)
-        Player playerBlack = new Player(TeamColor.Black, "Player");
-        Player playerWhite = new Player(TeamColor.White, "Puzzle");
+        Player player = getDefaultPlayer();
+        Player opponent = new Player(player.getTeamColor().getOpposite(), "Puzzle");
 
         GameConfig gameConfig =new GameConfig(
-                List.of(playerBlack, playerWhite),
-                playerBlack, // firstPlayer ; the human player
+                List.of(player, opponent),
+                player, // firstPlayer ; the human player
                 GameMode.Puzzle,
                 Collections.emptyList(), // initialRecruitableCards ; no recruitment in puzzles
                 initialActions
         );
 
         ArrayList<IHistoryEntry> entries = new ArrayList<>();
-        Turn turn = new Turn(playerBlack.getTeamColor());
+        Turn turn = new Turn(player.getTeamColor());
 
         // We start and end immediately the turn start phase to skip to the actions phase
         TurnPhase turnStartPhase = turn.getSubPhase(GamePhaseType.TurnStart);
@@ -229,8 +262,19 @@ public final class PuzzleEditionUtils {
     }
 
     @NonNull
-    public static GameHistory getDefaultHistory(@NonNull Board board) {
+    public static GameHistory getDefaultHistory(@NonNull Game game) {
         List<IGameAction> initialActions = new ArrayList<>();
+
+        initialActions.addAll(getBoardInitialActions(game.getBoard()));
+        initialActions.addAll(getTransformInitialActions(game));
+
+        return getDefaultHistory(initialActions);
+    }
+
+    @NonNull
+    private static List<IGameAction> getBoardInitialActions(@NonNull Board board) {
+        List<IGameAction> initialActions = new ArrayList<>();
+
         for (Cell characterCell : BoardQuery.findCharacterCells(board, null, null)) {
             initialActions.add(new RecruitmentAction(List.of(
                     new RecruitmentActionMotion(RecruitmentMotionType.Add,
@@ -239,6 +283,29 @@ public final class PuzzleEditionUtils {
                     ))
             );
         }
-        return getDefaultHistory(initialActions);
+        return initialActions;
+    }
+
+    @NonNull
+    private static List<IGameAction> getTransformInitialActions(@NonNull Game game) {
+        List<IGameAction> initialActions = new ArrayList<>();
+
+        for (TransformedState transformedState : game.getTransformedCharacterStates()) {
+            Position position = BoardQuery.getCellByCharacterId(
+                    game.getBoard(), transformedState.getCharacterId()
+            ).getPosition();
+
+            initialActions.add(new CharacterAction(
+                    transformedState.getCharacterBefore(),
+                    List.of(CharacterTransformQuery.createTransformMotion(
+                            CharacterMotionType.Transform,
+                            transformedState.getCharacterBefore(),
+                            transformedState.getCharacterAfter(),
+                            position
+                    ))
+            ));
+        }
+
+        return initialActions;
     }
 }

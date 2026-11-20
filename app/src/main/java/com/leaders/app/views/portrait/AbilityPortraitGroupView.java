@@ -15,11 +15,14 @@ import com.leaders.R;
 import com.leaders.app.entities.PortraitInfo;
 import com.leaders.app.enums.CharacterSkinType;
 import com.leaders.app.enums.PortraitDisplayMode;
+import com.leaders.app.utilities.CharacterCardUtils;
 import com.leaders.gamelogic.enums.AbilityType;
 import com.leaders.gamelogic.enums.CharacterCard;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public final class AbilityPortraitGroupView extends ConstraintLayout {
     private static final int PORTRAITS_PER_GROUP = 6;
@@ -103,20 +106,15 @@ public final class AbilityPortraitGroupView extends ConstraintLayout {
     }
 
     private List<PortraitInfo> getPortraitInfos(@NonNull GroupType groupType) {
-        List<PortraitInfo> portraitInfos = new ArrayList<>();
-
-        for (CharacterCard card : CharacterCard.values()) {
-            if (cardMatchGroupType(card, groupType)) {
-                portraitInfos.add(new PortraitInfo(
+        return Arrays.stream(CharacterCard.values())
+                .filter(card -> cardMatchGroupType(card, groupType))
+                .sorted(CharacterCardUtils.getByAbilityThenByNameComparator(getContext()))
+                .map(card -> new PortraitInfo(
                         card,
                         CharacterSkinType.Default,
                         false,
                         PortraitDisplayMode.Hexagonal
-                ));
-            }
-        }
-
-        return portraitInfos;
+                )).collect(Collectors.toList());
     }
 
     private boolean cardMatchGroupType(@NonNull CharacterCard card, @NonNull GroupType groupType) {

@@ -40,6 +40,8 @@ public final class CharacterCardView extends ConstraintLayout {
         imvHighlight = findViewById(R.id.imvCardHighlight_vwCharacterCard);
         txvCardName = findViewById(R.id.txvCardName_vwCharacterCard);
 
+        imvCard.setBackgroundResource(R.drawable.character_card_bg);
+
         card = CharacterCard.RoyalGuard;
         skinType = CharacterSkinType.Default;
     }
@@ -75,6 +77,24 @@ public final class CharacterCardView extends ConstraintLayout {
                     return R.drawable.character_card_vizier_lms;
                 }
                 return R.drawable.character_card_vizier;
+            }
+            case Assassin: {
+                if (skinType == CharacterSkinType.ShadowOfTheOpalWood) {
+                    return R.drawable.character_card_assassin_sotow;
+                }
+                return R.drawable.character_card_assassin;
+            }
+            case Wanderer: {
+                if (skinType == CharacterSkinType.ShadowOfTheOpalWood) {
+                    return R.drawable.character_card_wanderer_sotow;
+                }
+                return R.drawable.character_card_wanderer;
+            }
+            case Wisp: {
+                if (skinType == CharacterSkinType.ShadowOfTheOpalWood) {
+                    return R.drawable.character_card_wisp_sotow;
+                }
+                return R.drawable.character_card_wisp;
             }
             default: throw new IllegalStateException("No card resource found for card: " + card);
         }

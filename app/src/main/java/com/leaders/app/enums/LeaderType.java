@@ -11,12 +11,14 @@ import java.util.List;
 
 public enum LeaderType {
     King,
-    Queen;
+    Queen,
+    Vermilion;
 
     public static LeaderType getFromCharacterType(@NonNull CharacterType characterType) {
         switch (characterType) {
             case LeaderKing: return King;
             case LeaderQueen: return Queen;
+            case LeaderVermilion: return Vermilion;
             default: throw new IllegalArgumentException("No leader type found matching: " + characterType);
         }
     }
@@ -44,6 +46,7 @@ public enum LeaderType {
         switch (this) {
             case King: return CharacterCard.LeaderKing;
             case Queen: return CharacterCard.LeaderQueen;
+            case Vermilion: return CharacterCard.LeaderVermilion;
             default: throw new IllegalArgumentException("No character card found matching: " + this);
         }
     }
